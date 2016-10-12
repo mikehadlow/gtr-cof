@@ -2,11 +2,16 @@
 var gtrcof;
 (function (gtrcof) {
     function init() {
+        var pad = 10;
+        var radius = 300;
         var cof = d3.select("#cof").append("g");
         cof.append("circle")
-            .attr("r", "300")
-            .attr("cx", "300")
-            .attr("cy", "300");
+            .attr("r", radius)
+            .attr("cx", radius + pad)
+            .attr("cy", radius + pad)
+            .attr("fill", "none")
+            .attr("stroke", "black")
+            .attr("stroke-width", "2");
         console.log("init done!");
     }
     gtrcof.init = init;
