@@ -38,13 +38,18 @@ namespace music {
 namespace gtrcof {
 
     export function init() {
-        let pad = 10;
-        let radius = 300;
-        let innerRadius = radius - 150;
-        let textRadius = radius - 75;
+        let pad = 50;
 
-        let cof = d3
-            .select("#cof")
+        let svg = d3.select("#cof");
+        let svgWidth = +svg.attr("width");
+        let svgHeight = +svg.attr("height");
+        let svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
+        let radius = (svgMin - pad * 2) / 2;
+        let innerRadius = radius / 2;
+        let textRadius = innerRadius + (radius - innerRadius)/2;
+        
+
+        let cof = svg
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
 

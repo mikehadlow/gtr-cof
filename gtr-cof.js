@@ -35,12 +35,15 @@ var music;
 var gtrcof;
 (function (gtrcof) {
     function init() {
-        var pad = 10;
-        var radius = 300;
-        var innerRadius = radius - 150;
-        var textRadius = radius - 75;
-        var cof = d3
-            .select("#cof")
+        var pad = 50;
+        var svg = d3.select("#cof");
+        var svgWidth = +svg.attr("width");
+        var svgHeight = +svg.attr("height");
+        var svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
+        var radius = (svgMin - pad * 2) / 2;
+        var innerRadius = radius / 2;
+        var textRadius = innerRadius + (radius - innerRadius) / 2;
+        var cof = svg
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
         var segments = generateSegments(12);
@@ -77,11 +80,6 @@ var gtrcof;
     }
     function polarToCart(r, radians) {
         return [r * Math.cos(radians), r * Math.sin(radians)];
-    }
-    function radialGenerator(inner, outter, radians) {
-        var innerCart = polarToCart(inner, radians);
-        var outterCart = polarToCart(outter, radians);
-        return "M " + innerCart[0] + " " + innerCart[1] + " L " + outterCart[0] + " " + outterCart[1];
     }
     function generateSegments(count) {
         var fifths = music.fifths();
