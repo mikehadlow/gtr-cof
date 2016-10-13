@@ -75,7 +75,7 @@ namespace gtrcof {
             .enter()
             .append("text")
             .attr("x", function (x) { return polarToCart(textRadius, x.textAngle)[0]; })
-            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 30; })
+            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 25; })
             .text(function (x) { return x.note.name; })
             .attr("font-size", "80px")
             .attr("text-anchor", "middle")
