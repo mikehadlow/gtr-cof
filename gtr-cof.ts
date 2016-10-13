@@ -48,28 +48,17 @@ namespace gtrcof {
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
 
-        cof.append("circle")
-            .attr("r", radius)
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .attr("stroke-width", "2");
-
-        cof.append("circle")
-            .attr("r", innerRadius)
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .attr("stroke-width", "2");
-
         let segments = generateSegments(12);
 
         cof.selectAll("path")
             .data(segments)
             .enter()
             .append("path")
-            .attr("d", function (x) { return radialGenerator(innerRadius, radius, x.lineAngle); })
+            .attr("d", noteSegmentGenerator(innerRadius, radius))
+            .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "2");
-
+           
         cof.selectAll("text")
             .data(segments)
             .enter()
@@ -83,15 +72,21 @@ namespace gtrcof {
 
         console.log("init done!");
     }
+    
+    function noteSegmentGenerator(inner: number, outter: number) : (Segment) => string {
+        return function(segment: Segment) {
+            let arc = d3.svg.arc<d3.svg.Arc<void>>()
+                .innerRadius(inner)
+                .outerRadius(outter)
+                .startAngle(segment.startAngle)
+                .endAngle(segment.endAngle);
+                
+            return arc(d3.svg.arc<void>());
+        }
+    }
 
     function polarToCart(r: number, radians: number): [number, number] {
         return [r * Math.cos(radians), r * Math.sin(radians)];
-    }
-
-    function radialGenerator(inner: number, outter: number, radians: number): string {
-        let innerCart = polarToCart(inner, radians);
-        let outterCart = polarToCart(outter, radians);
-        return "M " + innerCart[0] + " " + innerCart[1] + " L " + outterCart[0] + " " + outterCart[1];
     }
 
     function generateSegments(count: number): Segment[] {
@@ -101,7 +96,8 @@ namespace gtrcof {
         for (let i: number = 0; i < count; i++) {
             let itemAngle = (angle * i) - (Math.PI / 2) - (angle / 2);
             items.push({
-                lineAngle: itemAngle,
+                startAngle: itemAngle,
+                endAngle: itemAngle + angle,
                 textAngle: itemAngle + (angle / 2),
                 note: fifths[i]
             });
@@ -110,7 +106,8 @@ namespace gtrcof {
     }
 
     class Segment {
-        lineAngle: number;
+        startAngle: number;
+        endAngle: number;
         textAngle: number;
         note: music.Note;
     }

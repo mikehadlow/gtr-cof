@@ -43,22 +43,13 @@ var gtrcof;
             .select("#cof")
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
-        cof.append("circle")
-            .attr("r", radius)
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .attr("stroke-width", "2");
-        cof.append("circle")
-            .attr("r", innerRadius)
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .attr("stroke-width", "2");
         var segments = generateSegments(12);
         cof.selectAll("path")
             .data(segments)
             .enter()
             .append("path")
-            .attr("d", function (x) { return radialGenerator(innerRadius, radius, x.lineAngle); })
+            .attr("d", noteSegmentGenerator(innerRadius, radius))
+            .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "2");
         cof.selectAll("text")
@@ -74,6 +65,16 @@ var gtrcof;
         console.log("init done!");
     }
     gtrcof.init = init;
+    function noteSegmentGenerator(inner, outter) {
+        return function (segment) {
+            var arc = d3.svg.arc()
+                .innerRadius(inner)
+                .outerRadius(outter)
+                .startAngle(segment.startAngle)
+                .endAngle(segment.endAngle);
+            return arc(d3.svg.arc());
+        };
+    }
     function polarToCart(r, radians) {
         return [r * Math.cos(radians), r * Math.sin(radians)];
     }
@@ -89,7 +90,8 @@ var gtrcof;
         for (var i = 0; i < count; i++) {
             var itemAngle = (angle * i) - (Math.PI / 2) - (angle / 2);
             items.push({
-                lineAngle: itemAngle,
+                startAngle: itemAngle,
+                endAngle: itemAngle + angle,
                 textAngle: itemAngle + (angle / 2),
                 note: fifths[i]
             });
