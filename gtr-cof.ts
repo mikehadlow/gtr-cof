@@ -16,6 +16,8 @@ namespace music {
         { name: 'A#', index: 10 },
         { name: 'B', index: 11 },
     ];
+    
+    let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
     export class Note {
         name: string;
@@ -33,9 +35,23 @@ namespace music {
 
         return items;
     }
+    
+    export function major(): Array<Note> {
+        let m: Array<Note> = [];
+        let index = 0;
+
+        for(let n of scaleTones){
+            m.push(notes[index]);
+            index = index + n;
+        }
+        
+        return m;
+    }
 }
 
 namespace gtrcof {
+    
+    let noteSegments: d3.Selection<Segment> = null;
 
     export function init() {
         let pad = 50;
@@ -46,8 +62,8 @@ namespace gtrcof {
         let svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
         let radius = (svgMin - pad * 2) / 2;
         let innerRadius = radius / 2;
-        let textRadius = innerRadius + (radius - innerRadius)/2;
-        
+        let textRadius = innerRadius + (radius - innerRadius) / 2;
+
 
         let cof = svg
             .append("g")
@@ -55,15 +71,16 @@ namespace gtrcof {
 
         let segments = generateSegments(12);
 
-        cof.selectAll("path")
-            .data(segments)
+        noteSegments = cof.selectAll("path")
+            .data(segments, function (s) { return s.note.name; })
             .enter()
             .append("path")
             .attr("d", noteSegmentGenerator(innerRadius, radius))
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
-            .attr("stroke-width", "2");
-           
+            .attr("stroke-width", "2")
+            .attr("class", "note-segment");
+
         cof.selectAll("text")
             .data(segments)
             .enter()
@@ -78,14 +95,33 @@ namespace gtrcof {
         console.log("init done!");
     }
     
-    function noteSegmentGenerator(inner: number, outter: number) : (Segment) => string {
-        return function(segment: Segment) {
+    export function update(notes: Array<music.Note>) {
+        
+        let data: Array<Segment> = [];
+        for(let n of notes){
+            data.push({
+                startAngle: 0,
+                endAngle: 0,
+                textAngle: 0,
+                note: n
+            });
+        }
+        
+        let segments = noteSegments
+            .data(data, function(n){ return n.note.name; })
+            .attr("fill", "white");
+            
+        segments.exit().attr("fill", "lightgrey");
+    }
+
+    function noteSegmentGenerator(inner: number, outter: number): (Segment) => string {
+        return function (segment: Segment) {
             let arc = d3.svg.arc<d3.svg.Arc<void>>()
                 .innerRadius(inner)
                 .outerRadius(outter)
                 .startAngle(segment.startAngle)
                 .endAngle(segment.endAngle);
-                
+
             return arc(d3.svg.arc<void>());
         }
     }
@@ -99,11 +135,11 @@ namespace gtrcof {
         let items: Array<Segment> = [];
         let angle = (Math.PI * (2 / count));
         for (let i: number = 0; i < count; i++) {
-            let itemAngle = (angle * i) - (Math.PI / 2) - (angle / 2);
+            let itemAngle = (angle * i) - (angle / 2);
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                textAngle: itemAngle + (angle / 2),
+                textAngle: itemAngle - (Math.PI / 2) + (angle / 2),
                 note: fifths[i]
             });
         }
@@ -119,3 +155,4 @@ namespace gtrcof {
 }
 
 gtrcof.init();
+gtrcof.update(music.major());

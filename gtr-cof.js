@@ -15,6 +15,7 @@ var music;
         { name: 'A#', index: 10 },
         { name: 'B', index: 11 },
     ];
+    var scaleTones = [2, 2, 1, 2, 2, 2, 1];
     var Note = (function () {
         function Note() {
         }
@@ -31,9 +32,21 @@ var music;
         return items;
     }
     music.fifths = fifths;
+    function major() {
+        var m = [];
+        var index = 0;
+        for (var _i = 0, scaleTones_1 = scaleTones; _i < scaleTones_1.length; _i++) {
+            var n = scaleTones_1[_i];
+            m.push(notes[index]);
+            index = index + n;
+        }
+        return m;
+    }
+    music.major = major;
 })(music || (music = {}));
 var gtrcof;
 (function (gtrcof) {
+    var noteSegments = null;
     function init() {
         var pad = 50;
         var svg = d3.select("#cof");
@@ -47,14 +60,15 @@ var gtrcof;
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
         var segments = generateSegments(12);
-        cof.selectAll("path")
-            .data(segments)
+        noteSegments = cof.selectAll("path")
+            .data(segments, function (s) { return s.note.name; })
             .enter()
             .append("path")
             .attr("d", noteSegmentGenerator(innerRadius, radius))
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
-            .attr("stroke-width", "2");
+            .attr("stroke-width", "2")
+            .attr("class", "note-segment");
         cof.selectAll("text")
             .data(segments)
             .enter()
@@ -68,6 +82,23 @@ var gtrcof;
         console.log("init done!");
     }
     gtrcof.init = init;
+    function update(notes) {
+        var data = [];
+        for (var _i = 0, notes_1 = notes; _i < notes_1.length; _i++) {
+            var n = notes_1[_i];
+            data.push({
+                startAngle: 0,
+                endAngle: 0,
+                textAngle: 0,
+                note: n
+            });
+        }
+        var segments = noteSegments
+            .data(data, function (n) { return n.note.name; })
+            .attr("fill", "white");
+        segments.exit().attr("fill", "lightgrey");
+    }
+    gtrcof.update = update;
     function noteSegmentGenerator(inner, outter) {
         return function (segment) {
             var arc = d3.svg.arc()
@@ -86,11 +117,11 @@ var gtrcof;
         var items = [];
         var angle = (Math.PI * (2 / count));
         for (var i = 0; i < count; i++) {
-            var itemAngle = (angle * i) - (Math.PI / 2) - (angle / 2);
+            var itemAngle = (angle * i) - (angle / 2);
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                textAngle: itemAngle + (angle / 2),
+                textAngle: itemAngle - (Math.PI / 2) + (angle / 2),
                 note: fifths[i]
             });
         }
@@ -103,4 +134,5 @@ var gtrcof;
     }());
 })(gtrcof || (gtrcof = {}));
 gtrcof.init();
+gtrcof.update(music.major());
 //# sourceMappingURL=gtr-cof.js.map
