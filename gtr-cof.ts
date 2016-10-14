@@ -120,7 +120,7 @@ namespace gtrcof {
             .attr("d", noteSegmentGenerator(innerRadius, radius))
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
-            .attr("stroke-width", "2")
+            .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
@@ -216,7 +216,7 @@ namespace modes {
             .data(music.modes)
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 100) + ")"; })
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; })
 
         buttons
             .append("rect")
@@ -226,13 +226,13 @@ namespace modes {
             .attr("height", buttonHeight)
             .attr("fill", "white")
             .attr("stroke", "black")
-            .attr("stroke-width", "2")
+            .attr("stroke-width", "3")
             .on("click", handleButtonClick);
 
         buttons
             .append("text")
-            .attr("x", pad + 25)
-            .attr("y", 33)
+            .attr("x", pad + 20)
+            .attr("y", 34)
             .text(function (x) { return x.name; })
             .attr("font-size", "30px")
             .attr("text-anchor", "left")
