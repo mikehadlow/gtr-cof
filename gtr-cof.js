@@ -58,6 +58,33 @@ var music;
     }
     music.scale = scale;
 })(music || (music = {}));
+var state;
+(function (state) {
+    var listeners = [];
+    var currentTonic = music.notes[0];
+    var currentMode = music.modes[1];
+    function addListener(listener) {
+        listeners.push(listener);
+    }
+    state.addListener = addListener;
+    function changeTonic(newTonic) {
+        currentTonic = newTonic;
+        updateListeners();
+    }
+    state.changeTonic = changeTonic;
+    function changeMode(newMode) {
+        currentMode = newMode;
+        updateListeners();
+    }
+    state.changeMode = changeMode;
+    function updateListeners() {
+        var scale = music.scale(currentTonic, currentMode);
+        for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
+            var listener = listeners_1[_i];
+            listener(scale);
+        }
+    }
+})(state || (state = {}));
 var gtrcof;
 (function (gtrcof) {
     var noteSegments = null;
@@ -82,7 +109,8 @@ var gtrcof;
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "2")
-            .attr("class", "note-segment");
+            .attr("class", "note-segment")
+            .on("click", handleNoteClick);
         cof.selectAll("text")
             .data(segments)
             .enter()
@@ -93,6 +121,7 @@ var gtrcof;
             .attr("font-size", "80px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
+        state.addListener(update);
         console.log("init done!");
     }
     gtrcof.init = init;
@@ -140,6 +169,9 @@ var gtrcof;
             });
         }
         return items;
+    }
+    function handleNoteClick(segment, i) {
+        state.changeTonic(segment.note);
     }
     var Segment = (function () {
         function Segment() {

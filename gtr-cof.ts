@@ -16,7 +16,7 @@ namespace music {
         { name: 'A#', index: 10 },
         { name: 'B', index: 11 },
     ];
-    
+
     export let modes: Array<Mode> = [
         { name: 'Lydian', index: 3 },
         { name: 'Major / Ionian', index: 0 },
@@ -26,14 +26,14 @@ namespace music {
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
-    
+
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
     export class Note {
         name: string;
         index: number;
     }
-    
+
     export class Mode {
         name: string;
         index: number;
@@ -50,12 +50,12 @@ namespace music {
 
         return items;
     }
-    
-    export function scale(tonic: Note, mode: Mode) : Array<Note> {
+
+    export function scale(tonic: Note, mode: Mode): Array<Note> {
         let scale: Array<Note> = [];
         let noteIndex = tonic.index;
-        
-        for(let i=0; i<7; i++){
+
+        for (let i = 0; i < 7; i++) {
             scale.push(notes[noteIndex]);
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
         }
@@ -63,8 +63,36 @@ namespace music {
     }
 }
 
-namespace gtrcof {
+namespace state {
     
+    let listeners: Array<(n: Array<music.Note>) => void> = [];
+    let currentTonic: music.Note = music.notes[0];
+    let currentMode: music.Mode = music.modes[1];
+    
+    export function addListener(listener: (n: Array<music.Note>) => void) : void {
+        listeners.push(listener);
+    }
+    
+    export function changeTonic(newTonic: music.Note): void {
+        currentTonic = newTonic;
+        updateListeners();
+    }
+    
+    export function changeMode(newMode: music.Mode): void {
+        currentMode = newMode;
+        updateListeners();
+    }
+    
+    function updateListeners(): void {
+        let scale = music.scale(currentTonic, currentMode);
+        for(let listener of listeners) {
+            listener(scale);
+        }
+    }
+}
+
+namespace gtrcof {
+
     let noteSegments: d3.Selection<Segment> = null;
 
     export function init() {
@@ -93,7 +121,8 @@ namespace gtrcof {
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "2")
-            .attr("class", "note-segment");
+            .attr("class", "note-segment")
+            .on("click", handleNoteClick);
 
         cof.selectAll("text")
             .data(segments)
@@ -105,14 +134,16 @@ namespace gtrcof {
             .attr("font-size", "80px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
+            
+        state.addListener(update);
 
         console.log("init done!");
     }
-    
-    export function update(notes: Array<music.Note>) {
-        
+
+    export function update(notes: Array<music.Note>): void {
+
         let data: Array<Segment> = [];
-        for(let n of notes){
+        for (let n of notes) {
             data.push({
                 startAngle: 0,
                 endAngle: 0,
@@ -120,11 +151,11 @@ namespace gtrcof {
                 note: n
             });
         }
-        
+
         let segments = noteSegments
-            .data(data, function(n){ return n.note.name; })
+            .data(data, function (n) { return n.note.name; })
             .attr("fill", "white");
-            
+
         segments.exit().attr("fill", "lightgrey");
     }
 
@@ -158,6 +189,10 @@ namespace gtrcof {
             });
         }
         return items;
+    }
+    
+    function handleNoteClick(segment: Segment, i: number): void {
+        state.changeTonic(segment.note);
     }
 
     class Segment {
