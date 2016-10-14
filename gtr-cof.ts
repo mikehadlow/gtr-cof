@@ -65,11 +65,11 @@ namespace music {
 
 namespace state {
 
-    let listeners: Array<(n: Array<music.Note>) => void> = [];
+    let listeners: Array<(n: StateChange) => void> = [];
     let currentTonic: music.Note = music.notes[0];
     let currentMode: music.Mode = music.modes[1];
 
-    export function addListener(listener: (n: Array<music.Note>) => void): void {
+    export function addListener(listener: (n: StateChange) => void): void {
         listeners.push(listener);
     }
 
@@ -84,10 +84,20 @@ namespace state {
     }
 
     function updateListeners(): void {
-        let scale = music.scale(currentTonic, currentMode);
+        let stateChange: StateChange = {
+            tonic: currentTonic,
+            mode: currentMode,
+            scale: music.scale(currentTonic, currentMode)
+        };
         for (let listener of listeners) {
-            listener(scale);
+            listener(stateChange);
         }
+    }
+    
+    export class StateChange {
+        tonic: music.Note;
+        mode: music.Mode;
+        scale: Array<music.Note>;
     }
 }
 
@@ -140,10 +150,10 @@ namespace gtrcof {
         console.log("init done!");
     }
 
-    export function update(notes: Array<music.Note>): void {
+    export function update(stateChange: state.StateChange): void {
 
         let data: Array<Segment> = [];
-        for (let n of notes) {
+        for (let n of stateChange.scale) {
             data.push({
                 startAngle: 0,
                 endAngle: 0,
@@ -205,6 +215,8 @@ namespace gtrcof {
 
 namespace modes {
 
+    let buttons: d3.Selection<music.Mode> = null;
+
     export function init(): void {
         let pad = 10;
         let buttonHeight = 50;
@@ -212,24 +224,24 @@ namespace modes {
         let svg = d3.select("#modes");
         let modes = svg.append("g");
 
-        let buttons = modes.selectAll("g")
-            .data(music.modes)
+        let gs = modes.selectAll("g")
+            .data(music.modes, function(m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; })
 
-        buttons
+        buttons = gs
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
             .attr("width", buttonWidth)
             .attr("height", buttonHeight)
-            .attr("fill", "white")
+            .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .on("click", handleButtonClick);
 
-        buttons
+        gs
             .append("text")
             .attr("x", pad + 20)
             .attr("y", 34)
@@ -237,12 +249,22 @@ namespace modes {
             .attr("font-size", "30px")
             .attr("text-anchor", "left")
             .attr("fill", "black");
+            
+        state.addListener(update);
     }
 
     function handleButtonClick(mode: music.Mode, i: number): void {
         state.changeMode(mode);
     }
 
+    function update(stateChange: state.StateChange): void {           
+        let modes: Array<music.Mode> = [stateChange.mode];
+        buttons
+            .data(modes, function(m) { return m.index.toString(); })
+            .attr("fill", "white")
+            .exit()
+            .attr("fill", "lightgrey")
+    }
 }
 
 gtrcof.init();

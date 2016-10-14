@@ -78,12 +78,22 @@ var state;
     }
     state.changeMode = changeMode;
     function updateListeners() {
-        var scale = music.scale(currentTonic, currentMode);
+        var stateChange = {
+            tonic: currentTonic,
+            mode: currentMode,
+            scale: music.scale(currentTonic, currentMode)
+        };
         for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
             var listener = listeners_1[_i];
-            listener(scale);
+            listener(stateChange);
         }
     }
+    var StateChange = (function () {
+        function StateChange() {
+        }
+        return StateChange;
+    }());
+    state.StateChange = StateChange;
 })(state || (state = {}));
 var gtrcof;
 (function (gtrcof) {
@@ -125,10 +135,10 @@ var gtrcof;
         console.log("init done!");
     }
     gtrcof.init = init;
-    function update(notes) {
+    function update(stateChange) {
         var data = [];
-        for (var _i = 0, notes_1 = notes; _i < notes_1.length; _i++) {
-            var n = notes_1[_i];
+        for (var _i = 0, _a = stateChange.scale; _i < _a.length; _i++) {
+            var n = _a[_i];
             data.push({
                 startAngle: 0,
                 endAngle: 0,
@@ -181,28 +191,29 @@ var gtrcof;
 })(gtrcof || (gtrcof = {}));
 var modes;
 (function (modes_1) {
+    var buttons = null;
     function init() {
         var pad = 10;
         var buttonHeight = 50;
         var buttonWidth = 250;
         var svg = d3.select("#modes");
         var modes = svg.append("g");
-        var buttons = modes.selectAll("g")
-            .data(music.modes)
+        var gs = modes.selectAll("g")
+            .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; });
-        buttons
+        buttons = gs
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
             .attr("width", buttonWidth)
             .attr("height", buttonHeight)
-            .attr("fill", "white")
+            .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .on("click", handleButtonClick);
-        buttons
+        gs
             .append("text")
             .attr("x", pad + 20)
             .attr("y", 34)
@@ -210,10 +221,19 @@ var modes;
             .attr("font-size", "30px")
             .attr("text-anchor", "left")
             .attr("fill", "black");
+        state.addListener(update);
     }
     modes_1.init = init;
     function handleButtonClick(mode, i) {
         state.changeMode(mode);
+    }
+    function update(stateChange) {
+        var modes = [stateChange.mode];
+        buttons
+            .data(modes, function (m) { return m.index.toString(); })
+            .attr("fill", "white")
+            .exit()
+            .attr("fill", "lightgrey");
     }
 })(modes || (modes = {}));
 gtrcof.init();
