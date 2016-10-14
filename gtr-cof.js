@@ -179,6 +179,44 @@ var gtrcof;
         return Segment;
     }());
 })(gtrcof || (gtrcof = {}));
+var modes;
+(function (modes_1) {
+    function init() {
+        var pad = 10;
+        var buttonHeight = 50;
+        var buttonWidth = 250;
+        var svg = d3.select("#modes");
+        var modes = svg.append("g");
+        var buttons = modes.selectAll("g")
+            .data(music.modes)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 100) + ")"; });
+        buttons
+            .append("rect")
+            .attr("x", pad)
+            .attr("y", 0)
+            .attr("width", buttonWidth)
+            .attr("height", buttonHeight)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", "2")
+            .on("click", handleButtonClick);
+        buttons
+            .append("text")
+            .attr("x", pad + 25)
+            .attr("y", 33)
+            .text(function (x) { return x.name; })
+            .attr("font-size", "30px")
+            .attr("text-anchor", "left")
+            .attr("fill", "black");
+    }
+    modes_1.init = init;
+    function handleButtonClick(mode, i) {
+        state.changeMode(mode);
+    }
+})(modes || (modes = {}));
 gtrcof.init();
-gtrcof.update(music.scale(music.notes[0], music.modes[1]));
+modes.init();
+state.changeTonic(music.notes[0]);
 //# sourceMappingURL=gtr-cof.js.map

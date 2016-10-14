@@ -64,28 +64,28 @@ namespace music {
 }
 
 namespace state {
-    
+
     let listeners: Array<(n: Array<music.Note>) => void> = [];
     let currentTonic: music.Note = music.notes[0];
     let currentMode: music.Mode = music.modes[1];
-    
-    export function addListener(listener: (n: Array<music.Note>) => void) : void {
+
+    export function addListener(listener: (n: Array<music.Note>) => void): void {
         listeners.push(listener);
     }
-    
+
     export function changeTonic(newTonic: music.Note): void {
         currentTonic = newTonic;
         updateListeners();
     }
-    
+
     export function changeMode(newMode: music.Mode): void {
         currentMode = newMode;
         updateListeners();
     }
-    
+
     function updateListeners(): void {
         let scale = music.scale(currentTonic, currentMode);
-        for(let listener of listeners) {
+        for (let listener of listeners) {
             listener(scale);
         }
     }
@@ -95,7 +95,7 @@ namespace gtrcof {
 
     let noteSegments: d3.Selection<Segment> = null;
 
-    export function init() {
+    export function init(): void {
         let pad = 50;
 
         let svg = d3.select("#cof");
@@ -134,7 +134,7 @@ namespace gtrcof {
             .attr("font-size", "80px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
-            
+
         state.addListener(update);
 
         console.log("init done!");
@@ -190,7 +190,7 @@ namespace gtrcof {
         }
         return items;
     }
-    
+
     function handleNoteClick(segment: Segment, i: number): void {
         state.changeTonic(segment.note);
     }
@@ -203,5 +203,48 @@ namespace gtrcof {
     }
 }
 
+namespace modes {
+
+    export function init(): void {
+        let pad = 10;
+        let buttonHeight = 50;
+        let buttonWidth = 250;
+        let svg = d3.select("#modes");
+        let modes = svg.append("g");
+
+        let buttons = modes.selectAll("g")
+            .data(music.modes)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 100) + ")"; })
+
+        buttons
+            .append("rect")
+            .attr("x", pad)
+            .attr("y", 0)
+            .attr("width", buttonWidth)
+            .attr("height", buttonHeight)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", "2")
+            .on("click", handleButtonClick);
+
+        buttons
+            .append("text")
+            .attr("x", pad + 25)
+            .attr("y", 33)
+            .text(function (x) { return x.name; })
+            .attr("font-size", "30px")
+            .attr("text-anchor", "left")
+            .attr("fill", "black");
+    }
+
+    function handleButtonClick(mode: music.Mode, i: number): void {
+        state.changeMode(mode);
+    }
+
+}
+
 gtrcof.init();
-gtrcof.update(music.scale(music.notes[0], music.modes[1]));
+modes.init();
+state.changeTonic(music.notes[0]);
