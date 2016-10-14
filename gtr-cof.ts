@@ -93,7 +93,7 @@ namespace state {
             listener(stateChange);
         }
     }
-    
+
     export class StateChange {
         tonic: music.Note;
         mode: music.Mode;
@@ -104,17 +104,19 @@ namespace state {
 namespace gtrcof {
 
     let noteSegments: d3.Selection<Segment> = null;
+    let degreeSegments: d3.Selection<Segment> = null;
 
     export function init(): void {
-        let pad = 50;
+        let pad = 30;
 
         let svg = d3.select("#cof");
         let svgWidth = +svg.attr("width");
         let svgHeight = +svg.attr("height");
         let svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
-        let radius = (svgMin - pad * 2) / 2;
-        let innerRadius = radius / 2;
-        let textRadius = innerRadius + (radius - innerRadius) / 2;
+        let radius = 220;
+        let midRadius = 125;
+        let innerRadius = 90;
+        let textRadius = 180;
 
 
         let cof = svg
@@ -123,25 +125,34 @@ namespace gtrcof {
 
         let segments = generateSegments(12);
 
-        noteSegments = cof.selectAll("path")
+        noteSegments = cof.append("g").selectAll("path")
             .data(segments, function (s) { return s.note.name; })
             .enter()
             .append("path")
-            .attr("d", noteSegmentGenerator(innerRadius, radius))
+            .attr("d", noteSegmentGenerator(midRadius, radius))
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
+        degreeSegments = cof.append("g").selectAll("path")
+            .data(segments, function (s) { return s.note.name; })
+            .enter()
+            .append("path")
+            .attr("d", noteSegmentGenerator(innerRadius, midRadius))
+            .attr("fill", "none")
+            .attr("stroke", "none")
+            .attr("class", "note-segment");
+
         cof.selectAll("text")
             .data(segments)
             .enter()
             .append("text")
             .attr("x", function (x) { return polarToCart(textRadius, x.textAngle)[0]; })
-            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 25; })
+            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 18; })
             .text(function (x) { return x.note.name; })
-            .attr("font-size", "80px")
+            .attr("font-size", "50px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
 
@@ -164,9 +175,18 @@ namespace gtrcof {
 
         let segments = noteSegments
             .data(data, function (n) { return n.note.name; })
-            .attr("fill", "white");
+            .attr("fill", function (d, i) { return (i === 0) ? "yellow" : "white"; })
+            .exit()
+            .attr("fill", "lightgrey");
 
-        segments.exit().attr("fill", "lightgrey");
+        let degrees = degreeSegments
+            .data(data, function (n) { return n.note.name; })
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", "2")
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
     }
 
     function noteSegmentGenerator(inner: number, outter: number): (Segment) => string {
@@ -225,7 +245,7 @@ namespace modes {
         let modes = svg.append("g");
 
         let gs = modes.selectAll("g")
-            .data(music.modes, function(m) { return m.index.toString(); })
+            .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; })
@@ -249,7 +269,7 @@ namespace modes {
             .attr("font-size", "30px")
             .attr("text-anchor", "left")
             .attr("fill", "black");
-            
+
         state.addListener(update);
     }
 
@@ -257,10 +277,10 @@ namespace modes {
         state.changeMode(mode);
     }
 
-    function update(stateChange: state.StateChange): void {           
+    function update(stateChange: state.StateChange): void {
         let modes: Array<music.Mode> = [stateChange.mode];
         buttons
-            .data(modes, function(m) { return m.index.toString(); })
+            .data(modes, function (m) { return m.index.toString(); })
             .attr("fill", "white")
             .exit()
             .attr("fill", "lightgrey")

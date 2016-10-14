@@ -98,37 +98,47 @@ var state;
 var gtrcof;
 (function (gtrcof) {
     var noteSegments = null;
+    var degreeSegments = null;
     function init() {
-        var pad = 50;
+        var pad = 30;
         var svg = d3.select("#cof");
         var svgWidth = +svg.attr("width");
         var svgHeight = +svg.attr("height");
         var svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
-        var radius = (svgMin - pad * 2) / 2;
-        var innerRadius = radius / 2;
-        var textRadius = innerRadius + (radius - innerRadius) / 2;
+        var radius = 220;
+        var midRadius = 125;
+        var innerRadius = 90;
+        var textRadius = 180;
         var cof = svg
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
         var segments = generateSegments(12);
-        noteSegments = cof.selectAll("path")
+        noteSegments = cof.append("g").selectAll("path")
             .data(segments, function (s) { return s.note.name; })
             .enter()
             .append("path")
-            .attr("d", noteSegmentGenerator(innerRadius, radius))
+            .attr("d", noteSegmentGenerator(midRadius, radius))
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
+        degreeSegments = cof.append("g").selectAll("path")
+            .data(segments, function (s) { return s.note.name; })
+            .enter()
+            .append("path")
+            .attr("d", noteSegmentGenerator(innerRadius, midRadius))
+            .attr("fill", "none")
+            .attr("stroke", "none")
+            .attr("class", "note-segment");
         cof.selectAll("text")
             .data(segments)
             .enter()
             .append("text")
             .attr("x", function (x) { return polarToCart(textRadius, x.textAngle)[0]; })
-            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 25; })
+            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 18; })
             .text(function (x) { return x.note.name; })
-            .attr("font-size", "80px")
+            .attr("font-size", "50px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
         state.addListener(update);
@@ -148,8 +158,17 @@ var gtrcof;
         }
         var segments = noteSegments
             .data(data, function (n) { return n.note.name; })
-            .attr("fill", "white");
-        segments.exit().attr("fill", "lightgrey");
+            .attr("fill", function (d, i) { return (i === 0) ? "yellow" : "white"; })
+            .exit()
+            .attr("fill", "lightgrey");
+        var degrees = degreeSegments
+            .data(data, function (n) { return n.note.name; })
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", "2")
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
     }
     gtrcof.update = update;
     function noteSegmentGenerator(inner, outter) {
