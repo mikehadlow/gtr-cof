@@ -2,7 +2,7 @@
 
 namespace music {
 
-    let notes: Array<Note> = [
+    export let notes: Array<Note> = [
         { name: 'C', index: 0 },
         { name: 'C#', index: 1 },
         { name: 'D', index: 2 },
@@ -17,9 +17,24 @@ namespace music {
         { name: 'B', index: 11 },
     ];
     
+    export let modes: Array<Mode> = [
+        { name: 'Lydian', index: 3 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 4 },
+        { name: 'Dorian', index: 1 },
+        { name: 'N Minor / Aolian', index: 5 },
+        { name: 'Phrygian', index: 2 },
+        { name: 'Locrian', index: 6 },
+    ];
+    
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
     export class Note {
+        name: string;
+        index: number;
+    }
+    
+    export class Mode {
         name: string;
         index: number;
     }
@@ -36,16 +51,15 @@ namespace music {
         return items;
     }
     
-    export function major(): Array<Note> {
-        let m: Array<Note> = [];
-        let index = 0;
-
-        for(let n of scaleTones){
-            m.push(notes[index]);
-            index = index + n;
-        }
+    export function scale(tonic: Note, mode: Mode) : Array<Note> {
+        let scale: Array<Note> = [];
+        let noteIndex = tonic.index;
         
-        return m;
+        for(let i=0; i<7; i++){
+            scale.push(notes[noteIndex]);
+            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
+        }
+        return scale;
     }
 }
 
@@ -155,4 +169,4 @@ namespace gtrcof {
 }
 
 gtrcof.init();
-gtrcof.update(music.major());
+gtrcof.update(music.scale(music.notes[0], music.modes[1]));
