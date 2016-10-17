@@ -29,6 +29,8 @@ namespace music {
 
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
+    let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+
     export class Note {
         name: string;
         index: number;
@@ -60,6 +62,10 @@ namespace music {
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
         }
         return scale;
+    }
+
+    export function degree(i: number): string {
+        return romanNumeral[i];
     }
 }
 
@@ -105,19 +111,16 @@ namespace gtrcof {
 
     let noteSegments: d3.Selection<Segment> = null;
     let degreeSegments: d3.Selection<Segment> = null;
+    let degreeText: d3.Selection<Segment> = null;
+    let indexer: (x: Segment) => string = (x) => x.note.name;
 
     export function init(): void {
         let pad = 30;
 
         let svg = d3.select("#cof");
-        let svgWidth = +svg.attr("width");
-        let svgHeight = +svg.attr("height");
-        let svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
         let radius = 220;
         let midRadius = 125;
         let innerRadius = 90;
-        let textRadius = 180;
-
 
         let cof = svg
             .append("g")
@@ -125,40 +128,56 @@ namespace gtrcof {
 
         let segments = generateSegments(12);
 
+        let noteArc = d3.svg.arc<Segment>()
+            .innerRadius(midRadius)
+            .outerRadius(radius);
+
+        let degreeArc = d3.svg.arc<Segment>()
+            .innerRadius(innerRadius)
+            .outerRadius(midRadius);
+
         noteSegments = cof.append("g").selectAll("path")
-            .data(segments, function (s) { return s.note.name; })
+            .data(segments, indexer)
             .enter()
             .append("path")
-            .attr("d", noteSegmentGenerator(midRadius, radius))
+            .attr("d", noteArc)
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
-        degreeSegments = cof.append("g").selectAll("path")
-            .data(segments, function (s) { return s.note.name; })
-            .enter()
-            .append("path")
-            .attr("d", noteSegmentGenerator(innerRadius, midRadius))
-            .attr("fill", "none")
-            .attr("stroke", "none")
-            .attr("class", "note-segment");
-
-        cof.selectAll("text")
+        cof.append("g").selectAll("text")
             .data(segments)
             .enter()
             .append("text")
-            .attr("x", function (x) { return polarToCart(textRadius, x.textAngle)[0]; })
-            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 18; })
+            .attr("x", function (x) { return noteArc.centroid(x)[0]; })
+            .attr("y", function (x) { return noteArc.centroid(x)[1] + 18; })
             .text(function (x) { return x.note.name; })
             .attr("font-size", "50px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
 
-        state.addListener(update);
+        degreeSegments = cof.append("g").selectAll("path")
+            .data(segments, indexer)
+            .enter()
+            .append("path")
+            .attr("d", degreeArc)
+            .attr("fill", "none")
+            .attr("stroke", "none")
 
-        console.log("init done!");
+        degreeText = cof.append("g").selectAll("text")
+            .data(segments, indexer)
+            .enter()
+            .append("text")
+            .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
+            .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
+            .text("")
+            .attr("font-size", "20px")
+            .attr("text-anchor", "middle")
+            .attr("fill", "black");
+
+        state.addListener(update);
     }
 
     export function update(stateChange: state.StateChange): void {
@@ -166,43 +185,32 @@ namespace gtrcof {
         let data: Array<Segment> = [];
         for (let n of stateChange.scale) {
             data.push({
+                note: n,
                 startAngle: 0,
-                endAngle: 0,
-                textAngle: 0,
-                note: n
+                endAngle: 0
             });
         }
 
-        let segments = noteSegments
-            .data(data, function (n) { return n.note.name; })
+        noteSegments
+            .data(data, indexer)
             .attr("fill", function (d, i) { return (i === 0) ? "yellow" : "white"; })
             .exit()
             .attr("fill", "lightgrey");
 
-        let degrees = degreeSegments
-            .data(data, function (n) { return n.note.name; })
+        degreeSegments
+            .data(data, indexer)
             .attr("fill", "white")
             .attr("stroke", "black")
             .attr("stroke-width", "2")
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
-    }
 
-    function noteSegmentGenerator(inner: number, outter: number): (Segment) => string {
-        return function (segment: Segment) {
-            let arc = d3.svg.arc<d3.svg.Arc<void>>()
-                .innerRadius(inner)
-                .outerRadius(outter)
-                .startAngle(segment.startAngle)
-                .endAngle(segment.endAngle);
-
-            return arc(d3.svg.arc<void>());
-        }
-    }
-
-    function polarToCart(r: number, radians: number): [number, number] {
-        return [r * Math.cos(radians), r * Math.sin(radians)];
+        degreeText
+            .data(data, indexer)
+            .text(function (d, i) { return music.degree(i); })
+            .exit()
+            .text("");
     }
 
     function generateSegments(count: number): Segment[] {
@@ -212,10 +220,9 @@ namespace gtrcof {
         for (let i: number = 0; i < count; i++) {
             let itemAngle = (angle * i) - (angle / 2);
             items.push({
+                note: fifths[i],
                 startAngle: itemAngle,
-                endAngle: itemAngle + angle,
-                textAngle: itemAngle - (Math.PI / 2) + (angle / 2),
-                note: fifths[i]
+                endAngle: itemAngle + angle
             });
         }
         return items;
@@ -226,10 +233,9 @@ namespace gtrcof {
     }
 
     class Segment {
+        note: music.Note;
         startAngle: number;
         endAngle: number;
-        textAngle: number;
-        note: music.Note;
     }
 }
 

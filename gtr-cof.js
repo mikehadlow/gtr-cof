@@ -25,6 +25,7 @@ var music;
         { name: 'Locrian', index: 6 },
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
+    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     var Note = (function () {
         function Note() {
         }
@@ -57,6 +58,10 @@ var music;
         return scale;
     }
     music.scale = scale;
+    function degree(i) {
+        return romanNumeral[i];
+    }
+    music.degree = degree;
 })(music || (music = {}));
 var state;
 (function (state) {
@@ -99,50 +104,62 @@ var gtrcof;
 (function (gtrcof) {
     var noteSegments = null;
     var degreeSegments = null;
+    var degreeText = null;
+    var indexer = function (x) { return x.note.name; };
     function init() {
         var pad = 30;
         var svg = d3.select("#cof");
-        var svgWidth = +svg.attr("width");
-        var svgHeight = +svg.attr("height");
-        var svgMin = (svgWidth > svgHeight) ? svgHeight : svgWidth;
         var radius = 220;
         var midRadius = 125;
         var innerRadius = 90;
-        var textRadius = 180;
         var cof = svg
             .append("g")
             .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
         var segments = generateSegments(12);
+        var noteArc = d3.svg.arc()
+            .innerRadius(midRadius)
+            .outerRadius(radius);
+        var degreeArc = d3.svg.arc()
+            .innerRadius(innerRadius)
+            .outerRadius(midRadius);
         noteSegments = cof.append("g").selectAll("path")
-            .data(segments, function (s) { return s.note.name; })
+            .data(segments, indexer)
             .enter()
             .append("path")
-            .attr("d", noteSegmentGenerator(midRadius, radius))
+            .attr("d", noteArc)
             .attr("fill", "lightgrey")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
-        degreeSegments = cof.append("g").selectAll("path")
-            .data(segments, function (s) { return s.note.name; })
-            .enter()
-            .append("path")
-            .attr("d", noteSegmentGenerator(innerRadius, midRadius))
-            .attr("fill", "none")
-            .attr("stroke", "none")
-            .attr("class", "note-segment");
-        cof.selectAll("text")
+        cof.append("g").selectAll("text")
             .data(segments)
             .enter()
             .append("text")
-            .attr("x", function (x) { return polarToCart(textRadius, x.textAngle)[0]; })
-            .attr("y", function (x) { return polarToCart(textRadius, x.textAngle)[1] + 18; })
+            .attr("x", function (x) { return noteArc.centroid(x)[0]; })
+            .attr("y", function (x) { return noteArc.centroid(x)[1] + 18; })
             .text(function (x) { return x.note.name; })
             .attr("font-size", "50px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
+        degreeSegments = cof.append("g").selectAll("path")
+            .data(segments, indexer)
+            .enter()
+            .append("path")
+            .attr("d", degreeArc)
+            .attr("fill", "none")
+            .attr("stroke", "none");
+        degreeText = cof.append("g").selectAll("text")
+            .data(segments, indexer)
+            .enter()
+            .append("text")
+            .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
+            .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
+            .text("")
+            .attr("font-size", "20px")
+            .attr("text-anchor", "middle")
+            .attr("fill", "black");
         state.addListener(update);
-        console.log("init done!");
     }
     gtrcof.init = init;
     function update(stateChange) {
@@ -150,40 +167,31 @@ var gtrcof;
         for (var _i = 0, _a = stateChange.scale; _i < _a.length; _i++) {
             var n = _a[_i];
             data.push({
+                note: n,
                 startAngle: 0,
-                endAngle: 0,
-                textAngle: 0,
-                note: n
+                endAngle: 0
             });
         }
-        var segments = noteSegments
-            .data(data, function (n) { return n.note.name; })
+        noteSegments
+            .data(data, indexer)
             .attr("fill", function (d, i) { return (i === 0) ? "yellow" : "white"; })
             .exit()
             .attr("fill", "lightgrey");
-        var degrees = degreeSegments
-            .data(data, function (n) { return n.note.name; })
+        degreeSegments
+            .data(data, indexer)
             .attr("fill", "white")
             .attr("stroke", "black")
             .attr("stroke-width", "2")
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+        degreeText
+            .data(data, indexer)
+            .text(function (d, i) { return music.degree(i); })
+            .exit()
+            .text("");
     }
     gtrcof.update = update;
-    function noteSegmentGenerator(inner, outter) {
-        return function (segment) {
-            var arc = d3.svg.arc()
-                .innerRadius(inner)
-                .outerRadius(outter)
-                .startAngle(segment.startAngle)
-                .endAngle(segment.endAngle);
-            return arc(d3.svg.arc());
-        };
-    }
-    function polarToCart(r, radians) {
-        return [r * Math.cos(radians), r * Math.sin(radians)];
-    }
     function generateSegments(count) {
         var fifths = music.fifths();
         var items = [];
@@ -191,10 +199,9 @@ var gtrcof;
         for (var i = 0; i < count; i++) {
             var itemAngle = (angle * i) - (angle / 2);
             items.push({
+                note: fifths[i],
                 startAngle: itemAngle,
-                endAngle: itemAngle + angle,
-                textAngle: itemAngle - (Math.PI / 2) + (angle / 2),
-                note: fifths[i]
+                endAngle: itemAngle + angle
             });
         }
         return items;
