@@ -288,10 +288,18 @@ var gtr;
         var noteRadius = 15;
         var pad = 50;
         var fretData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        var dots = [
+            [3, 3],
+            [5, 3],
+            [7, 3],
+            [9, 3],
+            [12, 2],
+            [12, 4],
+        ];
         var svg = d3.select("#gtr");
         var gtr = svg.append("g");
         // frets
-        gtr.selectAll("rect")
+        gtr.append("g").selectAll("rect")
             .data(fretData)
             .enter()
             .append("rect")
@@ -302,7 +310,17 @@ var gtr;
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
-        var strings = gtr.selectAll("g")
+        // dots
+        gtr.append("g").selectAll("circle")
+            .data(dots)
+            .enter()
+            .append("circle")
+            .attr("r", noteRadius)
+            .attr("cx", function (d) { return d[0] * fretGap + pad + (fretGap / 2); })
+            .attr("cy", function (d) { return (d[1] + 1) * stringGap + 12; })
+            .attr("fill", "lightgrey")
+            .attr("stroke", "none");
+        var strings = gtr.append("g").selectAll("g")
             .data(music.tuning.reverse(), function (n) { return n.name; })
             .enter()
             .append("g")
