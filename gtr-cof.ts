@@ -26,7 +26,7 @@ namespace music {
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
-    
+
     export let tuning: Array<Note> = [
         notes[4], // E
         notes[9], // A
@@ -76,14 +76,14 @@ namespace music {
     export function degree(i: number): string {
         return romanNumeral[i];
     }
-    
+
     export function allNotesFrom(note: Note): Array<Note> {
         let items: Array<Note> = [];
-        
-        for(let i=0; i < 12; i++) {
+
+        for (let i = 0; i < 12; i++) {
             items.push(notes[(i + note.index) % 12]);
         }
-        
+
         return items;
     }
 }
@@ -313,9 +313,19 @@ namespace modes {
 }
 
 namespace gtr {
-    
+
     let notes: d3.Selection<music.Note> = null;
-    
+
+    let noteColours: Array<string> = [
+        "yellow",
+        "lightgrey",
+        "white",
+        "white",
+        "white",
+        "lightgrey",
+        "white"
+    ];
+
     export function init(): void {
         let stringGap = 40;
         let fretGap = 70;
@@ -332,40 +342,40 @@ namespace gtr {
             [12, 2],
             [12, 4],
         ];
-        
+
         let svg = d3.select("#gtr");
         let gtr = svg.append("g");
-        
+
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
             .enter()
             .append("rect")
-            .attr("x", function(d, i) { return (i + 1) * fretGap + pad - fretWidth; })
+            .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
             .attr("height", stringGap * 5 + (fretWidth * 2))
-            .attr("fill", function(d, i) { return i === 0 ? "black" : "none"; })
+            .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
-            
+
         // dots
         gtr.append("g").selectAll("circle")
             .data(dots)
             .enter()
             .append("circle")
             .attr("r", noteRadius)
-            .attr("cx", function(d) { return d[0] * fretGap + pad + (fretGap / 2); })
-            .attr("cy", function(d) { return (d[1] + 1) * stringGap + 12; })
+            .attr("cx", function (d) { return d[0] * fretGap + pad + (fretGap / 2); })
+            .attr("cy", function (d) { return (d[1] + 1) * stringGap + 12; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
-        
+
         let strings = gtr.append("g").selectAll("g")
-            .data(music.tuning.reverse(), function(n) { return n.name; })
+            .data(music.tuning.reverse(), function (n) { return n.name; })
             .enter()
             .append("g")
-            .attr("transform", function(d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
-            
+            .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
+
         // string lines
         strings
             .append("line")
@@ -375,25 +385,25 @@ namespace gtr {
             .attr("y2", stringGap / 2)
             .attr("stroke", "black")
             .attr("stroke-width", 2);
-            
+
         notes = strings
             .selectAll("circle")
-            .data(function(d) { return music.allNotesFrom(d); }, function(d) { return d.name; })
+            .data(function (d) { return music.allNotesFrom(d); }, function (d) { return d.name; })
             .enter()
             .append("circle")
             .attr("r", noteRadius)
             .attr("cy", stringGap / 2)
-            .attr("cx", function(d, i) { return i * fretGap + pad + 30})
+            .attr("cx", function (d, i) { return i * fretGap + pad + 30 })
             .attr("fill", "none")
             .attr("stroke", "none");
-            
+
         state.addListener(update);
     }
-    
+
     function update(stateChange: state.StateChange): void {
         notes
-            .data(stateChange.scale, function(d) { return d.name; })
-            .attr("fill", "white")
+            .data(stateChange.scale, function (d) { return d.name; })
+            .attr("fill", function (d, i) { return noteColours[i]; })
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .exit()

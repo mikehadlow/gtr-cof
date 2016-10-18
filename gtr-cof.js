@@ -281,6 +281,15 @@ var modes;
 var gtr;
 (function (gtr_1) {
     var notes = null;
+    var noteColours = [
+        "yellow",
+        "lightgrey",
+        "white",
+        "white",
+        "white",
+        "lightgrey",
+        "white"
+    ];
     function init() {
         var stringGap = 40;
         var fretGap = 70;
@@ -350,7 +359,7 @@ var gtr;
     function update(stateChange) {
         notes
             .data(stateChange.scale, function (d) { return d.name; })
-            .attr("fill", "white")
+            .attr("fill", function (d, i) { return noteColours[i]; })
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .exit()
