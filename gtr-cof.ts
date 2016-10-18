@@ -26,6 +26,15 @@ namespace music {
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
+    
+    export let tuning: Array<Note> = [
+        notes[4], // E
+        notes[9], // A
+        notes[2], // D
+        notes[7], // G
+        notes[11],// B
+        notes[4], // E
+    ];
 
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
@@ -67,6 +76,16 @@ namespace music {
     export function degree(i: number): string {
         return romanNumeral[i];
     }
+    
+    export function allNotesFrom(note: Note): Array<Note> {
+        let items: Array<Note> = [];
+        
+        for(let i=0; i < 12; i++) {
+            items.push(notes[(i + note.index) % 12]);
+        }
+        
+        return items;
+    }
 }
 
 namespace state {
@@ -107,7 +126,7 @@ namespace state {
     }
 }
 
-namespace gtrcof {
+namespace cof {
 
     let noteSegments: d3.Selection<Segment> = null;
     let degreeSegments: d3.Selection<Segment> = null;
@@ -293,6 +312,77 @@ namespace modes {
     }
 }
 
-gtrcof.init();
+namespace gtr {
+    
+    let notes: d3.Selection<music.Note> = null;
+    
+    export function init(): void {
+        let stringGap = 40;
+        let fretGap = 70;
+        let fretWidth = 5;
+        let noteRadius = 15;
+        let pad = 50;
+        let fretData: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        
+        let svg = d3.select("#gtr");
+        let gtr = svg.append("g");
+        
+        // frets
+        gtr.selectAll("rect")
+            .data(fretData)
+            .enter()
+            .append("rect")
+            .attr("x", function(d, i) { return (i + 1) * fretGap + pad - fretWidth; })
+            .attr("y", pad + stringGap / 2 - fretWidth)
+            .attr("width", fretWidth)
+            .attr("height", stringGap * 5 + (fretWidth * 2))
+            .attr("fill", function(d, i) { return i === 0 ? "black" : "none"; })
+            .attr("stroke", "grey")
+            .attr("stroke-width", 1);
+        
+        let strings = gtr.selectAll("g")
+            .data(music.tuning.reverse(), function(n) { return n.name; })
+            .enter()
+            .append("g")
+            .attr("transform", function(d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
+            
+        // string lines
+        strings
+            .append("line")
+            .attr("x1", pad + fretGap)
+            .attr("y1", stringGap / 2)
+            .attr("x2", pad + (fretGap * 12) + 20)
+            .attr("y2", stringGap / 2)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2);
+            
+        notes = strings
+            .selectAll("circle")
+            .data(function(d) { return music.allNotesFrom(d); }, function(d) { return d.name; })
+            .enter()
+            .append("circle")
+            .attr("r", noteRadius)
+            .attr("cy", stringGap / 2)
+            .attr("cx", function(d, i) { return i * fretGap + pad + 30})
+            .attr("fill", "none")
+            .attr("stroke", "none");
+            
+        state.addListener(update);
+    }
+    
+    function update(stateChange: state.StateChange): void {
+        notes
+            .data(stateChange.scale, function(d) { return d.name; })
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
+    }
+}
+
+cof.init();
 modes.init();
+gtr.init();
 state.changeTonic(music.notes[0]);

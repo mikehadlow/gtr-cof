@@ -24,6 +24,14 @@ var music;
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
+    music.tuning = [
+        music.notes[4],
+        music.notes[9],
+        music.notes[2],
+        music.notes[7],
+        music.notes[11],
+        music.notes[4],
+    ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     var Note = (function () {
@@ -62,6 +70,14 @@ var music;
         return romanNumeral[i];
     }
     music.degree = degree;
+    function allNotesFrom(note) {
+        var items = [];
+        for (var i = 0; i < 12; i++) {
+            items.push(music.notes[(i + note.index) % 12]);
+        }
+        return items;
+    }
+    music.allNotesFrom = allNotesFrom;
 })(music || (music = {}));
 var state;
 (function (state) {
@@ -100,8 +116,8 @@ var state;
     }());
     state.StateChange = StateChange;
 })(state || (state = {}));
-var gtrcof;
-(function (gtrcof) {
+var cof;
+(function (cof_1) {
     var noteSegments = null;
     var degreeSegments = null;
     var degreeText = null;
@@ -161,7 +177,7 @@ var gtrcof;
             .attr("fill", "black");
         state.addListener(update);
     }
-    gtrcof.init = init;
+    cof_1.init = init;
     function update(stateChange) {
         var data = [];
         for (var _i = 0, _a = stateChange.scale; _i < _a.length; _i++) {
@@ -191,7 +207,7 @@ var gtrcof;
             .exit()
             .text("");
     }
-    gtrcof.update = update;
+    cof_1.update = update;
     function generateSegments(count) {
         var fifths = music.fifths();
         var items = [];
@@ -214,7 +230,7 @@ var gtrcof;
         }
         return Segment;
     }());
-})(gtrcof || (gtrcof = {}));
+})(cof || (cof = {}));
 var modes;
 (function (modes_1) {
     var buttons = null;
@@ -262,7 +278,70 @@ var modes;
             .attr("fill", "lightgrey");
     }
 })(modes || (modes = {}));
-gtrcof.init();
+var gtr;
+(function (gtr_1) {
+    var notes = null;
+    function init() {
+        var stringGap = 40;
+        var fretGap = 70;
+        var fretWidth = 5;
+        var noteRadius = 15;
+        var pad = 50;
+        var fretData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        var svg = d3.select("#gtr");
+        var gtr = svg.append("g");
+        // frets
+        gtr.selectAll("rect")
+            .data(fretData)
+            .enter()
+            .append("rect")
+            .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
+            .attr("y", pad + stringGap / 2 - fretWidth)
+            .attr("width", fretWidth)
+            .attr("height", stringGap * 5 + (fretWidth * 2))
+            .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
+            .attr("stroke", "grey")
+            .attr("stroke-width", 1);
+        var strings = gtr.selectAll("g")
+            .data(music.tuning.reverse(), function (n) { return n.name; })
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
+        // string lines
+        strings
+            .append("line")
+            .attr("x1", pad + fretGap)
+            .attr("y1", stringGap / 2)
+            .attr("x2", pad + (fretGap * 12) + 20)
+            .attr("y2", stringGap / 2)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2);
+        notes = strings
+            .selectAll("circle")
+            .data(function (d) { return music.allNotesFrom(d); }, function (d) { return d.name; })
+            .enter()
+            .append("circle")
+            .attr("r", noteRadius)
+            .attr("cy", stringGap / 2)
+            .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
+            .attr("fill", "none")
+            .attr("stroke", "none");
+        state.addListener(update);
+    }
+    gtr_1.init = init;
+    function update(stateChange) {
+        notes
+            .data(stateChange.scale, function (d) { return d.name; })
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
+    }
+})(gtr || (gtr = {}));
+cof.init();
 modes.init();
+gtr.init();
 state.changeTonic(music.notes[0]);
 //# sourceMappingURL=gtr-cof.js.map
