@@ -125,19 +125,19 @@ var cof;
     function init() {
         var pad = 30;
         var svg = d3.select("#cof");
-        var radius = 220;
-        var midRadius = 125;
+        var noteRadius = 200;
+        var degreeRadius = 135;
         var innerRadius = 90;
         var cof = svg
             .append("g")
-            .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
+            .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
         var segments = generateSegments(12);
         var noteArc = d3.svg.arc()
-            .innerRadius(midRadius)
-            .outerRadius(radius);
+            .innerRadius(degreeRadius)
+            .outerRadius(noteRadius);
         var degreeArc = d3.svg.arc()
             .innerRadius(innerRadius)
-            .outerRadius(midRadius);
+            .outerRadius(degreeRadius);
         noteSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
             .enter()

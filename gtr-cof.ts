@@ -137,23 +137,23 @@ namespace cof {
         let pad = 30;
 
         let svg = d3.select("#cof");
-        let radius = 220;
-        let midRadius = 125;
+        let noteRadius = 200;
+        let degreeRadius = 135;
         let innerRadius = 90;
 
         let cof = svg
             .append("g")
-            .attr("transform", "translate(" + (radius + pad) + ", " + (radius + pad) + ")");
+            .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
 
         let segments = generateSegments(12);
 
         let noteArc = d3.svg.arc<Segment>()
-            .innerRadius(midRadius)
-            .outerRadius(radius);
+            .innerRadius(degreeRadius)
+            .outerRadius(noteRadius);
 
         let degreeArc = d3.svg.arc<Segment>()
             .innerRadius(innerRadius)
-            .outerRadius(midRadius);
+            .outerRadius(degreeRadius);
 
         noteSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
