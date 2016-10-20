@@ -74,21 +74,21 @@ namespace music {
     }
 
     export function scale(tonic: Note, mode: Mode): Array<ScaleNote> {
-        let tempNotes: Array<Note> = [];
+        let notesOfScale: Array<Note> = [];
         let scale: Array<ScaleNote> = [];
         let noteIndex = tonic.index;
 
         for (let i = 0; i < 7; i++) {
-            tempNotes.push(notes[noteIndex]);
+            notesOfScale.push(notes[noteIndex]);
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
         }
 
         for (let i = 0; i < 7; i++) {
-            let note = tempNotes[i];
+            let note = notesOfScale[i];
             let triad: Triad = [
-                tempNotes[i],
-                tempNotes[(i + 2) % 7],
-                tempNotes[(i + 4) % 7]
+                notesOfScale[i],
+                notesOfScale[(i + 2) % 7],
+                notesOfScale[(i + 4) % 7]
             ];
 
             scale.push({
@@ -170,12 +170,14 @@ namespace cof {
     let noteSegments: d3.Selection<Segment> = null;
     let degreeSegments: d3.Selection<Segment> = null;
     let degreeText: d3.Selection<Segment> = null;
+    let chordSegments: d3.Selection<Segment> = null;
     let indexer: (x: Segment) => string = (x) => x.note.name;
 
     export function init(): void {
         let pad = 30;
 
         let svg = d3.select("#cof");
+        let chordRadius = 220;
         let noteRadius = 200;
         let degreeRadius = 135;
         let innerRadius = 90;
@@ -193,6 +195,10 @@ namespace cof {
         let degreeArc = d3.svg.arc<Segment>()
             .innerRadius(innerRadius)
             .outerRadius(degreeRadius);
+
+        let chordArc = d3.svg.arc<Segment>()
+            .innerRadius(noteRadius)
+            .outerRadius(chordRadius);
 
         noteSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
@@ -235,6 +241,14 @@ namespace cof {
             .attr("text-anchor", "middle")
             .attr("fill", "black");
 
+        chordSegments = cof.append("g").selectAll("path")
+            .data(segments, indexer)
+            .enter()
+            .append("path")
+            .attr("d", chordArc)
+            .attr("fill", "none")
+            .attr("stroke", "none")
+
         state.addListener(update);
     }
 
@@ -269,6 +283,29 @@ namespace cof {
             .text(function (d, i) { return (<music.ScaleNote>d.note).degreeName; })
             .exit()
             .text("");
+
+        chordSegments
+            .data(data, indexer)
+            .attr("fill", function(d, i) { return getChordTypeColour(<music.ScaleNote>d.note); })
+            .attr("stroke", "black")
+            .attr("stroke-width", "1")
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
+    }
+    
+    function getChordTypeText(note: music.ScaleNote): string {
+        if(note.chordType === music.ChordType.Diminished) return "O";
+        if(note.chordType === music.ChordType.Minor) return "-";
+        if(note.chordType === music.ChordType.Major) return "+";
+        throw "Unexpected ChordType";
+    }
+    
+    function getChordTypeColour(note: music.ScaleNote): string {
+        if(note.chordType === music.ChordType.Diminished) return "red";
+        if(note.chordType === music.ChordType.Minor) return "lightblue";
+        if(note.chordType === music.ChordType.Major) return "lightgreen";
+        throw "Unexpected ChordType";
     }
 
     function generateSegments(count: number): Segment[] {

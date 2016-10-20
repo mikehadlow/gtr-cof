@@ -52,19 +52,19 @@ var music;
     }
     music.fifths = fifths;
     function scale(tonic, mode) {
-        var tempNotes = [];
+        var notesOfScale = [];
         var scale = [];
         var noteIndex = tonic.index;
         for (var i = 0; i < 7; i++) {
-            tempNotes.push(music.notes[noteIndex]);
+            notesOfScale.push(music.notes[noteIndex]);
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12;
         }
         for (var i = 0; i < 7; i++) {
-            var note = tempNotes[i];
+            var note = notesOfScale[i];
             var triad = [
-                tempNotes[i],
-                tempNotes[(i + 2) % 7],
-                tempNotes[(i + 4) % 7]
+                notesOfScale[i],
+                notesOfScale[(i + 2) % 7],
+                notesOfScale[(i + 4) % 7]
             ];
             scale.push({
                 name: note.name,
@@ -136,10 +136,12 @@ var cof;
     var noteSegments = null;
     var degreeSegments = null;
     var degreeText = null;
+    var chordSegments = null;
     var indexer = function (x) { return x.note.name; };
     function init() {
         var pad = 30;
         var svg = d3.select("#cof");
+        var chordRadius = 220;
         var noteRadius = 200;
         var degreeRadius = 135;
         var innerRadius = 90;
@@ -153,6 +155,9 @@ var cof;
         var degreeArc = d3.svg.arc()
             .innerRadius(innerRadius)
             .outerRadius(degreeRadius);
+        var chordArc = d3.svg.arc()
+            .innerRadius(noteRadius)
+            .outerRadius(chordRadius);
         noteSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
             .enter()
@@ -190,6 +195,13 @@ var cof;
             .attr("font-size", "20px")
             .attr("text-anchor", "middle")
             .attr("fill", "black");
+        chordSegments = cof.append("g").selectAll("path")
+            .data(segments, indexer)
+            .enter()
+            .append("path")
+            .attr("d", chordArc)
+            .attr("fill", "none")
+            .attr("stroke", "none");
         state.addListener(update);
     }
     cof_1.init = init;
@@ -221,8 +233,34 @@ var cof;
             .text(function (d, i) { return d.note.degreeName; })
             .exit()
             .text("");
+        chordSegments
+            .data(data, indexer)
+            .attr("fill", function (d, i) { return getChordTypeColour(d.note); })
+            .attr("stroke", "black")
+            .attr("stroke-width", "1")
+            .exit()
+            .attr("fill", "none")
+            .attr("stroke", "none");
     }
     cof_1.update = update;
+    function getChordTypeText(note) {
+        if (note.chordType === music.ChordType.Diminished)
+            return "O";
+        if (note.chordType === music.ChordType.Minor)
+            return "-";
+        if (note.chordType === music.ChordType.Major)
+            return "+";
+        throw "Unexpected ChordType";
+    }
+    function getChordTypeColour(note) {
+        if (note.chordType === music.ChordType.Diminished)
+            return "red";
+        if (note.chordType === music.ChordType.Minor)
+            return "lightblue";
+        if (note.chordType === music.ChordType.Major)
+            return "lightgreen";
+        throw "Unexpected ChordType";
+    }
     function generateSegments(count) {
         var fifths = music.fifths();
         var items = [];
