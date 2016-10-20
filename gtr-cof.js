@@ -34,6 +34,13 @@ var music;
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    (function (ChordType) {
+        ChordType[ChordType["Major"] = 0] = "Major";
+        ChordType[ChordType["Minor"] = 1] = "Minor";
+        ChordType[ChordType["Diminished"] = 2] = "Diminished";
+    })(music.ChordType || (music.ChordType = {}));
+    var ChordType = music.ChordType;
+    ;
     function fifths() {
         var items = [];
         var current = music.notes[0];
@@ -45,21 +52,45 @@ var music;
     }
     music.fifths = fifths;
     function scale(tonic, mode) {
+        var tempNotes = [];
         var scale = [];
         var noteIndex = tonic.index;
         for (var i = 0; i < 7; i++) {
-            var note = music.notes[noteIndex];
+            tempNotes.push(music.notes[noteIndex]);
+            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12;
+        }
+        for (var i = 0; i < 7; i++) {
+            var note = tempNotes[i];
+            var triad = [
+                tempNotes[i],
+                tempNotes[(i + 2) % 7],
+                tempNotes[(i + 4) % 7]
+            ];
             scale.push({
                 name: note.name,
                 index: note.index,
                 degree: i,
-                degreeName: romanNumeral[i]
+                degreeName: romanNumeral[i],
+                triad: triad,
+                chordType: getChordType(triad)
             });
-            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12;
         }
         return scale;
     }
     music.scale = scale;
+    function getChordType(triad) {
+        // check for diminished
+        if (interval(triad[0], triad[2]) === 6)
+            return ChordType.Diminished;
+        // check for minor
+        if (interval(triad[0], triad[1]) === 3)
+            return ChordType.Minor;
+        // must be Major
+        return ChordType.Major;
+    }
+    function interval(a, b) {
+        return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
+    }
     function allNotesFrom(note) {
         var items = [];
         for (var i = 0; i < 12; i++) {

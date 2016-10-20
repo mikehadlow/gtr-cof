@@ -39,21 +39,27 @@ namespace music {
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-
+    
     export interface Note {
         readonly name: string;
         readonly index: number;
     }
-    
+
+    type Triad = [Note, Note, Note];
+
     export interface ScaleNote extends Note {
         readonly degree: number;
         readonly degreeName: string;
+        readonly triad: Triad;
+        readonly chordType: ChordType;
     }
-    
+
     export interface Mode {
         readonly name: string;
         readonly index: number;
     }
+    
+    export enum ChordType {Major, Minor, Diminished};
 
     export function fifths(): Array<Note> {
         let items: Array<Note> = [];
@@ -68,20 +74,46 @@ namespace music {
     }
 
     export function scale(tonic: Note, mode: Mode): Array<ScaleNote> {
+        let tempNotes: Array<Note> = [];
         let scale: Array<ScaleNote> = [];
         let noteIndex = tonic.index;
 
         for (let i = 0; i < 7; i++) {
-            let note = notes[noteIndex];
+            tempNotes.push(notes[noteIndex]);
+            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
+        }
+
+        for (let i = 0; i < 7; i++) {
+            let note = tempNotes[i];
+            let triad: Triad = [
+                tempNotes[i],
+                tempNotes[(i + 2) % 7],
+                tempNotes[(i + 4) % 7]
+            ];
+
             scale.push({
                 name: note.name,
                 index: note.index,
                 degree: i,
-                degreeName: romanNumeral[i]
+                degreeName: romanNumeral[i],
+                triad: triad,
+                chordType: getChordType(triad)
             });
-            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
         }
         return scale;
+    }
+    
+    function getChordType(triad: Triad): ChordType {
+        // check for diminished
+        if(interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
+        // check for minor
+        if(interval(triad[0], triad[1]) === 3) return ChordType.Minor;
+        // must be Major
+        return ChordType.Major;
+    }
+    
+    function interval(a: Note, b: Note): number {
+        return (a.index <= b.index) ?  b.index - a.index : (b.index + 12) - a.index;
     }
 
     export function allNotesFrom(note: Note): Array<Note> {
