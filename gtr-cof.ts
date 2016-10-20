@@ -39,7 +39,7 @@ namespace music {
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    
+
     export interface Note {
         readonly name: string;
         readonly index: number;
@@ -59,8 +59,8 @@ namespace music {
         readonly name: string;
         readonly index: number;
     }
-    
-    export enum ChordType {Major, Minor, Diminished};
+
+    export enum ChordType { Major, Minor, Diminished };
 
     export function fifths(): Array<Note> {
         let items: Array<Note> = [];
@@ -103,29 +103,29 @@ namespace music {
         }
         return scale;
     }
-    
+
     export function appendTriad(scale: Array<ScaleNote>, triad: Triad): Array<ScaleNote> {
-        for(let note of scale) {
-            for(let i=0; i<3; i++) {
-                if(note.name === triad[i].name) {
+        for (let note of scale) {
+            for (let i = 0; i < 3; i++) {
+                if (note.name === triad[i].name) {
                     note.chordNote = i;
                 }
             }
         }
         return scale;
     }
-    
+
     function getChordType(triad: Triad): ChordType {
         // check for diminished
-        if(interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
+        if (interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
         // check for minor
-        if(interval(triad[0], triad[1]) === 3) return ChordType.Minor;
+        if (interval(triad[0], triad[1]) === 3) return ChordType.Minor;
         // must be Major
         return ChordType.Major;
     }
-    
+
     function interval(a: Note, b: Note): number {
-        return (a.index <= b.index) ?  b.index - a.index : (b.index + 12) - a.index;
+        return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
     }
 
     export function allNotesFrom(note: Note): Array<Note> {
@@ -161,13 +161,12 @@ namespace state {
 
     export function changeChord(triad: music.Triad): void {
         updateListeners(triad);
-        console.log("chord " + triad[0].name + ", " + triad[1].name + ", " + triad[2].name);
     }
 
     function updateListeners(triad?: music.Triad): void {
         let scale = music.scale(currentTonic, currentMode);
-        
-        if(triad) {
+
+        if (triad) {
             scale = music.appendTriad(scale, triad);
         }
 
@@ -194,6 +193,7 @@ namespace cof {
     let degreeSegments: d3.Selection<Segment> = null;
     let degreeText: d3.Selection<Segment> = null;
     let chordSegments: d3.Selection<Segment> = null;
+    let chordNotes: d3.Selection<Segment> = null;
     let indexer: (x: Segment) => string = (x) => x.note.name;
 
     export function init(): void {
@@ -273,6 +273,17 @@ namespace cof {
             .attr("stroke", "none")
             .on("click", handleChordClick);
 
+        chordNotes = cof.append("g").selectAll("circle")
+            .data(segments, indexer)
+            .enter()
+            .append("circle")
+            .style("pointer-events", "none")
+            .attr("r", 15)
+            .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
+            .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
+            .attr("fill", "none")
+            .attr("stroke", "none");
+
         state.addListener(update);
     }
 
@@ -310,26 +321,38 @@ namespace cof {
 
         chordSegments
             .data(data, indexer)
-            .attr("fill", function(d, i) { return getChordTypeColour(<music.ScaleNote>d.note); })
+            .attr("fill", function (d, i) { return getChordTypeColour(<music.ScaleNote>d.note); })
             .attr("stroke", "black")
             .attr("stroke-width", "1")
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+
+        chordNotes
+            .data(data, indexer)
+            .attr("fill", function (d, i) { return getChordNoteColour(<music.ScaleNote>d.note); })
+            .exit()
+            .attr("fill", "none");
     }
-    
+
     function getChordTypeText(note: music.ScaleNote): string {
-        if(note.chordType === music.ChordType.Diminished) return "O";
-        if(note.chordType === music.ChordType.Minor) return "-";
-        if(note.chordType === music.ChordType.Major) return "+";
+        if (note.chordType === music.ChordType.Diminished) return "O";
+        if (note.chordType === music.ChordType.Minor) return "-";
+        if (note.chordType === music.ChordType.Major) return "+";
         throw "Unexpected ChordType";
     }
-    
+
     function getChordTypeColour(note: music.ScaleNote): string {
-        if(note.chordType === music.ChordType.Diminished) return "red";
-        if(note.chordType === music.ChordType.Minor) return "lightblue";
-        if(note.chordType === music.ChordType.Major) return "lightgreen";
+        if (note.chordType === music.ChordType.Diminished) return "red";
+        if (note.chordType === music.ChordType.Minor) return "lightblue";
+        if (note.chordType === music.ChordType.Major) return "lightgreen";
         throw "Unexpected ChordType";
+    }
+
+    function getChordNoteColour(note: music.ScaleNote): string {
+        if (note.chordNote === undefined) return "none";
+        if (note.chordNote === 0) return "black"
+        return "grey";
     }
 
     function generateSegments(count: number): Segment[] {
@@ -506,28 +529,28 @@ namespace gtr {
     }
 
     function update(stateChange: state.StateChange): void {
-        
-        let fill = function(d: music.Note, i: number): string {
+
+        let fill = function (d: music.Note, i: number): string {
             return noteColours[i];
         };
-        
-        let stroke = function(d: music.Note, i: number): string {
+
+        let stroke = function (d: music.Note, i: number): string {
             let note = <music.ScaleNote>d;
-            if(note.chordNote !== undefined) {
+            if (note.chordNote !== undefined) {
                 return "red";
             }
-            return "black";
+            return "grey";
         };
-        
-        let strokeWidth = function(d: music.Note, i: number): number {
+
+        let strokeWidth = function (d: music.Note, i: number): number {
             let note = <music.ScaleNote>d;
-            if(note.chordNote !== undefined) {
+            if (note.chordNote !== undefined) {
                 return 5;
             }
             return 2;
         };
 
-        
+
         notes
             .data(stateChange.scale, function (d) { return d.name; })
             .attr("fill", fill)

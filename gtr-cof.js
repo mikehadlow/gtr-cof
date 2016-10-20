@@ -133,7 +133,6 @@ var state;
     state.changeMode = changeMode;
     function changeChord(triad) {
         updateListeners(triad);
-        console.log("chord " + triad[0].name + ", " + triad[1].name + ", " + triad[2].name);
     }
     state.changeChord = changeChord;
     function updateListeners(triad) {
@@ -158,6 +157,7 @@ var cof;
     var degreeSegments = null;
     var degreeText = null;
     var chordSegments = null;
+    var chordNotes = null;
     var indexer = function (x) { return x.note.name; };
     function init() {
         var pad = 30;
@@ -224,6 +224,16 @@ var cof;
             .attr("fill", "none")
             .attr("stroke", "none")
             .on("click", handleChordClick);
+        chordNotes = cof.append("g").selectAll("circle")
+            .data(segments, indexer)
+            .enter()
+            .append("circle")
+            .style("pointer-events", "none")
+            .attr("r", 15)
+            .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
+            .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
+            .attr("fill", "none")
+            .attr("stroke", "none");
         state.addListener(update);
     }
     cof_1.init = init;
@@ -263,6 +273,11 @@ var cof;
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+        chordNotes
+            .data(data, indexer)
+            .attr("fill", function (d, i) { return getChordNoteColour(d.note); })
+            .exit()
+            .attr("fill", "none");
     }
     cof_1.update = update;
     function getChordTypeText(note) {
@@ -282,6 +297,13 @@ var cof;
         if (note.chordType === music.ChordType.Major)
             return "lightgreen";
         throw "Unexpected ChordType";
+    }
+    function getChordNoteColour(note) {
+        if (note.chordNote === undefined)
+            return "none";
+        if (note.chordNote === 0)
+            return "black";
+        return "grey";
     }
     function generateSegments(count) {
         var fifths = music.fifths();
@@ -439,7 +461,7 @@ var gtr;
             if (note.chordNote !== undefined) {
                 return "red";
             }
-            return "black";
+            return "grey";
         };
         var strokeWidth = function (d, i) {
             var note = d;
