@@ -34,18 +34,6 @@ var music;
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    var Note = (function () {
-        function Note() {
-        }
-        return Note;
-    }());
-    music.Note = Note;
-    var Mode = (function () {
-        function Mode() {
-        }
-        return Mode;
-    }());
-    music.Mode = Mode;
     function fifths() {
         var items = [];
         var current = music.notes[0];
@@ -60,16 +48,18 @@ var music;
         var scale = [];
         var noteIndex = tonic.index;
         for (var i = 0; i < 7; i++) {
-            scale.push(music.notes[noteIndex]);
+            var note = music.notes[noteIndex];
+            scale.push({
+                name: note.name,
+                index: note.index,
+                degree: i,
+                degreeName: romanNumeral[i]
+            });
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12;
         }
         return scale;
     }
     music.scale = scale;
-    function degree(i) {
-        return romanNumeral[i];
-    }
-    music.degree = degree;
     function allNotesFrom(note) {
         var items = [];
         for (var i = 0; i < 12; i++) {
@@ -109,12 +99,6 @@ var state;
             listener(stateChange);
         }
     }
-    var StateChange = (function () {
-        function StateChange() {
-        }
-        return StateChange;
-    }());
-    state.StateChange = StateChange;
 })(state || (state = {}));
 var cof;
 (function (cof_1) {
@@ -203,7 +187,7 @@ var cof;
             .attr("stroke", "none");
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return music.degree(i); })
+            .text(function (d, i) { return d.note.degreeName; })
             .exit()
             .text("");
     }
@@ -225,11 +209,6 @@ var cof;
     function handleNoteClick(segment, i) {
         state.changeTonic(segment.note);
     }
-    var Segment = (function () {
-        function Segment() {
-        }
-        return Segment;
-    }());
 })(cof || (cof = {}));
 var modes;
 (function (modes_1) {

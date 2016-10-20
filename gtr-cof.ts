@@ -40,14 +40,19 @@ namespace music {
 
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
 
-    export class Note {
-        name: string;
-        index: number;
+    export interface Note {
+        readonly name: string;
+        readonly index: number;
     }
-
-    export class Mode {
-        name: string;
-        index: number;
+    
+    export interface ScaleNote extends Note {
+        readonly degree: number;
+        readonly degreeName: string;
+    }
+    
+    export interface Mode {
+        readonly name: string;
+        readonly index: number;
     }
 
     export function fifths(): Array<Note> {
@@ -62,19 +67,21 @@ namespace music {
         return items;
     }
 
-    export function scale(tonic: Note, mode: Mode): Array<Note> {
-        let scale: Array<Note> = [];
+    export function scale(tonic: Note, mode: Mode): Array<ScaleNote> {
+        let scale: Array<ScaleNote> = [];
         let noteIndex = tonic.index;
 
         for (let i = 0; i < 7; i++) {
-            scale.push(notes[noteIndex]);
+            let note = notes[noteIndex];
+            scale.push({
+                name: note.name,
+                index: note.index,
+                degree: i,
+                degreeName: romanNumeral[i]
+            });
             noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
         }
         return scale;
-    }
-
-    export function degree(i: number): string {
-        return romanNumeral[i];
     }
 
     export function allNotesFrom(note: Note): Array<Note> {
@@ -119,10 +126,10 @@ namespace state {
         }
     }
 
-    export class StateChange {
-        tonic: music.Note;
-        mode: music.Mode;
-        scale: Array<music.Note>;
+    export interface StateChange {
+        readonly tonic: music.Note;
+        readonly mode: music.Mode;
+        readonly scale: Array<music.Note>;
     }
 }
 
@@ -227,7 +234,7 @@ namespace cof {
 
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return music.degree(i); })
+            .text(function (d, i) { return (<music.ScaleNote>d.note).degreeName; })
             .exit()
             .text("");
     }
@@ -251,10 +258,10 @@ namespace cof {
         state.changeTonic(segment.note);
     }
 
-    class Segment {
-        note: music.Note;
-        startAngle: number;
-        endAngle: number;
+    interface Segment {
+        readonly note: music.Note;
+        readonly startAngle: number;
+        readonly endAngle: number;
     }
 }
 
