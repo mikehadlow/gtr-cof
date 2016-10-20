@@ -78,6 +78,18 @@ var music;
         return scale;
     }
     music.scale = scale;
+    function appendTriad(scale, triad) {
+        for (var _i = 0, scale_1 = scale; _i < scale_1.length; _i++) {
+            var note = scale_1[_i];
+            for (var i = 0; i < 3; i++) {
+                if (note.name === triad[i].name) {
+                    note.chordNote = i;
+                }
+            }
+        }
+        return scale;
+    }
+    music.appendTriad = appendTriad;
     function getChordType(triad) {
         // check for diminished
         if (interval(triad[0], triad[2]) === 6)
@@ -119,11 +131,20 @@ var state;
         updateListeners();
     }
     state.changeMode = changeMode;
-    function updateListeners() {
+    function changeChord(triad) {
+        updateListeners(triad);
+        console.log("chord " + triad[0].name + ", " + triad[1].name + ", " + triad[2].name);
+    }
+    state.changeChord = changeChord;
+    function updateListeners(triad) {
+        var scale = music.scale(currentTonic, currentMode);
+        if (triad) {
+            scale = music.appendTriad(scale, triad);
+        }
         var stateChange = {
             tonic: currentTonic,
             mode: currentMode,
-            scale: music.scale(currentTonic, currentMode)
+            scale: scale
         };
         for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
             var listener = listeners_1[_i];
@@ -201,7 +222,8 @@ var cof;
             .append("path")
             .attr("d", chordArc)
             .attr("fill", "none")
-            .attr("stroke", "none");
+            .attr("stroke", "none")
+            .on("click", handleChordClick);
         state.addListener(update);
     }
     cof_1.init = init;
@@ -277,6 +299,10 @@ var cof;
     }
     function handleNoteClick(segment, i) {
         state.changeTonic(segment.note);
+    }
+    function handleChordClick(segment, i) {
+        var note = segment.note;
+        state.changeChord(note.triad);
     }
 })(cof || (cof = {}));
 var modes;
@@ -405,11 +431,28 @@ var gtr;
     }
     gtr_1.init = init;
     function update(stateChange) {
+        var fill = function (d, i) {
+            return noteColours[i];
+        };
+        var stroke = function (d, i) {
+            var note = d;
+            if (note.chordNote !== undefined) {
+                return "red";
+            }
+            return "black";
+        };
+        var strokeWidth = function (d, i) {
+            var note = d;
+            if (note.chordNote !== undefined) {
+                return 5;
+            }
+            return 2;
+        };
         notes
             .data(stateChange.scale, function (d) { return d.name; })
-            .attr("fill", function (d, i) { return noteColours[i]; })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
+            .attr("fill", fill)
+            .attr("stroke", stroke)
+            .attr("stroke-width", strokeWidth)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");

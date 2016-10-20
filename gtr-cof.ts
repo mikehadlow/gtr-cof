@@ -45,13 +45,14 @@ namespace music {
         readonly index: number;
     }
 
-    type Triad = [Note, Note, Note];
+    export type Triad = [Note, Note, Note];
 
     export interface ScaleNote extends Note {
         readonly degree: number;
         readonly degreeName: string;
         readonly triad: Triad;
         readonly chordType: ChordType;
+        chordNote?: number;
     }
 
     export interface Mode {
@@ -103,6 +104,17 @@ namespace music {
         return scale;
     }
     
+    export function appendTriad(scale: Array<ScaleNote>, triad: Triad): Array<ScaleNote> {
+        for(let note of scale) {
+            for(let i=0; i<3; i++) {
+                if(note.name === triad[i].name) {
+                    note.chordNote = i;
+                }
+            }
+        }
+        return scale;
+    }
+    
     function getChordType(triad: Triad): ChordType {
         // check for diminished
         if(interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
@@ -147,11 +159,22 @@ namespace state {
         updateListeners();
     }
 
-    function updateListeners(): void {
+    export function changeChord(triad: music.Triad): void {
+        updateListeners(triad);
+        console.log("chord " + triad[0].name + ", " + triad[1].name + ", " + triad[2].name);
+    }
+
+    function updateListeners(triad?: music.Triad): void {
+        let scale = music.scale(currentTonic, currentMode);
+        
+        if(triad) {
+            scale = music.appendTriad(scale, triad);
+        }
+
         let stateChange: StateChange = {
             tonic: currentTonic,
             mode: currentMode,
-            scale: music.scale(currentTonic, currentMode)
+            scale: scale
         };
         for (let listener of listeners) {
             listener(stateChange);
@@ -248,6 +271,7 @@ namespace cof {
             .attr("d", chordArc)
             .attr("fill", "none")
             .attr("stroke", "none")
+            .on("click", handleChordClick);
 
         state.addListener(update);
     }
@@ -325,6 +349,11 @@ namespace cof {
 
     function handleNoteClick(segment: Segment, i: number): void {
         state.changeTonic(segment.note);
+    }
+
+    function handleChordClick(segment: Segment, i: number): void {
+        let note = <music.ScaleNote>segment.note;
+        state.changeChord(note.triad);
     }
 
     interface Segment {
@@ -477,11 +506,33 @@ namespace gtr {
     }
 
     function update(stateChange: state.StateChange): void {
+        
+        let fill = function(d: music.Note, i: number): string {
+            return noteColours[i];
+        };
+        
+        let stroke = function(d: music.Note, i: number): string {
+            let note = <music.ScaleNote>d;
+            if(note.chordNote !== undefined) {
+                return "red";
+            }
+            return "black";
+        };
+        
+        let strokeWidth = function(d: music.Note, i: number): number {
+            let note = <music.ScaleNote>d;
+            if(note.chordNote !== undefined) {
+                return 5;
+            }
+            return 2;
+        };
+
+        
         notes
             .data(stateChange.scale, function (d) { return d.name; })
-            .attr("fill", function (d, i) { return noteColours[i]; })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
+            .attr("fill", fill)
+            .attr("stroke", stroke)
+            .attr("stroke-width", strokeWidth)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
