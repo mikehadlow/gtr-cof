@@ -5,3 +5,83 @@ body {
 text {
     pointer-events: none;
 }
+
+/* Circle of Fifths */
+.note-segment {
+    fill: lightgrey;
+    stroke: black;
+    stroke-width: 3px;
+}
+.note-segment-tonic {
+    fill: yellow;
+}
+.note-segment-scale {
+    fill: white;
+}
+.note-segment-text {
+    font-size: 50px;
+    text-anchor: middle;
+    fill: black;
+}
+.degree-segment {
+    fill: none;
+    stroke: none;
+}
+.degree-segment-selected {
+    fill: white;
+    stroke: black;
+    stroke-width: 2px;
+}
+.degree-segment-text {
+    font-size: 20px;
+    text-anchor: middle;
+    fill: black;
+}
+.chord-segment {
+    fill: none;
+    stroke: none;
+}
+.chord-segment-dim {
+    fill: red;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-minor {
+    fill: lightblue;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-major {
+    fill: lightgreen;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-note {
+    fill: none;
+    stroke: none;
+}
+.chord-segment-note-root {
+    fill: black;
+    stroke: none;
+}
+.chord-segment-note-other {
+    fill: grey;
+    stroke: none;
+}
+
+/* Modes */
+.mode-button {
+    fill: lightgrey;
+    stroke: black;
+    stroke-width: 2px;
+    width: 250px;
+    height: 50px;
+}
+.mode-button-selected {
+    fill: white;
+}
+.mode-text {
+    font-size: 30px;
+    text-anchor: left;
+    fill: black;
+}

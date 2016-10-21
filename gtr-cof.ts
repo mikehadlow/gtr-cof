@@ -228,9 +228,6 @@ namespace cof {
             .enter()
             .append("path")
             .attr("d", noteArc)
-            .attr("fill", "lightgrey")
-            .attr("stroke", "black")
-            .attr("stroke-width", "3")
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
@@ -241,17 +238,14 @@ namespace cof {
             .attr("x", function (x) { return noteArc.centroid(x)[0]; })
             .attr("y", function (x) { return noteArc.centroid(x)[1] + 18; })
             .text(function (x) { return x.note.name; })
-            .attr("font-size", "50px")
-            .attr("text-anchor", "middle")
-            .attr("fill", "black");
+            .attr("class", "note-segment-text");
 
         degreeSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
             .enter()
             .append("path")
             .attr("d", degreeArc)
-            .attr("fill", "none")
-            .attr("stroke", "none")
+            .attr("class", "degree-segment")
 
         degreeText = cof.append("g").selectAll("text")
             .data(segments, indexer)
@@ -260,17 +254,14 @@ namespace cof {
             .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
             .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
             .text("")
-            .attr("font-size", "20px")
-            .attr("text-anchor", "middle")
-            .attr("fill", "black");
+            .attr("class", "degree-segment-text");
 
         chordSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
             .enter()
             .append("path")
             .attr("d", chordArc)
-            .attr("fill", "none")
-            .attr("stroke", "none")
+            .attr("class", "chord-segment")
             .on("click", handleChordClick);
 
         chordNotes = cof.append("g").selectAll("circle")
@@ -281,8 +272,7 @@ namespace cof {
             .attr("r", 15)
             .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
             .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
-            .attr("fill", "none")
-            .attr("stroke", "none");
+            .attr("class", "chord-segment-note");
 
         state.addListener(update);
     }
@@ -300,18 +290,15 @@ namespace cof {
 
         noteSegments
             .data(data, indexer)
-            .attr("fill", function (d, i) { return (i === 0) ? "yellow" : "white"; })
+            .attr("class", function(d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic": "note-segment-scale"); })
             .exit()
-            .attr("fill", "lightgrey");
+            .attr("class", "note-segment");
 
         degreeSegments
             .data(data, indexer)
-            .attr("fill", "white")
-            .attr("stroke", "black")
-            .attr("stroke-width", "2")
+            .attr("class", "degree-segment-selected")
             .exit()
-            .attr("fill", "none")
-            .attr("stroke", "none");
+            .attr("class", "degree-segment")
 
         degreeText
             .data(data, indexer)
@@ -321,38 +308,28 @@ namespace cof {
 
         chordSegments
             .data(data, indexer)
-            .attr("fill", function (d, i) { return getChordTypeColour(<music.ScaleNote>d.note); })
-            .attr("stroke", "black")
-            .attr("stroke-width", "1")
+            .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
             .exit()
-            .attr("fill", "none")
-            .attr("stroke", "none");
+            .attr("class", "chord-segment");
 
         chordNotes
             .data(data, indexer)
-            .attr("fill", function (d, i) { return getChordNoteColour(<music.ScaleNote>d.note); })
+            .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
             .exit()
-            .attr("fill", "none");
+            .attr("class", "chord-segment-note");
     }
 
-    function getChordTypeText(note: music.ScaleNote): string {
-        if (note.chordType === music.ChordType.Diminished) return "O";
-        if (note.chordType === music.ChordType.Minor) return "-";
-        if (note.chordType === music.ChordType.Major) return "+";
+    function getChordSegmentClass(note: music.ScaleNote): string {
+        if (note.chordType === music.ChordType.Diminished) return "chord-segment-dim";
+        if (note.chordType === music.ChordType.Minor) return "chord-segment-minor";
+        if (note.chordType === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 
-    function getChordTypeColour(note: music.ScaleNote): string {
-        if (note.chordType === music.ChordType.Diminished) return "red";
-        if (note.chordType === music.ChordType.Minor) return "lightblue";
-        if (note.chordType === music.ChordType.Major) return "lightgreen";
-        throw "Unexpected ChordType";
-    }
-
-    function getChordNoteColour(note: music.ScaleNote): string {
-        if (note.chordNote === undefined) return "none";
-        if (note.chordNote === 0) return "black"
-        return "grey";
+    function getChordNoteClass(note: music.ScaleNote): string {
+        if (note.chordNote === undefined) return "chord-segment-note";
+        if (note.chordNote === 0) return "chord-segment-note-root";
+        return "chord-segment-note-other";
     }
 
     function generateSegments(count: number): Segment[] {
@@ -393,7 +370,6 @@ namespace modes {
     export function init(): void {
         let pad = 10;
         let buttonHeight = 50;
-        let buttonWidth = 250;
         let svg = d3.select("#modes");
         let modes = svg.append("g");
 
@@ -407,11 +383,7 @@ namespace modes {
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
-            .attr("width", buttonWidth)
-            .attr("height", buttonHeight)
-            .attr("fill", "lightgrey")
-            .attr("stroke", "black")
-            .attr("stroke-width", "3")
+            .attr("class", "mode-button")
             .on("click", handleButtonClick);
 
         gs
@@ -419,9 +391,7 @@ namespace modes {
             .attr("x", pad + 20)
             .attr("y", 34)
             .text(function (x) { return x.name; })
-            .attr("font-size", "30px")
-            .attr("text-anchor", "left")
-            .attr("fill", "black");
+            .attr("class", "mode-text");
 
         state.addListener(update);
     }
@@ -434,9 +404,9 @@ namespace modes {
         let modes: Array<music.Mode> = [stateChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
-            .attr("fill", "white")
+            .attr("class", "mode-button mode-button-selected")
             .exit()
-            .attr("fill", "lightgrey")
+            .attr("class", "mode-button")
     }
 }
 
