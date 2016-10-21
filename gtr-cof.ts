@@ -128,15 +128,6 @@ namespace music {
         return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
     }
 
-    export function allNotesFrom(note: Note): Array<Note> {
-        let items: Array<Note> = [];
-
-        for (let i = 0; i < 12; i++) {
-            items.push(notes[(i + note.index) % 12]);
-        }
-
-        return items;
-    }
 }
 
 namespace state {
@@ -412,7 +403,8 @@ namespace modes {
 
 namespace gtr {
 
-    let notes: d3.Selection<music.Note> = null;
+    let notes: d3.Selection<StringNote> = null;
+    let numberOfFrets = 16;
 
     let noteColours: Array<string> = [
         "yellow",
@@ -431,7 +423,7 @@ namespace gtr {
         let noteRadius = 15;
         let pad = 50;
 
-        let fretData: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        let fretData: Array<number> = getFretData(numberOfFrets);
         let dots: Array<[number, number]> = [
             [3, 3], // [fret, position]
             [5, 3],
@@ -439,6 +431,7 @@ namespace gtr {
             [9, 3],
             [12, 2],
             [12, 4],
+            [15, 3]
         ];
 
         let svg = d3.select("#gtr");
@@ -479,14 +472,14 @@ namespace gtr {
             .append("line")
             .attr("x1", pad + fretGap)
             .attr("y1", stringGap / 2)
-            .attr("x2", pad + (fretGap * 12) + 20)
+            .attr("x2", pad + (fretGap * numberOfFrets) + 20)
             .attr("y2", stringGap / 2)
             .attr("stroke", "black")
             .attr("stroke-width", 2);
 
         notes = strings
             .selectAll("circle")
-            .data(function (d) { return music.allNotesFrom(d); }, function (d) { return d.name; })
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, function (d) { return d.note.name + d.octave.toString(); })
             .enter()
             .append("circle")
             .attr("r", noteRadius)
@@ -500,35 +493,73 @@ namespace gtr {
 
     function update(stateChange: state.StateChange): void {
 
-        let fill = function (d: music.Note, i: number): string {
-            return noteColours[i];
+        let fill = function (d: StringNote, i: number): string {
+            return noteColours[i % 7];
         };
 
-        let stroke = function (d: music.Note, i: number): string {
-            let note = <music.ScaleNote>d;
+        let stroke = function (d: StringNote, i: number): string {
+            let note = <music.ScaleNote>d.note;
             if (note.chordNote !== undefined) {
                 return "red";
             }
             return "grey";
         };
 
-        let strokeWidth = function (d: music.Note, i: number): number {
-            let note = <music.ScaleNote>d;
+        let strokeWidth = function (d: StringNote, i: number): number {
+            let note = <music.ScaleNote>d.note;
             if (note.chordNote !== undefined) {
                 return 5;
             }
             return 2;
         };
 
-
         notes
-            .data(stateChange.scale, function (d) { return d.name; })
+            .data(repeatTo(stateChange.scale, numberOfFrets), function (d) { return d.note.name + d.octave.toString(); })
             .attr("fill", fill)
             .attr("stroke", stroke)
             .attr("stroke-width", strokeWidth)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+    }
+    
+    function allNotesFrom(note: music.Note, numberOfNotes: number): Array<StringNote> {
+        let items: Array<StringNote> = [];
+
+        for (let i = 0; i < numberOfNotes; i++) {
+            items.push({
+                note: music.notes[(i + note.index) % 12],
+                octave: Math.floor((i+1)/12)
+            });
+        }
+
+        return items;
+    }
+
+    function getFretData(numberOfFrets: number): Array<number> {
+        let data: Array<number> = [];
+        for(let i=0; i<numberOfFrets; i++) {
+            data.push(i);
+        }
+        return data;
+    }
+    
+    function repeatTo(scale: Array<music.Note>, count: number): Array<StringNote> {
+        let result: Array<StringNote> = [];
+        
+        for(let i=0; i<count; i++) {
+            result.push({
+                note: scale[i % scale.length],
+                octave: Math.floor((i+1)/8)
+            });
+        }
+        
+        return result;
+    }
+    
+    interface StringNote {
+        note: music.Note;
+        octave: number;
     }
 }
 

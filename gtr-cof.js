@@ -103,14 +103,6 @@ var music;
     function interval(a, b) {
         return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
     }
-    function allNotesFrom(note) {
-        var items = [];
-        for (var i = 0; i < 12; i++) {
-            items.push(music.notes[(i + note.index) % 12]);
-        }
-        return items;
-    }
-    music.allNotesFrom = allNotesFrom;
 })(music || (music = {}));
 var state;
 (function (state) {
@@ -345,6 +337,7 @@ var modes;
 var gtr;
 (function (gtr_1) {
     var notes = null;
+    var numberOfFrets = 16;
     var noteColours = [
         "yellow",
         "lightgrey",
@@ -360,7 +353,7 @@ var gtr;
         var fretWidth = 5;
         var noteRadius = 15;
         var pad = 50;
-        var fretData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        var fretData = getFretData(numberOfFrets);
         var dots = [
             [3, 3],
             [5, 3],
@@ -368,6 +361,7 @@ var gtr;
             [9, 3],
             [12, 2],
             [12, 4],
+            [15, 3]
         ];
         var svg = d3.select("#gtr");
         var gtr = svg.append("g");
@@ -403,13 +397,13 @@ var gtr;
             .append("line")
             .attr("x1", pad + fretGap)
             .attr("y1", stringGap / 2)
-            .attr("x2", pad + (fretGap * 12) + 20)
+            .attr("x2", pad + (fretGap * numberOfFrets) + 20)
             .attr("y2", stringGap / 2)
             .attr("stroke", "black")
             .attr("stroke-width", 2);
         notes = strings
             .selectAll("circle")
-            .data(function (d) { return music.allNotesFrom(d); }, function (d) { return d.name; })
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, function (d) { return d.note.name + d.octave.toString(); })
             .enter()
             .append("circle")
             .attr("r", noteRadius)
@@ -422,30 +416,57 @@ var gtr;
     gtr_1.init = init;
     function update(stateChange) {
         var fill = function (d, i) {
-            return noteColours[i];
+            return noteColours[i % 7];
         };
         var stroke = function (d, i) {
-            var note = d;
+            var note = d.note;
             if (note.chordNote !== undefined) {
                 return "red";
             }
             return "grey";
         };
         var strokeWidth = function (d, i) {
-            var note = d;
+            var note = d.note;
             if (note.chordNote !== undefined) {
                 return 5;
             }
             return 2;
         };
         notes
-            .data(stateChange.scale, function (d) { return d.name; })
+            .data(repeatTo(stateChange.scale, numberOfFrets), function (d) { return d.note.name + d.octave.toString(); })
             .attr("fill", fill)
             .attr("stroke", stroke)
             .attr("stroke-width", strokeWidth)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+    }
+    function allNotesFrom(note, numberOfNotes) {
+        var items = [];
+        for (var i = 0; i < numberOfNotes; i++) {
+            items.push({
+                note: music.notes[(i + note.index) % 12],
+                octave: Math.floor((i + 1) / 12)
+            });
+        }
+        return items;
+    }
+    function getFretData(numberOfFrets) {
+        var data = [];
+        for (var i = 0; i < numberOfFrets; i++) {
+            data.push(i);
+        }
+        return data;
+    }
+    function repeatTo(scale, count) {
+        var result = [];
+        for (var i = 0; i < count; i++) {
+            result.push({
+                note: scale[i % scale.length],
+                octave: Math.floor((i + 1) / 8)
+            });
+        }
+        return result;
     }
 })(gtr || (gtr = {}));
 cof.init();
