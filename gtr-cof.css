@@ -61,11 +61,17 @@ text {
     stroke: none;
 }
 .chord-segment-note-root {
-    fill: black;
-    stroke: none;
+    fill: red;
+    stroke: black;
+    stroke-width: 2px;
 }
-.chord-segment-note-other {
-    fill: white;
+.chord-segment-note-third {
+    fill: green;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-note-fifth {
+    fill: blue;
     stroke: black;
     stroke-width: 2px;
 }

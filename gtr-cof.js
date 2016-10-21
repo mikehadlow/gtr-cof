@@ -270,7 +270,9 @@ var cof;
             return "chord-segment-note";
         if (note.chordNote === 0)
             return "chord-segment-note-root";
-        return "chord-segment-note-other";
+        if (note.chordNote === 1)
+            return "chord-segment-note-third";
+        return "chord-segment-note-fifth";
     }
     function generateSegments(count) {
         var fifths = music.fifths();
@@ -420,10 +422,16 @@ var gtr;
         };
         var stroke = function (d, i) {
             var note = d.note;
-            if (note.chordNote !== undefined) {
+            if (note.chordNote === undefined) {
+                return "grey";
+            }
+            if (note.chordNote === 0) {
                 return "red";
             }
-            return "grey";
+            if (note.chordNote === 1) {
+                return "green";
+            }
+            return "blue";
         };
         var strokeWidth = function (d, i) {
             var note = d.note;

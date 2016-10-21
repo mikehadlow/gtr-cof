@@ -320,7 +320,8 @@ namespace cof {
     function getChordNoteClass(note: music.ScaleNote): string {
         if (note.chordNote === undefined) return "chord-segment-note";
         if (note.chordNote === 0) return "chord-segment-note-root";
-        return "chord-segment-note-other";
+        if (note.chordNote === 1) return "chord-segment-note-third";
+        return "chord-segment-note-fifth";
     }
 
     function generateSegments(count: number): Segment[] {
@@ -499,10 +500,16 @@ namespace gtr {
 
         let stroke = function (d: StringNote, i: number): string {
             let note = <music.ScaleNote>d.note;
-            if (note.chordNote !== undefined) {
+            if (note.chordNote === undefined) {
+                return "grey";
+            }
+            if (note.chordNote === 0) {
                 return "red";
             }
-            return "grey";
+            if (note.chordNote === 1) {
+                return "green";
+            }
+            return "blue";
         };
 
         let strokeWidth = function (d: StringNote, i: number): number {
