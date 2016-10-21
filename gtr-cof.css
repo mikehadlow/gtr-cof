@@ -65,8 +65,9 @@ text {
     stroke: none;
 }
 .chord-segment-note-other {
-    fill: grey;
-    stroke: none;
+    fill: white;
+    stroke: black;
+    stroke-width: 2px;
 }
 
 /* Modes */
