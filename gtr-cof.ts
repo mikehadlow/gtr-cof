@@ -368,8 +368,8 @@ namespace modes {
     let buttons: d3.Selection<music.Mode> = null;
 
     export function init(): void {
-        let pad = 10;
-        let buttonHeight = 50;
+        let pad = 5;
+        let buttonHeight = 25;
         let svg = d3.select("#modes");
         let modes = svg.append("g");
 
@@ -377,7 +377,7 @@ namespace modes {
             .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; })
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
 
         buttons = gs
             .append("rect")
@@ -388,8 +388,8 @@ namespace modes {
 
         gs
             .append("text")
-            .attr("x", pad + 20)
-            .attr("y", 34)
+            .attr("x", pad + 10)
+            .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
 

@@ -74,14 +74,14 @@ text {
     fill: lightgrey;
     stroke: black;
     stroke-width: 2px;
-    width: 250px;
-    height: 50px;
+    width: 150px;
+    height: 25px;
 }
 .mode-button-selected {
     fill: white;
 }
 .mode-text {
-    font-size: 30px;
+    font-size: 15;
     text-anchor: left;
     fill: black;
 }

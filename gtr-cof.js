@@ -306,15 +306,15 @@ var modes;
 (function (modes_1) {
     var buttons = null;
     function init() {
-        var pad = 10;
-        var buttonHeight = 50;
+        var pad = 5;
+        var buttonHeight = 25;
         var svg = d3.select("#modes");
         var modes = svg.append("g");
         var gs = modes.selectAll("g")
             .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + 30) + ")"; });
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
         buttons = gs
             .append("rect")
             .attr("x", pad)
@@ -323,8 +323,8 @@ var modes;
             .on("click", handleButtonClick);
         gs
             .append("text")
-            .attr("x", pad + 20)
-            .attr("y", 34)
+            .attr("x", pad + 10)
+            .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
         state.addListener(update);
