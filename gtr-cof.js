@@ -2,18 +2,18 @@
 var music;
 (function (music) {
     music.notes = [
-        { name: 'C', index: 0 },
-        { name: 'C#', index: 1 },
-        { name: 'D', index: 2 },
-        { name: 'D#', index: 3 },
-        { name: 'E', index: 4 },
-        { name: 'F', index: 5 },
-        { name: 'F#', index: 6 },
-        { name: 'G', index: 7 },
-        { name: 'G#', index: 8 },
-        { name: 'A', index: 9 },
-        { name: 'A#', index: 10 },
-        { name: 'B', index: 11 },
+        { name: 'C', flat: 'C', index: 0 },
+        { name: 'C#', flat: 'Db', index: 1 },
+        { name: 'D', flat: 'D', index: 2 },
+        { name: 'D#', flat: 'Eb', index: 3 },
+        { name: 'E', flat: 'E', index: 4 },
+        { name: 'F', flat: 'F', index: 5 },
+        { name: 'F#', flat: 'Gb', index: 6 },
+        { name: 'G', flat: 'G', index: 7 },
+        { name: 'G#', flat: 'Ab', index: 8 },
+        { name: 'A', flat: 'A', index: 9 },
+        { name: 'A#', flat: 'Bb', index: 10 },
+        { name: 'B', flat: 'B', index: 11 },
     ];
     music.modes = [
         { name: 'Lydian', index: 3 },
@@ -68,6 +68,7 @@ var music;
             ];
             scale.push({
                 name: note.name,
+                flat: note.flat,
                 index: note.index,
                 degree: i,
                 degreeName: romanNumeral[i],
