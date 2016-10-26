@@ -16,18 +16,18 @@ var music;
         { name: 'B', flat: 'B', index: 11 },
     ];
     music.quality = [
-        { name: "Unison", isFlat: false },
-        { name: "Minor 2nd", isFlat: true },
-        { name: "Major 2nd", isFlat: false },
-        { name: "Minor 3rd", isFlat: true },
-        { name: "Major 3rd", isFlat: false },
-        { name: "Perfect 4th", isFlat: false },
-        { name: "Tritone", isFlat: true },
-        { name: "Perfect 5th", isFlat: false },
-        { name: "Minor 6th", isFlat: true },
-        { name: "Major 6th", isFlat: false },
-        { name: "Minor 7th", isFlat: true },
-        { name: "Major 7th", isFlat: false },
+        { name: "I", isFlat: false },
+        { name: "ii", isFlat: true },
+        { name: "II", isFlat: false },
+        { name: "iii", isFlat: true },
+        { name: "III", isFlat: false },
+        { name: "IV", isFlat: false },
+        { name: "V°", isFlat: true },
+        { name: "V", isFlat: false },
+        { name: "vi", isFlat: true },
+        { name: "VI", isFlat: false },
+        { name: "vii", isFlat: true },
+        { name: "VII", isFlat: false },
     ];
     music.modes = [
         { name: 'Lydian', index: 3 },
@@ -85,7 +85,6 @@ var music;
                 flat: note.flat,
                 index: note.index,
                 degree: i,
-                degreeName: romanNumeral[i],
                 triad: triad,
                 chordType: getChordType(triad),
                 quality: music.quality[interval(tonic, note)]
@@ -263,7 +262,7 @@ var cof;
             .attr("class", "degree-segment");
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return d.note.degreeName; })
+            .text(function (d, i) { return d.note.quality.name; })
             .exit()
             .text("");
         chordSegments

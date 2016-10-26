@@ -18,18 +18,18 @@ namespace music {
     ];
 
     export let quality: Array<Quality> = [
-        { name: "Unison", isFlat: false },
-        { name: "Minor 2nd", isFlat: true },
-        { name: "Major 2nd", isFlat: false },
-        { name: "Minor 3rd", isFlat: true },
-        { name: "Major 3rd", isFlat: false },
-        { name: "Perfect 4th", isFlat: false },
-        { name: "Tritone", isFlat: true },
-        { name: "Perfect 5th", isFlat: false },
-        { name: "Minor 6th", isFlat: true },
-        { name: "Major 6th", isFlat: false },
-        { name: "Minor 7th", isFlat: true },
-        { name: "Major 7th", isFlat: false },
+        { name: "I", isFlat: false },
+        { name: "ii", isFlat: true },
+        { name: "II", isFlat: false },
+        { name: "iii", isFlat: true },
+        { name: "III", isFlat: false },
+        { name: "IV", isFlat: false },
+        { name: "V°", isFlat: true },
+        { name: "V", isFlat: false },
+        { name: "vi", isFlat: true },
+        { name: "VI", isFlat: false },
+        { name: "vii", isFlat: true },
+        { name: "VII", isFlat: false },
     ];
 
     export let modes: Array<Mode> = [
@@ -65,7 +65,6 @@ namespace music {
 
     export interface ScaleNote extends Note {
         readonly degree: number;
-        readonly degreeName: string;
         readonly triad: Triad;
         readonly chordType: ChordType;
         chordNote?: number;
@@ -119,7 +118,6 @@ namespace music {
                 flat: note.flat,
                 index: note.index,
                 degree: i,
-                degreeName: romanNumeral[i],
                 triad: triad,
                 chordType: getChordType(triad),
                 quality: quality[interval(tonic, note)]
@@ -324,7 +322,7 @@ namespace cof {
 
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return (<music.ScaleNote>d.note).degreeName; })
+            .text(function (d, i) { return (<music.ScaleNote>d.note).quality.name; })
             .exit()
             .text("");
 
