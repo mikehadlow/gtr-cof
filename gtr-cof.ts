@@ -4,17 +4,32 @@ namespace music {
 
     export let notes: Array<Note> = [
         { name: 'C', flat: 'C', index: 0 },
-        { name: 'C#', flat: 'Db', index: 1 },
+        { name: 'C♯', flat: 'D♭', index: 1 },
         { name: 'D', flat: 'D', index: 2 },
-        { name: 'D#', flat: 'Eb', index: 3 },
+        { name: 'D♯', flat: 'E♭', index: 3 },
         { name: 'E', flat: 'E', index: 4 },
         { name: 'F', flat: 'F', index: 5 },
-        { name: 'F#', flat: 'Gb', index: 6 },
+        { name: 'F♯', flat: 'G♭', index: 6 },
         { name: 'G', flat: 'G', index: 7 },
-        { name: 'G#', flat: 'Ab', index: 8 },
+        { name: 'G♯', flat: 'A♭', index: 8 },
         { name: 'A', flat: 'A', index: 9 },
-        { name: 'A#', flat: 'Bb', index: 10 },
+        { name: 'A♯', flat: 'B♭', index: 10 },
         { name: 'B', flat: 'B', index: 11 },
+    ];
+
+    export let quality: Array<Quality> = [
+        { name: "I", isFlat: false },
+        { name: "ii", isFlat: true },
+        { name: "II", isFlat: false },
+        { name: "iii", isFlat: true },
+        { name: "III", isFlat: false },
+        { name: "IV", isFlat: false },
+        { name: "V°", isFlat: true },
+        { name: "V", isFlat: false },
+        { name: "vi", isFlat: true },
+        { name: "VI", isFlat: false },
+        { name: "vii", isFlat: true },
+        { name: "VII", isFlat: false },
     ];
 
     export let modes: Array<Mode> = [
@@ -50,10 +65,15 @@ namespace music {
 
     export interface ScaleNote extends Note {
         readonly degree: number;
-        readonly degreeName: string;
         readonly triad: Triad;
         readonly chordType: ChordType;
         chordNote?: number;
+        readonly quality: Quality;
+    }
+
+    export interface Quality {
+        readonly name: string;
+        readonly isFlat: boolean;
     }
 
     export interface Mode {
@@ -98,9 +118,9 @@ namespace music {
                 flat: note.flat,
                 index: note.index,
                 degree: i,
-                degreeName: romanNumeral[i],
                 triad: triad,
-                chordType: getChordType(triad)
+                chordType: getChordType(triad),
+                quality: quality[interval(tonic, note)]
             });
         }
         return scale;
@@ -183,6 +203,7 @@ namespace state {
 namespace cof {
 
     let noteSegments: d3.Selection<Segment> = null;
+    let noteText: d3.Selection<Segment> = null;
     let degreeSegments: d3.Selection<Segment> = null;
     let degreeText: d3.Selection<Segment> = null;
     let chordSegments: d3.Selection<Segment> = null;
@@ -224,7 +245,7 @@ namespace cof {
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
-        cof.append("g").selectAll("text")
+        noteText = cof.append("g").selectAll("text")
             .data(segments)
             .enter()
             .append("text")
@@ -283,9 +304,15 @@ namespace cof {
 
         noteSegments
             .data(data, indexer)
-            .attr("class", function(d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic": "note-segment-scale"); })
+            .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
             .exit()
             .attr("class", "note-segment");
+
+        // noteText
+        //     .data(data, indexer)
+        //     .text(function(d) { return getNoteLabel(<music.ScaleNote>d.note); })
+        //     .exit()
+        //     .text("");
 
         degreeSegments
             .data(data, indexer)
@@ -295,7 +322,7 @@ namespace cof {
 
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return (<music.ScaleNote>d.note).degreeName; })
+            .text(function (d, i) { return (<music.ScaleNote>d.note).quality.name; })
             .exit()
             .text("");
 
@@ -324,6 +351,10 @@ namespace cof {
         if (note.chordNote === 0) return "chord-segment-note-root";
         if (note.chordNote === 1) return "chord-segment-note-third";
         return "chord-segment-note-fifth";
+    }
+
+    function getNoteLabel(note: music.ScaleNote): string {
+        return note.quality.isFlat ? note.flat : note.name;
     }
 
     function generateSegments(count: number): Segment[] {
@@ -538,7 +569,7 @@ namespace gtr {
         for (let i = 0; i < numberOfNotes; i++) {
             items.push({
                 note: music.notes[(i + note.index) % 12],
-                octave: Math.floor((i+1)/12)
+                octave: Math.floor((i + 1) / 12)
             });
         }
 
@@ -547,7 +578,7 @@ namespace gtr {
 
     function getFretData(numberOfFrets: number): Array<number> {
         let data: Array<number> = [];
-        for(let i=0; i<numberOfFrets; i++) {
+        for (let i = 0; i < numberOfFrets; i++) {
             data.push(i);
         }
         return data;
@@ -556,10 +587,10 @@ namespace gtr {
     function repeatTo(scale: Array<music.Note>, count: number): Array<StringNote> {
         let result: Array<StringNote> = [];
 
-        for(let i=0; i<count; i++) {
+        for (let i = 0; i < count; i++) {
             result.push({
                 note: scale[i % scale.length],
-                octave: Math.floor((i+1)/8)
+                octave: Math.floor((i + 1) / 8)
             });
         }
 
