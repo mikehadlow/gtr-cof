@@ -22,7 +22,7 @@ namespace music {
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 4 },
         { name: 'Dorian', index: 1 },
-        { name: 'N Minor / Aolian', index: 5 },
+        { name: 'N Minor / Aeolian', index: 5 },
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
@@ -531,7 +531,7 @@ namespace gtr {
             .attr("fill", "none")
             .attr("stroke", "none");
     }
-    
+
     function allNotesFrom(note: music.Note, numberOfNotes: number): Array<StringNote> {
         let items: Array<StringNote> = [];
 
@@ -552,20 +552,20 @@ namespace gtr {
         }
         return data;
     }
-    
+
     function repeatTo(scale: Array<music.Note>, count: number): Array<StringNote> {
         let result: Array<StringNote> = [];
-        
+
         for(let i=0; i<count; i++) {
             result.push({
                 note: scale[i % scale.length],
                 octave: Math.floor((i+1)/8)
             });
         }
-        
+
         return result;
     }
-    
+
     interface StringNote {
         note: music.Note;
         octave: number;
