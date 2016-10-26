@@ -71,7 +71,7 @@ var music;
                 flat: note.flat,
                 index: note.index,
                 degree: i,
-                degreeName: getDegreeName(romanNumeral[i], triad),
+                degreeName: romanNumeral[i],
                 triad: triad,
                 chordType: getChordType(triad)
             });
@@ -100,12 +100,6 @@ var music;
             return ChordType.Minor;
         // must be Major
         return ChordType.Major;
-    }
-    function getDegreeName(romanNumeral, triad) {
-        if (getChordType(triad) == ChordType.Major) {
-            romanNumeral = romanNumeral.toUpperCase();
-        }
-        return romanNumeral;
     }
     function interval(a, b) {
         return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;

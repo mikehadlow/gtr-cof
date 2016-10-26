@@ -98,7 +98,7 @@ namespace music {
                 flat: note.flat,
                 index: note.index,
                 degree: i,
-                degreeName: getDegreeName(romanNumeral[i], triad),
+                degreeName: romanNumeral[i],
                 triad: triad,
                 chordType: getChordType(triad)
             });
@@ -124,14 +124,6 @@ namespace music {
         if (interval(triad[0], triad[1]) === 3) return ChordType.Minor;
         // must be Major
         return ChordType.Major;
-    }
-
-    function getDegreeName(romanNumeral: string, triad: Triad): string {
-        if (getChordType(triad) == ChordType.Major) {
-            romanNumeral = romanNumeral.toUpperCase();
-        }
-
-        return romanNumeral;
     }
 
     function interval(a: Note, b: Note): number {
