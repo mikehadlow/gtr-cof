@@ -250,7 +250,7 @@ namespace cof {
             .enter()
             .append("text")
             .attr("x", function (x) { return noteArc.centroid(x)[0]; })
-            .attr("y", function (x) { return noteArc.centroid(x)[1] + 18; })
+            .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
             .text(function (x) { return x.note.name; })
             .attr("class", "note-segment-text");
 
