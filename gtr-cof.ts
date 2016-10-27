@@ -37,7 +37,7 @@ namespace music {
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 4 },
         { name: 'Dorian', index: 1 },
-        { name: 'N Minor / Aolian', index: 5 },
+        { name: 'N Minor / Aeolian', index: 5 },
         { name: 'Phrygian', index: 2 },
         { name: 'Locrian', index: 6 },
     ];
