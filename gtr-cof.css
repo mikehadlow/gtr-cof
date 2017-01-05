@@ -92,3 +92,20 @@ text {
     text-anchor: left;
     fill: black;
 }
+
+/* Tonics */
+.tonic-button {
+    fill: lightgrey;
+    stroke: black;
+    stroke-width: 2px;
+    width: 40px;
+    height: 25px;
+}
+.tonic-button-selected {
+    fill: white;
+}
+.tonic-text {
+    font-size: 15;
+    text-anchor: left;
+    fill: black;
+}

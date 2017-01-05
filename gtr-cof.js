@@ -1,4 +1,64 @@
 ///<reference path="node_modules/@types/d3/index.d.ts" />
+var music2;
+(function (music2) {
+    music2.noteBases = [
+        { id: 0, index: 0, name: 'C' },
+        { id: 1, index: 2, name: 'D' },
+        { id: 2, index: 4, name: 'E' },
+        { id: 3, index: 5, name: 'F' },
+        { id: 4, index: 7, name: 'G' },
+        { id: 5, index: 9, name: 'A' },
+        { id: 6, index: 11, name: 'B' }
+    ];
+    var noteLabels = [
+        { offset: 0, label: '' },
+        { offset: 1, label: '♯' },
+        { offset: 2, label: 'x' },
+        { offset: -1, label: '♭' },
+        { offset: -2, label: '♭♭' },
+    ];
+    music2.modes = [
+        { name: 'Lydian', index: 3 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 4 },
+        { name: 'Dorian', index: 1 },
+        { name: 'N Minor / Aeolian', index: 5 },
+        { name: 'Phrygian', index: 2 },
+        { name: 'Locrian', index: 6 },
+    ];
+    var scaleTones = [2, 2, 1, 2, 2, 2, 1];
+    ;
+    function generateScale(noteBase, index, mode) {
+        var scale = [];
+        var currentIndex = index;
+        var currentNoteBase = noteBase;
+        var _loop_1 = function(i) {
+            var offset = currentIndex - currentNoteBase.index;
+            if (Math.abs(offset) > 2) {
+                offset = (currentIndex < currentNoteBase.index)
+                    ? (currentIndex + 12) - currentNoteBase.index
+                    : currentIndex - (currentNoteBase.index + 12);
+            }
+            // lookup noteLabel with offset
+            var noteLabel = noteLabels.filter(function (n) { return n.offset == offset; })[0];
+            // add new ScaleNote to scale
+            scale.push({
+                index: currentIndex,
+                noteName: currentNoteBase.name + noteLabel.label,
+                chord: 'tba',
+                triad: [0, 0, 0]
+            });
+            var interval = scaleTones[(mode.index + i) % 7];
+            currentIndex = (currentIndex + interval) % 12;
+            currentNoteBase = music2.noteBases[(currentNoteBase.id + 1) % 7];
+        };
+        for (var i = 0; i < 7; i++) {
+            _loop_1(i);
+        }
+        return scale;
+    }
+    music2.generateScale = generateScale;
+})(music2 || (music2 = {}));
 var music;
 (function (music) {
     music.notes = [
@@ -320,6 +380,63 @@ var cof;
         state.changeChord(note.triad);
     }
 })(cof || (cof = {}));
+var tonics;
+(function (tonics_1) {
+    var buttons = null;
+    ;
+    function init() {
+        var pad = 5;
+        var buttonHeight = 25;
+        var svg = d3.select("#modes");
+        var tonics = svg.append("g");
+        var bg = function (noteBase) {
+            return [
+                { name: noteBase.name, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1 },
+                { name: noteBase.name, label: noteBase.name + "", index: noteBase.index },
+                { name: noteBase.name, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12 }
+            ];
+        };
+        var gs = tonics.selectAll("g")
+            .data(music2.noteBases)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
+            .selectAll("g")
+            .data(function (d) { return bg(d); }, indexer)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(" + (i * 55) + ", 0)"; });
+        buttons = gs
+            .append("rect")
+            .attr("x", pad)
+            .attr("y", 0)
+            .attr("class", "tonic-button")
+            .on("click", handleButtonClick);
+        gs
+            .append("text")
+            .attr("x", pad + 10)
+            .attr("y", 17)
+            .text(function (x) { return x.label; })
+            .attr("class", "tonic-text");
+    }
+    tonics_1.init = init;
+    function handleButtonClick(d, i) {
+        console.log("note click: " + d.name + " " + d.index + ".");
+        // just for now...
+        update(d);
+    }
+    function update(d) {
+        var ds = [d];
+        buttons
+            .data(ds, indexer)
+            .attr("class", "tonic-button tonic-button-selected")
+            .exit()
+            .attr("class", "tonic-button");
+    }
+    function indexer(d) {
+        return d.label;
+    }
+})(tonics || (tonics = {}));
 var modes;
 (function (modes_1) {
     var buttons = null;
@@ -327,7 +444,9 @@ var modes;
         var pad = 5;
         var buttonHeight = 25;
         var svg = d3.select("#modes");
-        var modes = svg.append("g");
+        var modes = svg
+            .append("g")
+            .attr("transform", "translate(0, 250)");
         var gs = modes.selectAll("g")
             .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
@@ -503,6 +622,7 @@ var gtr;
 })(gtr || (gtr = {}));
 cof.init();
 modes.init();
+tonics.init();
 gtr.init();
 state.changeTonic(music.notes[0]);
 //# sourceMappingURL=gtr-cof.js.map

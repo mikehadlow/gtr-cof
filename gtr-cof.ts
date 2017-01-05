@@ -1,5 +1,95 @@
 ///<reference path="node_modules/@types/d3/index.d.ts" />
 
+namespace music2 {
+    
+    export interface NoteBase {
+        readonly id: number;
+        readonly index: number;
+        readonly name: string;
+    }
+    
+    export let noteBases: Array<NoteBase> = [
+        { id: 0, index: 0, name: 'C' },
+        { id: 1, index: 2, name: 'D' },
+        { id: 2, index: 4, name: 'E' },
+        { id: 3, index: 5, name: 'F' },
+        { id: 4, index: 7, name: 'G' },
+        { id: 5, index: 9, name: 'A' },
+        { id: 6, index: 11, name: 'B' }
+    ];
+    
+    interface NoteLabel {
+        readonly offset: number;
+        readonly label: string;
+    }
+    
+    let noteLabels: Array<NoteLabel> = [
+        { offset: 0, label: '' },
+        { offset: 1, label: '♯' },
+        { offset: 2, label: 'x' },
+        { offset: -1, label: '♭' },
+        { offset: -2, label: '♭♭' },
+    ];
+
+    export interface Mode {
+        readonly name: string;
+        readonly index: number;
+    }
+
+    export let modes: Array<Mode> = [
+        { name: 'Lydian', index: 3 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 4 },
+        { name: 'Dorian', index: 1 },
+        { name: 'N Minor / Aeolian', index: 5 },
+        { name: 'Phrygian', index: 2 },
+        { name: 'Locrian', index: 6 },
+    ];
+
+    let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
+    
+    export type Triad = [number, number, number];
+    
+    export interface ScaleNote {
+        readonly index: number;
+        readonly noteName: string;
+        readonly chord: string;
+        readonly triad: Triad;
+    };
+    
+    export function generateScale(noteBase: NoteBase, index: number, mode: Mode): Array<ScaleNote> {
+        let scale: Array<ScaleNote> = [];
+        
+        let currentIndex = index;
+        let currentNoteBase = noteBase;
+        for (let i = 0; i < 7; i++) {
+            
+            let offset = currentIndex - currentNoteBase.index;
+            if(Math.abs(offset) > 2)
+            {
+                offset = (currentIndex < currentNoteBase.index)
+                    ? (currentIndex + 12) - currentNoteBase.index
+                    : currentIndex - (currentNoteBase.index + 12);
+            }
+            // lookup noteLabel with offset
+            let noteLabel: NoteLabel = noteLabels.filter(function(n:NoteLabel) { return n.offset == offset; })[0];
+            // add new ScaleNote to scale
+            scale.push({
+                index: currentIndex,
+                noteName: currentNoteBase.name + noteLabel.label,
+                chord: 'tba',
+                triad: [0,0,0]
+            })
+            
+            let interval = scaleTones[(mode.index + i) % 7];
+            currentIndex = (currentIndex + interval) % 12;
+            currentNoteBase = noteBases[(currentNoteBase.id + 1) % 7]
+        }
+
+        return scale;
+    }
+}
+
 namespace music {
 
     export let notes: Array<Note> = [
@@ -388,6 +478,77 @@ namespace cof {
     }
 }
 
+namespace tonics {
+
+    let buttons: d3.Selection<ButtonData> = null;
+    
+    interface ButtonData {
+        readonly name: string;
+        readonly label: string;
+        readonly index: number;
+    };
+
+    export function init(): void {
+        let pad = 5;
+        let buttonHeight = 25;
+        let svg = d3.select("#modes");
+
+        let tonics = svg.append("g");
+        
+        let bg = function(noteBase: music2.NoteBase): Array<ButtonData> {
+            return [
+                { name: noteBase.name, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1},
+                { name: noteBase.name, label: noteBase.name + "", index: noteBase.index},
+                { name: noteBase.name, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12}
+            ];
+        }
+        
+        let gs = tonics.selectAll("g")
+            .data(music2.noteBases)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
+            .selectAll("g")
+            .data(function(d) { return bg(d); }, indexer)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(" + (i * 55) + ", 0)"; });
+
+        buttons = gs
+            .append("rect")
+            .attr("x", pad)
+            .attr("y", 0)
+            .attr("class", "tonic-button")
+            .on("click", handleButtonClick);
+
+        gs
+            .append("text")
+            .attr("x", pad + 10)
+            .attr("y", 17)
+            .text(function (x) { return x.label; })
+            .attr("class", "tonic-text");
+    }
+
+    function handleButtonClick(d: ButtonData, i: number): void {
+        console.log("note click: " + d.name + " " + d.index + ".");
+        // just for now...
+        update(d);
+    }
+
+    function update(d: ButtonData): void {
+        let ds: Array<ButtonData> = [d];
+        buttons
+            .data(ds, indexer)
+            .attr("class", "tonic-button tonic-button-selected")
+            .exit()
+            .attr("class", "tonic-button");
+    }
+    
+    function indexer(d: ButtonData): string {
+        return d.label;
+    }
+}
+
 namespace modes {
 
     let buttons: d3.Selection<music.Mode> = null;
@@ -396,13 +557,15 @@ namespace modes {
         let pad = 5;
         let buttonHeight = 25;
         let svg = d3.select("#modes");
-        let modes = svg.append("g");
+        let modes = svg
+            .append("g")
+            .attr("transform", "translate(0, 250)");
 
         let gs = modes.selectAll("g")
             .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
 
         buttons = gs
             .append("rect")
@@ -605,5 +768,6 @@ namespace gtr {
 
 cof.init();
 modes.init();
+tonics.init();
 gtr.init();
 state.changeTonic(music.notes[0]);
