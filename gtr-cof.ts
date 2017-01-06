@@ -605,11 +605,11 @@ namespace gtr {
 
     let noteColours: Array<string> = [
         "yellow",
-        "lightgrey",
         "white",
         "white",
         "white",
-        "lightgrey",
+        "white",
+        "white",
         "white"
     ];
 

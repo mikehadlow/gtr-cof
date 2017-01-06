@@ -485,11 +485,11 @@ var gtr;
     var numberOfFrets = 16;
     var noteColours = [
         "yellow",
-        "lightgrey",
         "white",
         "white",
         "white",
-        "lightgrey",
+        "white",
+        "white",
         "white"
     ];
     function init() {
