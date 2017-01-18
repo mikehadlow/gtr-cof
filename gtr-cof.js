@@ -13,7 +13,7 @@ var music2;
     var noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
-        { offset: 2, label: 'x' },
+        { offset: 2, label: '♯♯' },
         { offset: -1, label: '♭' },
         { offset: -2, label: '♭♭' },
     ];
@@ -58,6 +58,16 @@ var music2;
         return scale;
     }
     music2.generateScale = generateScale;
+    function fifths() {
+        var indexes = [];
+        var current = 0;
+        for (var i = 0; i < 12; i++) {
+            indexes.push(current);
+            current = (current + 7) % 12;
+        }
+        return indexes;
+    }
+    music2.fifths = fifths;
 })(music2 || (music2 = {}));
 var music;
 (function (music) {
@@ -237,7 +247,7 @@ var cof;
     var degreeText = null;
     var chordSegments = null;
     var chordNotes = null;
-    var indexer = function (x) { return x.note.name; };
+    var indexer = function (x) { return x.index + ""; };
     function init() {
         var pad = 30;
         var svg = d3.select("#cof");
@@ -271,7 +281,7 @@ var cof;
             .append("text")
             .attr("x", function (x) { return noteArc.centroid(x)[0]; })
             .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
-            .text(function (x) { return x.note.name; })
+            .text("")
             .attr("class", "note-segment-text");
         degreeSegments = cof.append("g").selectAll("path")
             .data(segments, indexer)
@@ -308,12 +318,14 @@ var cof;
     cof_1.init = init;
     function update(stateChange) {
         var data = [];
-        for (var _i = 0, _a = stateChange.scale; _i < _a.length; _i++) {
+        for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
             var n = _a[_i];
             data.push({
-                note: n,
+                note: null,
                 startAngle: 0,
-                endAngle: 0
+                endAngle: 0,
+                scaleNote: n,
+                index: n.index
             });
         }
         noteSegments
@@ -321,11 +333,11 @@ var cof;
             .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
             .exit()
             .attr("class", "note-segment");
-        // noteText
-        //     .data(data, indexer)
-        //     .text(function(d) { return getNoteLabel(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .text("");
+        noteText
+            .data(data, indexer)
+            .text(function (d) { return d.scaleNote.noteName; })
+            .exit()
+            .text("");
         degreeSegments
             .data(data, indexer)
             .attr("class", "degree-segment-selected")
@@ -333,19 +345,19 @@ var cof;
             .attr("class", "degree-segment");
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return d.note.quality.name; })
+            .text(function (d, i) { return d.scaleNote.chord; })
             .exit()
             .text("");
-        chordSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordSegmentClass(d.note); })
-            .exit()
-            .attr("class", "chord-segment");
-        chordNotes
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordNoteClass(d.note); })
-            .exit()
-            .attr("class", "chord-segment-note");
+        // chordSegments
+        //     .data(data, indexer)
+        //     .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
+        //     .exit()
+        //     .attr("class", "chord-segment");
+        // chordNotes
+        //     .data(data, indexer)
+        //     .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
+        //     .exit()
+        //     .attr("class", "chord-segment-note");
     }
     cof_1.update = update;
     function getChordSegmentClass(note) {
@@ -370,25 +382,27 @@ var cof;
         return note.quality.isFlat ? note.flat : note.name;
     }
     function generateSegments(count) {
-        var fifths = music.fifths();
+        var fifths = music2.fifths();
         var items = [];
         var angle = (Math.PI * (2 / count));
         for (var i = 0; i < count; i++) {
             var itemAngle = (angle * i) - (angle / 2);
             items.push({
-                note: fifths[i],
+                note: null,
                 startAngle: itemAngle,
-                endAngle: itemAngle + angle
+                endAngle: itemAngle + angle,
+                scaleNote: null,
+                index: fifths[i]
             });
         }
         return items;
     }
     function handleNoteClick(segment, i) {
-        state.changeTonic(segment.note);
+        //state.changeTonic(segment.note);
     }
     function handleChordClick(segment, i) {
         var note = segment.note;
-        state.changeChord(note.triad);
+        //state.changeChord(note.triad);
     }
 })(cof || (cof = {}));
 var tonics;

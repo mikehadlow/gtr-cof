@@ -26,7 +26,7 @@ namespace music2 {
     let noteLabels: Array<NoteLabel> = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
-        { offset: 2, label: 'x' },
+        { offset: 2, label: '♯♯' },
         { offset: -1, label: '♭' },
         { offset: -2, label: '♭♭' },
     ];
@@ -87,6 +87,16 @@ namespace music2 {
         }
 
         return scale;
+    }
+    
+    export function fifths(): Array<number> {
+        let indexes: Array<number> = [];
+        let current: number = 0;
+        for(let i: number = 0; i < 12; i++) {
+            indexes.push(current);
+            current = (current + 7) % 12;
+        }
+        return indexes;
     }
 }
 
@@ -315,7 +325,7 @@ namespace cof {
     let degreeText: d3.Selection<Segment> = null;
     let chordSegments: d3.Selection<Segment> = null;
     let chordNotes: d3.Selection<Segment> = null;
-    let indexer: (x: Segment) => string = (x) => x.note.name;
+    let indexer: (x: Segment) => string = (x) => x.index + "";
 
     export function init(): void {
         let pad = 30;
@@ -358,7 +368,7 @@ namespace cof {
             .append("text")
             .attr("x", function (x) { return noteArc.centroid(x)[0]; })
             .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
-            .text(function (x) { return x.note.name; })
+            .text("")
             .attr("class", "note-segment-text");
 
         degreeSegments = cof.append("g").selectAll("path")
@@ -401,11 +411,13 @@ namespace cof {
     export function update(stateChange: state.StateChange): void {
 
         let data: Array<Segment> = [];
-        for (let n of stateChange.scale) {
+        for (let n of stateChange.scale2) {
             data.push({
-                note: n,
+                note: null,
                 startAngle: 0,
-                endAngle: 0
+                endAngle: 0,
+                scaleNote: n,
+                index: n.index
             });
         }
 
@@ -415,11 +427,11 @@ namespace cof {
             .exit()
             .attr("class", "note-segment");
 
-        // noteText
-        //     .data(data, indexer)
-        //     .text(function(d) { return getNoteLabel(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .text("");
+        noteText
+            .data(data, indexer)
+            .text(function(d) { return d.scaleNote.noteName; })
+            .exit()
+            .text("");
 
         degreeSegments
             .data(data, indexer)
@@ -429,21 +441,21 @@ namespace cof {
 
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return (<music.ScaleNote>d.note).quality.name; })
+            .text(function (d, i) { return d.scaleNote.chord; })
             .exit()
             .text("");
 
-        chordSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
-            .exit()
-            .attr("class", "chord-segment");
+        // chordSegments
+        //     .data(data, indexer)
+        //     .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
+        //     .exit()
+        //     .attr("class", "chord-segment");
 
-        chordNotes
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
-            .exit()
-            .attr("class", "chord-segment-note");
+        // chordNotes
+        //     .data(data, indexer)
+        //     .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
+        //     .exit()
+        //     .attr("class", "chord-segment-note");
     }
 
     function getChordSegmentClass(note: music.ScaleNote): string {
@@ -465,33 +477,38 @@ namespace cof {
     }
 
     function generateSegments(count: number): Segment[] {
-        let fifths = music.fifths();
+        let fifths = music2.fifths();
         let items: Array<Segment> = [];
         let angle = (Math.PI * (2 / count));
         for (let i: number = 0; i < count; i++) {
             let itemAngle = (angle * i) - (angle / 2);
             items.push({
-                note: fifths[i],
+                note: null,
                 startAngle: itemAngle,
-                endAngle: itemAngle + angle
+                endAngle: itemAngle + angle,
+                scaleNote: null,
+                index: fifths[i]
             });
         }
         return items;
     }
 
     function handleNoteClick(segment: Segment, i: number): void {
-        state.changeTonic(segment.note);
+        //state.changeTonic(segment.note);
     }
 
     function handleChordClick(segment: Segment, i: number): void {
         let note = <music.ScaleNote>segment.note;
-        state.changeChord(note.triad);
+        //state.changeChord(note.triad);
     }
 
     interface Segment {
         readonly note: music.Note;
         readonly startAngle: number;
         readonly endAngle: number;
+        //
+        readonly scaleNote: music2.ScaleNote;
+        readonly index: number;
     }
 }
 
