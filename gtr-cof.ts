@@ -247,6 +247,9 @@ namespace state {
     let listeners: Array<(n: StateChange) => void> = [];
     let currentTonic: music.Note = music.notes[0];
     let currentMode: music.Mode = music.modes[1];
+    
+    let currentNoteBase: music2.NoteBase = music2.noteBases[0];
+    let currentIndex: number = 0;
 
     export function addListener(listener: (n: StateChange) => void): void {
         listeners.push(listener);
@@ -254,6 +257,12 @@ namespace state {
 
     export function changeTonic(newTonic: music.Note): void {
         currentTonic = newTonic;
+        updateListeners();
+    }
+    
+    export function changeTonic2(newNoteBase: music2.NoteBase, index: number): void {
+        currentNoteBase = newNoteBase;
+        currentIndex = index;
         updateListeners();
     }
 
@@ -276,7 +285,11 @@ namespace state {
         let stateChange: StateChange = {
             tonic: currentTonic,
             mode: currentMode,
-            scale: scale
+            scale: scale,
+            
+            noteBase: currentNoteBase,
+            index: currentIndex,
+            scale2: music2.generateScale(currentNoteBase, currentIndex, currentMode)
         };
         for (let listener of listeners) {
             listener(stateChange);
@@ -287,6 +300,10 @@ namespace state {
         readonly tonic: music.Note;
         readonly mode: music.Mode;
         readonly scale: Array<music.Note>;
+        
+        readonly noteBase: music2.NoteBase;
+        readonly index: number;
+        readonly scale2: Array<music2.ScaleNote>;
     }
 }
 
@@ -483,7 +500,7 @@ namespace tonics {
     let buttons: d3.Selection<ButtonData> = null;
     
     interface ButtonData {
-        readonly name: string;
+        readonly noteBase: music2.NoteBase;
         readonly label: string;
         readonly index: number;
     };
@@ -497,9 +514,9 @@ namespace tonics {
         
         let bg = function(noteBase: music2.NoteBase): Array<ButtonData> {
             return [
-                { name: noteBase.name, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1},
-                { name: noteBase.name, label: noteBase.name + "", index: noteBase.index},
-                { name: noteBase.name, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12}
+                { noteBase: noteBase, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1},
+                { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index},
+                { noteBase: noteBase, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12}
             ];
         }
         
@@ -527,11 +544,13 @@ namespace tonics {
             .attr("y", 17)
             .text(function (x) { return x.label; })
             .attr("class", "tonic-text");
+            
+        state.addListener(listener);
     }
 
     function handleButtonClick(d: ButtonData, i: number): void {
-        console.log("note click: " + d.name + " " + d.index + ".");
-        // just for now...
+        console.log("note click: " + d.noteBase.name + " " + d.index + ".");
+        state.changeTonic2(d.noteBase, d.index);
         update(d);
     }
 
@@ -542,6 +561,10 @@ namespace tonics {
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
             .attr("class", "tonic-button");
+    }
+    
+    function listener(state: state.StateChange): void {
+        console.log("note state change: index: " + state.index);
     }
     
     function indexer(d: ButtonData): string {

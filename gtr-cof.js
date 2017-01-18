@@ -184,6 +184,8 @@ var state;
     var listeners = [];
     var currentTonic = music.notes[0];
     var currentMode = music.modes[1];
+    var currentNoteBase = music2.noteBases[0];
+    var currentIndex = 0;
     function addListener(listener) {
         listeners.push(listener);
     }
@@ -193,6 +195,12 @@ var state;
         updateListeners();
     }
     state.changeTonic = changeTonic;
+    function changeTonic2(newNoteBase, index) {
+        currentNoteBase = newNoteBase;
+        currentIndex = index;
+        updateListeners();
+    }
+    state.changeTonic2 = changeTonic2;
     function changeMode(newMode) {
         currentMode = newMode;
         updateListeners();
@@ -210,7 +218,10 @@ var state;
         var stateChange = {
             tonic: currentTonic,
             mode: currentMode,
-            scale: scale
+            scale: scale,
+            noteBase: currentNoteBase,
+            index: currentIndex,
+            scale2: music2.generateScale(currentNoteBase, currentIndex, currentMode)
         };
         for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
             var listener = listeners_1[_i];
@@ -391,9 +402,9 @@ var tonics;
         var tonics = svg.append("g");
         var bg = function (noteBase) {
             return [
-                { name: noteBase.name, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1 },
-                { name: noteBase.name, label: noteBase.name + "", index: noteBase.index },
-                { name: noteBase.name, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12 }
+                { noteBase: noteBase, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1 },
+                { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index },
+                { noteBase: noteBase, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12 }
             ];
         };
         var gs = tonics.selectAll("g")
@@ -418,11 +429,12 @@ var tonics;
             .attr("y", 17)
             .text(function (x) { return x.label; })
             .attr("class", "tonic-text");
+        state.addListener(listener);
     }
     tonics_1.init = init;
     function handleButtonClick(d, i) {
-        console.log("note click: " + d.name + " " + d.index + ".");
-        // just for now...
+        console.log("note click: " + d.noteBase.name + " " + d.index + ".");
+        state.changeTonic2(d.noteBase, d.index);
         update(d);
     }
     function update(d) {
@@ -432,6 +444,9 @@ var tonics;
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
             .attr("class", "tonic-button");
+    }
+    function listener(state) {
+        console.log("note state change: index: " + state.index);
     }
     function indexer(d) {
         return d.label;
