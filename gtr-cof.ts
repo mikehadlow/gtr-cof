@@ -177,163 +177,10 @@ namespace music2 {
     }
 }
 
-namespace music {
-
-    export let notes: Array<Note> = [
-        { name: 'C', flat: 'C', index: 0 },
-        { name: 'C♯', flat: 'D♭', index: 1 },
-        { name: 'D', flat: 'D', index: 2 },
-        { name: 'D♯', flat: 'E♭', index: 3 },
-        { name: 'E', flat: 'E', index: 4 },
-        { name: 'F', flat: 'F', index: 5 },
-        { name: 'F♯', flat: 'G♭', index: 6 },
-        { name: 'G', flat: 'G', index: 7 },
-        { name: 'G♯', flat: 'A♭', index: 8 },
-        { name: 'A', flat: 'A', index: 9 },
-        { name: 'A♯', flat: 'B♭', index: 10 },
-        { name: 'B', flat: 'B', index: 11 },
-    ];
-
-    export let quality: Array<Quality> = [
-        { name: "I", isFlat: false },
-        { name: "ii", isFlat: true },
-        { name: "II", isFlat: false },
-        { name: "iii", isFlat: true },
-        { name: "III", isFlat: false },
-        { name: "IV", isFlat: false },
-        { name: "V°", isFlat: true },
-        { name: "V", isFlat: false },
-        { name: "vi", isFlat: true },
-        { name: "VI", isFlat: false },
-        { name: "vii", isFlat: true },
-        { name: "VII", isFlat: false },
-    ];
-
-    export let modes: Array<Mode> = [
-        { name: 'Lydian', index: 3 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 4 },
-        { name: 'Dorian', index: 1 },
-        { name: 'N Minor / Aeolian', index: 5 },
-        { name: 'Phrygian', index: 2 },
-        { name: 'Locrian', index: 6 },
-    ];
-
-    export let tuning: Array<Note> = [
-        notes[4], // E
-        notes[9], // A
-        notes[2], // D
-        notes[7], // G
-        notes[11],// B
-        notes[4], // E
-    ];
-
-    let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
-
-    let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-
-    export interface Note {
-        readonly name: string;
-        readonly flat: string;
-        readonly index: number;
-    }
-
-    export type Triad = [Note, Note, Note];
-
-    export interface ScaleNote extends Note {
-        readonly degree: number;
-        readonly triad: Triad;
-        readonly chordType: ChordType;
-        chordNote?: number;
-        readonly quality: Quality;
-    }
-
-    export interface Quality {
-        readonly name: string;
-        readonly isFlat: boolean;
-    }
-
-    export interface Mode {
-        readonly name: string;
-        readonly index: number;
-    }
-
-    export enum ChordType { Major, Minor, Diminished };
-
-    export function fifths(): Array<Note> {
-        let items: Array<Note> = [];
-        let current: Note = notes[0];
-
-        for (let i: number = 0; i < 12; i++) {
-            items.push(current);
-            current = notes[(current.index + 7) % 12];
-        }
-
-        return items;
-    }
-
-    export function scale(tonic: Note, mode: Mode): Array<ScaleNote> {
-        let notesOfScale: Array<Note> = [];
-        let scale: Array<ScaleNote> = [];
-        let noteIndex = tonic.index;
-
-        for (let i = 0; i < 7; i++) {
-            notesOfScale.push(notes[noteIndex]);
-            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12
-        }
-
-        for (let i = 0; i < 7; i++) {
-            let note = notesOfScale[i];
-            let triad: Triad = [
-                notesOfScale[i],
-                notesOfScale[(i + 2) % 7],
-                notesOfScale[(i + 4) % 7]
-            ];
-
-            scale.push({
-                name: note.name,
-                flat: note.flat,
-                index: note.index,
-                degree: i,
-                triad: triad,
-                chordType: getChordType(triad),
-                quality: quality[interval(tonic, note)]
-            });
-        }
-        return scale;
-    }
-
-    export function appendTriad(scale: Array<ScaleNote>, triad: Triad): Array<ScaleNote> {
-        for (let note of scale) {
-            for (let i = 0; i < 3; i++) {
-                if (note.name === triad[i].name) {
-                    note.chordNote = i;
-                }
-            }
-        }
-        return scale;
-    }
-
-    function getChordType(triad: Triad): ChordType {
-        // check for diminished
-        if (interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
-        // check for minor
-        if (interval(triad[0], triad[1]) === 3) return ChordType.Minor;
-        // must be Major
-        return ChordType.Major;
-    }
-
-    function interval(a: Note, b: Note): number {
-        return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
-    }
-
-}
-
 namespace state {
 
     let listeners: Array<(n: StateChange) => void> = [];
-    let currentTonic: music.Note = music.notes[0];
-    let currentMode: music.Mode = music.modes[1];
+    let currentMode: music2.Mode = music2.modes[1];
     
     let currentNoteBase: music2.NoteBase = music2.noteBases[0];
     let currentIndex: number = 0;
@@ -342,18 +189,13 @@ namespace state {
         listeners.push(listener);
     }
 
-    export function changeTonic(newTonic: music.Note): void {
-        currentTonic = newTonic;
-        updateListeners();
-    }
-    
     export function changeTonic2(newNoteBase: music2.NoteBase, index: number): void {
         currentNoteBase = newNoteBase;
         currentIndex = index;
         updateListeners();
     }
 
-    export function changeMode(newMode: music.Mode): void {
+    export function changeMode(newMode: music2.Mode): void {
         currentMode = newMode;
         updateListeners();
     }
@@ -370,10 +212,7 @@ namespace state {
         }
 
         let stateChange: StateChange = {
-            tonic: null,
             mode: currentMode,
-            scale: null,
-
             noteBase: currentNoteBase,
             index: currentIndex,
             scale2: scale
@@ -384,9 +223,7 @@ namespace state {
     }
 
     export interface StateChange {
-        readonly tonic: music.Note;
-        readonly mode: music.Mode;
-        readonly scale: Array<music.Note>;
+        readonly mode: music2.Mode;
         
         readonly noteBase: music2.NoteBase;
         readonly index: number;
@@ -490,7 +327,6 @@ namespace cof {
         let data: Array<Segment> = [];
         for (let n of stateChange.scale2) {
             data.push({
-                note: null,
                 startAngle: 0,
                 endAngle: 0,
                 scaleNote: n,
@@ -536,9 +372,9 @@ namespace cof {
     }
 
     function getChordSegmentClass(note: music2.ScaleNote): string {
-        if (note.chord.type === music.ChordType.Diminished) return "chord-segment-dim";
-        if (note.chord.type === music.ChordType.Minor) return "chord-segment-minor";
-        if (note.chord.type === music.ChordType.Major) return "chord-segment-major";
+        if (note.chord.type === music2.ChordType.Diminished) return "chord-segment-dim";
+        if (note.chord.type === music2.ChordType.Minor) return "chord-segment-minor";
+        if (note.chord.type === music2.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 
@@ -549,10 +385,6 @@ namespace cof {
         return "chord-segment-note-fifth";
     }
 
-    function getNoteLabel(note: music.ScaleNote): string {
-        return note.quality.isFlat ? note.flat : note.name;
-    }
-
     function generateSegments(count: number): Segment[] {
         let fifths = music2.fifths();
         let items: Array<Segment> = [];
@@ -560,7 +392,6 @@ namespace cof {
         for (let i: number = 0; i < count; i++) {
             let itemAngle = (angle * i) - (angle / 2);
             items.push({
-                note: null,
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 scaleNote: null,
@@ -580,10 +411,8 @@ namespace cof {
     }
 
     interface Segment {
-        readonly note: music.Note;
         readonly startAngle: number;
         readonly endAngle: number;
-        //
         readonly scaleNote: music2.ScaleNote;
         readonly index: number;
     }
@@ -668,7 +497,7 @@ namespace tonics {
 
 namespace modes {
 
-    let buttons: d3.Selection<music.Mode> = null;
+    let buttons: d3.Selection<music2.Mode> = null;
 
     export function init(): void {
         let pad = 5;
@@ -679,7 +508,7 @@ namespace modes {
             .attr("transform", "translate(0, 250)");
 
         let gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+            .data(music2.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -701,12 +530,12 @@ namespace modes {
         state.addListener(update);
     }
 
-    function handleButtonClick(mode: music.Mode, i: number): void {
+    function handleButtonClick(mode: music2.Mode, i: number): void {
         state.changeMode(mode);
     }
 
     function update(stateChange: state.StateChange): void {
-        let modes: Array<music.Mode> = [stateChange.mode];
+        let modes: Array<music2.Mode> = [stateChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
             .attr("class", "mode-button mode-button-selected")
@@ -895,4 +724,4 @@ cof.init();
 modes.init();
 tonics.init();
 gtr.init();
-state.changeTonic(music.notes[0]);
+state.changeTonic2(music2.noteBases[0], 0);

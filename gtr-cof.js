@@ -140,142 +140,16 @@ var music2;
         return (a <= b) ? b - a : (b + 12) - a;
     }
 })(music2 || (music2 = {}));
-var music;
-(function (music) {
-    music.notes = [
-        { name: 'C', flat: 'C', index: 0 },
-        { name: 'C♯', flat: 'D♭', index: 1 },
-        { name: 'D', flat: 'D', index: 2 },
-        { name: 'D♯', flat: 'E♭', index: 3 },
-        { name: 'E', flat: 'E', index: 4 },
-        { name: 'F', flat: 'F', index: 5 },
-        { name: 'F♯', flat: 'G♭', index: 6 },
-        { name: 'G', flat: 'G', index: 7 },
-        { name: 'G♯', flat: 'A♭', index: 8 },
-        { name: 'A', flat: 'A', index: 9 },
-        { name: 'A♯', flat: 'B♭', index: 10 },
-        { name: 'B', flat: 'B', index: 11 },
-    ];
-    music.quality = [
-        { name: "I", isFlat: false },
-        { name: "ii", isFlat: true },
-        { name: "II", isFlat: false },
-        { name: "iii", isFlat: true },
-        { name: "III", isFlat: false },
-        { name: "IV", isFlat: false },
-        { name: "V°", isFlat: true },
-        { name: "V", isFlat: false },
-        { name: "vi", isFlat: true },
-        { name: "VI", isFlat: false },
-        { name: "vii", isFlat: true },
-        { name: "VII", isFlat: false },
-    ];
-    music.modes = [
-        { name: 'Lydian', index: 3 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 4 },
-        { name: 'Dorian', index: 1 },
-        { name: 'N Minor / Aeolian', index: 5 },
-        { name: 'Phrygian', index: 2 },
-        { name: 'Locrian', index: 6 },
-    ];
-    music.tuning = [
-        music.notes[4],
-        music.notes[9],
-        music.notes[2],
-        music.notes[7],
-        music.notes[11],
-        music.notes[4],
-    ];
-    var scaleTones = [2, 2, 1, 2, 2, 2, 1];
-    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    (function (ChordType) {
-        ChordType[ChordType["Major"] = 0] = "Major";
-        ChordType[ChordType["Minor"] = 1] = "Minor";
-        ChordType[ChordType["Diminished"] = 2] = "Diminished";
-    })(music.ChordType || (music.ChordType = {}));
-    var ChordType = music.ChordType;
-    ;
-    function fifths() {
-        var items = [];
-        var current = music.notes[0];
-        for (var i = 0; i < 12; i++) {
-            items.push(current);
-            current = music.notes[(current.index + 7) % 12];
-        }
-        return items;
-    }
-    music.fifths = fifths;
-    function scale(tonic, mode) {
-        var notesOfScale = [];
-        var scale = [];
-        var noteIndex = tonic.index;
-        for (var i = 0; i < 7; i++) {
-            notesOfScale.push(music.notes[noteIndex]);
-            noteIndex = (noteIndex + scaleTones[((i + mode.index) % 7)]) % 12;
-        }
-        for (var i = 0; i < 7; i++) {
-            var note = notesOfScale[i];
-            var triad = [
-                notesOfScale[i],
-                notesOfScale[(i + 2) % 7],
-                notesOfScale[(i + 4) % 7]
-            ];
-            scale.push({
-                name: note.name,
-                flat: note.flat,
-                index: note.index,
-                degree: i,
-                triad: triad,
-                chordType: getChordType(triad),
-                quality: music.quality[interval(tonic, note)]
-            });
-        }
-        return scale;
-    }
-    music.scale = scale;
-    function appendTriad(scale, triad) {
-        for (var _i = 0, scale_3 = scale; _i < scale_3.length; _i++) {
-            var note = scale_3[_i];
-            for (var i = 0; i < 3; i++) {
-                if (note.name === triad[i].name) {
-                    note.chordNote = i;
-                }
-            }
-        }
-        return scale;
-    }
-    music.appendTriad = appendTriad;
-    function getChordType(triad) {
-        // check for diminished
-        if (interval(triad[0], triad[2]) === 6)
-            return ChordType.Diminished;
-        // check for minor
-        if (interval(triad[0], triad[1]) === 3)
-            return ChordType.Minor;
-        // must be Major
-        return ChordType.Major;
-    }
-    function interval(a, b) {
-        return (a.index <= b.index) ? b.index - a.index : (b.index + 12) - a.index;
-    }
-})(music || (music = {}));
 var state;
 (function (state) {
     var listeners = [];
-    var currentTonic = music.notes[0];
-    var currentMode = music.modes[1];
+    var currentMode = music2.modes[1];
     var currentNoteBase = music2.noteBases[0];
     var currentIndex = 0;
     function addListener(listener) {
         listeners.push(listener);
     }
     state.addListener = addListener;
-    function changeTonic(newTonic) {
-        currentTonic = newTonic;
-        updateListeners();
-    }
-    state.changeTonic = changeTonic;
     function changeTonic2(newNoteBase, index) {
         currentNoteBase = newNoteBase;
         currentIndex = index;
@@ -297,9 +171,7 @@ var state;
             scale = music2.appendTriad(scale, chord);
         }
         var stateChange = {
-            tonic: null,
             mode: currentMode,
-            scale: null,
             noteBase: currentNoteBase,
             index: currentIndex,
             scale2: scale
@@ -392,7 +264,6 @@ var cof;
         for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
             var n = _a[_i];
             data.push({
-                note: null,
                 startAngle: 0,
                 endAngle: 0,
                 scaleNote: n,
@@ -432,11 +303,11 @@ var cof;
     }
     cof_1.update = update;
     function getChordSegmentClass(note) {
-        if (note.chord.type === music.ChordType.Diminished)
+        if (note.chord.type === music2.ChordType.Diminished)
             return "chord-segment-dim";
-        if (note.chord.type === music.ChordType.Minor)
+        if (note.chord.type === music2.ChordType.Minor)
             return "chord-segment-minor";
-        if (note.chord.type === music.ChordType.Major)
+        if (note.chord.type === music2.ChordType.Major)
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
@@ -449,9 +320,6 @@ var cof;
             return "chord-segment-note-third";
         return "chord-segment-note-fifth";
     }
-    function getNoteLabel(note) {
-        return note.quality.isFlat ? note.flat : note.name;
-    }
     function generateSegments(count) {
         var fifths = music2.fifths();
         var items = [];
@@ -459,7 +327,6 @@ var cof;
         for (var i = 0; i < count; i++) {
             var itemAngle = (angle * i) - (angle / 2);
             items.push({
-                note: null,
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 scaleNote: null,
@@ -548,7 +415,7 @@ var modes;
             .append("g")
             .attr("transform", "translate(0, 250)");
         var gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+            .data(music2.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -730,5 +597,5 @@ cof.init();
 modes.init();
 tonics.init();
 gtr.init();
-state.changeTonic(music.notes[0]);
+state.changeTonic2(music2.noteBases[0], 0);
 //# sourceMappingURL=gtr-cof.js.map
