@@ -1,7 +1,7 @@
 ///<reference path="node_modules/@types/d3/index.d.ts" />
-var music2;
-(function (music2) {
-    music2.noteBases = [
+var music;
+(function (music) {
+    music.noteBases = [
         { id: 0, index: 0, name: 'C' },
         { id: 1, index: 2, name: 'D' },
         { id: 2, index: 4, name: 'E' },
@@ -17,7 +17,7 @@ var music2;
         { offset: -1, label: '♭' },
         { offset: -2, label: '♭♭' },
     ];
-    music2.modes = [
+    music.modes = [
         { name: 'Lydian', index: 3 },
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 4 },
@@ -27,7 +27,7 @@ var music2;
         { name: 'Locrian', index: 6 },
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
-    music2.tuning = [
+    music.tuning = [
         4,
         9,
         2,
@@ -40,8 +40,8 @@ var music2;
         ChordType[ChordType["Major"] = 0] = "Major";
         ChordType[ChordType["Minor"] = 1] = "Minor";
         ChordType[ChordType["Diminished"] = 2] = "Diminished";
-    })(music2.ChordType || (music2.ChordType = {}));
-    var ChordType = music2.ChordType;
+    })(music.ChordType || (music.ChordType = {}));
+    var ChordType = music.ChordType;
     ;
     ;
     function generateScale(noteBase, index, mode) {
@@ -66,7 +66,7 @@ var music2;
             });
             var interval_1 = scaleTones[(mode.index + i) % 7];
             currentIndex = (currentIndex + interval_1) % 12;
-            currentNoteBase = music2.noteBases[(currentNoteBase.id + 1) % 7];
+            currentNoteBase = music.noteBases[(currentNoteBase.id + 1) % 7];
         };
         for (var i = 0; i < 7; i++) {
             _loop_1(i);
@@ -83,7 +83,7 @@ var music2;
         }
         return scalePlusChord;
     }
-    music2.generateScale = generateScale;
+    music.generateScale = generateScale;
     function generateChord(scale, root) {
         var triad = [
             root.index,
@@ -115,7 +115,7 @@ var music2;
         }
         return scale;
     }
-    music2.appendTriad = appendTriad;
+    music.appendTriad = appendTriad;
     function fifths() {
         var indexes = [];
         var current = 0;
@@ -125,7 +125,7 @@ var music2;
         }
         return indexes;
     }
-    music2.fifths = fifths;
+    music.fifths = fifths;
     function getChordType(triad) {
         // check for diminished
         if (interval(triad[0], triad[2]) === 6)
@@ -139,23 +139,23 @@ var music2;
     function interval(a, b) {
         return (a <= b) ? b - a : (b + 12) - a;
     }
-})(music2 || (music2 = {}));
+})(music || (music = {}));
 var state;
 (function (state) {
     var listeners = [];
-    var currentMode = music2.modes[1];
-    var currentNoteBase = music2.noteBases[0];
+    var currentMode = music.modes[1];
+    var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
     function addListener(listener) {
         listeners.push(listener);
     }
     state.addListener = addListener;
-    function changeTonic2(newNoteBase, index) {
+    function changeTonic(newNoteBase, index) {
         currentNoteBase = newNoteBase;
         currentIndex = index;
         updateListeners();
     }
-    state.changeTonic2 = changeTonic2;
+    state.changeTonic = changeTonic;
     function changeMode(newMode) {
         currentMode = newMode;
         updateListeners();
@@ -166,9 +166,9 @@ var state;
     }
     state.changeChord = changeChord;
     function updateListeners(chord) {
-        var scale = music2.generateScale(currentNoteBase, currentIndex, currentMode);
+        var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
         if (chord) {
-            scale = music2.appendTriad(scale, chord);
+            scale = music.appendTriad(scale, chord);
         }
         var stateChange = {
             mode: currentMode,
@@ -303,11 +303,11 @@ var cof;
     }
     cof_1.update = update;
     function getChordSegmentClass(note) {
-        if (note.chord.type === music2.ChordType.Diminished)
+        if (note.chord.type === music.ChordType.Diminished)
             return "chord-segment-dim";
-        if (note.chord.type === music2.ChordType.Minor)
+        if (note.chord.type === music.ChordType.Minor)
             return "chord-segment-minor";
-        if (note.chord.type === music2.ChordType.Major)
+        if (note.chord.type === music.ChordType.Major)
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
@@ -321,7 +321,7 @@ var cof;
         return "chord-segment-note-fifth";
     }
     function generateSegments(count) {
-        var fifths = music2.fifths();
+        var fifths = music.fifths();
         var items = [];
         var angle = (Math.PI * (2 / count));
         for (var i = 0; i < count; i++) {
@@ -360,7 +360,7 @@ var tonics;
             ];
         };
         var gs = tonics.selectAll("g")
-            .data(music2.noteBases)
+            .data(music.noteBases)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
@@ -386,7 +386,7 @@ var tonics;
     tonics_1.init = init;
     function handleButtonClick(d, i) {
         console.log("note click: " + d.noteBase.name + " " + d.index + ".");
-        state.changeTonic2(d.noteBase, d.index);
+        state.changeTonic(d.noteBase, d.index);
         update(d);
     }
     function update(d) {
@@ -415,7 +415,7 @@ var modes;
             .append("g")
             .attr("transform", "translate(0, 250)");
         var gs = modes.selectAll("g")
-            .data(music2.modes, function (m) { return m.index.toString(); })
+            .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -503,7 +503,7 @@ var gtr;
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(music2.tuning.reverse(), function (n) { return n + ""; })
+            .data(music.tuning.reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -597,5 +597,5 @@ cof.init();
 modes.init();
 tonics.init();
 gtr.init();
-state.changeTonic2(music2.noteBases[0], 0);
+state.changeTonic(music.noteBases[0], 0);
 //# sourceMappingURL=gtr-cof.js.map

@@ -1,6 +1,6 @@
 ///<reference path="node_modules/@types/d3/index.d.ts" />
 
-namespace music2 {
+namespace music {
     
     export interface NoteBase {
         readonly id: number;
@@ -180,35 +180,35 @@ namespace music2 {
 namespace state {
 
     let listeners: Array<(n: StateChange) => void> = [];
-    let currentMode: music2.Mode = music2.modes[1];
+    let currentMode: music.Mode = music.modes[1];
     
-    let currentNoteBase: music2.NoteBase = music2.noteBases[0];
+    let currentNoteBase: music.NoteBase = music.noteBases[0];
     let currentIndex: number = 0;
 
     export function addListener(listener: (n: StateChange) => void): void {
         listeners.push(listener);
     }
 
-    export function changeTonic2(newNoteBase: music2.NoteBase, index: number): void {
+    export function changeTonic(newNoteBase: music.NoteBase, index: number): void {
         currentNoteBase = newNoteBase;
         currentIndex = index;
         updateListeners();
     }
 
-    export function changeMode(newMode: music2.Mode): void {
+    export function changeMode(newMode: music.Mode): void {
         currentMode = newMode;
         updateListeners();
     }
 
-    export function changeChord(chord: music2.Chord): void {
+    export function changeChord(chord: music.Chord): void {
         updateListeners(chord);
     }
 
-    function updateListeners(chord?: music2.Chord): void {
-        let scale = music2.generateScale(currentNoteBase, currentIndex, currentMode);
+    function updateListeners(chord?: music.Chord): void {
+        let scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
 
         if (chord) {
-            scale = music2.appendTriad(scale, chord);
+            scale = music.appendTriad(scale, chord);
         }
 
         let stateChange: StateChange = {
@@ -223,11 +223,11 @@ namespace state {
     }
 
     export interface StateChange {
-        readonly mode: music2.Mode;
+        readonly mode: music.Mode;
         
-        readonly noteBase: music2.NoteBase;
+        readonly noteBase: music.NoteBase;
         readonly index: number;
-        readonly scale2: Array<music2.ScaleNote>;
+        readonly scale2: Array<music.ScaleNote>;
     }
 }
 
@@ -371,14 +371,14 @@ namespace cof {
             .attr("class", "chord-segment-note");
     }
 
-    function getChordSegmentClass(note: music2.ScaleNote): string {
-        if (note.chord.type === music2.ChordType.Diminished) return "chord-segment-dim";
-        if (note.chord.type === music2.ChordType.Minor) return "chord-segment-minor";
-        if (note.chord.type === music2.ChordType.Major) return "chord-segment-major";
+    function getChordSegmentClass(note: music.ScaleNote): string {
+        if (note.chord.type === music.ChordType.Diminished) return "chord-segment-dim";
+        if (note.chord.type === music.ChordType.Minor) return "chord-segment-minor";
+        if (note.chord.type === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 
-    function getChordNoteClass(note: music2.ScaleNote): string {
+    function getChordNoteClass(note: music.ScaleNote): string {
         if (note.chordNote === undefined) return "chord-segment-note";
         if (note.chordNote === 0) return "chord-segment-note-root";
         if (note.chordNote === 1) return "chord-segment-note-third";
@@ -386,7 +386,7 @@ namespace cof {
     }
 
     function generateSegments(count: number): Segment[] {
-        let fifths = music2.fifths();
+        let fifths = music.fifths();
         let items: Array<Segment> = [];
         let angle = (Math.PI * (2 / count));
         for (let i: number = 0; i < count; i++) {
@@ -413,7 +413,7 @@ namespace cof {
     interface Segment {
         readonly startAngle: number;
         readonly endAngle: number;
-        readonly scaleNote: music2.ScaleNote;
+        readonly scaleNote: music.ScaleNote;
         readonly index: number;
     }
 }
@@ -423,7 +423,7 @@ namespace tonics {
     let buttons: d3.Selection<ButtonData> = null;
     
     interface ButtonData {
-        readonly noteBase: music2.NoteBase;
+        readonly noteBase: music.NoteBase;
         readonly label: string;
         readonly index: number;
     };
@@ -435,7 +435,7 @@ namespace tonics {
 
         let tonics = svg.append("g");
         
-        let bg = function(noteBase: music2.NoteBase): Array<ButtonData> {
+        let bg = function(noteBase: music.NoteBase): Array<ButtonData> {
             return [
                 { noteBase: noteBase, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1},
                 { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index},
@@ -444,7 +444,7 @@ namespace tonics {
         }
         
         let gs = tonics.selectAll("g")
-            .data(music2.noteBases)
+            .data(music.noteBases)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
@@ -473,7 +473,7 @@ namespace tonics {
 
     function handleButtonClick(d: ButtonData, i: number): void {
         console.log("note click: " + d.noteBase.name + " " + d.index + ".");
-        state.changeTonic2(d.noteBase, d.index);
+        state.changeTonic(d.noteBase, d.index);
         update(d);
     }
 
@@ -497,7 +497,7 @@ namespace tonics {
 
 namespace modes {
 
-    let buttons: d3.Selection<music2.Mode> = null;
+    let buttons: d3.Selection<music.Mode> = null;
 
     export function init(): void {
         let pad = 5;
@@ -508,7 +508,7 @@ namespace modes {
             .attr("transform", "translate(0, 250)");
 
         let gs = modes.selectAll("g")
-            .data(music2.modes, function (m) { return m.index.toString(); })
+            .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -530,12 +530,12 @@ namespace modes {
         state.addListener(update);
     }
 
-    function handleButtonClick(mode: music2.Mode, i: number): void {
+    function handleButtonClick(mode: music.Mode, i: number): void {
         state.changeMode(mode);
     }
 
     function update(stateChange: state.StateChange): void {
-        let modes: Array<music2.Mode> = [stateChange.mode];
+        let modes: Array<music.Mode> = [stateChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
             .attr("class", "mode-button mode-button-selected")
@@ -609,7 +609,7 @@ namespace gtr {
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(music2.tuning.reverse(), function (n) { return n + ""; })
+            .data(music.tuning.reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -698,7 +698,7 @@ namespace gtr {
         return data;
     }
 
-    function repeatTo(scale: Array<music2.ScaleNote>, count: number): Array<StringNote> {
+    function repeatTo(scale: Array<music.ScaleNote>, count: number): Array<StringNote> {
         let result: Array<StringNote> = [];
 
         for (let i = 0; i < count; i++) {
@@ -716,7 +716,7 @@ namespace gtr {
     interface StringNote {
         readonly octave: number;
         readonly index: number;
-        readonly scaleNote: music2.ScaleNote;
+        readonly scaleNote: music.ScaleNote;
     }
 }
 
@@ -724,4 +724,4 @@ cof.init();
 modes.init();
 tonics.init();
 gtr.init();
-state.changeTonic2(music2.noteBases[0], 0);
+state.changeTonic(music.noteBases[0], 0);
