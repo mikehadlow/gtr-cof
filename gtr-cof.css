@@ -9,14 +9,17 @@ text {
 /* Circle of Fifths */
 .note-segment {
     fill: lightgrey;
-    stroke: black;
-    stroke-width: 3px;
+    stroke: none;
 }
 .note-segment-tonic {
     fill: yellow;
+    stroke: black;
+    stroke-width: 3px;
 }
 .note-segment-scale {
     fill: white;
+    stroke: black;
+    stroke-width: 3px;
 }
 .note-segment-text {
     font-size: 35px;

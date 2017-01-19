@@ -57,14 +57,21 @@ namespace music2 {
         4, // E
     ];
     
+    let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    
     export type Triad = [number, number, number];
     
     export interface ScaleNote {
         readonly index: number;
+        readonly degree: number;
         readonly noteName: string;
-        readonly chord: string;
-        readonly triad: Triad;
+        readonly chord: Chord;
     };
+    
+    export interface Chord {
+        readonly romanNumeral: string;
+        readonly triad: Triad;
+    }
     
     export function generateScale(noteBase: NoteBase, index: number, mode: Mode): Array<ScaleNote> {
         let scale: Array<ScaleNote> = [];
@@ -85,17 +92,39 @@ namespace music2 {
             // add new ScaleNote to scale
             scale.push({
                 index: currentIndex,
+                degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
-                chord: 'tba',
-                triad: [0,0,0]
+                chord: null
             })
             
             let interval = scaleTones[(mode.index + i) % 7];
             currentIndex = (currentIndex + interval) % 12;
             currentNoteBase = noteBases[(currentNoteBase.id + 1) % 7]
         }
+        
+        let scalePlusChord: Array<ScaleNote> = [];
+        
+        for(let note of scale) {
+            scalePlusChord.push({
+                index: note.index,
+                degree: note.degree,
+                noteName: note.noteName,
+                chord: generateChord(scale, note)
+            });
+        }
 
-        return scale;
+        return scalePlusChord;
+    }
+    
+    function generateChord(scale: Array<ScaleNote>, root: ScaleNote): Chord {
+        return {
+            romanNumeral: romanNumeral[root.degree],
+            triad: [
+                root.degree, 
+                scale[(root.degree + 2) % 7].index, 
+                scale[(root.degree + 4) % 7].index
+            ]
+        };
     }
     
     export function fifths(): Array<number> {
@@ -450,7 +479,7 @@ namespace cof {
 
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return d.scaleNote.chord; })
+            .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
             .exit()
             .text("");
 

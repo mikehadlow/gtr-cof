@@ -35,6 +35,7 @@ var music2;
         11,
         4,
     ];
+    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     ;
     function generateScale(noteBase, index, mode) {
         var scale = [];
@@ -52,9 +53,9 @@ var music2;
             // add new ScaleNote to scale
             scale.push({
                 index: currentIndex,
+                degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
-                chord: 'tba',
-                triad: [0, 0, 0]
+                chord: null
             });
             var interval = scaleTones[(mode.index + i) % 7];
             currentIndex = (currentIndex + interval) % 12;
@@ -63,9 +64,29 @@ var music2;
         for (var i = 0; i < 7; i++) {
             _loop_1(i);
         }
-        return scale;
+        var scalePlusChord = [];
+        for (var _i = 0, scale_1 = scale; _i < scale_1.length; _i++) {
+            var note = scale_1[_i];
+            scalePlusChord.push({
+                index: note.index,
+                degree: note.degree,
+                noteName: note.noteName,
+                chord: generateChord(scale, note)
+            });
+        }
+        return scalePlusChord;
     }
     music2.generateScale = generateScale;
+    function generateChord(scale, root) {
+        return {
+            romanNumeral: romanNumeral[root.degree],
+            triad: [
+                root.degree,
+                scale[(root.degree + 2) % 7].index,
+                scale[(root.degree + 4) % 7].index
+            ]
+        };
+    }
     function fifths() {
         var indexes = [];
         var current = 0;
@@ -172,8 +193,8 @@ var music;
     }
     music.scale = scale;
     function appendTriad(scale, triad) {
-        for (var _i = 0, scale_1 = scale; _i < scale_1.length; _i++) {
-            var note = scale_1[_i];
+        for (var _i = 0, scale_2 = scale; _i < scale_2.length; _i++) {
+            var note = scale_2[_i];
             for (var i = 0; i < 3; i++) {
                 if (note.name === triad[i].name) {
                     note.chordNote = i;
@@ -353,7 +374,7 @@ var cof;
             .attr("class", "degree-segment");
         degreeText
             .data(data, indexer)
-            .text(function (d, i) { return d.scaleNote.chord; })
+            .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
             .exit()
             .text("");
         // chordSegments
