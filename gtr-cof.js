@@ -27,6 +27,14 @@ var music2;
         { name: 'Locrian', index: 6 },
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
+    music2.tuning = [
+        4,
+        9,
+        2,
+        7,
+        11,
+        4,
+    ];
     ;
     function generateScale(noteBase, index, mode) {
         var scale = [];
@@ -521,6 +529,9 @@ var gtr;
         "white",
         "white"
     ];
+    function indexer(stringNote) {
+        return stringNote.index + "_" + stringNote.octave;
+    }
     function init() {
         var stringGap = 40;
         var fretGap = 70;
@@ -562,7 +573,7 @@ var gtr;
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(music.tuning.reverse(), function (n) { return n.name; })
+            .data(music2.tuning.reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -577,7 +588,7 @@ var gtr;
             .attr("stroke-width", 2);
         notes = strings
             .selectAll("circle")
-            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, function (d) { return d.note.name + d.octave.toString(); })
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
             .enter()
             .append("circle")
             .attr("r", noteRadius)
@@ -592,41 +603,21 @@ var gtr;
         var fill = function (d, i) {
             return noteColours[i % 7];
         };
-        var stroke = function (d, i) {
-            var note = d.note;
-            if (note.chordNote === undefined) {
-                return "grey";
-            }
-            if (note.chordNote === 0) {
-                return "red";
-            }
-            if (note.chordNote === 1) {
-                return "green";
-            }
-            return "blue";
-        };
-        var strokeWidth = function (d, i) {
-            var note = d.note;
-            if (note.chordNote !== undefined) {
-                return 5;
-            }
-            return 2;
-        };
         notes
-            .data(repeatTo(stateChange.scale, numberOfFrets), function (d) { return d.note.name + d.octave.toString(); })
+            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .attr("fill", fill)
-            .attr("stroke", stroke)
-            .attr("stroke-width", strokeWidth)
+            .attr("stroke", "grey")
+            .attr("stroke-width", 2)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
     }
-    function allNotesFrom(note, numberOfNotes) {
+    function allNotesFrom(index, numberOfNotes) {
         var items = [];
         for (var i = 0; i < numberOfNotes; i++) {
             items.push({
-                note: music.notes[(i + note.index) % 12],
-                octave: Math.floor((i + 1) / 12)
+                octave: Math.floor((i + 1) / 12),
+                index: (i + index) % 12
             });
         }
         return items;
@@ -642,8 +633,8 @@ var gtr;
         var result = [];
         for (var i = 0; i < count; i++) {
             result.push({
-                note: scale[i % scale.length],
-                octave: Math.floor((i + 1) / 8)
+                octave: Math.floor((i + 1) / 8),
+                index: scale[i % scale.length].index
             });
         }
         return result;

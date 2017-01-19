@@ -47,6 +47,15 @@ namespace music2 {
     ];
 
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
+   
+    export let tuning: Array<number> = [
+        4, // E
+        9, // A
+        2, // D
+        7, // G
+        11,// B
+        4, // E
+    ];
     
     export type Triad = [number, number, number];
     
@@ -652,6 +661,10 @@ namespace gtr {
         "white",
         "white"
     ];
+    
+    function indexer(stringNote: StringNote): string {
+        return stringNote.index + "_" + stringNote.octave;
+    }
 
     export function init(): void {
         let stringGap = 40;
@@ -699,7 +712,7 @@ namespace gtr {
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(music.tuning.reverse(), function (n) { return n.name; })
+            .data(music2.tuning.reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -716,7 +729,7 @@ namespace gtr {
 
         notes = strings
             .selectAll("circle")
-            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, function (d) { return d.note.name + d.octave.toString(); })
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
             .enter()
             .append("circle")
             .attr("r", noteRadius)
@@ -734,45 +747,23 @@ namespace gtr {
             return noteColours[i % 7];
         };
 
-        let stroke = function (d: StringNote, i: number): string {
-            let note = <music.ScaleNote>d.note;
-            if (note.chordNote === undefined) {
-                return "grey";
-            }
-            if (note.chordNote === 0) {
-                return "red";
-            }
-            if (note.chordNote === 1) {
-                return "green";
-            }
-            return "blue";
-        };
-
-        let strokeWidth = function (d: StringNote, i: number): number {
-            let note = <music.ScaleNote>d.note;
-            if (note.chordNote !== undefined) {
-                return 5;
-            }
-            return 2;
-        };
-
         notes
-            .data(repeatTo(stateChange.scale, numberOfFrets), function (d) { return d.note.name + d.octave.toString(); })
+            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .attr("fill", fill)
-            .attr("stroke", stroke)
-            .attr("stroke-width", strokeWidth)
+            .attr("stroke", "grey")
+            .attr("stroke-width", 2)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
     }
 
-    function allNotesFrom(note: music.Note, numberOfNotes: number): Array<StringNote> {
+    function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
         let items: Array<StringNote> = [];
 
         for (let i = 0; i < numberOfNotes; i++) {
             items.push({
-                note: music.notes[(i + note.index) % 12],
-                octave: Math.floor((i + 1) / 12)
+                octave: Math.floor((i + 1) / 12),
+                index: (i + index) % 12
             });
         }
 
@@ -787,13 +778,13 @@ namespace gtr {
         return data;
     }
 
-    function repeatTo(scale: Array<music.Note>, count: number): Array<StringNote> {
+    function repeatTo(scale: Array<music2.ScaleNote>, count: number): Array<StringNote> {
         let result: Array<StringNote> = [];
 
         for (let i = 0; i < count; i++) {
             result.push({
-                note: scale[i % scale.length],
-                octave: Math.floor((i + 1) / 8)
+                octave: Math.floor((i + 1) / 8),
+                index: scale[i % scale.length].index
             });
         }
 
@@ -801,8 +792,8 @@ namespace gtr {
     }
 
     interface StringNote {
-        note: music.Note;
         octave: number;
+        index: number;
     }
 }
 
