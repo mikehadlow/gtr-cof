@@ -60,6 +60,8 @@ namespace music2 {
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     
     export type Triad = [number, number, number];
+
+    export enum ChordType { Major, Minor, Diminished };
     
     export interface ScaleNote {
         readonly index: number;
@@ -71,6 +73,7 @@ namespace music2 {
     export interface Chord {
         readonly romanNumeral: string;
         readonly triad: Triad;
+        readonly type: ChordType;
     }
     
     export function generateScale(noteBase: NoteBase, index: number, mode: Mode): Array<ScaleNote> {
@@ -117,13 +120,24 @@ namespace music2 {
     }
     
     function generateChord(scale: Array<ScaleNote>, root: ScaleNote): Chord {
+        let triad: Triad = [
+            root.index, 
+            scale[(root.degree + 2) % 7].index, 
+            scale[(root.degree + 4) % 7].index
+        ];
+        let chordType = getChordType(triad);
+        let roman = romanNumeral[root.degree];
+        if(chordType === ChordType.Major){
+            roman = roman.toLocaleUpperCase();
+        }
+        if(chordType === ChordType.Diminished) {
+            roman = roman + "°";
+        }
+        
         return {
-            romanNumeral: romanNumeral[root.degree],
-            triad: [
-                root.degree, 
-                scale[(root.degree + 2) % 7].index, 
-                scale[(root.degree + 4) % 7].index
-            ]
+            romanNumeral: roman,
+            triad: triad,
+            type: chordType
         };
     }
     
@@ -135,6 +149,19 @@ namespace music2 {
             current = (current + 7) % 12;
         }
         return indexes;
+    }
+
+    function getChordType(triad: Triad): ChordType {
+        // check for diminished
+        if (interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
+        // check for minor
+        if (interval(triad[0], triad[1]) === 3) return ChordType.Minor;
+        // must be Major
+        return ChordType.Major;
+    }
+
+    function interval(a: number, b: number): number {
+        return (a <= b) ? b - a : (b + 12) - a;
     }
 }
 
@@ -483,11 +510,11 @@ namespace cof {
             .exit()
             .text("");
 
-        // chordSegments
-        //     .data(data, indexer)
-        //     .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .attr("class", "chord-segment");
+        chordSegments
+            .data(data, indexer)
+            .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
+            .exit()
+            .attr("class", "chord-segment");
 
         // chordNotes
         //     .data(data, indexer)
@@ -496,10 +523,10 @@ namespace cof {
         //     .attr("class", "chord-segment-note");
     }
 
-    function getChordSegmentClass(note: music.ScaleNote): string {
-        if (note.chordType === music.ChordType.Diminished) return "chord-segment-dim";
-        if (note.chordType === music.ChordType.Minor) return "chord-segment-minor";
-        if (note.chordType === music.ChordType.Major) return "chord-segment-major";
+    function getChordSegmentClass(note: music2.ScaleNote): string {
+        if (note.chord.type === music.ChordType.Diminished) return "chord-segment-dim";
+        if (note.chord.type === music.ChordType.Minor) return "chord-segment-minor";
+        if (note.chord.type === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 

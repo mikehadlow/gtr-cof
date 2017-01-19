@@ -36,6 +36,13 @@ var music2;
         4,
     ];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    (function (ChordType) {
+        ChordType[ChordType["Major"] = 0] = "Major";
+        ChordType[ChordType["Minor"] = 1] = "Minor";
+        ChordType[ChordType["Diminished"] = 2] = "Diminished";
+    })(music2.ChordType || (music2.ChordType = {}));
+    var ChordType = music2.ChordType;
+    ;
     ;
     function generateScale(noteBase, index, mode) {
         var scale = [];
@@ -57,8 +64,8 @@ var music2;
                 noteName: currentNoteBase.name + noteLabel.label,
                 chord: null
             });
-            var interval = scaleTones[(mode.index + i) % 7];
-            currentIndex = (currentIndex + interval) % 12;
+            var interval_1 = scaleTones[(mode.index + i) % 7];
+            currentIndex = (currentIndex + interval_1) % 12;
             currentNoteBase = music2.noteBases[(currentNoteBase.id + 1) % 7];
         };
         for (var i = 0; i < 7; i++) {
@@ -78,13 +85,23 @@ var music2;
     }
     music2.generateScale = generateScale;
     function generateChord(scale, root) {
+        var triad = [
+            root.index,
+            scale[(root.degree + 2) % 7].index,
+            scale[(root.degree + 4) % 7].index
+        ];
+        var chordType = getChordType(triad);
+        var roman = romanNumeral[root.degree];
+        if (chordType === ChordType.Major) {
+            roman = roman.toLocaleUpperCase();
+        }
+        if (chordType === ChordType.Diminished) {
+            roman = roman + "°";
+        }
         return {
-            romanNumeral: romanNumeral[root.degree],
-            triad: [
-                root.degree,
-                scale[(root.degree + 2) % 7].index,
-                scale[(root.degree + 4) % 7].index
-            ]
+            romanNumeral: roman,
+            triad: triad,
+            type: chordType
         };
     }
     function fifths() {
@@ -97,6 +114,19 @@ var music2;
         return indexes;
     }
     music2.fifths = fifths;
+    function getChordType(triad) {
+        // check for diminished
+        if (interval(triad[0], triad[2]) === 6)
+            return ChordType.Diminished;
+        // check for minor
+        if (interval(triad[0], triad[1]) === 3)
+            return ChordType.Minor;
+        // must be Major
+        return ChordType.Major;
+    }
+    function interval(a, b) {
+        return (a <= b) ? b - a : (b + 12) - a;
+    }
 })(music2 || (music2 = {}));
 var music;
 (function (music) {
@@ -377,11 +407,11 @@ var cof;
             .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
             .exit()
             .text("");
-        // chordSegments
-        //     .data(data, indexer)
-        //     .attr("class", function (d, i) { return getChordSegmentClass(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .attr("class", "chord-segment");
+        chordSegments
+            .data(data, indexer)
+            .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
+            .exit()
+            .attr("class", "chord-segment");
         // chordNotes
         //     .data(data, indexer)
         //     .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
@@ -390,11 +420,11 @@ var cof;
     }
     cof_1.update = update;
     function getChordSegmentClass(note) {
-        if (note.chordType === music.ChordType.Diminished)
+        if (note.chord.type === music.ChordType.Diminished)
             return "chord-segment-dim";
-        if (note.chordType === music.ChordType.Minor)
+        if (note.chord.type === music.ChordType.Minor)
             return "chord-segment-minor";
-        if (note.chordType === music.ChordType.Major)
+        if (note.chord.type === music.ChordType.Major)
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
