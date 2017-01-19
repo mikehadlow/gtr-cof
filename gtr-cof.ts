@@ -68,6 +68,7 @@ namespace music2 {
         readonly degree: number;
         readonly noteName: string;
         readonly chord: Chord;
+        chordNote?: number;
     };
     
     export interface Chord {
@@ -139,6 +140,17 @@ namespace music2 {
             triad: triad,
             type: chordType
         };
+    }
+    
+    export function appendTriad(scale: Array<ScaleNote>, chord: Chord): Array<ScaleNote> {
+        for (let note of scale) {
+            for (let i = 0; i < 3; i++) {
+                if (note.index === chord.triad[i]) {
+                    note.chordNote = i;
+                }
+            }
+        }
+        return scale;
     }
     
     export function fifths(): Array<number> {
@@ -346,25 +358,25 @@ namespace state {
         updateListeners();
     }
 
-    export function changeChord(triad: music.Triad): void {
-        updateListeners(triad);
+    export function changeChord(chord: music2.Chord): void {
+        updateListeners(chord);
     }
 
-    function updateListeners(triad?: music.Triad): void {
-        let scale = music.scale(currentTonic, currentMode);
+    function updateListeners(chord?: music2.Chord): void {
+        let scale = music2.generateScale(currentNoteBase, currentIndex, currentMode);
 
-        if (triad) {
-            scale = music.appendTriad(scale, triad);
+        if (chord) {
+            scale = music2.appendTriad(scale, chord);
         }
 
         let stateChange: StateChange = {
-            tonic: currentTonic,
+            tonic: null,
             mode: currentMode,
-            scale: scale,
-            
+            scale: null,
+
             noteBase: currentNoteBase,
             index: currentIndex,
-            scale2: music2.generateScale(currentNoteBase, currentIndex, currentMode)
+            scale2: scale
         };
         for (let listener of listeners) {
             listener(stateChange);
@@ -516,11 +528,11 @@ namespace cof {
             .exit()
             .attr("class", "chord-segment");
 
-        // chordNotes
-        //     .data(data, indexer)
-        //     .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .attr("class", "chord-segment-note");
+        chordNotes
+            .data(data, indexer)
+            .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
+            .exit()
+            .attr("class", "chord-segment-note");
     }
 
     function getChordSegmentClass(note: music2.ScaleNote): string {
@@ -530,7 +542,7 @@ namespace cof {
         throw "Unexpected ChordType";
     }
 
-    function getChordNoteClass(note: music.ScaleNote): string {
+    function getChordNoteClass(note: music2.ScaleNote): string {
         if (note.chordNote === undefined) return "chord-segment-note";
         if (note.chordNote === 0) return "chord-segment-note-root";
         if (note.chordNote === 1) return "chord-segment-note-third";
@@ -563,8 +575,8 @@ namespace cof {
     }
 
     function handleChordClick(segment: Segment, i: number): void {
-        let note = <music.ScaleNote>segment.note;
-        //state.changeChord(note.triad);
+        let note = segment.scaleNote;
+        state.changeChord(note.chord);
     }
 
     interface Segment {

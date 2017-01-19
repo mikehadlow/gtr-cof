@@ -104,6 +104,18 @@ var music2;
             type: chordType
         };
     }
+    function appendTriad(scale, chord) {
+        for (var _i = 0, scale_2 = scale; _i < scale_2.length; _i++) {
+            var note = scale_2[_i];
+            for (var i = 0; i < 3; i++) {
+                if (note.index === chord.triad[i]) {
+                    note.chordNote = i;
+                }
+            }
+        }
+        return scale;
+    }
+    music2.appendTriad = appendTriad;
     function fifths() {
         var indexes = [];
         var current = 0;
@@ -223,8 +235,8 @@ var music;
     }
     music.scale = scale;
     function appendTriad(scale, triad) {
-        for (var _i = 0, scale_2 = scale; _i < scale_2.length; _i++) {
-            var note = scale_2[_i];
+        for (var _i = 0, scale_3 = scale; _i < scale_3.length; _i++) {
+            var note = scale_3[_i];
             for (var i = 0; i < 3; i++) {
                 if (note.name === triad[i].name) {
                     note.chordNote = i;
@@ -275,22 +287,22 @@ var state;
         updateListeners();
     }
     state.changeMode = changeMode;
-    function changeChord(triad) {
-        updateListeners(triad);
+    function changeChord(chord) {
+        updateListeners(chord);
     }
     state.changeChord = changeChord;
-    function updateListeners(triad) {
-        var scale = music.scale(currentTonic, currentMode);
-        if (triad) {
-            scale = music.appendTriad(scale, triad);
+    function updateListeners(chord) {
+        var scale = music2.generateScale(currentNoteBase, currentIndex, currentMode);
+        if (chord) {
+            scale = music2.appendTriad(scale, chord);
         }
         var stateChange = {
-            tonic: currentTonic,
+            tonic: null,
             mode: currentMode,
-            scale: scale,
+            scale: null,
             noteBase: currentNoteBase,
             index: currentIndex,
-            scale2: music2.generateScale(currentNoteBase, currentIndex, currentMode)
+            scale2: scale
         };
         for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
             var listener = listeners_1[_i];
@@ -412,11 +424,11 @@ var cof;
             .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
             .exit()
             .attr("class", "chord-segment");
-        // chordNotes
-        //     .data(data, indexer)
-        //     .attr("class", function (d, i) { return getChordNoteClass(<music.ScaleNote>d.note); })
-        //     .exit()
-        //     .attr("class", "chord-segment-note");
+        chordNotes
+            .data(data, indexer)
+            .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
+            .exit()
+            .attr("class", "chord-segment-note");
     }
     cof_1.update = update;
     function getChordSegmentClass(note) {
@@ -460,8 +472,8 @@ var cof;
         //state.changeTonic(segment.note);
     }
     function handleChordClick(segment, i) {
-        var note = segment.note;
-        //state.changeChord(note.triad);
+        var note = segment.scaleNote;
+        state.changeChord(note.chord);
     }
 })(cof || (cof = {}));
 var tonics;
