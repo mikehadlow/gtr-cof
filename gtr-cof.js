@@ -666,11 +666,31 @@ var gtr;
         var fill = function (d, i) {
             return noteColours[i % 7];
         };
+        var stroke = function (d, i) {
+            var note = d.scaleNote;
+            if (note.chordNote === undefined) {
+                return "grey";
+            }
+            if (note.chordNote === 0) {
+                return "red";
+            }
+            if (note.chordNote === 1) {
+                return "green";
+            }
+            return "blue";
+        };
+        var strokeWidth = function (d, i) {
+            var note = d.scaleNote;
+            if (note.chordNote === undefined) {
+                return 2;
+            }
+            return 5;
+        };
         notes
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .attr("fill", fill)
-            .attr("stroke", "grey")
-            .attr("stroke-width", 2)
+            .attr("stroke", stroke)
+            .attr("stroke-width", strokeWidth)
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
@@ -680,7 +700,8 @@ var gtr;
         for (var i = 0; i < numberOfNotes; i++) {
             items.push({
                 octave: Math.floor((i + 1) / 12),
-                index: (i + index) % 12
+                index: (i + index) % 12,
+                scaleNote: null
             });
         }
         return items;
@@ -695,9 +716,11 @@ var gtr;
     function repeatTo(scale, count) {
         var result = [];
         for (var i = 0; i < count; i++) {
+            var note = scale[i % scale.length];
             result.push({
                 octave: Math.floor((i + 1) / 8),
-                index: scale[i % scale.length].index
+                index: note.index,
+                scaleNote: note
             });
         }
         return result;
