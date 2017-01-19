@@ -224,7 +224,6 @@ namespace state {
 
     export interface StateChange {
         readonly mode: music.Mode;
-        
         readonly noteBase: music.NoteBase;
         readonly index: number;
         readonly scale2: Array<music.ScaleNote>;
@@ -472,22 +471,21 @@ namespace tonics {
     }
 
     function handleButtonClick(d: ButtonData, i: number): void {
-        console.log("note click: " + d.noteBase.name + " " + d.index + ".");
         state.changeTonic(d.noteBase, d.index);
-        update(d);
     }
-
-    function update(d: ButtonData): void {
-        let ds: Array<ButtonData> = [d];
+    
+    function listener(state: state.StateChange): void {
+        let tonic = state.scale2[0];
+        let ds: Array<ButtonData> = [{
+            noteBase: state.noteBase,
+            label: tonic.noteName,
+            index: tonic.index
+        }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
             .attr("class", "tonic-button");
-    }
-    
-    function listener(state: state.StateChange): void {
-        console.log("note state change: index: " + state.index);
     }
     
     function indexer(d: ButtonData): string {

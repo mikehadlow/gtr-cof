@@ -385,20 +385,20 @@ var tonics;
     }
     tonics_1.init = init;
     function handleButtonClick(d, i) {
-        console.log("note click: " + d.noteBase.name + " " + d.index + ".");
         state.changeTonic(d.noteBase, d.index);
-        update(d);
     }
-    function update(d) {
-        var ds = [d];
+    function listener(state) {
+        var tonic = state.scale2[0];
+        var ds = [{
+                noteBase: state.noteBase,
+                label: tonic.noteName,
+                index: tonic.index
+            }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
             .attr("class", "tonic-button");
-    }
-    function listener(state) {
-        console.log("note state change: index: " + state.index);
     }
     function indexer(d) {
         return d.label;
