@@ -1,2 +1,2 @@
 # Guitar Dashboard
-An interactive music theory dashboard for guitarists. http://guitardashboard/
+An interactive music theory dashboard for guitarists. http://guitardashboard.com/
