@@ -378,6 +378,9 @@ var tonics;
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
+            .attr("strokeWidth", 2)
+            .attr("width", 40)
+            .attr("height", 25)
             .attr("class", "tonic-button")
             .on("click", handleButtonClick);
         gs
@@ -428,6 +431,9 @@ var modes;
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
+            .attr("strokeWidth", 2)
+            .attr("width", 150)
+            .attr("height", 25)
             .attr("class", "mode-button")
             .on("click", handleButtonClick);
         gs

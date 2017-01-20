@@ -464,6 +464,9 @@ namespace tonics {
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
+            .attr("strokeWidth", 2)
+            .attr("width", 40)
+            .attr("height", 25)
             .attr("class", "tonic-button")
             .on("click", handleButtonClick);
 
@@ -522,6 +525,9 @@ namespace modes {
             .append("rect")
             .attr("x", pad)
             .attr("y", 0)
+            .attr("strokeWidth", 2)
+            .attr("width", 150)
+            .attr("height", 25)
             .attr("class", "mode-button")
             .on("click", handleButtonClick);
 

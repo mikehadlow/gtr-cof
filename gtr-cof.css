@@ -83,9 +83,6 @@ text {
 .mode-button {
     fill: white;
     stroke: black;
-    stroke-width: 2px;
-    width: 150px;
-    height: 25px;
 }
 .mode-button-selected {
     fill: yellow;
@@ -100,9 +97,6 @@ text {
 .tonic-button {
     fill: white;
     stroke: black;
-    stroke-width: 2px;
-    width: 40px;
-    height: 25px;
 }
 .tonic-button-selected {
     fill: yellow;
