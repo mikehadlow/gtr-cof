@@ -1,2 +1,2 @@
-# gtr-cof
-Circle of Fifths for guitarists. http://mikehadlow.com/gtr-cof/
+# Guitar Dashboard
+An interactive music theory dashboard for guitarists. http://guitardashboard
