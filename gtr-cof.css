@@ -81,14 +81,14 @@ text {
 
 /* Modes */
 .mode-button {
-    fill: lightgrey;
+    fill: white;
     stroke: black;
     stroke-width: 2px;
     width: 150px;
     height: 25px;
 }
 .mode-button-selected {
-    fill: white;
+    fill: yellow;
 }
 .mode-text {
     font-size: 15;
@@ -98,14 +98,14 @@ text {
 
 /* Tonics */
 .tonic-button {
-    fill: lightgrey;
+    fill: white;
     stroke: black;
     stroke-width: 2px;
     width: 40px;
     height: 25px;
 }
 .tonic-button-selected {
-    fill: white;
+    fill: yellow;
 }
 .tonic-text {
     font-size: 15;
