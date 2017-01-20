@@ -62,6 +62,8 @@ var music;
                 index: currentIndex,
                 degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
+                noteBase: currentNoteBase,
+                canSelect: Math.abs(offset) < 2,
                 chord: null
             });
             var interval_1 = scaleTones[(mode.index + i) % 7];
@@ -78,6 +80,8 @@ var music;
                 index: note.index,
                 degree: note.degree,
                 noteName: note.noteName,
+                noteBase: note.noteBase,
+                canSelect: note.canSelect,
                 chord: generateChord(scale, note)
             });
         }
@@ -336,11 +340,12 @@ var cof;
         return items;
     }
     function handleNoteClick(segment, i) {
-        //state.changeTonic(segment.note);
+        if (segment.scaleNote.canSelect) {
+            state.changeTonic(segment.scaleNote.noteBase, segment.scaleNote.index);
+        }
     }
     function handleChordClick(segment, i) {
-        var note = segment.scaleNote;
-        state.changeChord(note.chord);
+        state.changeChord(segment.scaleNote.chord);
     }
 })(cof || (cof = {}));
 var tonics;

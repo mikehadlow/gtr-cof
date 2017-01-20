@@ -68,6 +68,8 @@ namespace music {
         readonly degree: number;
         readonly noteName: string;
         readonly chord: Chord;
+        readonly noteBase: NoteBase;
+        readonly canSelect: boolean;
         chordNote?: number;
     };
     
@@ -98,6 +100,8 @@ namespace music {
                 index: currentIndex,
                 degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
+                noteBase: currentNoteBase,
+                canSelect: Math.abs(offset) < 2,
                 chord: null
             })
             
@@ -113,6 +117,8 @@ namespace music {
                 index: note.index,
                 degree: note.degree,
                 noteName: note.noteName,
+                noteBase: note.noteBase,
+                canSelect: note.canSelect,
                 chord: generateChord(scale, note)
             });
         }
@@ -401,12 +407,13 @@ namespace cof {
     }
 
     function handleNoteClick(segment: Segment, i: number): void {
-        //state.changeTonic(segment.note);
+        if(segment.scaleNote.canSelect) {
+            state.changeTonic(segment.scaleNote.noteBase, segment.scaleNote.index);
+        }
     }
 
     function handleChordClick(segment: Segment, i: number): void {
-        let note = segment.scaleNote;
-        state.changeChord(note.chord);
+        state.changeChord(segment.scaleNote.chord);
     }
 
     interface Segment {
