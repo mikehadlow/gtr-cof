@@ -130,6 +130,14 @@ var music;
         return indexes;
     }
     music.fifths = fifths;
+    function chromatic() {
+        var indexes = [];
+        for (var i = 0; i < 12; i++) {
+            indexes.push(i);
+        }
+        return indexes;
+    }
+    music.chromatic = chromatic;
     function getChordType(triad) {
         // check for diminished
         if (interval(triad[0], triad[2]) === 6)
@@ -189,7 +197,7 @@ var state;
 var cof;
 (function (cof_1) {
     var NoteCircle = (function () {
-        function NoteCircle(svg) {
+        function NoteCircle(svg, noteIndexes, label) {
             this.noteSegments = null;
             this.noteText = null;
             this.degreeSegments = null;
@@ -197,7 +205,7 @@ var cof;
             this.chordSegments = null;
             this.chordNotes = null;
             this.indexer = function (x) { return x.index + ""; };
-            var pad = 30;
+            var pad = 50;
             var chordRadius = 220;
             var noteRadius = 200;
             var degreeRadius = 135;
@@ -205,7 +213,12 @@ var cof;
             var cof = svg
                 .append("g")
                 .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
-            var segments = generateSegments(12);
+            cof.append("text")
+                .attr("text-anchor", "middle")
+                .attr("x", 0)
+                .attr("y", 0)
+                .text(label);
+            var segments = generateSegments(noteIndexes);
             var noteArc = d3.svg.arc()
                 .innerRadius(degreeRadius)
                 .outerRadius(noteRadius);
@@ -328,8 +341,8 @@ var cof;
             return "chord-segment-note-third";
         return "chord-segment-note-fifth";
     }
-    function generateSegments(count) {
-        var fifths = music.fifths();
+    function generateSegments(fifths) {
+        var count = fifths.length;
         var items = [];
         var angle = (Math.PI * (2 / count));
         for (var i = 0; i < count; i++) {
@@ -610,7 +623,8 @@ var gtr;
 })(gtr || (gtr = {}));
 tonics.init();
 modes.init();
-var circleOfFifths = new cof.NoteCircle(d3.select("#cof"));
+var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
+var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
 state.changeTonic(music.noteBases[0], 0);
 //# sourceMappingURL=gtr-cof.js.map

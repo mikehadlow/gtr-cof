@@ -169,6 +169,14 @@ namespace music {
         return indexes;
     }
 
+    export function chromatic(): Array<number> {
+        let indexes: Array<number> = [];
+        for(let i: number = 0; i < 12; i++) {
+            indexes.push(i);
+        }
+        return indexes;
+    }
+
     function getChordType(triad: Triad): ChordType {
         // check for diminished
         if (interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
@@ -248,9 +256,9 @@ namespace cof {
         chordNotes: d3.Selection<Segment> = null;
         indexer: (x: Segment) => string = (x) => x.index + "";
 
-        constructor(svg: d3.Selection<any>)
+        constructor(svg: d3.Selection<any>, noteIndexes: number[], label: string)
         {
-            let pad = 30;
+            let pad = 50;
 
             let chordRadius = 220;
             let noteRadius = 200;
@@ -261,7 +269,13 @@ namespace cof {
                 .append("g")
                 .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
 
-            let segments = generateSegments(12);
+            cof.append("text")
+                .attr("text-anchor", "middle")
+                .attr("x", 0)
+                .attr("y", 0)
+                .text(label)
+
+            let segments = generateSegments(noteIndexes);
 
             let noteArc = d3.svg.arc<Segment>()
                 .innerRadius(degreeRadius)
@@ -396,8 +410,8 @@ namespace cof {
         return "chord-segment-note-fifth";
     }
 
-    function generateSegments(count: number): Segment[] {
-        let fifths = music.fifths();
+    function generateSegments(fifths: number[]): Segment[] {
+        let count = fifths.length;
         let items: Array<Segment> = [];
         let angle = (Math.PI * (2 / count));
         for (let i: number = 0; i < count; i++) {
@@ -739,6 +753,7 @@ namespace gtr {
 
 tonics.init();
 modes.init();
-let circleOfFifths = new cof.NoteCircle(d3.select("#cof"));
+let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
+let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
 state.changeTonic(music.noteBases[0], 0);
