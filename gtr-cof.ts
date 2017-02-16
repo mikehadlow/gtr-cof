@@ -238,142 +238,148 @@ namespace state {
 
 namespace cof {
 
-    let noteSegments: d3.Selection<Segment> = null;
-    let noteText: d3.Selection<Segment> = null;
-    let degreeSegments: d3.Selection<Segment> = null;
-    let degreeText: d3.Selection<Segment> = null;
-    let chordSegments: d3.Selection<Segment> = null;
-    let chordNotes: d3.Selection<Segment> = null;
-    let indexer: (x: Segment) => string = (x) => x.index + "";
+    export class NoteCircle
+    {
+        noteSegments: d3.Selection<Segment> = null;
+        noteText: d3.Selection<Segment> = null;
+        degreeSegments: d3.Selection<Segment> = null;
+        degreeText: d3.Selection<Segment> = null;
+        chordSegments: d3.Selection<Segment> = null;
+        chordNotes: d3.Selection<Segment> = null;
+        indexer: (x: Segment) => string = (x) => x.index + "";
 
-    export function init(): void {
-        let pad = 30;
+        constructor(svg: d3.Selection<any>)
+        {
+            let pad = 30;
 
-        let svg = d3.select("#cof");
-        let chordRadius = 220;
-        let noteRadius = 200;
-        let degreeRadius = 135;
-        let innerRadius = 90;
+            let chordRadius = 220;
+            let noteRadius = 200;
+            let degreeRadius = 135;
+            let innerRadius = 90;
 
-        let cof = svg
-            .append("g")
-            .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
+            let cof = svg
+                .append("g")
+                .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
 
-        let segments = generateSegments(12);
+            let segments = generateSegments(12);
 
-        let noteArc = d3.svg.arc<Segment>()
-            .innerRadius(degreeRadius)
-            .outerRadius(noteRadius);
+            let noteArc = d3.svg.arc<Segment>()
+                .innerRadius(degreeRadius)
+                .outerRadius(noteRadius);
 
-        let degreeArc = d3.svg.arc<Segment>()
-            .innerRadius(innerRadius)
-            .outerRadius(degreeRadius);
+            let degreeArc = d3.svg.arc<Segment>()
+                .innerRadius(innerRadius)
+                .outerRadius(degreeRadius);
 
-        let chordArc = d3.svg.arc<Segment>()
-            .innerRadius(noteRadius)
-            .outerRadius(chordRadius);
+            let chordArc = d3.svg.arc<Segment>()
+                .innerRadius(noteRadius)
+                .outerRadius(chordRadius);
 
-        noteSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", noteArc)
-            .attr("class", "note-segment")
-            .on("click", handleNoteClick);
+            this.noteSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", noteArc)
+                .attr("class", "note-segment")
+                .on("click", handleNoteClick);
 
-        noteText = cof.append("g").selectAll("text")
-            .data(segments)
-            .enter()
-            .append("text")
-            .attr("x", function (x) { return noteArc.centroid(x)[0]; })
-            .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
-            .text("")
-            .attr("class", "note-segment-text");
+            this.noteText = cof.append("g").selectAll("text")
+                .data(segments)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return noteArc.centroid(x)[0]; })
+                .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
+                .text("")
+                .attr("class", "note-segment-text");
 
-        degreeSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", degreeArc)
-            .attr("class", "degree-segment")
+            this.degreeSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", degreeArc)
+                .attr("class", "degree-segment")
 
-        degreeText = cof.append("g").selectAll("text")
-            .data(segments, indexer)
-            .enter()
-            .append("text")
-            .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
-            .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
-            .text("")
-            .attr("class", "degree-segment-text");
+            this.degreeText = cof.append("g").selectAll("text")
+                .data(segments, this.indexer)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
+                .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
+                .text("")
+                .attr("class", "degree-segment-text");
 
-        chordSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", chordArc)
-            .attr("class", "chord-segment")
-            .on("click", handleChordClick);
+            this.chordSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", chordArc)
+                .attr("class", "chord-segment")
+                .on("click", handleChordClick);
 
-        chordNotes = cof.append("g").selectAll("circle")
-            .data(segments, indexer)
-            .enter()
-            .append("circle")
-            .style("pointer-events", "none")
-            .attr("r", 15)
-            .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
-            .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
-            .attr("class", "chord-segment-note");
+            this.chordNotes = cof.append("g").selectAll("circle")
+                .data(segments, this.indexer)
+                .enter()
+                .append("circle")
+                .style("pointer-events", "none")
+                .attr("r", 15)
+                .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
+                .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
+                .attr("class", "chord-segment-note");
 
-        state.addListener(update);
-    }
-
-    export function update(stateChange: state.StateChange): void {
-
-        let data: Array<Segment> = [];
-        for (let n of stateChange.scale2) {
-            data.push({
-                startAngle: 0,
-                endAngle: 0,
-                scaleNote: n,
-                index: n.index
+            let instance = this;
+            state.addListener(function(stateChange: state.StateChange) { 
+                instance.update(stateChange);
             });
         }
 
-        noteSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
-            .exit()
-            .attr("class", "note-segment");
+        update(stateChange: state.StateChange): void {
 
-        noteText
-            .data(data, indexer)
-            .text(function(d) { return d.scaleNote.noteName; })
-            .exit()
-            .text("");
+            let data: Array<Segment> = [];
+            for (let n of stateChange.scale2) {
+                data.push({
+                    startAngle: 0,
+                    endAngle: 0,
+                    scaleNote: n,
+                    index: n.index
+                });
+            }
 
-        degreeSegments
-            .data(data, indexer)
-            .attr("class", "degree-segment-selected")
-            .exit()
-            .attr("class", "degree-segment")
+            this.noteSegments
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
+                .exit()
+                .attr("class", "note-segment");
 
-        degreeText
-            .data(data, indexer)
-            .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
-            .exit()
-            .text("");
+            this.noteText
+                .data(data, this.indexer)
+                .text(function(d) { return d.scaleNote.noteName; })
+                .exit()
+                .text("");
 
-        chordSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
-            .exit()
-            .attr("class", "chord-segment");
+            this.degreeSegments
+                .data(data, this.indexer)
+                .attr("class", "degree-segment-selected")
+                .exit()
+                .attr("class", "degree-segment")
 
-        chordNotes
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
-            .exit()
-            .attr("class", "chord-segment-note");
+            this.degreeText
+                .data(data, this.indexer)
+                .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
+                .exit()
+                .text("");
+
+            this.chordSegments
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
+                .exit()
+                .attr("class", "chord-segment");
+
+            this.chordNotes
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
+                .exit()
+                .attr("class", "chord-segment-note");
+        }
     }
 
     function getChordSegmentClass(note: music.ScaleNote): string {
@@ -733,6 +739,6 @@ namespace gtr {
 
 tonics.init();
 modes.init();
-cof.init();
+let circleOfFifths = new cof.NoteCircle(d3.select("#cof"));
 gtr.init();
 state.changeTonic(music.noteBases[0], 0);

@@ -188,124 +188,128 @@ var state;
 })(state || (state = {}));
 var cof;
 (function (cof_1) {
-    var noteSegments = null;
-    var noteText = null;
-    var degreeSegments = null;
-    var degreeText = null;
-    var chordSegments = null;
-    var chordNotes = null;
-    var indexer = function (x) { return x.index + ""; };
-    function init() {
-        var pad = 30;
-        var svg = d3.select("#cof");
-        var chordRadius = 220;
-        var noteRadius = 200;
-        var degreeRadius = 135;
-        var innerRadius = 90;
-        var cof = svg
-            .append("g")
-            .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
-        var segments = generateSegments(12);
-        var noteArc = d3.svg.arc()
-            .innerRadius(degreeRadius)
-            .outerRadius(noteRadius);
-        var degreeArc = d3.svg.arc()
-            .innerRadius(innerRadius)
-            .outerRadius(degreeRadius);
-        var chordArc = d3.svg.arc()
-            .innerRadius(noteRadius)
-            .outerRadius(chordRadius);
-        noteSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", noteArc)
-            .attr("class", "note-segment")
-            .on("click", handleNoteClick);
-        noteText = cof.append("g").selectAll("text")
-            .data(segments)
-            .enter()
-            .append("text")
-            .attr("x", function (x) { return noteArc.centroid(x)[0]; })
-            .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
-            .text("")
-            .attr("class", "note-segment-text");
-        degreeSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", degreeArc)
-            .attr("class", "degree-segment");
-        degreeText = cof.append("g").selectAll("text")
-            .data(segments, indexer)
-            .enter()
-            .append("text")
-            .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
-            .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
-            .text("")
-            .attr("class", "degree-segment-text");
-        chordSegments = cof.append("g").selectAll("path")
-            .data(segments, indexer)
-            .enter()
-            .append("path")
-            .attr("d", chordArc)
-            .attr("class", "chord-segment")
-            .on("click", handleChordClick);
-        chordNotes = cof.append("g").selectAll("circle")
-            .data(segments, indexer)
-            .enter()
-            .append("circle")
-            .style("pointer-events", "none")
-            .attr("r", 15)
-            .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
-            .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
-            .attr("class", "chord-segment-note");
-        state.addListener(update);
-    }
-    cof_1.init = init;
-    function update(stateChange) {
-        var data = [];
-        for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
-            var n = _a[_i];
-            data.push({
-                startAngle: 0,
-                endAngle: 0,
-                scaleNote: n,
-                index: n.index
+    var NoteCircle = (function () {
+        function NoteCircle(svg) {
+            this.noteSegments = null;
+            this.noteText = null;
+            this.degreeSegments = null;
+            this.degreeText = null;
+            this.chordSegments = null;
+            this.chordNotes = null;
+            this.indexer = function (x) { return x.index + ""; };
+            var pad = 30;
+            var chordRadius = 220;
+            var noteRadius = 200;
+            var degreeRadius = 135;
+            var innerRadius = 90;
+            var cof = svg
+                .append("g")
+                .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
+            var segments = generateSegments(12);
+            var noteArc = d3.svg.arc()
+                .innerRadius(degreeRadius)
+                .outerRadius(noteRadius);
+            var degreeArc = d3.svg.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(degreeRadius);
+            var chordArc = d3.svg.arc()
+                .innerRadius(noteRadius)
+                .outerRadius(chordRadius);
+            this.noteSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", noteArc)
+                .attr("class", "note-segment")
+                .on("click", handleNoteClick);
+            this.noteText = cof.append("g").selectAll("text")
+                .data(segments)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return noteArc.centroid(x)[0]; })
+                .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
+                .text("")
+                .attr("class", "note-segment-text");
+            this.degreeSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", degreeArc)
+                .attr("class", "degree-segment");
+            this.degreeText = cof.append("g").selectAll("text")
+                .data(segments, this.indexer)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return degreeArc.centroid(x)[0]; })
+                .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
+                .text("")
+                .attr("class", "degree-segment-text");
+            this.chordSegments = cof.append("g").selectAll("path")
+                .data(segments, this.indexer)
+                .enter()
+                .append("path")
+                .attr("d", chordArc)
+                .attr("class", "chord-segment")
+                .on("click", handleChordClick);
+            this.chordNotes = cof.append("g").selectAll("circle")
+                .data(segments, this.indexer)
+                .enter()
+                .append("circle")
+                .style("pointer-events", "none")
+                .attr("r", 15)
+                .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
+                .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
+                .attr("class", "chord-segment-note");
+            var instance = this;
+            state.addListener(function (stateChange) {
+                instance.update(stateChange);
             });
         }
-        noteSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
-            .exit()
-            .attr("class", "note-segment");
-        noteText
-            .data(data, indexer)
-            .text(function (d) { return d.scaleNote.noteName; })
-            .exit()
-            .text("");
-        degreeSegments
-            .data(data, indexer)
-            .attr("class", "degree-segment-selected")
-            .exit()
-            .attr("class", "degree-segment");
-        degreeText
-            .data(data, indexer)
-            .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
-            .exit()
-            .text("");
-        chordSegments
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
-            .exit()
-            .attr("class", "chord-segment");
-        chordNotes
-            .data(data, indexer)
-            .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
-            .exit()
-            .attr("class", "chord-segment-note");
-    }
-    cof_1.update = update;
+        NoteCircle.prototype.update = function (stateChange) {
+            var data = [];
+            for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
+                var n = _a[_i];
+                data.push({
+                    startAngle: 0,
+                    endAngle: 0,
+                    scaleNote: n,
+                    index: n.index
+                });
+            }
+            this.noteSegments
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
+                .exit()
+                .attr("class", "note-segment");
+            this.noteText
+                .data(data, this.indexer)
+                .text(function (d) { return d.scaleNote.noteName; })
+                .exit()
+                .text("");
+            this.degreeSegments
+                .data(data, this.indexer)
+                .attr("class", "degree-segment-selected")
+                .exit()
+                .attr("class", "degree-segment");
+            this.degreeText
+                .data(data, this.indexer)
+                .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
+                .exit()
+                .text("");
+            this.chordSegments
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
+                .exit()
+                .attr("class", "chord-segment");
+            this.chordNotes
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
+                .exit()
+                .attr("class", "chord-segment-note");
+        };
+        return NoteCircle;
+    }());
+    cof_1.NoteCircle = NoteCircle;
     function getChordSegmentClass(note) {
         if (note.chord.type === music.ChordType.Diminished)
             return "chord-segment-dim";
@@ -606,7 +610,7 @@ var gtr;
 })(gtr || (gtr = {}));
 tonics.init();
 modes.init();
-cof.init();
+var circleOfFifths = new cof.NoteCircle(d3.select("#cof"));
 gtr.init();
 state.changeTonic(music.noteBases[0], 0);
 //# sourceMappingURL=gtr-cof.js.map
