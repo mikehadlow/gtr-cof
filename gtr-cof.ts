@@ -731,8 +731,8 @@ namespace gtr {
     }
 }
 
-cof.init();
-modes.init();
 tonics.init();
+modes.init();
+cof.init();
 gtr.init();
 state.changeTonic(music.noteBases[0], 0);

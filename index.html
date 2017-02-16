@@ -6,32 +6,38 @@
     <link href="gtr-cof.css" rel="stylesheet">
   </head>
   <body>
-    <h1>Guitar Dashboard</h1>
-    <div id="content">
-      <p>
-        An interactive music theory dashboard, including a <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a> for guitarists.
-        By <a href="http://mikehadlow.com/">Mike Hadlow</a>.
-      </p>
-      <ul>
-        <li>Select a <a href="https://en.wikipedia.org/wiki/Mode_(music)">mode</a> by clicking on a mode button.</li>
-        <li>Select the <a href="https://en.wikipedia.org/wiki/Tonic_(music)">tonic</a> by clicking on a note button. The current tonic is highlighted in yellow.</li>
-        <li>
-          Click on the outer 'chord' ring to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> 
-          associated with that note. Click on a note to cancel the chord display.</li>
-        <li>Chord ring colours:
-          <ul>
-            <li>Green: major chord.</li>
-            <li>Blue: minor chord.</li>
-            <li>Red: diminished chord.</li>
-          </ul>
-        </li>
-      </ul>
+    <div class="header">
+      <div class="menu"><span class="title">Guitar Dashboard</span></div>
+      <div class="dropdown"><div class="menu">Info</div>
+          <div class="dropdown-content">
+            <p>
+              An interactive music theory dashboard, including a <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a> for guitarists.
+            </p>
+            <ul>
+              <li>Select the <a href="https://en.wikipedia.org/wiki/Tonic_(music)">tonic</a> by clicking on a note button. The current tonic is highlighted in yellow.</li>
+              <li>Select a <a href="https://en.wikipedia.org/wiki/Mode_(music)">mode</a> by clicking on a mode button.</li>
+              <li>
+                Click on the outer 'chord' ring to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> 
+                associated with that note. Click on a note to cancel the chord display.</li>
+              <li>Chord ring colours:
+                <ul>
+                  <li>Green: major chord.</li>
+                  <li>Blue: minor chord.</li>
+                  <li>Red: diminished chord.</li>
+                </ul>
+              </li>
+            </ul>
+            <p>
+              By <a href="http://mikehadlow.com/">Mike Hadlow</a>.
+              Open source on <a href="https://github.com/mikehadlow/gtr-cof">Github</a>. 
+            </p>
+          </div>
+      </div>
+    </div>
+    <div class="content">
       <svg id="modes" width="160" height="500" />
       <svg id="cof" width="500" height="500" />
       <svg id="gtr" width="1500" height="300" />
-      <p>
-        Open source on <a href="https://github.com/mikehadlow/gtr-cof">Github</a>. 
-      </p>
     </div>
     <script src="http://d3js.org/d3.v2.js"></script>
     <script src="gtr-cof.js"></script>
