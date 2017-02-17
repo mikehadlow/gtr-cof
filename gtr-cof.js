@@ -151,6 +151,12 @@ var music;
     function interval(a, b) {
         return (a <= b) ? b - a : (b + 12) - a;
     }
+    function indexIsNatural(index) {
+        return music.noteBases.filter(function (noteBase, i, a) {
+            return noteBase.index == index;
+        }).length != 0;
+    }
+    music.indexIsNatural = indexIsNatural;
 })(music || (music = {}));
 var state;
 (function (state) {
@@ -369,18 +375,20 @@ var tonics;
 (function (tonics_1) {
     var buttons = null;
     ;
+    function bg(noteBase) {
+        var flatIndex = noteBase.index == 0 ? 11 : noteBase.index - 1;
+        var sharpIndex = (noteBase.index + 1) % 12;
+        return [
+            { noteBase: noteBase, label: noteBase.name + "♭", index: flatIndex, greyOut: music.indexIsNatural(flatIndex) },
+            { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index, greyOut: false },
+            { noteBase: noteBase, label: noteBase.name + "♯", index: sharpIndex, greyOut: music.indexIsNatural(sharpIndex) }
+        ];
+    }
     function init() {
         var pad = 5;
         var buttonHeight = 25;
         var svg = d3.select("#modes");
         var tonics = svg.append("g");
-        var bg = function (noteBase) {
-            return [
-                { noteBase: noteBase, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1 },
-                { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index },
-                { noteBase: noteBase, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12 }
-            ];
-        };
         var gs = tonics.selectAll("g")
             .data(music.noteBases)
             .enter()
@@ -398,7 +406,7 @@ var tonics;
             .attr("strokeWidth", 2)
             .attr("width", 40)
             .attr("height", 25)
-            .attr("class", "tonic-button")
+            .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; })
             .on("click", handleButtonClick);
         gs
             .append("text")
@@ -417,13 +425,14 @@ var tonics;
         var ds = [{
                 noteBase: state.noteBase,
                 label: tonic.noteName,
-                index: tonic.index
+                index: tonic.index,
+                greyOut: (state.noteBase.index != tonic.index) && music.indexIsNatural(tonic.index)
             }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
-            .attr("class", "tonic-button");
+            .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; });
     }
     function indexer(d) {
         return d.label;

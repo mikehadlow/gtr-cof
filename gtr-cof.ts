@@ -189,6 +189,13 @@ namespace music {
     function interval(a: number, b: number): number {
         return (a <= b) ? b - a : (b + 12) - a;
     }
+
+    export function indexIsNatural(index: number): boolean {
+        return noteBases.filter(function(noteBase, i, a)
+        { 
+            return noteBase.index == index; 
+        }).length != 0;
+    }
 }
 
 namespace state {
@@ -452,22 +459,26 @@ namespace tonics {
         readonly noteBase: music.NoteBase;
         readonly label: string;
         readonly index: number;
+        readonly greyOut: boolean;
     };
 
+    function bg(noteBase: music.NoteBase): Array<ButtonData> {
+
+        let flatIndex = noteBase.index == 0 ? 11 : noteBase.index - 1;
+        let sharpIndex = (noteBase.index + 1) % 12;
+        return [
+            { noteBase: noteBase, label: noteBase.name + "♭", index: flatIndex, greyOut: music.indexIsNatural(flatIndex)},
+            { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index, greyOut: false},
+            { noteBase: noteBase, label: noteBase.name + "♯", index: sharpIndex, greyOut: music.indexIsNatural(sharpIndex)}
+        ];
+    }
+        
     export function init(): void {
         let pad = 5;
         let buttonHeight = 25;
         let svg = d3.select("#modes");
 
         let tonics = svg.append("g");
-        
-        let bg = function(noteBase: music.NoteBase): Array<ButtonData> {
-            return [
-                { noteBase: noteBase, label: noteBase.name + "♭", index: noteBase.index == 0 ? 11 : noteBase.index - 1},
-                { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index},
-                { noteBase: noteBase, label: noteBase.name + "♯", index: (noteBase.index + 1) % 12}
-            ];
-        }
         
         let gs = tonics.selectAll("g")
             .data(music.noteBases)
@@ -487,7 +498,7 @@ namespace tonics {
             .attr("strokeWidth", 2)
             .attr("width", 40)
             .attr("height", 25)
-            .attr("class", "tonic-button")
+            .attr("class", function(d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; })
             .on("click", handleButtonClick);
 
         gs
@@ -509,13 +520,14 @@ namespace tonics {
         let ds: Array<ButtonData> = [{
             noteBase: state.noteBase,
             label: tonic.noteName,
-            index: tonic.index
+            index: tonic.index,
+            greyOut: (state.noteBase.index != tonic.index) && music.indexIsNatural(tonic.index)
         }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
-            .attr("class", "tonic-button");
+            .attr("class", function(d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; });
     }
     
     function indexer(d: ButtonData): string {
