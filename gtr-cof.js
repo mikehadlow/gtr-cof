@@ -164,6 +164,11 @@ var state;
     var currentMode = music.modes[1];
     var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
+    function init() {
+        readCookie();
+        updateListeners();
+    }
+    state.init = init;
     function addListener(listener) {
         listeners.push(listener);
     }
@@ -197,6 +202,21 @@ var state;
         for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
             var listener = listeners_1[_i];
             listener(stateChange);
+        }
+        bakeCookie();
+    }
+    function bakeCookie() {
+        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index;
+    }
+    function readCookie() {
+        var result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
+        if (result != null) {
+            var items_1 = result[1].split("|");
+            if (items_1.length == 3) {
+                currentIndex = Number(items_1[0]);
+                currentNoteBase = music.noteBases[Number(items_1[1])];
+                currentMode = music.modes.filter(function (x) { return x.index == Number(items_1[2]); })[0];
+            }
         }
     }
 })(state || (state = {}));
@@ -636,5 +656,5 @@ modes.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
-state.changeTonic(music.noteBases[0], 0);
+state.init();
 //# sourceMappingURL=gtr-cof.js.map
