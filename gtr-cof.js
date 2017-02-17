@@ -495,19 +495,20 @@ var gtr;
         var fretGap = 70;
         var fretWidth = 5;
         var noteRadius = 15;
-        var pad = 50;
+        var pad = 20;
         var fretData = getFretData(numberOfFrets);
         var dots = [
-            [3, 3],
-            [5, 3],
-            [7, 3],
-            [9, 3],
-            [12, 2],
-            [12, 4],
-            [15, 3]
+            [3, 0],
+            [5, 0],
+            [7, 0],
+            [9, 0],
+            [12, -1],
+            [12, 1],
+            [15, 0]
         ];
         var svg = d3.select("#gtr");
         var gtr = svg.append("g");
+        var tuning = music.tuning.reverse();
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
@@ -525,13 +526,13 @@ var gtr;
             .data(dots)
             .enter()
             .append("circle")
-            .attr("r", noteRadius)
-            .attr("cx", function (d) { return d[0] * fretGap + pad + (fretGap / 2); })
-            .attr("cy", function (d) { return (d[1] + 1) * stringGap + 12; })
+            .attr("r", 10)
+            .attr("cx", function (d) { return d[0] * fretGap + pad + 30 + (d[1] * 10); })
+            .attr("cy", function (d) { return (tuning.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(music.tuning.reverse(), function (n) { return n + ""; })
+            .data(tuning, function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
