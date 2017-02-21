@@ -218,8 +218,12 @@ var state;
         bakeCookie(chordIndex);
     }
     function bakeCookie(chordIndex) {
+        var cookieExpiryDays = 30;
+        var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + expiryDate.toUTCString();
         chordIndex = (chordIndex == undefined) ? -1 : chordIndex;
-        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + chordIndex;
+        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + chordIndex
+            + ";" + expires;
     }
     function readCookie() {
         var result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
