@@ -204,22 +204,19 @@ namespace state {
 
     let currentNoteBase: music.NoteBase = music.noteBases[0];
     let currentIndex: number = 0;
+    let currentChordIndex: number = -1
 
     export function init() {
         let cookieData = readCookie();
 
         if(cookieData.hasCookie) {
-            currentIndex = cookieData.index,
-            currentNoteBase = music.noteBases[cookieData.noteBaseIndex],
-            currentMode = music.modes.filter((x) => x.index == cookieData.modeIndex)[0]
+            currentIndex = cookieData.index;
+            currentNoteBase = music.noteBases[cookieData.noteBaseIndex];
+            currentMode = music.modes.filter((x) => x.index == cookieData.modeIndex)[0];
+            currentChordIndex = cookieData.chordIndex;
         }
 
-        if(cookieData.chordIndex == -1) {
-            updateListeners();
-        }
-        else {
-            updateListeners(cookieData.chordIndex);
-        }
+        updateListeners();
     }
 
     export function addListener(listener: (n: StateChange) => void): void {
@@ -229,24 +226,31 @@ namespace state {
     export function changeTonic(newNoteBase: music.NoteBase, index: number): void {
         currentNoteBase = newNoteBase;
         currentIndex = index;
+        currentChordIndex = -1;
         updateListeners();
     }
 
     export function changeMode(newMode: music.Mode): void {
         currentMode = newMode;
+        currentChordIndex = -1;
         updateListeners();
     }
 
-    export function changeChord(chordIndex?: number): void {
-        console.log(chordIndex);
-        updateListeners(chordIndex);
+    export function changeChord(chordIndex: number): void {
+        if(chordIndex == currentChordIndex) {
+            currentChordIndex = -1
+        }
+        else {
+            currentChordIndex = chordIndex;
+        }
+        updateListeners();
     }
 
-    function updateListeners(chordIndex?: number): void {
+    function updateListeners(): void {
         let scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
 
-        if (chordIndex != undefined) {
-            scale = music.appendTriad(scale, chordIndex);
+        if (currentChordIndex != -1) {
+            scale = music.appendTriad(scale, currentChordIndex);
         }
 
         let stateChange: StateChange = {
@@ -258,15 +262,14 @@ namespace state {
         for (let listener of listeners) {
             listener(stateChange);
         }
-        bakeCookie(chordIndex);
+        bakeCookie();
     }
 
-    function bakeCookie(chordIndex?: number) {
+    function bakeCookie() {
         let cookieExpiryDays = 30;
         let expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
         let expires = "expires=" + expiryDate.toUTCString();
-        chordIndex = (chordIndex == undefined) ? -1 : chordIndex;
-        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + chordIndex
+        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + currentChordIndex
             + ";" + expires;
     }
 

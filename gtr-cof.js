@@ -165,19 +165,16 @@ var state;
     var currentMode = music.modes[1];
     var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
+    var currentChordIndex = -1;
     function init() {
         var cookieData = readCookie();
         if (cookieData.hasCookie) {
-            currentIndex = cookieData.index,
-                currentNoteBase = music.noteBases[cookieData.noteBaseIndex],
-                currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
+            currentIndex = cookieData.index;
+            currentNoteBase = music.noteBases[cookieData.noteBaseIndex];
+            currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
+            currentChordIndex = cookieData.chordIndex;
         }
-        if (cookieData.chordIndex == -1) {
-            updateListeners();
-        }
-        else {
-            updateListeners(cookieData.chordIndex);
-        }
+        updateListeners();
     }
     state.init = init;
     function addListener(listener) {
@@ -187,23 +184,30 @@ var state;
     function changeTonic(newNoteBase, index) {
         currentNoteBase = newNoteBase;
         currentIndex = index;
+        currentChordIndex = -1;
         updateListeners();
     }
     state.changeTonic = changeTonic;
     function changeMode(newMode) {
         currentMode = newMode;
+        currentChordIndex = -1;
         updateListeners();
     }
     state.changeMode = changeMode;
     function changeChord(chordIndex) {
-        console.log(chordIndex);
-        updateListeners(chordIndex);
+        if (chordIndex == currentChordIndex) {
+            currentChordIndex = -1;
+        }
+        else {
+            currentChordIndex = chordIndex;
+        }
+        updateListeners();
     }
     state.changeChord = changeChord;
-    function updateListeners(chordIndex) {
+    function updateListeners() {
         var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
-        if (chordIndex != undefined) {
-            scale = music.appendTriad(scale, chordIndex);
+        if (currentChordIndex != -1) {
+            scale = music.appendTriad(scale, currentChordIndex);
         }
         var stateChange = {
             mode: currentMode,
@@ -215,14 +219,13 @@ var state;
             var listener = listeners_1[_i];
             listener(stateChange);
         }
-        bakeCookie(chordIndex);
+        bakeCookie();
     }
-    function bakeCookie(chordIndex) {
+    function bakeCookie() {
         var cookieExpiryDays = 30;
         var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
         var expires = "expires=" + expiryDate.toUTCString();
-        chordIndex = (chordIndex == undefined) ? -1 : chordIndex;
-        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + chordIndex
+        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + currentChordIndex
             + ";" + expires;
     }
     function readCookie() {
