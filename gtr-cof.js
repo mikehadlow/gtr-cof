@@ -27,14 +27,6 @@ var music;
         { name: 'Locrian', index: 6 },
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
-    music.tuning = [
-        4,
-        9,
-        2,
-        7,
-        11,
-        4,
-    ];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     (function (ChordType) {
         ChordType[ChordType["Major"] = 0] = "Major";
@@ -536,8 +528,23 @@ var modes;
 })(modes || (modes = {}));
 var gtr;
 (function (gtr_1) {
+    var currentState = null;
     var notes = null;
     var numberOfFrets = 16;
+    gtr_1.guitarStandard = [
+        4,
+        9,
+        2,
+        7,
+        11,
+        4,
+    ];
+    gtr_1.bassStandard = [
+        4,
+        9,
+        2,
+        7,
+    ];
     var noteColours = [
         "yellow",
         "white",
@@ -550,7 +557,7 @@ var gtr;
     function indexer(stringNote) {
         return stringNote.index + "_" + stringNote.octave;
     }
-    function init() {
+    function init(tuning) {
         var stringGap = 40;
         var fretGap = 70;
         var fretWidth = 5;
@@ -566,9 +573,9 @@ var gtr;
             [12, 1],
             [15, 0]
         ];
+        d3.selectAll("#gtr > *").remove();
         var svg = d3.select("#gtr");
         var gtr = svg.append("g");
-        var tuning = music.tuning.reverse();
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
@@ -577,7 +584,7 @@ var gtr;
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * 5 + (fretWidth * 2))
+            .attr("height", stringGap * (tuning.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -592,7 +599,7 @@ var gtr;
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(tuning, function (n) { return n + ""; })
+            .data(tuning.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -616,6 +623,9 @@ var gtr;
             .attr("fill", "none")
             .attr("stroke", "none");
         state.addListener(update);
+        if (currentState != null) {
+            update(currentState);
+        }
     }
     gtr_1.init = init;
     function update(stateChange) {
@@ -650,6 +660,7 @@ var gtr;
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+        currentState = stateChange;
     }
     function allNotesFrom(index, numberOfNotes) {
         var items = [];
@@ -686,6 +697,6 @@ tonics.init();
 modes.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init();
+gtr.init(gtr.guitarStandard);
 state.init();
 //# sourceMappingURL=gtr-cof.js.map

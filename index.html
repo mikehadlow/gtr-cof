@@ -1,48 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Guitar Dashboard</title>
-    <meta name="description" content="An interactive music theory dashboard for guitarists including a cirle of fifths." />
-    <link href="gtr-cof.css" rel="stylesheet">
-    <link rel="shortcut icon" href="favicon.ico?r=31241" />
-  </head>
-  <body>
-    <div class="header">
-      <div class="menu"><span class="title">Guitar Dashboard</span></div>
-      <div class="dropdown"><div class="menu">Info</div>
-          <div class="dropdown-content">
-            <p>
-              An interactive music theory dashboard, including a <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a> for guitarists.
-            </p>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Guitar Dashboard</title>
+  <meta name="description" content="An interactive music theory dashboard for guitarists including a cirle of fifths." />
+  <link href="gtr-cof.css" rel="stylesheet">
+  <link rel="shortcut icon" href="favicon.ico?r=31241" />
+</head>
+
+<body>
+  <div class="header">
+    <div class="menu"><span class="title">Guitar Dashboard</span></div>
+    <div class="dropdown">
+      <div class="menu">Info</div>
+      <div class="dropdown-content with-padding">
+        <p>
+          An interactive music theory dashboard, including a <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a>          for guitarists.
+        </p>
+        <ul>
+          <li>Select the <a href="https://en.wikipedia.org/wiki/Tonic_(music)">tonic</a> by clicking on a note button. The current
+            tonic is highlighted in yellow.</li>
+          <li>Select a <a href="https://en.wikipedia.org/wiki/Mode_(music)">mode</a> by clicking on a mode button.</li>
+          <li>
+            Click on the outer 'chord' ring of either the chromatic note circle or the <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a>            to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> associated with that note. Click
+            on a note to cancel the chord display.</li>
+          <li>Chord ring colours:
             <ul>
-              <li>Select the <a href="https://en.wikipedia.org/wiki/Tonic_(music)">tonic</a> by clicking on a note button. The current tonic is highlighted in yellow.</li>
-              <li>Select a <a href="https://en.wikipedia.org/wiki/Mode_(music)">mode</a> by clicking on a mode button.</li>
-              <li>
-                Click on the outer 'chord' ring of either the chromatic note circle or the <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a> to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> 
-                associated with that note. Click on a note to cancel the chord display.</li>
-              <li>Chord ring colours:
-                <ul>
-                  <li>Green: major chord.</li>
-                  <li>Blue: minor chord.</li>
-                  <li>Red: diminished chord.</li>
-                </ul>
-              </li>
+              <li>Green: major chord.</li>
+              <li>Blue: minor chord.</li>
+              <li>Red: diminished chord.</li>
             </ul>
-            <p>
-              By <a href="http://mikehadlow.com/">Mike Hadlow</a>.
-              Open source on <a href="https://github.com/mikehadlow/gtr-cof">Github</a>. 
-            </p>
-          </div>
+          </li>
+        </ul>
+        <p>
+          By <a href="http://mikehadlow.com/">Mike Hadlow</a>. Open source on <a href="https://github.com/mikehadlow/gtr-cof">Github</a>.
+        </p>
       </div>
     </div>
-    <div class="content">
-      <svg id="chromatic" width="500" height="500" />
-      <svg id="modes" width="160" height="500" />
-      <svg id="cof" width="500" height="500" />
-      <svg id="gtr" width="1500" height="300" />
+    <div class="dropdown">
+      <div class="menu">Tunings</div>
+      <div class="dropdown-content">
+          <div class="dropdown-content-item" onclick="gtr.init(gtr.guitarStandard)">Guitar Standard EADGBE</div>
+          <div class="dropdown-content-item" onclick="gtr.init(gtr.bassStandard)">Bass Standard EADG</div>
+      </div>
     </div>
-    <script src="http://d3js.org/d3.v2.js"></script>
-    <script src="gtr-cof.js"></script>
-  </body>
+  </div>
+  <div class="content">
+    <svg id="chromatic" width="500" height="500" />
+    <svg id="modes" width="160" height="500" />
+    <svg id="cof" width="500" height="500" />
+    <svg id="gtr" width="1500" height="300" />
+  </div>
+  <script src="http://d3js.org/d3.v2.js"></script>
+  <script src="gtr-cof.js"></script>
+</body>
+
 </html>

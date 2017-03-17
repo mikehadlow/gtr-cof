@@ -48,15 +48,6 @@ namespace music {
 
     let scaleTones: Array<number> = [2, 2, 1, 2, 2, 2, 1];
 
-    export let tuning: Array<number> = [
-        4, // E
-        9, // A
-        2, // D
-        7, // G
-        11,// B
-        4, // E
-    ];
-
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
 
     export type Triad = [number, number, number];
@@ -649,8 +640,25 @@ namespace modes {
 
 namespace gtr {
 
+    let currentState: state.StateChange = null;
     let notes: d3.Selection<StringNote> = null;
     let numberOfFrets = 16;
+
+    export let guitarStandard: Array<number> = [
+        4, // E
+        9, // A
+        2, // D
+        7, // G
+        11,// B
+        4, // E
+    ];
+
+    export let bassStandard: Array<number> = [
+        4, // E
+        9, // A
+        2, // D
+        7, // G
+    ];
 
     let noteColours: Array<string> = [
         "yellow",
@@ -666,7 +674,7 @@ namespace gtr {
         return stringNote.index + "_" + stringNote.octave;
     }
 
-    export function init(): void {
+    export function init(tuning: Array<number>): void {
         let stringGap = 40;
         let fretGap = 70;
         let fretWidth = 5;
@@ -684,9 +692,9 @@ namespace gtr {
             [15, 0]
         ];
 
+        d3.selectAll("#gtr > *").remove();
         let svg = d3.select("#gtr");
         let gtr = svg.append("g");
-        let tuning = music.tuning.reverse();
 
         // frets
         gtr.append("g").selectAll("rect")
@@ -696,7 +704,7 @@ namespace gtr {
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * 5 + (fretWidth * 2))
+            .attr("height", stringGap * (tuning.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -713,7 +721,7 @@ namespace gtr {
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(tuning, function (n) { return n + ""; })
+            .data(tuning.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -740,6 +748,10 @@ namespace gtr {
             .attr("stroke", "none");
 
         state.addListener(update);
+
+        if(currentState != null) {
+            update(currentState);
+        }
     }
 
     function update(stateChange: state.StateChange): void {
@@ -778,6 +790,8 @@ namespace gtr {
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+
+        currentState = stateChange;
     }
 
     function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
@@ -828,5 +842,5 @@ tonics.init();
 modes.init();
 let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init();
+gtr.init(gtr.guitarStandard);
 state.init();
