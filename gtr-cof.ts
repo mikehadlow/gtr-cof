@@ -18,6 +18,15 @@ namespace music {
         { id: 6, index: 11, name: 'B' }
     ];
 
+    export let notes : { [id: string]: number } = {};
+    notes["C"] = 0;
+    notes["D"] = 2;
+    notes["E"] = 4;
+    notes["F"] = 5;
+    notes["G"] = 7;
+    notes["A"] = 9;
+    notes["B"] = 11;
+
     interface NoteLabel {
         readonly offset: number;
         readonly label: string;
@@ -644,22 +653,6 @@ namespace gtr {
     let notes: d3.Selection<StringNote> = null;
     let numberOfFrets = 16;
 
-    export let guitarStandard: Array<number> = [
-        4, // E
-        9, // A
-        2, // D
-        7, // G
-        11,// B
-        4, // E
-    ];
-
-    export let bassStandard: Array<number> = [
-        4, // E
-        9, // A
-        2, // D
-        7, // G
-    ];
-
     let noteColours: Array<string> = [
         "yellow",
         "white",
@@ -674,7 +667,7 @@ namespace gtr {
         return stringNote.index + "_" + stringNote.octave;
     }
 
-    export function init(tuning: Array<number>): void {
+    export function init(tuningInfo: tuning.TuningInfo): void {
         let stringGap = 40;
         let fretGap = 70;
         let fretWidth = 5;
@@ -682,18 +675,16 @@ namespace gtr {
         let pad = 20;
 
         let fretData: Array<number> = getFretData(numberOfFrets);
-        let dots: Array<[number, number]> = [
-            [3, 0], // [fret, position]
-            [5, 0],
-            [7, 0],
-            [9, 0],
-            [12, -1],
-            [12, 1],
-            [15, 0]
-        ];
+        let dots: Array<[number, number]> = tuningInfo.dots;
+        let tuningIds = tuning.parseTuning(tuningInfo.tuning);
 
         d3.selectAll("#gtr > *").remove();
         let svg = d3.select("#gtr");
+        svg.append("text")
+            .attr("class", "mode-text")
+            .attr("x", 30)
+            .attr("y", 10)
+            .text(tuningInfo.tuning + " " + tuningInfo.description);
         let gtr = svg.append("g");
 
         // frets
@@ -704,7 +695,7 @@ namespace gtr {
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * (tuning.length - 1) + (fretWidth * 2))
+            .attr("height", stringGap * (tuningIds.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -716,12 +707,12 @@ namespace gtr {
             .append("circle")
             .attr("r", 10)
             .attr("cx", function (d) { return d[0] * fretGap + pad + 30 + (d[1] * 10); })
-            .attr("cy", function (d) { return (tuning.length) * stringGap + pad + 15; })
+            .attr("cy", function (d) { return (tuningIds.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(tuning.slice().reverse(), function (n) { return n + ""; })
+            .data(tuningIds.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -838,9 +829,59 @@ namespace gtr {
     }
 }
 
+namespace tuning {
+
+    export interface TuningInfo {
+        readonly tuning: string;
+        readonly dots: Array<[number, number]>;
+        readonly description: string;
+    }
+
+    export let guitarDots: Array<[number, number]> = [
+        [3, 0], // [fret, position]
+        [5, 0],
+        [7, 0],
+        [9, 0],
+        [12, -1],
+        [12, 1],
+        [15, 0]
+    ];
+
+    export let tunings: Array<TuningInfo> = [
+        { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
+        { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
+        { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
+        { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
+        { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
+    ]
+
+    export function parseTuning(tuning: string) : Array<number> {
+        let result: Array<number> = [];
+        for(let i: number = 0; i < tuning.length; i++){
+            let noteChar = tuning.charAt(i);
+            if(music.notes[noteChar] != null) {
+                result.push(music.notes[noteChar]);
+            }
+        }
+        return result;
+    }
+
+    export function init() {
+        d3.select("#tuning-dropdown")
+            .selectAll("div")
+            .data(tunings)
+            .enter()
+            .append("div")
+            .attr("class", "dropdown-content-item")
+            .on("click", x => gtr.init(x))
+            .text(x => x.tuning + "   " + x.description);
+    }
+}
+
 tonics.init();
 modes.init();
 let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init(gtr.guitarStandard);
+gtr.init(tuning.tunings[0]);
+tuning.init();
 state.init();

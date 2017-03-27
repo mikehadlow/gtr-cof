@@ -10,6 +10,14 @@ var music;
         { id: 5, index: 9, name: 'A' },
         { id: 6, index: 11, name: 'B' }
     ];
+    music.notes = {};
+    music.notes["C"] = 0;
+    music.notes["D"] = 2;
+    music.notes["E"] = 4;
+    music.notes["F"] = 5;
+    music.notes["G"] = 7;
+    music.notes["A"] = 9;
+    music.notes["B"] = 11;
     var noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
@@ -531,20 +539,6 @@ var gtr;
     var currentState = null;
     var notes = null;
     var numberOfFrets = 16;
-    gtr_1.guitarStandard = [
-        4,
-        9,
-        2,
-        7,
-        11,
-        4,
-    ];
-    gtr_1.bassStandard = [
-        4,
-        9,
-        2,
-        7,
-    ];
     var noteColours = [
         "yellow",
         "white",
@@ -557,24 +551,22 @@ var gtr;
     function indexer(stringNote) {
         return stringNote.index + "_" + stringNote.octave;
     }
-    function init(tuning) {
+    function init(tuningInfo) {
         var stringGap = 40;
         var fretGap = 70;
         var fretWidth = 5;
         var noteRadius = 15;
         var pad = 20;
         var fretData = getFretData(numberOfFrets);
-        var dots = [
-            [3, 0],
-            [5, 0],
-            [7, 0],
-            [9, 0],
-            [12, -1],
-            [12, 1],
-            [15, 0]
-        ];
+        var dots = tuningInfo.dots;
+        var tuningIds = tuning.parseTuning(tuningInfo.tuning);
         d3.selectAll("#gtr > *").remove();
         var svg = d3.select("#gtr");
+        svg.append("text")
+            .attr("class", "mode-text")
+            .attr("x", 30)
+            .attr("y", 10)
+            .text(tuningInfo.tuning + " " + tuningInfo.description);
         var gtr = svg.append("g");
         // frets
         gtr.append("g").selectAll("rect")
@@ -584,7 +576,7 @@ var gtr;
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * (tuning.length - 1) + (fretWidth * 2))
+            .attr("height", stringGap * (tuningIds.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -595,11 +587,11 @@ var gtr;
             .append("circle")
             .attr("r", 10)
             .attr("cx", function (d) { return d[0] * fretGap + pad + 30 + (d[1] * 10); })
-            .attr("cy", function (d) { return (tuning.length) * stringGap + pad + 15; })
+            .attr("cy", function (d) { return (tuningIds.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(tuning.slice().reverse(), function (n) { return n + ""; })
+            .data(tuningIds.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -693,10 +685,52 @@ var gtr;
         return result;
     }
 })(gtr || (gtr = {}));
+var tuning;
+(function (tuning_1) {
+    tuning_1.guitarDots = [
+        [3, 0],
+        [5, 0],
+        [7, 0],
+        [9, 0],
+        [12, -1],
+        [12, 1],
+        [15, 0]
+    ];
+    tuning_1.tunings = [
+        { tuning: "EADGBE", dots: tuning_1.guitarDots, description: "Guitar Standard" },
+        { tuning: "DADGBE", dots: tuning_1.guitarDots, description: "Guitar Drop D" },
+        { tuning: "DADGAD", dots: tuning_1.guitarDots, description: "Guitar" },
+        { tuning: "EADG", dots: tuning_1.guitarDots, description: "Bass Standard" },
+        { tuning: "DADG", dots: tuning_1.guitarDots, description: "Bass Drop D" },
+    ];
+    function parseTuning(tuning) {
+        var result = [];
+        for (var i = 0; i < tuning.length; i++) {
+            var noteChar = tuning.charAt(i);
+            if (music.notes[noteChar] != null) {
+                result.push(music.notes[noteChar]);
+            }
+        }
+        return result;
+    }
+    tuning_1.parseTuning = parseTuning;
+    function init() {
+        d3.select("#tuning-dropdown")
+            .selectAll("div")
+            .data(tuning_1.tunings)
+            .enter()
+            .append("div")
+            .attr("class", "dropdown-content-item")
+            .on("click", function (x) { return gtr.init(x); })
+            .text(function (x) { return x.tuning + "   " + x.description; });
+    }
+    tuning_1.init = init;
+})(tuning || (tuning = {}));
 tonics.init();
 modes.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init(gtr.guitarStandard);
+gtr.init(tuning.tunings[0]);
+tuning.init();
 state.init();
 //# sourceMappingURL=gtr-cof.js.map
