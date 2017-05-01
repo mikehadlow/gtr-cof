@@ -36,19 +36,19 @@ var music;
     ];
     var scaleTones = [2, 2, 1, 2, 2, 2, 1];
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    var ChordType;
     (function (ChordType) {
         ChordType[ChordType["Major"] = 0] = "Major";
         ChordType[ChordType["Minor"] = 1] = "Minor";
         ChordType[ChordType["Diminished"] = 2] = "Diminished";
-    })(music.ChordType || (music.ChordType = {}));
-    var ChordType = music.ChordType;
+    })(ChordType = music.ChordType || (music.ChordType = {}));
     ;
     ;
     function generateScale(noteBase, index, mode) {
         var scale = [];
         var currentIndex = index;
         var currentNoteBase = noteBase;
-        var _loop_1 = function(i) {
+        var _loop_1 = function (i) {
             var offset = currentIndex - currentNoteBase.index;
             if (Math.abs(offset) > 2) {
                 offset = (currentIndex < currentNoteBase.index)
