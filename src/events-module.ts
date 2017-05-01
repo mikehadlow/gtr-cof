@@ -48,5 +48,6 @@ namespace events {
         readonly tuning: string;
         readonly dots: Array<[number, number]>;
         readonly description: string;
+        readonly notes: Array<number>;
     }
 }

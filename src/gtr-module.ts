@@ -33,7 +33,6 @@ namespace gtr {
 
         let fretData: Array<number> = getFretData(numberOfFrets);
         let dots: Array<[number, number]> = tuningInfo.dots;
-        let tuningIds = tuning.parseTuning(tuningInfo.tuning);
 
         d3.selectAll("#gtr > *").remove();
         let svg = d3.select("#gtr");
@@ -52,7 +51,7 @@ namespace gtr {
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * (tuningIds.length - 1) + (fretWidth * 2))
+            .attr("height", stringGap * (tuningInfo.notes.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -64,12 +63,12 @@ namespace gtr {
             .append("circle")
             .attr("r", 10)
             .attr("cx", function (d) { return d[0] * fretGap + pad + 30 + (d[1] * 10); })
-            .attr("cy", function (d) { return (tuningIds.length) * stringGap + pad + 15; })
+            .attr("cy", function (d) { return (tuningInfo.notes.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(tuningIds.slice().reverse(), function (n) { return n + ""; })
+            .data(tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });

@@ -590,7 +590,6 @@ var gtr;
         var pad = 20;
         var fretData = getFretData(numberOfFrets);
         var dots = tuningInfo.dots;
-        var tuningIds = tuning.parseTuning(tuningInfo.tuning);
         d3.selectAll("#gtr > *").remove();
         var svg = d3.select("#gtr");
         svg.append("text")
@@ -607,7 +606,7 @@ var gtr;
             .attr("x", function (d, i) { return (i + 1) * fretGap + pad - fretWidth; })
             .attr("y", pad + stringGap / 2 - fretWidth)
             .attr("width", fretWidth)
-            .attr("height", stringGap * (tuningIds.length - 1) + (fretWidth * 2))
+            .attr("height", stringGap * (tuningInfo.notes.length - 1) + (fretWidth * 2))
             .attr("fill", function (d, i) { return i === 0 ? "black" : "none"; })
             .attr("stroke", "grey")
             .attr("stroke-width", 1);
@@ -618,11 +617,11 @@ var gtr;
             .append("circle")
             .attr("r", 10)
             .attr("cx", function (d) { return d[0] * fretGap + pad + 30 + (d[1] * 10); })
-            .attr("cy", function (d) { return (tuningIds.length) * stringGap + pad + 15; })
+            .attr("cy", function (d) { return (tuningInfo.notes.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(tuningIds.slice().reverse(), function (n) { return n + ""; })
+            .data(tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -716,7 +715,7 @@ var gtr;
 })(gtr || (gtr = {}));
 var tuning;
 (function (tuning_1) {
-    tuning_1.guitarDots = [
+    var guitarDots = [
         [3, 0],
         [5, 0],
         [7, 0],
@@ -725,13 +724,13 @@ var tuning;
         [12, 1],
         [15, 0]
     ];
-    tuning_1.tunings = [
-        { tuning: "EADGBE", dots: tuning_1.guitarDots, description: "Guitar Standard" },
-        { tuning: "DADGBE", dots: tuning_1.guitarDots, description: "Guitar Drop D" },
-        { tuning: "DADGAD", dots: tuning_1.guitarDots, description: "Guitar" },
-        { tuning: "EADG", dots: tuning_1.guitarDots, description: "Bass Standard" },
-        { tuning: "DADG", dots: tuning_1.guitarDots, description: "Bass Drop D" },
-        { tuning: "GCEA", dots: tuning_1.guitarDots, description: "Ukelele C" },
+    var tunings = [
+        { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
+        { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
+        { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
+        { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
+        { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
+        { tuning: "GCEA", dots: guitarDots, description: "Ukelele C" },
     ];
     function parseTuning(tuning) {
         var result = [];
@@ -743,19 +742,26 @@ var tuning;
         }
         return result;
     }
-    tuning_1.parseTuning = parseTuning;
     function init() {
         d3.select("#tuning-dropdown")
             .selectAll("div")
-            .data(tuning_1.tunings)
+            .data(tunings)
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", function (x) { return events.tuningChange.publish(x); })
+            .on("click", function (x) { return raiseTuningChangedEvent(x); })
             .text(function (x) { return x.tuning + "   " + x.description; });
-        events.tuningChange.publish(tuning_1.tunings[0]);
+        raiseTuningChangedEvent(tunings[0]);
     }
     tuning_1.init = init;
+    function raiseTuningChangedEvent(info) {
+        events.tuningChange.publish({
+            tuning: info.tuning,
+            dots: info.dots,
+            description: info.description,
+            notes: parseTuning(info.tuning)
+        });
+    }
 })(tuning || (tuning = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();

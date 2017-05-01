@@ -1,6 +1,6 @@
 namespace tuning {
 
-    export let guitarDots: Array<[number, number]> = [
+    let guitarDots: Array<[number, number]> = [
         [3, 0], // [fret, position]
         [5, 0],
         [7, 0],
@@ -10,7 +10,13 @@ namespace tuning {
         [15, 0]
     ];
 
-    export let tunings: Array<events.TuningChangedEvent> = [
+    interface TuningInfo {
+        readonly tuning: string;
+        readonly dots: Array<[number, number]>;
+        readonly description: string;
+    }
+
+    let tunings: Array<TuningInfo> = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
         { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
@@ -19,7 +25,7 @@ namespace tuning {
         { tuning: "GCEA", dots: guitarDots, description: "Ukelele C" },
     ]
 
-    export function parseTuning(tuning: string) : Array<number> {
+    function parseTuning(tuning: string) : Array<number> {
         let result: Array<number> = [];
         for(let i: number = 0; i < tuning.length; i++){
             let noteChar = tuning.charAt(i);
@@ -37,9 +43,18 @@ namespace tuning {
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", x => events.tuningChange.publish(x))
+            .on("click", x => raiseTuningChangedEvent(x))
             .text(x => x.tuning + "   " + x.description);
         
-        events.tuningChange.publish(tunings[0]);
+        raiseTuningChangedEvent(tunings[0]);
+    }
+
+    function raiseTuningChangedEvent(info: TuningInfo): void{
+        events.tuningChange.publish({
+            tuning: info.tuning,
+            dots: info.dots,
+            description: info.description,
+            notes: parseTuning(info.tuning)
+        });
     }
 }
