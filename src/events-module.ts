@@ -28,4 +28,10 @@ namespace events {
         readonly newNoteBase: music.NoteBase;
         readonly index: number;
     }
+
+    export let modeChange: Bus<ModeChangedEvent> = new Bus<ModeChangedEvent>();
+
+    export interface ModeChangedEvent {
+        readonly mode: music.Mode;
+    }
 }

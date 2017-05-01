@@ -18,6 +18,7 @@ var events;
     events.Bus = Bus;
     events.scaleChange = new Bus();
     events.tonicChange = new Bus();
+    events.modeChange = new Bus();
 })(events || (events = {}));
 var music;
 (function (music) {
@@ -194,6 +195,7 @@ var state;
             currentChordIndex = cookieData.chordIndex;
         }
         events.tonicChange.subscribe(tonicChanged);
+        events.modeChange.subscribe(modeChanged);
         updateListeners();
     }
     state.init = init;
@@ -203,10 +205,13 @@ var state;
         currentChordIndex = -1;
         updateListeners();
     }
-    function changeMode(newMode) {
-        currentMode = newMode;
+    function modeChanged(modeChangedEvent) {
+        currentMode = modeChangedEvent.mode;
         currentChordIndex = -1;
         updateListeners();
+    }
+    function changeMode(newMode) {
+        events.modeChange.publish({ mode: newMode });
     }
     state.changeMode = changeMode;
     function changeChord(chordIndex) {

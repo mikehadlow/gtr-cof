@@ -20,6 +20,7 @@ namespace state {
         }
 
         events.tonicChange.subscribe(tonicChanged);
+        events.modeChange.subscribe(modeChanged);
 
         updateListeners();
     }
@@ -31,10 +32,14 @@ namespace state {
         updateListeners();
     }
 
-    export function changeMode(newMode: music.Mode): void {
-        currentMode = newMode;
+    function modeChanged(modeChangedEvent: events.ModeChangedEvent): void {
+        currentMode = modeChangedEvent.mode;
         currentChordIndex = -1;
         updateListeners();
+    }
+
+    export function changeMode(newMode: music.Mode): void {
+        events.modeChange.publish({ mode: newMode });
     }
 
     export function changeChord(chordIndex: number): void {
