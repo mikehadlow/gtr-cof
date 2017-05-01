@@ -25,7 +25,7 @@ namespace modes {
             .attr("width", 150)
             .attr("height", 25)
             .attr("class", "mode-button")
-            .on("click", handleButtonClick);
+            .on("click", (d) => events.modeChange.publish({ mode: d }));
 
         gs
             .append("text")
@@ -35,10 +35,6 @@ namespace modes {
             .attr("class", "mode-text");
 
         events.scaleChange.subscribe(update);
-    }
-
-    function handleButtonClick(mode: music.Mode, i: number): void {
-        state.changeMode(mode);
     }
 
     function update(stateChange: events.ScaleChangedEvent): void {

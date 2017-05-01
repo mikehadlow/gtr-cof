@@ -210,10 +210,6 @@ var state;
         currentChordIndex = -1;
         updateListeners();
     }
-    function changeMode(newMode) {
-        events.modeChange.publish({ mode: newMode });
-    }
-    state.changeMode = changeMode;
     function changeChord(chordIndex) {
         if (chordIndex == currentChordIndex) {
             currentChordIndex = -1;
@@ -531,7 +527,7 @@ var modes;
             .attr("width", 150)
             .attr("height", 25)
             .attr("class", "mode-button")
-            .on("click", handleButtonClick);
+            .on("click", function (d) { return events.modeChange.publish({ mode: d }); });
         gs
             .append("text")
             .attr("x", pad + 10)
@@ -541,9 +537,6 @@ var modes;
         events.scaleChange.subscribe(update);
     }
     modes_1.init = init;
-    function handleButtonClick(mode, i) {
-        state.changeMode(mode);
-    }
     function update(stateChange) {
         var modes = [stateChange.mode];
         buttons

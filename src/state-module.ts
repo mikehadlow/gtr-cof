@@ -38,10 +38,6 @@ namespace state {
         updateListeners();
     }
 
-    export function changeMode(newMode: music.Mode): void {
-        events.modeChange.publish({ mode: newMode });
-    }
-
     export function changeChord(chordIndex: number): void {
         if(chordIndex == currentChordIndex) {
             currentChordIndex = -1
