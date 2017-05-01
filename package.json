@@ -3,7 +3,7 @@
    "version": "1.0.0",
    "description": "gtr-cof",
    "scripts": {
-     "lite": "lite-server --port 10001",
+     "lite": "lite-server --baseDir=\"docs\" --port 10001",
      "start": "npm run lite"
    },
    "author": "Mike Hadlow",
