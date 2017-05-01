@@ -17,6 +17,7 @@ var events;
     }());
     events.Bus = Bus;
     events.scaleChange = new Bus();
+    events.tonicChange = new Bus();
 })(events || (events = {}));
 var music;
 (function (music) {
@@ -192,16 +193,16 @@ var state;
             currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
             currentChordIndex = cookieData.chordIndex;
         }
+        events.tonicChange.subscribe(tonicChanged);
         updateListeners();
     }
     state.init = init;
-    function changeTonic(newNoteBase, index) {
-        currentNoteBase = newNoteBase;
-        currentIndex = index;
+    function tonicChanged(tonicChangedEvent) {
+        currentNoteBase = tonicChangedEvent.newNoteBase;
+        currentIndex = tonicChangedEvent.index;
         currentChordIndex = -1;
         updateListeners();
     }
-    state.changeTonic = changeTonic;
     function changeMode(newMode) {
         currentMode = newMode;
         currentChordIndex = -1;
@@ -425,7 +426,10 @@ var cof;
     }
     function handleNoteClick(segment, i) {
         if (segment.scaleNote.canSelect) {
-            state.changeTonic(segment.scaleNote.noteBase, segment.scaleNote.index);
+            events.tonicChange.publish({
+                newNoteBase: segment.scaleNote.noteBase,
+                index: segment.scaleNote.index
+            });
         }
     }
     function handleChordClick(segment, i) {
@@ -468,7 +472,10 @@ var tonics;
             .attr("width", 40)
             .attr("height", 25)
             .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; })
-            .on("click", handleButtonClick);
+            .on("click", function (d, i) { return events.tonicChange.publish({
+            newNoteBase: d.noteBase,
+            index: d.index
+        }); });
         gs
             .append("text")
             .attr("x", pad + 10)
@@ -478,9 +485,6 @@ var tonics;
         events.scaleChange.subscribe(listener);
     }
     tonics_1.init = init;
-    function handleButtonClick(d, i) {
-        state.changeTonic(d.noteBase, d.index);
-    }
     function listener(state) {
         var tonic = state.scale2[0];
         var ds = [{

@@ -181,7 +181,10 @@ namespace cof {
 
     function handleNoteClick(segment: Segment, i: number): void {
         if (segment.scaleNote.canSelect) {
-            state.changeTonic(segment.scaleNote.noteBase, segment.scaleNote.index);
+            events.tonicChange.publish({
+                newNoteBase: segment.scaleNote.noteBase,
+                index: segment.scaleNote.index
+            });
         }
     }
 

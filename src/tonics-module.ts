@@ -47,7 +47,10 @@ namespace tonics {
             .attr("width", 40)
             .attr("height", 25)
             .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; })
-            .on("click", handleButtonClick);
+            .on("click", (d, i) => events.tonicChange.publish({
+                newNoteBase: d.noteBase,
+                index: d.index
+            }));
 
         gs
             .append("text")
@@ -57,10 +60,6 @@ namespace tonics {
             .attr("class", "tonic-text");
 
         events.scaleChange.subscribe(listener);
-    }
-
-    function handleButtonClick(d: ButtonData, i: number): void {
-        state.changeTonic(d.noteBase, d.index);
     }
 
     function listener(state: events.ScaleChangedEvent): void {

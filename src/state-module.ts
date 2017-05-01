@@ -19,12 +19,14 @@ namespace state {
             currentChordIndex = cookieData.chordIndex;
         }
 
+        events.tonicChange.subscribe(tonicChanged);
+
         updateListeners();
     }
 
-    export function changeTonic(newNoteBase: music.NoteBase, index: number): void {
-        currentNoteBase = newNoteBase;
-        currentIndex = index;
+    function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
+        currentNoteBase = tonicChangedEvent.newNoteBase;
+        currentIndex = tonicChangedEvent.index;
         currentChordIndex = -1;
         updateListeners();
     }
