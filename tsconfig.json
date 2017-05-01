@@ -3,9 +3,9 @@
         "target": "es5",
         "module": "commonjs",
         "sourceMap": true,
-        "outDir": "../docs"
+        "outDir": "docs"
     },
     "files": [
-        "gtr-cof.ts"
+        "src/gtr-cof.ts"
     ]
 }
