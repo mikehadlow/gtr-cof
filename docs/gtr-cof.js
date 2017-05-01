@@ -1,3 +1,23 @@
+var events;
+(function (events) {
+    var Bus = (function () {
+        function Bus() {
+            this.listeners = [];
+        }
+        Bus.prototype.subscribe = function (listener) {
+            this.listeners.push(listener);
+        };
+        Bus.prototype.publish = function (event) {
+            for (var _i = 0, _a = this.listeners; _i < _a.length; _i++) {
+                var listener = _a[_i];
+                listener(event);
+            }
+        };
+        return Bus;
+    }());
+    events.Bus = Bus;
+    events.stateChange = new Bus();
+})(events || (events = {}));
 var music;
 (function (music) {
     music.noteBases = [
@@ -160,7 +180,6 @@ var music;
 })(music || (music = {}));
 var state;
 (function (state) {
-    var listeners = [];
     var currentMode = music.modes[1];
     var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
@@ -177,7 +196,7 @@ var state;
     }
     state.init = init;
     function addListener(listener) {
-        listeners.push(listener);
+        events.stateChange.subscribe(listener);
     }
     state.addListener = addListener;
     function changeTonic(newNoteBase, index) {
@@ -208,16 +227,12 @@ var state;
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
         }
-        var stateChange = {
+        events.stateChange.publish({
             mode: currentMode,
             noteBase: currentNoteBase,
             index: currentIndex,
             scale2: scale
-        };
-        for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
-            var listener = listeners_1[_i];
-            listener(stateChange);
-        }
+        });
         bakeCookie();
     }
     function bakeCookie() {

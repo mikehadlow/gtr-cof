@@ -3,7 +3,6 @@
 
 namespace state {
 
-    let listeners: Array<(n: StateChange) => void> = [];
     let currentMode: music.Mode = music.modes[1];
 
     let currentNoteBase: music.NoteBase = music.noteBases[0];
@@ -23,8 +22,8 @@ namespace state {
         updateListeners();
     }
 
-    export function addListener(listener: (n: StateChange) => void): void {
-        listeners.push(listener);
+    export function addListener(listener: (n: events.StateChange) => void): void {
+        events.stateChange.subscribe(listener);
     }
 
     export function changeTonic(newNoteBase: music.NoteBase, index: number): void {
@@ -57,15 +56,13 @@ namespace state {
             scale = music.appendTriad(scale, currentChordIndex);
         }
 
-        let stateChange: StateChange = {
+        events.stateChange.publish({
             mode: currentMode,
             noteBase: currentNoteBase,
             index: currentIndex,
             scale2: scale
-        };
-        for (let listener of listeners) {
-            listener(stateChange);
-        }
+        });
+
         bakeCookie();
     }
 
@@ -107,12 +104,5 @@ namespace state {
         readonly noteBaseIndex: number;
         readonly modeIndex: number;
         readonly chordIndex: number;
-    }
-
-    export interface StateChange {
-        readonly mode: music.Mode;
-        readonly noteBase: music.NoteBase;
-        readonly index: number;
-        readonly scale2: Array<music.ScaleNote>;
     }
 }
