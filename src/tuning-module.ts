@@ -1,11 +1,5 @@
 namespace tuning {
 
-    export interface TuningInfo {
-        readonly tuning: string;
-        readonly dots: Array<[number, number]>;
-        readonly description: string;
-    }
-
     export let guitarDots: Array<[number, number]> = [
         [3, 0], // [fret, position]
         [5, 0],
@@ -16,7 +10,7 @@ namespace tuning {
         [15, 0]
     ];
 
-    export let tunings: Array<TuningInfo> = [
+    export let tunings: Array<events.TuningChangedEvent> = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
         { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
@@ -43,7 +37,9 @@ namespace tuning {
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", x => gtr.init(x))
+            .on("click", x => events.tuningChange.publish(x))
             .text(x => x.tuning + "   " + x.description);
+        
+        events.tuningChange.publish(tunings[0]);
     }
 }

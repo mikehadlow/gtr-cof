@@ -41,4 +41,12 @@ namespace events {
     export interface ChordChangeEvent {
         readonly chordIndex: number;
     }
+
+    export let tuningChange: Bus<TuningChangedEvent> = new Bus<TuningChangedEvent>();
+
+    export interface TuningChangedEvent {
+        readonly tuning: string;
+        readonly dots: Array<[number, number]>;
+        readonly description: string;
+    }
 }

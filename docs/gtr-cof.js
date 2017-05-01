@@ -20,6 +20,7 @@ var events;
     events.tonicChange = new Bus();
     events.modeChange = new Bus();
     events.chordChange = new Bus();
+    events.tuningChange = new Bus();
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -239,19 +240,19 @@ var state;
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
-        updateListeners();
+        updateScale();
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
         currentNoteBase = tonicChangedEvent.newNoteBase;
         currentIndex = tonicChangedEvent.index;
         currentChordIndex = -1;
-        updateListeners();
+        updateScale();
     }
     function modeChanged(modeChangedEvent) {
         currentMode = modeChangedEvent.mode;
         currentChordIndex = -1;
-        updateListeners();
+        updateScale();
     }
     function chordChanged(chordChangedEvent) {
         if (chordChangedEvent.chordIndex == currentChordIndex) {
@@ -260,9 +261,9 @@ var state;
         else {
             currentChordIndex = chordChangedEvent.chordIndex;
         }
-        updateListeners();
+        updateScale();
     }
-    function updateListeners() {
+    function updateScale() {
         var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
@@ -576,7 +577,12 @@ var gtr;
     function indexer(stringNote) {
         return stringNote.index + "_" + stringNote.octave;
     }
-    function init(tuningInfo) {
+    function init() {
+        events.tuningChange.subscribe(updateFretboard);
+        events.scaleChange.subscribe(update);
+    }
+    gtr_1.init = init;
+    function updateFretboard(tuningInfo) {
         var stringGap = 40;
         var fretGap = 70;
         var fretWidth = 5;
@@ -639,12 +645,10 @@ var gtr;
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
             .attr("fill", "none")
             .attr("stroke", "none");
-        events.scaleChange.subscribe(update);
         if (currentState != null) {
             update(currentState);
         }
     }
-    gtr_1.init = init;
     function update(stateChange) {
         var fill = function (d, i) {
             return noteColours[i % 7];
@@ -747,8 +751,9 @@ var tuning;
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", function (x) { return gtr.init(x); })
+            .on("click", function (x) { return events.tuningChange.publish(x); })
             .text(function (x) { return x.tuning + "   " + x.description; });
+        events.tuningChange.publish(tuning_1.tunings[0]);
     }
     tuning_1.init = init;
 })(tuning || (tuning = {}));
@@ -757,7 +762,7 @@ tonics.init();
 modes.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init(tuning.tunings[0]);
+gtr.init();
 tuning.init();
 state.init();
 cookies.init();

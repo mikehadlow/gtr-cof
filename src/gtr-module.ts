@@ -19,7 +19,12 @@ namespace gtr {
         return stringNote.index + "_" + stringNote.octave;
     }
 
-    export function init(tuningInfo: tuning.TuningInfo): void {
+    export function init() {
+        events.tuningChange.subscribe(updateFretboard);
+        events.scaleChange.subscribe(update);
+    }
+
+    function updateFretboard(tuningInfo: events.TuningChangedEvent): void {
         let stringGap = 40;
         let fretGap = 70;
         let fretWidth = 5;
@@ -89,8 +94,6 @@ namespace gtr {
             .attr("cx", function (d, i) { return i * fretGap + pad + 30 })
             .attr("fill", "none")
             .attr("stroke", "none");
-
-        events.scaleChange.subscribe(update);
 
         if(currentState != null) {
             update(currentState);
