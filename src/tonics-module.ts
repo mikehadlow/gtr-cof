@@ -56,14 +56,14 @@ namespace tonics {
             .text(function (x) { return x.label; })
             .attr("class", "tonic-text");
 
-        state.addListener(listener);
+        events.stateChange.subscribe(listener);
     }
 
     function handleButtonClick(d: ButtonData, i: number): void {
         state.changeTonic(d.noteBase, d.index);
     }
 
-    function listener(state: state.StateChange): void {
+    function listener(state: events.StateChange): void {
         let tonic = state.scale2[0];
         let ds: Array<ButtonData> = [{
             noteBase: state.noteBase,

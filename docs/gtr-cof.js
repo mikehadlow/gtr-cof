@@ -195,10 +195,6 @@ var state;
         updateListeners();
     }
     state.init = init;
-    function addListener(listener) {
-        events.stateChange.subscribe(listener);
-    }
-    state.addListener = addListener;
     function changeTonic(newNoteBase, index) {
         currentNoteBase = newNoteBase;
         currentIndex = index;
@@ -345,7 +341,7 @@ var cof;
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
             var instance = this;
-            state.addListener(function (stateChange) {
+            events.stateChange.subscribe(function (stateChange) {
                 instance.update(stateChange);
             });
         }
@@ -479,7 +475,7 @@ var tonics;
             .attr("y", 17)
             .text(function (x) { return x.label; })
             .attr("class", "tonic-text");
-        state.addListener(listener);
+        events.stateChange.subscribe(listener);
     }
     tonics_1.init = init;
     function handleButtonClick(d, i) {
@@ -533,7 +529,7 @@ var modes;
             .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
-        state.addListener(update);
+        events.stateChange.subscribe(update);
     }
     modes_1.init = init;
     function handleButtonClick(mode, i) {
@@ -628,7 +624,7 @@ var gtr;
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
             .attr("fill", "none")
             .attr("stroke", "none");
-        state.addListener(update);
+        events.stateChange.subscribe(update);
         if (currentState != null) {
             update(currentState);
         }

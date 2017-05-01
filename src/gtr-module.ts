@@ -1,7 +1,7 @@
 
 namespace gtr {
 
-    let currentState: state.StateChange = null;
+    let currentState: events.StateChange = null;
     let notes: d3.Selection<StringNote> = null;
     let numberOfFrets = 16;
 
@@ -90,14 +90,14 @@ namespace gtr {
             .attr("fill", "none")
             .attr("stroke", "none");
 
-        state.addListener(update);
+        events.stateChange.subscribe(update);
 
         if(currentState != null) {
             update(currentState);
         }
     }
 
-    function update(stateChange: state.StateChange): void {
+    function update(stateChange: events.StateChange): void {
 
         let fill = function (d: StringNote, i: number): string {
             return noteColours[i % 7];

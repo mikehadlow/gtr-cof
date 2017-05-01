@@ -22,10 +22,6 @@ namespace state {
         updateListeners();
     }
 
-    export function addListener(listener: (n: events.StateChange) => void): void {
-        events.stateChange.subscribe(listener);
-    }
-
     export function changeTonic(newNoteBase: music.NoteBase, index: number): void {
         currentNoteBase = newNoteBase;
         currentIndex = index;
