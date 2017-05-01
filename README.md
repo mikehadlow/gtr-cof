@@ -5,7 +5,7 @@ The aim is to provide a graphical representation of music theory elements (scale
 
 ## Developing with VS Code
 
-Guitar Dashboard is written in Typescript using VS Code. Make all code changes in the src\*.ts files. Compilation outputs to the docs folder, do not edit the *.js or *.js.map files in this directory. They are included in the source repository because the website is hosted in GitHub pages which does not support Typescript compilation.
+Guitar Dashboard is written in Typescript using VS Code. Make all code changes in the src/*.ts files. Compilation outputs to the docs folder, do not edit the *.js or *.js.map files in this directory. They are included in the source repository because the website is hosted in GitHub pages which does not support Typescript compilation.
 
 1. Clone or fork-and-clone this repository.
 2. File -> Open folder at the root directory of the cloned repository.
@@ -14,6 +14,6 @@ Guitar Dashboard is written in Typescript using VS Code. Make all code changes i
     - npm install 
     - npm start
 5. Browse to http://localhost:10001/
-6. Edit the src\*.ts, index.html and gtr-cof.css files.
+6. Edit the src/*.ts, index.html and gtr-cof.css files.
 7. Compile.
 8. Commit, push to GitHub and create a pull request :)
