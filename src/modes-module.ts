@@ -34,11 +34,11 @@ namespace modes {
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
 
-        events.scaleChange.subscribe(update);
+        events.modeChange.subscribe(update);
     }
 
-    function update(stateChange: events.ScaleChangedEvent): void {
-        let modes: Array<music.Mode> = [stateChange.mode];
+    function update(modeChange: events.ModeChangedEvent): void {
+        let modes: Array<music.Mode> = [modeChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
             .attr("class", "mode-button mode-button-selected")

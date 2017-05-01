@@ -548,11 +548,11 @@ var modes;
             .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
-        events.scaleChange.subscribe(update);
+        events.modeChange.subscribe(update);
     }
     modes_1.init = init;
-    function update(stateChange) {
-        var modes = [stateChange.mode];
+    function update(modeChange) {
+        var modes = [modeChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
             .attr("class", "mode-button mode-button-selected")
