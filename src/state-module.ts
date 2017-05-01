@@ -21,6 +21,7 @@ namespace state {
 
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
+        events.chordChange.subscribe(chordChanged);
 
         updateListeners();
     }
@@ -38,14 +39,18 @@ namespace state {
         updateListeners();
     }
 
-    export function changeChord(chordIndex: number): void {
-        if(chordIndex == currentChordIndex) {
+    function chordChanged(chordChangedEvent: events.ChordChangeEvent): void {
+        if(chordChangedEvent.chordIndex == currentChordIndex) {
             currentChordIndex = -1
         }
         else {
-            currentChordIndex = chordIndex;
+            currentChordIndex = chordChangedEvent.chordIndex;
         }
         updateListeners();
+    }
+
+    export function changeChord(chordIndex: number): void {
+        events.chordChange.publish({ chordIndex: chordIndex });
     }
 
     function updateListeners(): void {

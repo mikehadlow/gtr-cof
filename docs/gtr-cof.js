@@ -19,6 +19,7 @@ var events;
     events.scaleChange = new Bus();
     events.tonicChange = new Bus();
     events.modeChange = new Bus();
+    events.chordChange = new Bus();
 })(events || (events = {}));
 var music;
 (function (music) {
@@ -196,6 +197,7 @@ var state;
         }
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
+        events.chordChange.subscribe(chordChanged);
         updateListeners();
     }
     state.init = init;
@@ -210,14 +212,17 @@ var state;
         currentChordIndex = -1;
         updateListeners();
     }
-    function changeChord(chordIndex) {
-        if (chordIndex == currentChordIndex) {
+    function chordChanged(chordChangedEvent) {
+        if (chordChangedEvent.chordIndex == currentChordIndex) {
             currentChordIndex = -1;
         }
         else {
-            currentChordIndex = chordIndex;
+            currentChordIndex = chordChangedEvent.chordIndex;
         }
         updateListeners();
+    }
+    function changeChord(chordIndex) {
+        events.chordChange.publish({ chordIndex: chordIndex });
     }
     state.changeChord = changeChord;
     function updateListeners() {

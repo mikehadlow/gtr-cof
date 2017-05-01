@@ -34,4 +34,10 @@ namespace events {
     export interface ModeChangedEvent {
         readonly mode: music.Mode;
     }
+
+    export let chordChange: Bus<ChordChangeEvent> = new Bus<ChordChangeEvent>();
+
+    export interface ChordChangeEvent {
+        readonly chordIndex: number;
+    }
 }
