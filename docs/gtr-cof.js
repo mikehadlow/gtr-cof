@@ -21,6 +21,47 @@ var events;
     events.modeChange = new Bus();
     events.chordChange = new Bus();
 })(events || (events = {}));
+var cookies;
+(function (cookies) {
+    function init() {
+        events.scaleChange.subscribe(bakeCookie);
+    }
+    cookies.init = init;
+    function bakeCookie(scaleChange) {
+        var cookieExpiryDays = 30;
+        var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + expiryDate.toUTCString();
+        document.cookie = "gtr-cof-state="
+            + scaleChange.index + "|"
+            + scaleChange.noteBase.id + "|"
+            + scaleChange.mode.index + "|"
+            + scaleChange.chordIndex
+            + ";" + expires;
+    }
+    function readCookie() {
+        var result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
+        if (result != null) {
+            var items = result[1].split("|");
+            if (items.length == 4) {
+                return {
+                    hasCookie: true,
+                    index: Number(items[0]),
+                    noteBaseIndex: Number(items[1]),
+                    modeIndex: Number(items[2]),
+                    chordIndex: Number(items[3])
+                };
+            }
+        }
+        return {
+            hasCookie: false,
+            index: 0,
+            noteBaseIndex: 0,
+            modeIndex: 0,
+            chordIndex: -1
+        };
+    }
+    cookies.readCookie = readCookie;
+})(cookies || (cookies = {}));
 var music;
 (function (music) {
     music.noteBases = [
@@ -188,7 +229,7 @@ var state;
     var currentIndex = 0;
     var currentChordIndex = -1;
     function init() {
-        var cookieData = readCookie();
+        var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
             currentIndex = cookieData.index;
             currentNoteBase = music.noteBases[cookieData.noteBaseIndex];
@@ -230,38 +271,9 @@ var state;
             mode: currentMode,
             noteBase: currentNoteBase,
             index: currentIndex,
-            scale2: scale
+            scale2: scale,
+            chordIndex: currentChordIndex
         });
-        bakeCookie();
-    }
-    function bakeCookie() {
-        var cookieExpiryDays = 30;
-        var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
-        var expires = "expires=" + expiryDate.toUTCString();
-        document.cookie = "gtr-cof-state=" + currentIndex + "|" + currentNoteBase.id + "|" + currentMode.index + "|" + currentChordIndex
-            + ";" + expires;
-    }
-    function readCookie() {
-        var result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
-        if (result != null) {
-            var items = result[1].split("|");
-            if (items.length == 4) {
-                return {
-                    hasCookie: true,
-                    index: Number(items[0]),
-                    noteBaseIndex: Number(items[1]),
-                    modeIndex: Number(items[2]),
-                    chordIndex: Number(items[3])
-                };
-            }
-        }
-        return {
-            hasCookie: false,
-            index: 0,
-            noteBaseIndex: 0,
-            modeIndex: 0,
-            chordIndex: -1
-        };
     }
 })(state || (state = {}));
 var cof;
@@ -748,4 +760,5 @@ var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circ
 gtr.init(tuning.tunings[0]);
 tuning.init();
 state.init();
+cookies.init();
 //# sourceMappingURL=gtr-cof.js.map

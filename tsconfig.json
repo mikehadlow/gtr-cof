@@ -9,6 +9,7 @@
     },
     "files": [
         "src/events-module.ts",
+        "src/cookie-module.ts",
         "src/music-module.ts",
         "src/state-module.ts",
         "src/cof-module.ts",

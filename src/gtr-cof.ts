@@ -7,3 +7,4 @@ let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circ
 gtr.init(tuning.tunings[0]);
 tuning.init();
 state.init();
+cookies.init();

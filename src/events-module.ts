@@ -20,6 +20,7 @@ namespace events {
         readonly noteBase: music.NoteBase;
         readonly index: number;
         readonly scale2: Array<music.ScaleNote>;
+        readonly chordIndex: number;
     }
 
     export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>();
