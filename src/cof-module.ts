@@ -94,12 +94,12 @@ namespace cof {
                 .attr("class", "chord-segment-note");
 
             let instance = this;
-            events.stateChange.subscribe(function (stateChange: events.StateChange) {
+            events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
                 instance.update(stateChange);
             });
         }
 
-        update(stateChange: events.StateChange): void {
+        update(stateChange: events.ScaleChangedEvent): void {
 
             let data: Array<Segment> = [];
             for (let n of stateChange.scale2) {

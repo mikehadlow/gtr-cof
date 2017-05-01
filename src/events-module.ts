@@ -13,9 +13,9 @@ namespace events {
         }
     }
 
-    export let stateChange: Bus<StateChange> = new Bus<StateChange>();
+    export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>();
 
-    export interface StateChange {
+    export interface ScaleChangedEvent {
         readonly mode: music.Mode;
         readonly noteBase: music.NoteBase;
         readonly index: number;

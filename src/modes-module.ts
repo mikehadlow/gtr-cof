@@ -34,14 +34,14 @@ namespace modes {
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
 
-        events.stateChange.subscribe(update);
+        events.scaleChange.subscribe(update);
     }
 
     function handleButtonClick(mode: music.Mode, i: number): void {
         state.changeMode(mode);
     }
 
-    function update(stateChange: events.StateChange): void {
+    function update(stateChange: events.ScaleChangedEvent): void {
         let modes: Array<music.Mode> = [stateChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })

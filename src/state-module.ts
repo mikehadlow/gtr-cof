@@ -52,7 +52,7 @@ namespace state {
             scale = music.appendTriad(scale, currentChordIndex);
         }
 
-        events.stateChange.publish({
+        events.scaleChange.publish({
             mode: currentMode,
             noteBase: currentNoteBase,
             index: currentIndex,

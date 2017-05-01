@@ -16,7 +16,7 @@ var events;
         return Bus;
     }());
     events.Bus = Bus;
-    events.stateChange = new Bus();
+    events.scaleChange = new Bus();
 })(events || (events = {}));
 var music;
 (function (music) {
@@ -223,7 +223,7 @@ var state;
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
         }
-        events.stateChange.publish({
+        events.scaleChange.publish({
             mode: currentMode,
             noteBase: currentNoteBase,
             index: currentIndex,
@@ -341,7 +341,7 @@ var cof;
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
             var instance = this;
-            events.stateChange.subscribe(function (stateChange) {
+            events.scaleChange.subscribe(function (stateChange) {
                 instance.update(stateChange);
             });
         }
@@ -475,7 +475,7 @@ var tonics;
             .attr("y", 17)
             .text(function (x) { return x.label; })
             .attr("class", "tonic-text");
-        events.stateChange.subscribe(listener);
+        events.scaleChange.subscribe(listener);
     }
     tonics_1.init = init;
     function handleButtonClick(d, i) {
@@ -529,7 +529,7 @@ var modes;
             .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
-        events.stateChange.subscribe(update);
+        events.scaleChange.subscribe(update);
     }
     modes_1.init = init;
     function handleButtonClick(mode, i) {
@@ -624,7 +624,7 @@ var gtr;
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
             .attr("fill", "none")
             .attr("stroke", "none");
-        events.stateChange.subscribe(update);
+        events.scaleChange.subscribe(update);
         if (currentState != null) {
             update(currentState);
         }
