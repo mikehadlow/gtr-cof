@@ -1,4 +1,3 @@
-///<reference path="../node_modules/@types/d3/index.d.ts" />
 var music;
 (function (music) {
     music.noteBases = [
@@ -727,6 +726,7 @@ var tuning;
     }
     tuning_1.init = init;
 })(tuning || (tuning = {}));
+///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");

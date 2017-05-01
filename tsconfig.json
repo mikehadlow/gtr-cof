@@ -4,9 +4,17 @@
         "module": "commonjs",
         "sourceMap": true,
         "outDir": "docs",
+        "outFile": "docs/gtr-cof.js",
         "types": []
     },
     "files": [
+        "src/music-module.ts",
+        "src/state-module.ts",
+        "src/cof-module.ts",
+        "src/tonics-module.ts",
+        "src/modes-module.ts",
+        "src/gtr-module.ts",
+        "src/tuning-module.ts",
         "src/gtr-cof.ts"
     ]
 }
