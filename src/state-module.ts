@@ -49,10 +49,6 @@ namespace state {
         updateListeners();
     }
 
-    export function changeChord(chordIndex: number): void {
-        events.chordChange.publish({ chordIndex: chordIndex });
-    }
-
     function updateListeners(): void {
         let scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
 

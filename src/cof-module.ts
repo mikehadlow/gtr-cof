@@ -189,7 +189,7 @@ namespace cof {
     }
 
     function handleChordClick(segment: Segment, i: number): void {
-        state.changeChord(segment.scaleNote.index);
+        events.chordChange.publish({ chordIndex: segment.scaleNote.index });
     }
 
     interface Segment {

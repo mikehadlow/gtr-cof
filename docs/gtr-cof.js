@@ -221,10 +221,6 @@ var state;
         }
         updateListeners();
     }
-    function changeChord(chordIndex) {
-        events.chordChange.publish({ chordIndex: chordIndex });
-    }
-    state.changeChord = changeChord;
     function updateListeners() {
         var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
         if (currentChordIndex != -1) {
@@ -439,7 +435,7 @@ var cof;
         }
     }
     function handleChordClick(segment, i) {
-        state.changeChord(segment.scaleNote.index);
+        events.chordChange.publish({ chordIndex: segment.scaleNote.index });
     }
 })(cof || (cof = {}));
 var tonics;
