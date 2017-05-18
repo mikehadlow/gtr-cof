@@ -601,7 +601,9 @@ var gtr;
             .attr("x", 30)
             .attr("y", 10)
             .text(tuningInfo.tuning + " " + tuningInfo.description);
-        var gtr = svg.append("g");
+        var gtr = svg
+            .append("g");
+        //.attr("transform", (d, i) => "translate(1200, 0) scale(-1, 1)");
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
