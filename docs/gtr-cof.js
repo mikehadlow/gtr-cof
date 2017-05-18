@@ -754,7 +754,7 @@ var tuning;
         { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
-        { tuning: "GCEA", dots: guitarDots, description: "Ukelele C" },
+        { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
     ];
     function parseTuning(tuning) {
         var result = [];
