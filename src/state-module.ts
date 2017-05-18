@@ -18,11 +18,16 @@ namespace state {
             currentChordIndex = cookieData.chordIndex;
         }
 
+        // lets remember this while we reset everything.
+        let tempChordIndex = currentChordIndex;
+
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
 
-        updateScale();
+        events.tonicChange.publish({ index: currentIndex, newNoteBase: currentNoteBase });
+        events.modeChange.publish({ mode: currentMode });
+        events.chordChange.publish({ chordIndex: tempChordIndex });
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {

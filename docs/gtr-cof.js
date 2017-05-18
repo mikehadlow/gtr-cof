@@ -237,10 +237,14 @@ var state;
             currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
             currentChordIndex = cookieData.chordIndex;
         }
+        // lets remember this while we reset everything.
+        var tempChordIndex = currentChordIndex;
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
-        updateScale();
+        events.tonicChange.publish({ index: currentIndex, newNoteBase: currentNoteBase });
+        events.modeChange.publish({ mode: currentMode });
+        events.chordChange.publish({ chordIndex: tempChordIndex });
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
