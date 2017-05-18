@@ -17,6 +17,7 @@
         "src/modes-module.ts",
         "src/gtr-module.ts",
         "src/tuning-module.ts",
+        "src/settings-module.ts",
         "src/gtr-cof.ts"
     ]
 }

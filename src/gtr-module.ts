@@ -4,6 +4,8 @@ namespace gtr {
     let currentState: events.ScaleChangedEvent = null;
     let notes: d3.Selection<StringNote> = null;
     let numberOfFrets = 16;
+    let fretboardElement: SVGGElement = null;
+    let isLeftHanded: boolean = false;
 
     let noteColours: Array<string> = [
         "yellow",
@@ -22,6 +24,23 @@ namespace gtr {
     export function init() {
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
+        events.leftHandedChange.subscribe(handleLeftHandedChanged);
+    }
+
+    function handleLeftHandedChanged(lhEvent: events.LeftHandedFretboardEvent) {
+        isLeftHanded = lhEvent.isLeftHanded;
+        setHandedness();
+    }
+
+    function setHandedness()
+    {
+        if(isLeftHanded) {
+            fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
+            fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
+        } else {
+            fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
+            fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
+        }
     }
 
     function updateFretboard(tuningInfo: events.TuningChangedEvent): void {
@@ -41,9 +60,9 @@ namespace gtr {
             .attr("x", 30)
             .attr("y", 10)
             .text(tuningInfo.tuning + " " + tuningInfo.description);
-        let gtr = svg
-            .append("g");
-            //.attr("transform", (d, i) => "translate(1200, 0) scale(-1, 1)");
+        let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
+        fretboardElement = <SVGGElement>gtr.node();
+        setHandedness();
 
         // frets
         gtr.append("g").selectAll("rect")

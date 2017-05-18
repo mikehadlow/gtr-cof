@@ -21,6 +21,7 @@ var events;
     events.modeChange = new Bus();
     events.chordChange = new Bus();
     events.tuningChange = new Bus();
+    events.leftHandedChange = new Bus();
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -569,6 +570,8 @@ var gtr;
     var currentState = null;
     var notes = null;
     var numberOfFrets = 16;
+    var fretboardElement = null;
+    var isLeftHanded = false;
     var noteColours = [
         "yellow",
         "white",
@@ -584,8 +587,23 @@ var gtr;
     function init() {
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
+        events.leftHandedChange.subscribe(handleLeftHandedChanged);
     }
     gtr_1.init = init;
+    function handleLeftHandedChanged(lhEvent) {
+        isLeftHanded = lhEvent.isLeftHanded;
+        setHandedness();
+    }
+    function setHandedness() {
+        if (isLeftHanded) {
+            fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
+            fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
+        }
+        else {
+            fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
+            fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
+        }
+    }
     function updateFretboard(tuningInfo) {
         var stringGap = 40;
         var fretGap = 70;
@@ -601,9 +619,9 @@ var gtr;
             .attr("x", 30)
             .attr("y", 10)
             .text(tuningInfo.tuning + " " + tuningInfo.description);
-        var gtr = svg
-            .append("g");
-        //.attr("transform", (d, i) => "translate(1200, 0) scale(-1, 1)");
+        var gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
+        fretboardElement = gtr.node();
+        setHandedness();
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
@@ -769,6 +787,13 @@ var tuning;
         });
     }
 })(tuning || (tuning = {}));
+var settings;
+(function (settings) {
+    function onLeftHandedClick(e) {
+        events.leftHandedChange.publish({ isLeftHanded: e.checked });
+    }
+    settings.onLeftHandedClick = onLeftHandedClick;
+})(settings || (settings = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init();

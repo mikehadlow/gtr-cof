@@ -23,7 +23,8 @@
             tonic is highlighted in yellow.</li>
           <li>Select a <a href="https://en.wikipedia.org/wiki/Mode_(music)">mode</a> by clicking on a mode button.</li>
           <li>
-            Click on the outer 'chord' ring of either the chromatic note circle or the <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a>            to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> associated with that note. Click
+            Click on the outer 'chord' ring of either the chromatic note circle or the <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a>
+            to show the <a href="https://en.wikipedia.org/wiki/Triad_(music)">triad</a> associated with that note. Click
             on a note to cancel the chord display.</li>
           <li>Chord ring colours:
             <ul>
@@ -41,6 +42,15 @@
     <div class="dropdown">
       <div class="menu">Tunings</div>
       <div id="tuning-dropdown" class="dropdown-content">
+      </div>
+    </div>
+    <div class="dropdown">
+      <div class="menu">Settings</div>
+      <div id="settings-dropdown" class="dropdown-content with-padding">
+        <div>
+          <input type="checkbox" id="left-handed-checkbox" name="left_handed" onclick="settings.onLeftHandedClick(this)" >
+          <label for="left_handed">Left Handed Fretboard</label>
+        </div>
       </div>
     </div>
   </div>

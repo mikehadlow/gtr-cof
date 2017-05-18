@@ -50,4 +50,10 @@ namespace events {
         readonly description: string;
         readonly notes: Array<number>;
     }
+
+    export let leftHandedChange: Bus<LeftHandedFretboardEvent> = new Bus<LeftHandedFretboardEvent>();
+
+    export interface LeftHandedFretboardEvent {
+        readonly isLeftHanded: boolean;
+    }
 }
