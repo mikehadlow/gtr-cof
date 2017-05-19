@@ -573,6 +573,11 @@ var gtr;
     var numberOfFrets = 16;
     var fretboardElement = null;
     var isLeftHanded = false;
+    var stringGap = 40;
+    var fretGap = 70;
+    var fretWidth = 5;
+    var noteRadius = 15;
+    var pad = 20;
     var noteColours = [
         "yellow",
         "white",
@@ -599,18 +604,19 @@ var gtr;
         if (isLeftHanded) {
             fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
+            noteLabels
+                .attr("transform", function (d, i) { return "translate(0, 0) scale(-1, 1)"; })
+                .attr("x", function (d, i) { return -(i * fretGap + pad + 30); });
         }
         else {
             fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
+            noteLabels
+                .attr("transform", function (d, i) { return "translate(0, 0) scale(1, 1)"; })
+                .attr("x", function (d, i) { return (i * fretGap + pad + 30); });
         }
     }
     function updateFretboard(tuningInfo) {
-        var stringGap = 40;
-        var fretGap = 70;
-        var fretWidth = 5;
-        var noteRadius = 15;
-        var pad = 20;
         var fretData = getFretData(numberOfFrets);
         var dots = tuningInfo.dots;
         d3.selectAll("#gtr > *").remove();
@@ -622,7 +628,6 @@ var gtr;
             .text(tuningInfo.tuning + " " + tuningInfo.description);
         var gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = gtr.node();
-        setHandedness();
         // frets
         gtr.append("g").selectAll("rect")
             .data(fretData)
@@ -674,10 +679,12 @@ var gtr;
             .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
             .enter()
             .append("text")
+            .attr("transform", "translate(0, 0) scale(1, 1)")
             .attr("text-anchor", "middle")
-            .attr("y", (stringGap / 2) + 5)
             .attr("x", function (d, i) { return i * fretGap + pad + 30; })
+            .attr("y", (stringGap / 2) + 5)
             .text("");
+        setHandedness();
         if (currentState != null) {
             update(currentState);
         }
@@ -706,6 +713,9 @@ var gtr;
             }
             return 5;
         };
+        var setText = function (d, i) {
+            return d.scaleNote.noteName;
+        };
         notes
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .attr("fill", fill)
@@ -716,7 +726,7 @@ var gtr;
             .attr("stroke", "none");
         noteLabels
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
-            .text(function (d, i) { return d.scaleNote.noteName; })
+            .text(setText)
             .exit()
             .text("");
         currentState = stateChange;

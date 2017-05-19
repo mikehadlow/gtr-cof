@@ -8,6 +8,12 @@ namespace gtr {
     let fretboardElement: SVGGElement = null;
     let isLeftHanded: boolean = false;
 
+    let stringGap = 40;
+    let fretGap = 70;
+    let fretWidth = 5;
+    let noteRadius = 15;
+    let pad = 20;
+
     let noteColours: Array<string> = [
         "yellow",
         "white",
@@ -38,18 +44,19 @@ namespace gtr {
         if(isLeftHanded) {
             fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
+            noteLabels
+                .attr("transform", (d, i) => "translate(0, 0) scale(-1, 1)")
+                .attr("x", (d, i) => -(i * fretGap + pad + 30))
         } else {
             fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
+            noteLabels
+                .attr("transform", (d, i) => "translate(0, 0) scale(1, 1)")
+                .attr("x", (d, i) => (i * fretGap + pad + 30))
         }
     }
 
     function updateFretboard(tuningInfo: events.TuningChangedEvent): void {
-        let stringGap = 40;
-        let fretGap = 70;
-        let fretWidth = 5;
-        let noteRadius = 15;
-        let pad = 20;
 
         let fretData: Array<number> = getFretData(numberOfFrets);
         let dots: Array<[number, number]> = tuningInfo.dots;
@@ -63,7 +70,6 @@ namespace gtr {
             .text(tuningInfo.tuning + " " + tuningInfo.description);
         let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = <SVGGElement>gtr.node();
-        setHandedness();
 
         // frets
         gtr.append("g").selectAll("rect")
@@ -121,10 +127,13 @@ namespace gtr {
             .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
             .enter()
             .append("text")
+            .attr("transform", "translate(0, 0) scale(1, 1)")
             .attr("text-anchor", "middle")
+            .attr("x", (d, i) => i * fretGap + pad + 30)
             .attr("y", (stringGap / 2) + 5)
-            .attr("x", function (d, i) { return i * fretGap + pad + 30 })
             .text("");
+
+        setHandedness();
 
         if(currentState != null) {
             update(currentState);
@@ -159,6 +168,10 @@ namespace gtr {
             return 5
         };
 
+        let setText = function(d: StringNote, i: number): string {
+            return d.scaleNote.noteName;
+        }
+
         notes
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .attr("fill", fill)
@@ -169,7 +182,7 @@ namespace gtr {
             .attr("stroke", "none");
         noteLabels
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
-            .text((d, i) => d.scaleNote.noteName)
+            .text(setText)
             .exit()
             .text("");
 
