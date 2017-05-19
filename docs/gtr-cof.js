@@ -93,7 +93,7 @@ var music;
     var noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
-        { offset: 2, label: '♯♯' },
+        { offset: 2, label: 'x' },
         { offset: -1, label: '♭' },
         { offset: -2, label: '♭♭' },
     ];
