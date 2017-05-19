@@ -3,6 +3,7 @@ namespace gtr {
 
     let currentState: events.ScaleChangedEvent = null;
     let notes: d3.Selection<StringNote> = null;
+    let noteLabels: d3.Selection<StringNote> = null;
     let numberOfFrets = 16;
     let fretboardElement: SVGGElement = null;
     let isLeftHanded: boolean = false;
@@ -115,6 +116,16 @@ namespace gtr {
             .attr("fill", "none")
             .attr("stroke", "none");
 
+        noteLabels = strings
+            .selectAll("text")
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
+            .enter()
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("y", (stringGap / 2) + 5)
+            .attr("x", function (d, i) { return i * fretGap + pad + 30 })
+            .text("");
+
         if(currentState != null) {
             update(currentState);
         }
@@ -156,6 +167,11 @@ namespace gtr {
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+        noteLabels
+            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
+            .text((d, i) => d.scaleNote.noteName)
+            .exit()
+            .text("");
 
         currentState = stateChange;
     }

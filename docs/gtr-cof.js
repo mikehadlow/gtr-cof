@@ -569,6 +569,7 @@ var gtr;
 (function (gtr_1) {
     var currentState = null;
     var notes = null;
+    var noteLabels = null;
     var numberOfFrets = 16;
     var fretboardElement = null;
     var isLeftHanded = false;
@@ -668,6 +669,15 @@ var gtr;
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
             .attr("fill", "none")
             .attr("stroke", "none");
+        noteLabels = strings
+            .selectAll("text")
+            .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
+            .enter()
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("y", (stringGap / 2) + 5)
+            .attr("x", function (d, i) { return i * fretGap + pad + 30; })
+            .text("");
         if (currentState != null) {
             update(currentState);
         }
@@ -704,6 +714,11 @@ var gtr;
             .exit()
             .attr("fill", "none")
             .attr("stroke", "none");
+        noteLabels
+            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
+            .text(function (d, i) { return d.scaleNote.noteName; })
+            .exit()
+            .text("");
         currentState = stateChange;
     }
     function allNotesFrom(index, numberOfNotes) {
