@@ -7,6 +7,7 @@ namespace gtr {
     let numberOfFrets = 16;
     let fretboardElement: SVGGElement = null;
     let isLeftHanded: boolean = false;
+    let fretboardLabelType: events.FretboardLabelType = events.FretboardLabelType.NoteName;
 
     let stringGap = 40;
     let fretGap = 70;
@@ -32,6 +33,7 @@ namespace gtr {
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
+        events.fretboardLabelChange.subscribe(handleLabelChange);
     }
 
     function handleLeftHandedChanged(lhEvent: events.LeftHandedFretboardEvent) {
@@ -53,6 +55,37 @@ namespace gtr {
             noteLabels
                 .attr("transform", (d, i) => "translate(0, 0) scale(1, 1)")
                 .attr("x", (d, i) => (i * fretGap + pad + 30))
+        }
+    }
+
+    function handleLabelChange(lcEvent: events.FretboardLabelChangeEvent) {
+
+        this.fretboardLabelType = lcEvent.labelType;
+        setLabels();
+    }
+
+    function setLabels()
+    {
+        function setNoteName(note: StringNote): string {
+            if(note.scaleNote == null) return "";
+            return note.scaleNote.noteName;
+        }
+
+        function setInterval(note: StringNote): string {
+            if(note.scaleNote == null) return "";
+            return note.scaleNote.intervalShort;
+        }
+
+        switch (this.fretboardLabelType) {
+            case events.FretboardLabelType.None:
+                noteLabels.text("");
+                break;
+            case events.FretboardLabelType.NoteName:
+                noteLabels.text(setNoteName)
+                break;
+            case events.FretboardLabelType.Interval:
+                noteLabels.text(setInterval);
+                break;
         }
     }
 
@@ -184,9 +217,12 @@ namespace gtr {
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .text(setText)
             .exit()
+            .each((d, i) => d.scaleNote = null)
             .text("");
 
         currentState = stateChange;
+
+        setLabels();
     }
 
     function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
@@ -229,6 +265,6 @@ namespace gtr {
     interface StringNote {
         readonly octave: number;
         readonly index: number;
-        readonly scaleNote: music.ScaleNote;
+        scaleNote: music.ScaleNote;
     }
 }

@@ -46,10 +46,18 @@
     </div>
     <div class="dropdown">
       <div class="menu">Settings</div>
-      <div id="settings-dropdown" class="dropdown-content with-padding">
-        <div>
+      <div id="settings-dropdown" class="dropdown-content">
+        <div class="with-padding">
           <input type="checkbox" id="left-handed-checkbox" name="left_handed" onclick="settings.onLeftHandedClick(this)" >
           <label for="left_handed">Left Handed Fretboard</label>
+        </div>
+        <div class="with-padding">
+          <fieldset>
+            <label for="fb-note-text">Fretboard note labels:</label><br/>
+            <input type="radio" name="fb-note-text" onclick="settings.onFbNoteTextClick(this)" value="0" /> None <br/>
+            <input type="radio" name="fb-note-text" onclick="settings.onFbNoteTextClick(this)" value="1" checked /> Note names <br/>
+            <input type="radio" name="fb-note-text" onclick="settings.onFbNoteTextClick(this)" value="2" /> Intervals 
+          </fieldset>
         </div>
       </div>
     </div>

@@ -56,4 +56,16 @@ namespace events {
     export interface LeftHandedFretboardEvent {
         readonly isLeftHanded: boolean;
     }
+
+    export let fretboardLabelChange: Bus<FretboardLabelChangeEvent> = new Bus<FretboardLabelChangeEvent>();
+
+    export interface FretboardLabelChangeEvent {
+        readonly labelType: FretboardLabelType;
+    }
+
+    export enum FretboardLabelType {
+        None,
+        NoteName,
+        Interval
+    }
 }

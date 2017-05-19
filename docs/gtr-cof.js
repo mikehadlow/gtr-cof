@@ -22,6 +22,13 @@ var events;
     events.chordChange = new Bus();
     events.tuningChange = new Bus();
     events.leftHandedChange = new Bus();
+    events.fretboardLabelChange = new Bus();
+    var FretboardLabelType;
+    (function (FretboardLabelType) {
+        FretboardLabelType[FretboardLabelType["None"] = 0] = "None";
+        FretboardLabelType[FretboardLabelType["NoteName"] = 1] = "NoteName";
+        FretboardLabelType[FretboardLabelType["Interval"] = 2] = "Interval";
+    })(FretboardLabelType = events.FretboardLabelType || (events.FretboardLabelType = {}));
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -109,6 +116,33 @@ var music;
     })(ChordType = music.ChordType || (music.ChordType = {}));
     ;
     ;
+    // https://en.wikipedia.org/wiki/Interval_(music)
+    music.intervals = {};
+    // key is "<scale degree>.<semitones>"
+    music.intervals["1.0"] = { short: "1", text: "Unison" };
+    music.intervals["2.0"] = { short: "d2", text: "Diminished Second" };
+    music.intervals["2.1"] = { short: "m2", text: "Minor Second" };
+    music.intervals["1.1"] = { short: "A1", text: "Augmented Unison" };
+    music.intervals["2.2"] = { short: "M2", text: "Major Second" };
+    music.intervals["3.2"] = { short: "d3", text: "Diminished Third" };
+    music.intervals["3.3"] = { short: "m3", text: "Minor Third" };
+    music.intervals["2.3"] = { short: "A2", text: "Augmented Second" };
+    music.intervals["3.4"] = { short: "M3", text: "Major Third" };
+    music.intervals["4.4"] = { short: "d4", text: "Diminished Fourth" };
+    music.intervals["4.5"] = { short: "4", text: "Perfect Fourth" };
+    music.intervals["3.5"] = { short: "A3", text: "Augmented Third" };
+    music.intervals["5.6"] = { short: "d5", text: "Diminished Fifth" };
+    music.intervals["4.6"] = { short: "A4", text: "Augmented Fourth" };
+    music.intervals["5.7"] = { short: "5", text: "Perfect Fifth" };
+    music.intervals["6.7"] = { short: "d6", text: "Diminished Sixth" };
+    music.intervals["6.8"] = { short: "m6", text: "Minor Sixth" };
+    music.intervals["5.8"] = { short: "A5", text: "Augmented Fifth" };
+    music.intervals["6.9"] = { short: "M6", text: "Major Sixth" };
+    music.intervals["7.9"] = { short: "d7", text: "Diminished Seventh" };
+    music.intervals["7.10"] = { short: "m7", text: "Minor Seventh" };
+    music.intervals["6.10"] = { short: "A6", text: "Augmented Sixth" };
+    music.intervals["7.11"] = { short: "M7", text: "Major Seventh" };
+    music.intervals["8.11"] = { short: "d8", text: "Diminished Octave" };
     function generateScale(noteBase, index, mode) {
         var scale = [];
         var currentIndex = index;
@@ -122,6 +156,8 @@ var music;
             }
             // lookup noteLabel with offset
             var noteLabel = noteLabels.filter(function (n) { return n.offset == offset; })[0];
+            // find interval
+            var noteInterval = music.intervals[(i + 1) + "." + findInterval(index, currentIndex)];
             // add new ScaleNote to scale
             scale.push({
                 index: currentIndex,
@@ -129,10 +165,12 @@ var music;
                 noteName: currentNoteBase.name + noteLabel.label,
                 noteBase: currentNoteBase,
                 canSelect: Math.abs(offset) < 2,
+                intervalShort: noteInterval.short,
+                intervalLong: noteInterval.text,
                 chord: null
             });
-            var interval_1 = scaleTones[(mode.index + i) % 7];
-            currentIndex = (currentIndex + interval_1) % 12;
+            var interval = scaleTones[(mode.index + i) % 7];
+            currentIndex = (currentIndex + interval) % 12;
             currentNoteBase = music.noteBases[(currentNoteBase.id + 1) % 7];
         };
         for (var i = 0; i < 7; i++) {
@@ -147,6 +185,8 @@ var music;
                 noteName: note.noteName,
                 noteBase: note.noteBase,
                 canSelect: note.canSelect,
+                intervalShort: note.intervalShort,
+                intervalLong: note.intervalLong,
                 chord: generateChord(scale, note)
             });
         }
@@ -206,15 +246,15 @@ var music;
     music.chromatic = chromatic;
     function getChordType(triad) {
         // check for diminished
-        if (interval(triad[0], triad[2]) === 6)
+        if (findInterval(triad[0], triad[2]) === 6)
             return ChordType.Diminished;
         // check for minor
-        if (interval(triad[0], triad[1]) === 3)
+        if (findInterval(triad[0], triad[1]) === 3)
             return ChordType.Minor;
         // must be Major
         return ChordType.Major;
     }
-    function interval(a, b) {
+    function findInterval(a, b) {
         return (a <= b) ? b - a : (b + 12) - a;
     }
     function indexIsNatural(index) {
@@ -573,6 +613,7 @@ var gtr;
     var numberOfFrets = 16;
     var fretboardElement = null;
     var isLeftHanded = false;
+    var fretboardLabelType = events.FretboardLabelType.NoteName;
     var stringGap = 40;
     var fretGap = 70;
     var fretWidth = 5;
@@ -594,6 +635,7 @@ var gtr;
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
+        events.fretboardLabelChange.subscribe(handleLabelChange);
     }
     gtr_1.init = init;
     function handleLeftHandedChanged(lhEvent) {
@@ -614,6 +656,33 @@ var gtr;
             noteLabels
                 .attr("transform", function (d, i) { return "translate(0, 0) scale(1, 1)"; })
                 .attr("x", function (d, i) { return (i * fretGap + pad + 30); });
+        }
+    }
+    function handleLabelChange(lcEvent) {
+        this.fretboardLabelType = lcEvent.labelType;
+        setLabels();
+    }
+    function setLabels() {
+        function setNoteName(note) {
+            if (note.scaleNote == null)
+                return "";
+            return note.scaleNote.noteName;
+        }
+        function setInterval(note) {
+            if (note.scaleNote == null)
+                return "";
+            return note.scaleNote.intervalShort;
+        }
+        switch (this.fretboardLabelType) {
+            case events.FretboardLabelType.None:
+                noteLabels.text("");
+                break;
+            case events.FretboardLabelType.NoteName:
+                noteLabels.text(setNoteName);
+                break;
+            case events.FretboardLabelType.Interval:
+                noteLabels.text(setInterval);
+                break;
         }
     }
     function updateFretboard(tuningInfo) {
@@ -728,8 +797,10 @@ var gtr;
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .text(setText)
             .exit()
+            .each(function (d, i) { return d.scaleNote = null; })
             .text("");
         currentState = stateChange;
+        setLabels();
     }
     function allNotesFrom(index, numberOfNotes) {
         var items = [];
@@ -818,6 +889,10 @@ var settings;
         events.leftHandedChange.publish({ isLeftHanded: e.checked });
     }
     settings.onLeftHandedClick = onLeftHandedClick;
+    function onFbNoteTextClick(e) {
+        events.fretboardLabelChange.publish({ labelType: parseInt(e.value) });
+    }
+    settings.onFbNoteTextClick = onFbNoteTextClick;
 })(settings || (settings = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();

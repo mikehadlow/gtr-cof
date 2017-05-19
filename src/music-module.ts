@@ -69,6 +69,8 @@ namespace music {
         readonly chord: Chord;
         readonly noteBase: NoteBase;
         readonly canSelect: boolean;
+        readonly intervalShort: string;
+        readonly intervalLong: string;
         chordNote?: number;
     };
 
@@ -77,6 +79,39 @@ namespace music {
         readonly triad: Triad;
         readonly type: ChordType;
     }
+
+    export interface Interval {
+        readonly short: string;
+        readonly text: string;
+    }
+
+    // https://en.wikipedia.org/wiki/Interval_(music)
+    export let intervals : { [id: string]: Interval } = {};
+    // key is "<scale degree>.<semitones>"
+    intervals["1.0"] = { short: "1", text: "Unison" };
+    intervals["2.0"] = { short: "d2", text: "Diminished Second" };
+    intervals["2.1"] = { short: "m2", text: "Minor Second" };
+    intervals["1.1"] = { short: "A1", text: "Augmented Unison" };
+    intervals["2.2"] = { short: "M2", text: "Major Second" };
+    intervals["3.2"] = { short: "d3", text: "Diminished Third" };
+    intervals["3.3"] = { short: "m3", text: "Minor Third" };
+    intervals["2.3"] = { short: "A2", text: "Augmented Second" };
+    intervals["3.4"] = { short: "M3", text: "Major Third" };
+    intervals["4.4"] = { short: "d4", text: "Diminished Fourth" };
+    intervals["4.5"] = { short: "4", text: "Perfect Fourth" };
+    intervals["3.5"] = { short: "A3", text: "Augmented Third" };
+    intervals["5.6"] = { short: "d5", text: "Diminished Fifth" };
+    intervals["4.6"] = { short: "A4", text: "Augmented Fourth" };
+    intervals["5.7"] = { short: "5", text: "Perfect Fifth" };
+    intervals["6.7"] = { short: "d6", text: "Diminished Sixth" };
+    intervals["6.8"] = { short: "m6", text: "Minor Sixth" };
+    intervals["5.8"] = { short: "A5", text: "Augmented Fifth" };
+    intervals["6.9"] = { short: "M6", text: "Major Sixth" };
+    intervals["7.9"] = { short: "d7", text: "Diminished Seventh" };
+    intervals["7.10"] = { short: "m7", text: "Minor Seventh" };
+    intervals["6.10"] = { short: "A6", text: "Augmented Sixth" };
+    intervals["7.11"] = { short: "M7", text: "Major Seventh" };
+    intervals["8.11"] = { short: "d8", text: "Diminished Octave" };
 
     export function generateScale(noteBase: NoteBase, index: number, mode: Mode): Array<ScaleNote> {
         let scale: Array<ScaleNote> = [];
@@ -93,6 +128,8 @@ namespace music {
             }
             // lookup noteLabel with offset
             let noteLabel: NoteLabel = noteLabels.filter(function (n: NoteLabel) { return n.offset == offset; })[0];
+            // find interval
+            let noteInterval = intervals[(i+1) + "." + findInterval(index, currentIndex)]
             // add new ScaleNote to scale
             scale.push({
                 index: currentIndex,
@@ -100,6 +137,8 @@ namespace music {
                 noteName: currentNoteBase.name + noteLabel.label,
                 noteBase: currentNoteBase,
                 canSelect: Math.abs(offset) < 2,
+                intervalShort: noteInterval.short,
+                intervalLong: noteInterval.text,
                 chord: null
             })
 
@@ -117,6 +156,8 @@ namespace music {
                 noteName: note.noteName,
                 noteBase: note.noteBase,
                 canSelect: note.canSelect,
+                intervalShort: note.intervalShort,
+                intervalLong: note.intervalLong,
                 chord: generateChord(scale, note)
             });
         }
@@ -178,14 +219,14 @@ namespace music {
 
     function getChordType(triad: Triad): ChordType {
         // check for diminished
-        if (interval(triad[0], triad[2]) === 6) return ChordType.Diminished;
+        if (findInterval(triad[0], triad[2]) === 6) return ChordType.Diminished;
         // check for minor
-        if (interval(triad[0], triad[1]) === 3) return ChordType.Minor;
+        if (findInterval(triad[0], triad[1]) === 3) return ChordType.Minor;
         // must be Major
         return ChordType.Major;
     }
 
-    function interval(a: number, b: number): number {
+    function findInterval(a: number, b: number): number {
         return (a <= b) ? b - a : (b + 12) - a;
     }
 
