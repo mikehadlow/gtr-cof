@@ -4,8 +4,9 @@ namespace cof {
     export class NoteCircle {
         noteSegments: d3.Selection<Segment> = null;
         noteText: d3.Selection<Segment> = null;
-        degreeSegments: d3.Selection<Segment> = null;
-        degreeText: d3.Selection<Segment> = null;
+        intervalSegments: d3.Selection<Segment> = null;
+        intervalText: d3.Selection<Segment> = null;
+        chordText: d3.Selection<Segment> = null;
         chordSegments: d3.Selection<Segment> = null;
         chordNotes: d3.Selection<Segment> = null;
         indexer: (x: Segment) => string = (x) => x.index + "";
@@ -13,7 +14,7 @@ namespace cof {
         constructor(svg: d3.Selection<any>, noteIndexes: number[], label: string) {
             let pad = 50;
 
-            let chordRadius = 220;
+            let chordRadius = 240;
             let noteRadius = 200;
             let degreeRadius = 135;
             let innerRadius = 90;
@@ -59,14 +60,14 @@ namespace cof {
                 .text("")
                 .attr("class", "note-segment-text");
 
-            this.degreeSegments = cof.append("g").selectAll("path")
+            this.intervalSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
                 .attr("d", degreeArc)
                 .attr("class", "degree-segment")
 
-            this.degreeText = cof.append("g").selectAll("text")
+            this.intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -88,10 +89,19 @@ namespace cof {
                 .enter()
                 .append("circle")
                 .style("pointer-events", "none")
-                .attr("r", 15)
+                .attr("r", 25)
                 .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
+
+            this.chordText = cof.append("g").selectAll("text")
+                .data(segments, this.indexer)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return chordArc.centroid(x)[0]; })
+                .attr("y", function (x) { return chordArc.centroid(x)[1] + 8; })
+                .text("")
+                .attr("class", "degree-segment-text");
 
             let instance = this;
             events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
@@ -123,13 +133,19 @@ namespace cof {
                 .exit()
                 .text("");
 
-            this.degreeSegments
+            this.intervalSegments
                 .data(data, this.indexer)
                 .attr("class", "degree-segment-selected")
                 .exit()
                 .attr("class", "degree-segment")
 
-            this.degreeText
+            this.intervalText
+                .data(data, this.indexer)
+                .text(function (d, i) { return d.scaleNote.intervalShort; })
+                .exit()
+                .text("");
+
+            this.chordText
                 .data(data, this.indexer)
                 .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
                 .exit()

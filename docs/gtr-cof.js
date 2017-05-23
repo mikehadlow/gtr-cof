@@ -328,13 +328,14 @@ var cof;
         function NoteCircle(svg, noteIndexes, label) {
             this.noteSegments = null;
             this.noteText = null;
-            this.degreeSegments = null;
-            this.degreeText = null;
+            this.intervalSegments = null;
+            this.intervalText = null;
+            this.chordText = null;
             this.chordSegments = null;
             this.chordNotes = null;
             this.indexer = function (x) { return x.index + ""; };
             var pad = 50;
-            var chordRadius = 220;
+            var chordRadius = 240;
             var noteRadius = 200;
             var degreeRadius = 135;
             var innerRadius = 90;
@@ -371,13 +372,13 @@ var cof;
                 .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
                 .text("")
                 .attr("class", "note-segment-text");
-            this.degreeSegments = cof.append("g").selectAll("path")
+            this.intervalSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
                 .attr("d", degreeArc)
                 .attr("class", "degree-segment");
-            this.degreeText = cof.append("g").selectAll("text")
+            this.intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -397,10 +398,18 @@ var cof;
                 .enter()
                 .append("circle")
                 .style("pointer-events", "none")
-                .attr("r", 15)
+                .attr("r", 25)
                 .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
+            this.chordText = cof.append("g").selectAll("text")
+                .data(segments, this.indexer)
+                .enter()
+                .append("text")
+                .attr("x", function (x) { return chordArc.centroid(x)[0]; })
+                .attr("y", function (x) { return chordArc.centroid(x)[1] + 8; })
+                .text("")
+                .attr("class", "degree-segment-text");
             var instance = this;
             events.scaleChange.subscribe(function (stateChange) {
                 instance.update(stateChange);
@@ -427,12 +436,17 @@ var cof;
                 .text(function (d) { return d.scaleNote.noteName; })
                 .exit()
                 .text("");
-            this.degreeSegments
+            this.intervalSegments
                 .data(data, this.indexer)
                 .attr("class", "degree-segment-selected")
                 .exit()
                 .attr("class", "degree-segment");
-            this.degreeText
+            this.intervalText
+                .data(data, this.indexer)
+                .text(function (d, i) { return d.scaleNote.intervalShort; })
+                .exit()
+                .text("");
+            this.chordText
                 .data(data, this.indexer)
                 .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
                 .exit()

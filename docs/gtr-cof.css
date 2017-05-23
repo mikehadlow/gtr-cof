@@ -118,7 +118,7 @@ div {
     stroke: none;
 }
 .chord-segment-dim {
-    fill: red;
+    fill: lightcoral;
     stroke: black;
     stroke-width: 2px;
 }
@@ -137,17 +137,17 @@ div {
     stroke: none;
 }
 .chord-segment-note-root {
-    fill: red;
+    fill: lightcoral;
     stroke: black;
     stroke-width: 2px;
 }
 .chord-segment-note-third {
-    fill: green;
+    fill: lightgreen;
     stroke: black;
     stroke-width: 2px;
 }
 .chord-segment-note-fifth {
-    fill: blue;
+    fill: lightblue;
     stroke: black;
     stroke-width: 2px;
 }
