@@ -196,12 +196,21 @@ namespace cof {
     }
 
     function handleNoteClick(segment: Segment, i: number): void {
-        if (segment.scaleNote.canSelect) {
-            events.tonicChange.publish({
-                newNoteBase: segment.scaleNote.noteBase,
-                index: segment.scaleNote.index
-            });
+        let noteBase: music.NoteBase = segment.scaleNote.noteBase;
+
+        if (Math.abs(segment.scaleNote.offset) > 1) {
+            noteBase = music.noteBases.filter(x => x.index === segment.scaleNote.index)[0];
+
+            if(noteBase === undefined) {
+                noteBase = 
+                    music.noteBases.filter(x => x.index === (segment.scaleNote.index + (segment.scaleNote.offset > 0 ? -1 : 1)))[0];
+            }
         }
+
+        events.tonicChange.publish({
+            newNoteBase: noteBase,
+            index: segment.scaleNote.index
+        });
     }
 
     function handleChordClick(segment: Segment, i: number): void {

@@ -68,7 +68,7 @@ namespace music {
         readonly noteName: string;
         readonly chord: Chord;
         readonly noteBase: NoteBase;
-        readonly canSelect: boolean;
+        readonly offset: number;
         readonly intervalShort: string;
         readonly intervalLong: string;
         chordNote?: number;
@@ -136,7 +136,7 @@ namespace music {
                 degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
                 noteBase: currentNoteBase,
-                canSelect: Math.abs(offset) < 2,
+                offset: offset,
                 intervalShort: noteInterval.short,
                 intervalLong: noteInterval.text,
                 chord: null
@@ -155,7 +155,7 @@ namespace music {
                 degree: note.degree,
                 noteName: note.noteName,
                 noteBase: note.noteBase,
-                canSelect: note.canSelect,
+                offset: note.offset,
                 intervalShort: note.intervalShort,
                 intervalLong: note.intervalLong,
                 chord: generateChord(scale, note)

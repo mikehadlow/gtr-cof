@@ -164,7 +164,7 @@ var music;
                 degree: i,
                 noteName: currentNoteBase.name + noteLabel.label,
                 noteBase: currentNoteBase,
-                canSelect: Math.abs(offset) < 2,
+                offset: offset,
                 intervalShort: noteInterval.short,
                 intervalLong: noteInterval.text,
                 chord: null
@@ -184,7 +184,7 @@ var music;
                 degree: note.degree,
                 noteName: note.noteName,
                 noteBase: note.noteBase,
-                canSelect: note.canSelect,
+                offset: note.offset,
                 intervalShort: note.intervalShort,
                 intervalLong: note.intervalLong,
                 chord: generateChord(scale, note)
@@ -499,12 +499,18 @@ var cof;
         return items;
     }
     function handleNoteClick(segment, i) {
-        if (segment.scaleNote.canSelect) {
-            events.tonicChange.publish({
-                newNoteBase: segment.scaleNote.noteBase,
-                index: segment.scaleNote.index
-            });
+        var noteBase = segment.scaleNote.noteBase;
+        if (Math.abs(segment.scaleNote.offset) > 1) {
+            noteBase = music.noteBases.filter(function (x) { return x.index === segment.scaleNote.index; })[0];
+            if (noteBase === undefined) {
+                noteBase =
+                    music.noteBases.filter(function (x) { return x.index === (segment.scaleNote.index + (segment.scaleNote.offset > 0 ? -1 : 1)); })[0];
+            }
         }
+        events.tonicChange.publish({
+            newNoteBase: noteBase,
+            index: segment.scaleNote.index
+        });
     }
     function handleChordClick(segment, i) {
         events.chordChange.publish({ chordIndex: segment.scaleNote.index });
