@@ -2,13 +2,13 @@
 namespace cof {
 
     export class NoteCircle {
-        noteSegments: d3.Selection<Segment> = null;
-        noteText: d3.Selection<Segment> = null;
-        intervalSegments: d3.Selection<Segment> = null;
-        intervalText: d3.Selection<Segment> = null;
-        chordText: d3.Selection<Segment> = null;
-        chordSegments: d3.Selection<Segment> = null;
-        chordNotes: d3.Selection<Segment> = null;
+        noteSegments: d3.Selection<Segment>;
+        noteText: d3.Selection<Segment>;
+        intervalSegments: d3.Selection<Segment>;
+        intervalText: d3.Selection<Segment>;
+        chordText: d3.Selection<Segment>;
+        chordSegments: d3.Selection<Segment>;
+        chordNotes: d3.Selection<Segment>;
         indexer: (x: Segment) => string = (x) => x.index + "";
 
         constructor(svg: d3.Selection<any>, noteIndexes: number[], label: string) {
@@ -188,7 +188,7 @@ namespace cof {
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                scaleNote: null,
+                scaleNote: music.nullScaleNote,
                 index: fifths[i]
             });
         }

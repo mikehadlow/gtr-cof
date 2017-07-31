@@ -1,11 +1,11 @@
 
 namespace gtr {
 
-    let currentState: events.ScaleChangedEvent = null;
-    let notes: d3.Selection<StringNote> = null;
-    let noteLabels: d3.Selection<StringNote> = null;
+    let currentState: events.ScaleChangedEvent;
+    let notes: d3.Selection<StringNote>;
+    let noteLabels: d3.Selection<StringNote>;
     let numberOfFrets = 16;
-    let fretboardElement: SVGGElement = null;
+    let fretboardElement: SVGGElement;
     let isLeftHanded: boolean = false;
     let fretboardLabelType: events.FretboardLabelType = events.FretboardLabelType.NoteName;
 
@@ -59,8 +59,7 @@ namespace gtr {
     }
 
     function handleLabelChange(lcEvent: events.FretboardLabelChangeEvent) {
-
-        this.fretboardLabelType = lcEvent.labelType;
+        fretboardLabelType = lcEvent.labelType;
         setLabels();
     }
 
@@ -76,7 +75,7 @@ namespace gtr {
             return note.scaleNote.intervalShort;
         }
 
-        switch (this.fretboardLabelType) {
+        switch (fretboardLabelType) {
             case events.FretboardLabelType.None:
                 noteLabels.text("");
                 break;
@@ -217,7 +216,7 @@ namespace gtr {
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .text(setText)
             .exit()
-            .each((d, i) => d.scaleNote = null)
+            .each((d, i) => d.scaleNote = music.nullScaleNote)
             .text("");
 
         currentState = stateChange;
@@ -232,7 +231,7 @@ namespace gtr {
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                scaleNote: null
+                scaleNote: music.nullScaleNote
             });
         }
 

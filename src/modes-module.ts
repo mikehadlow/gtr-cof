@@ -1,7 +1,7 @@
 
 namespace modes {
 
-    let buttons: d3.Selection<music.Mode> = null;
+    let buttons: d3.Selection<music.Mode>;
 
     export function init(): void {
         let pad = 5;

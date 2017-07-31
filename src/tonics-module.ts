@@ -1,7 +1,7 @@
 
 namespace tonics {
 
-    let buttons: d3.Selection<ButtonData> = null;
+    let buttons: d3.Selection<ButtonData>;
 
     interface ButtonData {
         readonly noteBase: music.NoteBase;

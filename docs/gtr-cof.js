@@ -1,3 +1,39 @@
+"use strict";
+var mod;
+(function (mod) {
+    var Mod = (function () {
+        function Mod(items) {
+            this.size = 0;
+            this.start = 0;
+            this.items = items;
+            this.size = items.length;
+        }
+        Mod.prototype.setStart = function (start) {
+            this.start = start % this.size;
+        };
+        Mod.prototype.itemAt = function (index) {
+            return this.items[(this.start + index) % this.size];
+        };
+        Mod.prototype.diff = function (a, b) {
+            var ax = a % this.size;
+            var bx = b % this.size;
+            if (ax == bx)
+                return 0;
+            var d1 = bx - ax;
+            var d2 = 0;
+            if (d1 > 0) {
+                d2 = -((ax + this.size) - bx);
+            }
+            else {
+                d2 = (bx + this.size) - ax;
+            }
+            return Math.abs(d1) > Math.abs(d2) ? d2 : d1;
+        };
+        return Mod;
+    }());
+    mod.Mod = Mod;
+})(mod || (mod = {}));
+var modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
 var events;
 (function (events) {
     var Bus = (function () {
@@ -116,6 +152,27 @@ var music;
     })(ChordType = music.ChordType || (music.ChordType = {}));
     ;
     ;
+    var nullChord = {
+        romanNumeral: "",
+        triad: [0, 0, 0],
+        type: ChordType.Major
+    };
+    music.nullScaleNote = {
+        index: 0,
+        degree: 0,
+        noteName: "",
+        chord: nullChord,
+        noteBase: {
+            id: 0,
+            index: 0,
+            name: ""
+        },
+        offset: 0,
+        intervalShort: "",
+        intervalLong: ""
+    };
+    ;
+    ;
     // https://en.wikipedia.org/wiki/Interval_(music)
     music.intervals = {};
     // key is "<scale degree>.<semitones>"
@@ -167,7 +224,7 @@ var music;
                 offset: offset,
                 intervalShort: noteInterval.short,
                 intervalLong: noteInterval.text,
-                chord: null
+                chord: nullChord
             });
             var interval = scaleTones[(mode.index + i) % 7];
             currentIndex = (currentIndex + interval) % 12;
@@ -326,13 +383,6 @@ var cof;
 (function (cof_1) {
     var NoteCircle = (function () {
         function NoteCircle(svg, noteIndexes, label) {
-            this.noteSegments = null;
-            this.noteText = null;
-            this.intervalSegments = null;
-            this.intervalText = null;
-            this.chordText = null;
-            this.chordSegments = null;
-            this.chordNotes = null;
             this.indexer = function (x) { return x.index + ""; };
             var pad = 50;
             var chordRadius = 240;
@@ -492,7 +542,7 @@ var cof;
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                scaleNote: null,
+                scaleNote: music.nullScaleNote,
                 index: fifths[i]
             });
         }
@@ -518,7 +568,7 @@ var cof;
 })(cof || (cof = {}));
 var tonics;
 (function (tonics_1) {
-    var buttons = null;
+    var buttons;
     ;
     function bg(noteBase) {
         var flatIndex = noteBase.index == 0 ? 11 : noteBase.index - 1;
@@ -585,7 +635,7 @@ var tonics;
 })(tonics || (tonics = {}));
 var modes;
 (function (modes_1) {
-    var buttons = null;
+    var buttons;
     function init() {
         var pad = 5;
         var buttonHeight = 25;
@@ -627,11 +677,11 @@ var modes;
 })(modes || (modes = {}));
 var gtr;
 (function (gtr_1) {
-    var currentState = null;
-    var notes = null;
-    var noteLabels = null;
+    var currentState;
+    var notes;
+    var noteLabels;
     var numberOfFrets = 16;
-    var fretboardElement = null;
+    var fretboardElement;
     var isLeftHanded = false;
     var fretboardLabelType = events.FretboardLabelType.NoteName;
     var stringGap = 40;
@@ -679,7 +729,7 @@ var gtr;
         }
     }
     function handleLabelChange(lcEvent) {
-        this.fretboardLabelType = lcEvent.labelType;
+        fretboardLabelType = lcEvent.labelType;
         setLabels();
     }
     function setLabels() {
@@ -693,7 +743,7 @@ var gtr;
                 return "";
             return note.scaleNote.intervalShort;
         }
-        switch (this.fretboardLabelType) {
+        switch (fretboardLabelType) {
             case events.FretboardLabelType.None:
                 noteLabels.text("");
                 break;
@@ -817,7 +867,7 @@ var gtr;
             .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
             .text(setText)
             .exit()
-            .each(function (d, i) { return d.scaleNote = null; })
+            .each(function (d, i) { return d.scaleNote = music.nullScaleNote; })
             .text("");
         currentState = stateChange;
         setLabels();
@@ -828,7 +878,7 @@ var gtr;
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                scaleNote: null
+                scaleNote: music.nullScaleNote
             });
         }
         return items;

@@ -74,16 +74,37 @@ namespace music {
         chordNote?: number;
     };
 
+    let nullChord: Chord = {
+        romanNumeral: "",
+        triad: [0, 0, 0],
+        type: ChordType.Major
+    };
+
+    export let nullScaleNote: ScaleNote = {
+        index: 0,
+        degree: 0,
+        noteName: "",
+        chord: nullChord,
+        noteBase: {
+            id: 0,
+            index: 0,
+            name: ""
+        },
+        offset: 0,
+        intervalShort: "",
+        intervalLong: ""
+    };
+
     export interface Chord {
         readonly romanNumeral: string;
         readonly triad: Triad;
         readonly type: ChordType;
-    }
+    };
 
     export interface Interval {
         readonly short: string;
         readonly text: string;
-    }
+    };
 
     // https://en.wikipedia.org/wiki/Interval_(music)
     export let intervals : { [id: string]: Interval } = {};
@@ -139,7 +160,7 @@ namespace music {
                 offset: offset,
                 intervalShort: noteInterval.short,
                 intervalLong: noteInterval.text,
-                chord: null
+                chord: nullChord
             })
 
             let interval = scaleTones[(mode.index + i) % 7];

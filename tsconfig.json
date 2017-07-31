@@ -1,15 +1,18 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "module": "commonjs",
+        "strict": true,
+        "module": "none",
         "sourceMap": true,
         "outDir": "docs",
         "outFile": "docs/gtr-cof.js",
         "types": []
     },
     "files": [
+        "src/mod-module.ts",
         "src/events-module.ts",
         "src/cookie-module.ts",
+        "src/music2-module.ts",
         "src/music-module.ts",
         "src/state-module.ts",
         "src/cof-module.ts",
