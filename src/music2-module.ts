@@ -81,17 +81,17 @@ namespace music2 {
 
     export interface Mode {
         readonly name: string;
-        readonly diatonicOffset: number;
+        readonly index: number;
     };
 
     export let modes: Array<Mode> = [
-        { name: 'Lydian', diatonicOffset: 5 },
-        { name: 'Major / Ionian', diatonicOffset: 0 },
-        { name: 'Mixolydian', diatonicOffset: 7 },
-        { name: 'Dorian', diatonicOffset: 2 },
-        { name: 'N Minor / Aeolian', diatonicOffset: 9 },
-        { name: 'Phrygian', diatonicOffset: 4 },
-        { name: 'Locrian', diatonicOffset: 11 },
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
     ];
 
     export interface ScaleNote {
@@ -102,25 +102,46 @@ namespace music2 {
         readonly isScaleNote: boolean;
         readonly noteNumber: number;
         readonly diatonicOffset: number;
+        chordNumber?: string;
     };
+
+    export interface ScaleNoteWithChordNumbers extends ScaleNote {
+        readonly chordNumber: string;
+    }
 
     export interface Node {
         readonly scaleNote: ScaleNote;
         readonly chordInterval: Interval;
     }
 
+
+    export function generateScaleShim(noteBase: music.NoteBase, index: number, mode: music.Mode): Node[] {
+        let note = (noteBase.index + 3) % 12;
+        let newIndex = (index + 3) % 12;
+        let newMode = modes.filter(x => x.name === mode.name)[0];
+
+        let scale = generateScale(newIndex, note, newMode);
+
+        console.log(scale.filter(x => x.isScaleNote).map(x => x.label + " ").join())
+
+        let chordNumbers = generateChordNumbers(scale);
+        mod.zip(scale, chordNumbers).forEach(x => x[0].chordNumber = x[1]);
+        return generateNodes(scale);
+    }
+
     export function generateScale(index: number, note: NoteName, mode: Mode): ScaleNote[] {
         let scale: ScaleNote[] = [];
         indexList.setStart(index);
-        diatonic.setStart(mode.diatonicOffset);        
+        diatonic.setStart(mode.index);        
         noteList.setStart(noteIndex[note]);
         intervals.setStart(0);
         let workingSet = indexList.merge3(buildScaleCounter(diatonic.toArray()), intervals.toArray());
 
-        let getLabel = (index:number, noteIndex:number) => {
-            let offset = mod.diff(12, noteList.itemAt(noteIndex), index);
+        let getLabel = (index:number, noteNum:number) => {
+            let noteIndex = noteList.itemAt(noteNum);
+            let offset = mod.diff(12, noteIndex, index);
             let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
-            return NoteName[noteList.itemAt(noteIndex)] + noteLabel.label;
+            return NoteName[noteList.itemAt(noteNum)] + noteLabel.label;
         }
 
         return workingSet.map(item => {
@@ -144,27 +165,14 @@ namespace music2 {
                 intervalName: getIntervalName(activeInterval),
                 isScaleNote: isScaleNote,
                 noteNumber: noteNumber,
-                diatonicOffset: mode.diatonicOffset
+                diatonicOffset: mode.index
             };
-        });
-    }
-
-    export function buildScaleCounter(diatonic: boolean[], startAt:number = 0): [boolean, number][] {
-        let noteCount = diatonic.filter(x => x).length;
-        let i=(noteCount - startAt) % noteCount;
-        return diatonic.map(isNote => {
-            if(isNote) {
-                let value = <[boolean, number]>[true, i];
-                i = (i+1) % noteCount;
-                return value;
-            }
-            return <[boolean, number]>[false, 0];
         });
     }
 
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    export function generateNodes(scaleNotes: ScaleNote[], chordIndex: number): Node[] {
+    export function generateNodes(scaleNotes: ScaleNote[], chordIndex: number = 0): Node[] {
         let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].index) % 12;
         intervals.setStart(12 - chordIndexOffset);
         diatonic.setStart(scaleNotes[0].diatonicOffset);
@@ -190,6 +198,19 @@ namespace music2 {
                 scaleNote: scaleNote,
                 chordInterval: activeInterval
             };
+        });
+    }
+
+    function buildScaleCounter(diatonic: boolean[], startAt:number = 0): [boolean, number][] {
+        let noteCount = diatonic.filter(x => x).length;
+        let i=(noteCount - startAt) % noteCount;
+        return diatonic.map(isNote => {
+            if(isNote) {
+                let value = <[boolean, number]>[true, i];
+                i = (i+1) % noteCount;
+                return value;
+            }
+            return <[boolean, number]>[false, 0];
         });
     }
 

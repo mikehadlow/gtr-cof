@@ -23,29 +23,29 @@ var mod;
         };
         Mod.prototype.merge = function (items) {
             var theseItems = this.toArray();
-            if (theseItems.length != items.length) {
-                throw "Cannot merge arrays of different lengths";
-            }
-            var mergedItems = [];
-            for (var i = 0; i < theseItems.length; i++) {
-                mergedItems.push([theseItems[i], items[i]]);
-            }
-            return mergedItems;
+            return zip(theseItems, items);
         };
         Mod.prototype.merge3 = function (items2, items3) {
             var theseItems = this.toArray();
-            if (theseItems.length != items2.length) {
-                throw "Cannot merge arrays of different lengths";
-            }
-            var mergedItems = [];
-            for (var i = 0; i < theseItems.length; i++) {
-                mergedItems.push([theseItems[i], items2[i], items3[i]]);
-            }
-            return mergedItems;
+            return zip3(theseItems, items2, items3);
         };
         return Mod;
     }());
     mod.Mod = Mod;
+    function zip(a, b) {
+        if (a.length != b.length) {
+            throw "Cannot merge arrays of different lengths";
+        }
+        return a.map(function (x, i) { return [x, b[i]]; });
+    }
+    mod.zip = zip;
+    function zip3(a, b, c) {
+        if (a.length != b.length || a.length != c.length) {
+            throw "Cannot merge arrays of different lengths";
+        }
+        return a.map(function (x, i) { return [x, b[i], c[i]]; });
+    }
+    mod.zip3 = zip3;
     function diff(size, a, b) {
         var ax = a % size;
         var bx = b % size;
@@ -213,26 +213,38 @@ var music2;
     ];
     ;
     music2.modes = [
-        { name: 'Lydian', diatonicOffset: 5 },
-        { name: 'Major / Ionian', diatonicOffset: 0 },
-        { name: 'Mixolydian', diatonicOffset: 7 },
-        { name: 'Dorian', diatonicOffset: 2 },
-        { name: 'N Minor / Aeolian', diatonicOffset: 9 },
-        { name: 'Phrygian', diatonicOffset: 4 },
-        { name: 'Locrian', diatonicOffset: 11 },
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
     ];
     ;
+    function generateScaleShim(noteBase, index, mode) {
+        var note = (noteBase.index + 3) % 12;
+        var newIndex = (index + 3) % 12;
+        var newMode = music2.modes.filter(function (x) { return x.name === mode.name; })[0];
+        var scale = generateScale(newIndex, note, newMode);
+        console.log(scale.filter(function (x) { return x.isScaleNote; }).map(function (x) { return x.label + " "; }).join());
+        var chordNumbers = generateChordNumbers(scale);
+        mod.zip(scale, chordNumbers).forEach(function (x) { return x[0].chordNumber = x[1]; });
+        return generateNodes(scale);
+    }
+    music2.generateScaleShim = generateScaleShim;
     function generateScale(index, note, mode) {
         var scale = [];
         music2.indexList.setStart(index);
-        music2.diatonic.setStart(mode.diatonicOffset);
+        music2.diatonic.setStart(mode.index);
         music2.noteList.setStart(music2.noteIndex[note]);
         music2.intervals.setStart(0);
         var workingSet = music2.indexList.merge3(buildScaleCounter(music2.diatonic.toArray()), music2.intervals.toArray());
-        var getLabel = function (index, noteIndex) {
-            var offset = mod.diff(12, music2.noteList.itemAt(noteIndex), index);
+        var getLabel = function (index, noteNum) {
+            var noteIndex = music2.noteList.itemAt(noteNum);
+            var offset = mod.diff(12, noteIndex, index);
             var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
-            return NoteName[music2.noteList.itemAt(noteIndex)] + noteLabel.label;
+            return NoteName[music2.noteList.itemAt(noteNum)] + noteLabel.label;
         };
         return workingSet.map(function (item) {
             var index = item[0];
@@ -253,28 +265,15 @@ var music2;
                 intervalName: music2.getIntervalName(activeInterval),
                 isScaleNote: isScaleNote,
                 noteNumber: noteNumber,
-                diatonicOffset: mode.diatonicOffset
+                diatonicOffset: mode.index
             };
         });
     }
     music2.generateScale = generateScale;
-    function buildScaleCounter(diatonic, startAt) {
-        if (startAt === void 0) { startAt = 0; }
-        var noteCount = diatonic.filter(function (x) { return x; }).length;
-        var i = (noteCount - startAt) % noteCount;
-        return diatonic.map(function (isNote) {
-            if (isNote) {
-                var value = [true, i];
-                i = (i + 1) % noteCount;
-                return value;
-            }
-            return [false, 0];
-        });
-    }
-    music2.buildScaleCounter = buildScaleCounter;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
     function generateNodes(scaleNotes, chordIndex) {
+        if (chordIndex === void 0) { chordIndex = 0; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].index) % 12;
         music2.intervals.setStart(12 - chordIndexOffset);
         music2.diatonic.setStart(scaleNotes[0].diatonicOffset);
@@ -298,6 +297,19 @@ var music2;
         });
     }
     music2.generateNodes = generateNodes;
+    function buildScaleCounter(diatonic, startAt) {
+        if (startAt === void 0) { startAt = 0; }
+        var noteCount = diatonic.filter(function (x) { return x; }).length;
+        var i = (noteCount - startAt) % noteCount;
+        return diatonic.map(function (isNote) {
+            if (isNote) {
+                var value = [true, i];
+                i = (i + 1) % noteCount;
+                return value;
+            }
+            return [false, 0];
+        });
+    }
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
     function generateChordNumbers(scaleNotes) {
         return scaleNotes.map(function (scaleNote, i) {
@@ -589,6 +601,7 @@ var state;
     }
     function updateScale() {
         var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
+        var nodes = music2.generateScaleShim(currentNoteBase, currentIndex, currentMode);
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
         }

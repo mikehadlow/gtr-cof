@@ -29,29 +29,27 @@ namespace mod {
 
         merge<U>(items: U[]): [T, U][] {
             let theseItems: T[] = this.toArray();
-            if(theseItems.length != items.length) {
-                throw "Cannot merge arrays of different lengths";
-            }
-            
-            let mergedItems: [T, U][] = [];
-            for(let i=0; i<theseItems.length; i++) {
-                mergedItems.push([theseItems[i], items[i]]);
-            }
-            return mergedItems;
+            return zip(theseItems, items);
         }
 
         merge3<U, V>(items2: U[], items3: V[]): [T, U, V][] {
             let theseItems: T[] = this.toArray();
-            if(theseItems.length != items2.length) {
-                throw "Cannot merge arrays of different lengths";
-            }
-            
-            let mergedItems: [T, U, V][] = [];
-            for(let i=0; i<theseItems.length; i++) {
-                mergedItems.push([theseItems[i], items2[i], items3[i]]);
-            }
-            return mergedItems;
+            return zip3(theseItems, items2, items3);
         }
+    }
+
+    export function zip<A, B>(a:A[], b:B[]): [A,B][] {
+        if(a.length != b.length) {
+            throw "Cannot merge arrays of different lengths";
+        }
+        return a.map((x, i) => <[A,B]>[x, b[i]]);
+    }
+
+    export function zip3<A, B, C>(a:A[], b:B[], c:C[]): [A,B,C][] {
+        if(a.length != b.length || a.length != c.length) {
+            throw "Cannot merge arrays of different lengths";
+        }
+        return a.map((x, i) => <[A,B,C]>[x, b[i], c[i]]);
     }
 
     export function diff(size: number, a: number, b: number) : number {

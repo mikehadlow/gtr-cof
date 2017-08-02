@@ -55,6 +55,7 @@ namespace state {
 
     function updateScale(): void {
         let scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
+        let nodes = music2.generateScaleShim(currentNoteBase, currentIndex, currentMode);
 
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
