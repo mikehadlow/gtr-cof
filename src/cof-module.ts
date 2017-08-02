@@ -103,10 +103,53 @@ namespace cof {
                 .text("")
                 .attr("class", "degree-segment-text");
 
-            let instance = this;
-            events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
-                instance.update(stateChange);
-            });
+            // let instance = this;
+            // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
+            //     instance.update(stateChange);
+            // });
+
+            events.scaleChange2.subscribe(scaleChnaged => this.update2(scaleChnaged));
+        }
+
+        update2(scaleChnaged: events.ScaleChangedEvent2): void {
+            let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
+                    startAngle: 0,
+                    endAngle: 0,
+                    scaleNote: {},
+                    index: node.scaleNote.index,
+                    node: node
+                });
+
+            this.noteSegments
+                .data(data, this.indexer)
+                .attr("class", (d, i) => "note-segment " + 
+                    (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""));
+
+            this.noteText
+                .data(data, this.indexer)
+                .text(d => d.node.scaleNote.label);
+
+            this.intervalSegments
+                .data(data, this.indexer)
+                .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment");
+
+            this.intervalText
+                .data(data, this.indexer)
+                .text(d => d.node.scaleNote.intervalName);
+
+            this.chordText
+                .data(data, this.indexer)
+                .text(d => d.node.scaleNote.chordNumber + "");
+
+            this.chordSegments
+                .data(data, this.indexer)
+                //.attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.scaleNote) : "chord-segment");
+                .attr("class", "chord-segment");
+
+            this.chordNotes
+                .data(data, this.indexer)
+                //.attr("class", d => d.node.scaleNote.isScaleNote ? getChordNoteClass(d.scaleNote) : "chord-segment-note");
+                .attr("chord-segment-note");
         }
 
         update(stateChange: events.ScaleChangedEvent): void {
@@ -117,7 +160,8 @@ namespace cof {
                     startAngle: 0,
                     endAngle: 0,
                     scaleNote: n,
-                    index: n.index
+                    index: n.index,
+                    node: music2.nullNode
                 });
             }
 
@@ -189,7 +233,8 @@ namespace cof {
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 scaleNote: music.nullScaleNote,
-                index: fifths[i]
+                index: fifths[i],
+                node: music2.nullNode
             });
         }
         return items;
@@ -222,5 +267,6 @@ namespace cof {
         readonly endAngle: number;
         readonly scaleNote: music.ScaleNote;
         readonly index: number;
+        readonly node: music2.Node;
     }
 }

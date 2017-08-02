@@ -114,6 +114,25 @@ namespace music2 {
         readonly chordInterval: Interval;
     }
 
+    export let nullNode: Node = {
+        scaleNote: {
+            chordNumber: "",
+            diatonicOffset: 0,
+            index: 0,
+            interval: {
+                ord: 0,
+                type: 0
+            },
+            intervalName: "",
+            isScaleNote: false,
+            label: "",
+            noteNumber: 0
+        },
+        chordInterval: {
+            ord: 0,
+            type: 0
+        }
+    };
 
     export function generateScaleShim(noteBase: music.NoteBase, index: number, mode: music.Mode): Node[] {
         let note = (noteBase.index + 3) % 12;

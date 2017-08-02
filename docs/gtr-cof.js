@@ -223,6 +223,25 @@ var music2;
         { name: 'Locrian', index: 11 },
     ];
     ;
+    music2.nullNode = {
+        scaleNote: {
+            chordNumber: "",
+            diatonicOffset: 0,
+            index: 0,
+            interval: {
+                ord: 0,
+                type: 0
+            },
+            intervalName: "",
+            isScaleNote: false,
+            label: "",
+            noteNumber: 0
+        },
+        chordInterval: {
+            ord: 0,
+            type: 0
+        }
+    };
     function generateScaleShim(noteBase, index, mode) {
         var note = (noteBase.index + 3) % 12;
         var newIndex = (index + 3) % 12;
@@ -622,6 +641,7 @@ var cof;
 (function (cof_1) {
     var NoteCircle = (function () {
         function NoteCircle(svg, noteIndexes, label) {
+            var _this = this;
             this.indexer = function (x) { return x.index + ""; };
             var pad = 50;
             var chordRadius = 240;
@@ -699,11 +719,43 @@ var cof;
                 .attr("y", function (x) { return chordArc.centroid(x)[1] + 8; })
                 .text("")
                 .attr("class", "degree-segment-text");
-            var instance = this;
-            events.scaleChange.subscribe(function (stateChange) {
-                instance.update(stateChange);
-            });
+            // let instance = this;
+            // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
+            //     instance.update(stateChange);
+            // });
+            events.scaleChange2.subscribe(function (scaleChnaged) { return _this.update2(scaleChnaged); });
         }
+        NoteCircle.prototype.update2 = function (scaleChnaged) {
+            var data = scaleChnaged.nodes.map(function (node) { return ({
+                startAngle: 0,
+                endAngle: 0,
+                scaleNote: {},
+                index: node.scaleNote.index,
+                node: node
+            }); });
+            this.noteSegments
+                .data(data, this.indexer)
+                .attr("class", function (d, i) { return "note-segment " +
+                (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""); });
+            this.noteText
+                .data(data, this.indexer)
+                .text(function (d) { return d.node.scaleNote.label; });
+            this.intervalSegments
+                .data(data, this.indexer)
+                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment"; });
+            this.intervalText
+                .data(data, this.indexer)
+                .text(function (d) { return d.node.scaleNote.intervalName; });
+            this.chordText
+                .data(data, this.indexer)
+                .text(function (d) { return d.node.scaleNote.chordNumber + ""; });
+            this.chordSegments
+                .data(data, this.indexer)
+                .attr("class", "chord-segment");
+            this.chordNotes
+                .data(data, this.indexer)
+                .attr("chord-segment-note");
+        };
         NoteCircle.prototype.update = function (stateChange) {
             var data = [];
             for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
@@ -712,7 +764,8 @@ var cof;
                     startAngle: 0,
                     endAngle: 0,
                     scaleNote: n,
-                    index: n.index
+                    index: n.index,
+                    node: music2.nullNode
                 });
             }
             this.noteSegments
@@ -782,7 +835,8 @@ var cof;
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 scaleNote: music.nullScaleNote,
-                index: fifths[i]
+                index: fifths[i],
+                node: music2.nullNode
             });
         }
         return items;
