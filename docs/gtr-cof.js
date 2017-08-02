@@ -14,24 +14,54 @@ var mod;
         Mod.prototype.itemAt = function (index) {
             return this.items[(this.start + index) % this.size];
         };
-        Mod.prototype.diff = function (a, b) {
-            var ax = a % this.size;
-            var bx = b % this.size;
-            if (ax == bx)
-                return 0;
-            var d1 = bx - ax;
-            var d2 = 0;
-            if (d1 > 0) {
-                d2 = -((ax + this.size) - bx);
+        Mod.prototype.toArray = function () {
+            var newArray = [];
+            for (var i = 0; i < this.size; i++) {
+                newArray.push(this.items[(i + this.start) % this.size]);
             }
-            else {
-                d2 = (bx + this.size) - ax;
+            return newArray;
+        };
+        Mod.prototype.merge = function (items) {
+            var theseItems = this.toArray();
+            if (theseItems.length != items.length) {
+                throw "Cannot merge arrays of different lengths";
             }
-            return Math.abs(d1) > Math.abs(d2) ? d2 : d1;
+            var mergedItems = [];
+            for (var i = 0; i < theseItems.length; i++) {
+                mergedItems.push([theseItems[i], items[i]]);
+            }
+            return mergedItems;
+        };
+        Mod.prototype.merge3 = function (items2, items3) {
+            var theseItems = this.toArray();
+            if (theseItems.length != items2.length) {
+                throw "Cannot merge arrays of different lengths";
+            }
+            var mergedItems = [];
+            for (var i = 0; i < theseItems.length; i++) {
+                mergedItems.push([theseItems[i], items2[i], items3[i]]);
+            }
+            return mergedItems;
         };
         return Mod;
     }());
     mod.Mod = Mod;
+    function diff(size, a, b) {
+        var ax = a % size;
+        var bx = b % size;
+        if (ax == bx)
+            return 0;
+        var d1 = bx - ax;
+        var d2 = 0;
+        if (d1 > 0) {
+            d2 = -((ax + size) - bx);
+        }
+        else {
+            d2 = (bx + size) - ax;
+        }
+        return Math.abs(d1) > Math.abs(d2) ? d2 : d1;
+    }
+    mod.diff = diff;
 })(mod || (mod = {}));
 var modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
 var events;
@@ -107,6 +137,198 @@ var cookies;
     }
     cookies.readCookie = readCookie;
 })(cookies || (cookies = {}));
+var music2;
+(function (music2) {
+    var IntervalType;
+    (function (IntervalType) {
+        IntervalType[IntervalType["Nat"] = 0] = "Nat";
+        IntervalType[IntervalType["Maj"] = 1] = "Maj";
+        IntervalType[IntervalType["Min"] = 2] = "Min";
+        IntervalType[IntervalType["Aug"] = 3] = "Aug";
+        IntervalType[IntervalType["Dim"] = 4] = "Dim";
+    })(IntervalType = music2.IntervalType || (music2.IntervalType = {}));
+    ;
+    music2.intervalName = {};
+    music2.intervalName[IntervalType.Nat] = "";
+    music2.intervalName[IntervalType.Maj] = "M";
+    music2.intervalName[IntervalType.Min] = "m";
+    music2.intervalName[IntervalType.Aug] = "A";
+    music2.intervalName[IntervalType.Dim] = "d";
+    ;
+    music2.getIntervalName = function (interval) { return music2.intervalName[interval.type] + (interval.ord + 1); };
+    music2.intervals = new mod.Mod([
+        [{ ord: 0, type: IntervalType.Nat }, { ord: 1, type: IntervalType.Dim }],
+        [{ ord: 1, type: IntervalType.Min }, { ord: 0, type: IntervalType.Aug }],
+        [{ ord: 1, type: IntervalType.Maj }, { ord: 2, type: IntervalType.Dim }],
+        [{ ord: 2, type: IntervalType.Min }, { ord: 1, type: IntervalType.Aug }],
+        [{ ord: 2, type: IntervalType.Maj }, { ord: 3, type: IntervalType.Dim }],
+        [{ ord: 3, type: IntervalType.Nat }, { ord: 2, type: IntervalType.Aug }],
+        [{ ord: 4, type: IntervalType.Dim }, { ord: 3, type: IntervalType.Aug }],
+        [{ ord: 4, type: IntervalType.Nat }, { ord: 5, type: IntervalType.Dim }],
+        [{ ord: 5, type: IntervalType.Min }, { ord: 4, type: IntervalType.Aug }],
+        [{ ord: 5, type: IntervalType.Maj }, { ord: 6, type: IntervalType.Dim }],
+        [{ ord: 6, type: IntervalType.Min }, { ord: 5, type: IntervalType.Aug }],
+        [{ ord: 6, type: IntervalType.Maj }, { ord: 0, type: IntervalType.Dim }],
+    ]);
+    // root diatonic scale is major
+    music2.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
+    music2.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    // fixed index:
+    // 0  1  2  3  4  5  6  7  8  9  10 11 
+    // A     B  C     D     E  F     G
+    var NoteName;
+    (function (NoteName) {
+        NoteName[NoteName["A"] = 0] = "A";
+        NoteName[NoteName["B"] = 2] = "B";
+        NoteName[NoteName["C"] = 3] = "C";
+        NoteName[NoteName["D"] = 5] = "D";
+        NoteName[NoteName["E"] = 7] = "E";
+        NoteName[NoteName["F"] = 8] = "F";
+        NoteName[NoteName["G"] = 10] = "G";
+    })(NoteName = music2.NoteName || (music2.NoteName = {}));
+    ;
+    music2.noteList = new mod.Mod([
+        NoteName.A,
+        NoteName.B,
+        NoteName.C,
+        NoteName.D,
+        NoteName.E,
+        NoteName.F,
+        NoteName.G,
+    ]);
+    music2.noteIndex = [];
+    music2.noteIndex[NoteName.A] = 0;
+    music2.noteIndex[NoteName.B] = 1;
+    music2.noteIndex[NoteName.C] = 2;
+    music2.noteIndex[NoteName.D] = 3;
+    music2.noteIndex[NoteName.E] = 4;
+    music2.noteIndex[NoteName.F] = 5;
+    music2.noteIndex[NoteName.G] = 6;
+    var noteLabels = [
+        { offset: 0, label: '' },
+        { offset: 1, label: '♯' },
+        { offset: 2, label: 'x' },
+        { offset: -1, label: '♭' },
+        { offset: -2, label: '♭♭' },
+    ];
+    ;
+    music2.modes = [
+        { name: 'Lydian', diatonicOffset: 5 },
+        { name: 'Major / Ionian', diatonicOffset: 0 },
+        { name: 'Mixolydian', diatonicOffset: 7 },
+        { name: 'Dorian', diatonicOffset: 2 },
+        { name: 'N Minor / Aeolian', diatonicOffset: 9 },
+        { name: 'Phrygian', diatonicOffset: 4 },
+        { name: 'Locrian', diatonicOffset: 11 },
+    ];
+    ;
+    function generateScale(index, note, mode) {
+        var scale = [];
+        music2.indexList.setStart(index);
+        music2.diatonic.setStart(mode.diatonicOffset);
+        music2.noteList.setStart(music2.noteIndex[note]);
+        music2.intervals.setStart(0);
+        var workingSet = music2.indexList.merge3(buildScaleCounter(music2.diatonic.toArray()), music2.intervals.toArray());
+        var getLabel = function (index, noteIndex) {
+            var offset = mod.diff(12, music2.noteList.itemAt(noteIndex), index);
+            var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
+            return NoteName[music2.noteList.itemAt(noteIndex)] + noteLabel.label;
+        };
+        return workingSet.map(function (item) {
+            var index = item[0];
+            var isScaleNote = item[1][0];
+            var noteNumber = item[1][1];
+            var activeInterval = isScaleNote
+                ? item[2].filter(function (x) { return x.ord == noteNumber; })[0]
+                : item[2][0];
+            var label = isScaleNote
+                ? getLabel(index, noteNumber)
+                : getLabel(index, activeInterval.ord);
+            // console.log("index: " + index + ", isScaleNote: " + isScaleNote + ", scaleCounter: " 
+            //     + noteNumber + ", label: " + label + ", interval: " + getIntervalName(activeInterval))
+            return {
+                index: index,
+                label: label,
+                interval: activeInterval,
+                intervalName: music2.getIntervalName(activeInterval),
+                isScaleNote: isScaleNote,
+                noteNumber: noteNumber,
+                diatonicOffset: mode.diatonicOffset
+            };
+        });
+    }
+    music2.generateScale = generateScale;
+    function buildScaleCounter(diatonic, startAt) {
+        if (startAt === void 0) { startAt = 0; }
+        var noteCount = diatonic.filter(function (x) { return x; }).length;
+        var i = (noteCount - startAt) % noteCount;
+        return diatonic.map(function (isNote) {
+            if (isNote) {
+                var value = [true, i];
+                i = (i + 1) % noteCount;
+                return value;
+            }
+            return [false, 0];
+        });
+    }
+    music2.buildScaleCounter = buildScaleCounter;
+    // generateNodes creates an 'outer' sliding interval ring that can change with
+    // chord selections.
+    function generateNodes(scaleNotes, chordIndex) {
+        var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].index) % 12;
+        music2.intervals.setStart(12 - chordIndexOffset);
+        music2.diatonic.setStart(scaleNotes[0].diatonicOffset);
+        var startAt = scaleNotes.filter(function (x) { return x.index === chordIndex; })[0].noteNumber;
+        var workingSet = music2.intervals.merge3(scaleNotes, buildScaleCounter(music2.diatonic.toArray(), startAt));
+        return workingSet.map(function (item) {
+            var chordIntervalCandidates = item[0];
+            var scaleNote = item[1];
+            var scaleCounter = item[2];
+            var activeInterval = scaleNote.isScaleNote
+                ? chordIntervalCandidates.filter(function (x) { return x.ord === scaleCounter[1]; })[0]
+                : chordIntervalCandidates[0];
+            // console.log("index: " + scaleNote.index + ", isScaleNote: " + scaleNote.isScaleNote +
+            //     ", note: " + scaleNote.label + ", interval: " + scaleNote.intervalName + " -> " + 
+            //     getIntervalName(activeInterval) +
+            //     ", scaleCount: " + scaleNote.noteNumber + " -> " + scaleCounter[1]);
+            return {
+                scaleNote: scaleNote,
+                chordInterval: activeInterval
+            };
+        });
+    }
+    music2.generateNodes = generateNodes;
+    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    function generateChordNumbers(scaleNotes) {
+        return scaleNotes.map(function (scaleNote, i) {
+            if (scaleNote.isScaleNote) {
+                var roman = romanNumeral[scaleNote.noteNumber];
+                var nodes = generateNodes(scaleNotes, scaleNote.index);
+                var diminished = "";
+                var seventh = "";
+                // does it have a diminished 5th?
+                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim; })) {
+                    diminished = "°";
+                }
+                // does it have a major 3rd?
+                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj; })) {
+                    roman = roman.toLocaleUpperCase();
+                }
+                // does it have a natural 7th?
+                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min; })) {
+                    seventh = "7";
+                }
+                // does it have a major 7th?
+                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj; })) {
+                    seventh = "maj7";
+                }
+                return roman + diminished + seventh;
+            }
+            return "";
+        });
+    }
+    music2.generateChordNumbers = generateChordNumbers;
+})(music2 || (music2 = {}));
 var music;
 (function (music) {
     music.noteBases = [
