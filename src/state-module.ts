@@ -68,5 +68,9 @@ namespace state {
             scale2: scale,
             chordIndex: currentChordIndex
         });
+
+        events.scaleChange2.publish({
+            nodes: nodes
+        });
     }
 }

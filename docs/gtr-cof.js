@@ -83,6 +83,7 @@ var events;
     }());
     events.Bus = Bus;
     events.scaleChange = new Bus();
+    events.scaleChange2 = new Bus();
     events.tonicChange = new Bus();
     events.modeChange = new Bus();
     events.chordChange = new Bus();
@@ -611,6 +612,9 @@ var state;
             index: currentIndex,
             scale2: scale,
             chordIndex: currentChordIndex
+        });
+        events.scaleChange2.publish({
+            nodes: nodes
         });
     }
 })(state || (state = {}));

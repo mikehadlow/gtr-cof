@@ -23,6 +23,12 @@ namespace events {
         readonly chordIndex: number;
     }
 
+    export let scaleChange2: Bus<ScaleChangedEvent2> = new Bus<ScaleChangedEvent2>();
+
+    export interface ScaleChangedEvent2 {
+        readonly nodes: music2.Node[];
+    }
+
     export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>();
 
     export interface TonicChangedEvent {
