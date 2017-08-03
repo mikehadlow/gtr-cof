@@ -952,21 +952,12 @@ var gtr;
     var fretWidth = 5;
     var noteRadius = 15;
     var pad = 20;
-    var noteColours = [
-        "yellow",
-        "white",
-        "white",
-        "white",
-        "white",
-        "white",
-        "white"
-    ];
     function indexer(stringNote) {
         return stringNote.index + "_" + stringNote.octave;
     }
     function init() {
         events.tuningChange.subscribe(updateFretboard);
-        events.scaleChange.subscribe(update);
+        events.scaleChange2.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
@@ -997,14 +988,10 @@ var gtr;
     }
     function setLabels() {
         function setNoteName(note) {
-            if (note.scaleNote == null)
-                return "";
-            return note.scaleNote.noteName;
+            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.note.label : "";
         }
         function setInterval(note) {
-            if (note.scaleNote == null)
-                return "";
-            return note.scaleNote.intervalShort;
+            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.intervalName : "";
         }
         switch (fretboardLabelType) {
             case events.FretboardLabelType.None:
@@ -1092,48 +1079,29 @@ var gtr;
         }
     }
     function update(stateChange) {
-        var fill = function (d, i) {
-            return noteColours[i % 7];
+        var fill = function (d) {
+            return d.node.scaleNote.isScaleNote
+                ? d.node.scaleNote.noteNumber === 0 ? "yellow" : "white"
+                : "none";
         };
-        var stroke = function (d, i) {
-            var note = d.scaleNote;
-            if (note.chordNote === undefined) {
-                return "grey";
-            }
-            if (note.chordNote === 0) {
-                return "red";
-            }
-            if (note.chordNote === 1) {
-                return "green";
-            }
-            return "blue";
+        var stroke = function (d) {
+            return d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
-        var strokeWidth = function (d, i) {
-            var note = d.scaleNote;
-            if (note.chordNote === undefined) {
-                return 2;
-            }
-            return 5;
+        var strokeWidth = function (d) {
+            return d.node.scaleNote.isScaleNote ? 2 : 0;
         };
-        var setText = function (d, i) {
-            return d.scaleNote.noteName;
+        var setText = function (d) {
+            return d.node.scaleNote.isScaleNote ? d.node.scaleNote.note.label : "";
         };
+        var data = repeatTo(stateChange.nodes, numberOfFrets);
         notes
-            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
+            .data(data, indexer)
             .attr("fill", fill)
             .attr("stroke", stroke)
-            .attr("stroke-width", strokeWidth)
-            .exit()
-            .attr("fill", "none")
-            .attr("stroke", "none");
-        noteLabels
-            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
-            .text(setText)
-            .exit()
-            .each(function (d, i) { return d.scaleNote = music.nullScaleNote; })
-            .text("");
-        currentState = stateChange;
+            .attr("stroke-width", strokeWidth);
+        noteLabels.data(data, indexer);
         setLabels();
+        currentState = stateChange;
     }
     function allNotesFrom(index, numberOfNotes) {
         var items = [];
@@ -1141,7 +1109,7 @@ var gtr;
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                scaleNote: music.nullScaleNote
+                node: music2.nullNode
             });
         }
         return items;
@@ -1153,17 +1121,19 @@ var gtr;
         }
         return data;
     }
-    function repeatTo(scale, count) {
-        var result = [];
-        for (var i = 0; i < count; i++) {
-            var note = scale[i % scale.length];
-            result.push({
-                octave: Math.floor((i + 1) / 8),
-                index: note.index,
-                scaleNote: note
-            });
+    function repeatTo(nodes, count) {
+        var stringNotes = [];
+        var _loop_2 = function (i) {
+            stringNotes = stringNotes.concat(nodes.map(function (x) { return ({
+                octave: i,
+                index: x.scaleNote.note.index,
+                node: x
+            }); }));
+        };
+        for (var i = 0; i <= Math.floor(count / 12); i++) {
+            _loop_2(i);
         }
-        return result;
+        return stringNotes;
     }
 })(gtr || (gtr = {}));
 var tuning;
@@ -1191,11 +1161,16 @@ var tuning;
     ];
     function parseTuning(tuning) {
         var result = [];
-        for (var i = 0; i < tuning.length; i++) {
+        var _loop_3 = function (i) {
             var noteChar = tuning.charAt(i);
-            if (music.notes[noteChar] != null) {
-                result.push(music.notes[noteChar]);
+            var natural = music2.naturals.filter(function (x) { return x.label === noteChar; });
+            if (natural.length != 1) {
+                throw "Invalid tuning char";
             }
+            result.push(natural[0].index);
+        };
+        for (var i = 0; i < tuning.length; i++) {
+            _loop_3(i);
         }
         return result;
     }

@@ -1,7 +1,7 @@
 
 namespace gtr {
 
-    let currentState: events.ScaleChangedEvent;
+    let currentState: events.ScaleChangedEvent2;
     let notes: d3.Selection<StringNote>;
     let noteLabels: d3.Selection<StringNote>;
     let numberOfFrets = 16;
@@ -15,23 +15,13 @@ namespace gtr {
     let noteRadius = 15;
     let pad = 20;
 
-    let noteColours: Array<string> = [
-        "yellow",
-        "white",
-        "white",
-        "white",
-        "white",
-        "white",
-        "white"
-    ];
-
     function indexer(stringNote: StringNote): string {
         return stringNote.index + "_" + stringNote.octave;
     }
 
     export function init() {
         events.tuningChange.subscribe(updateFretboard);
-        events.scaleChange.subscribe(update);
+        events.scaleChange2.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
@@ -66,13 +56,11 @@ namespace gtr {
     function setLabels()
     {
         function setNoteName(note: StringNote): string {
-            if(note.scaleNote == null) return "";
-            return note.scaleNote.noteName;
+            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.note.label : "";
         }
 
         function setInterval(note: StringNote): string {
-            if(note.scaleNote == null) return "";
-            return note.scaleNote.intervalShort;
+            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.intervalName : "";
         }
 
         switch (fretboardLabelType) {
@@ -172,56 +160,39 @@ namespace gtr {
         }
     }
 
-    function update(stateChange: events.ScaleChangedEvent): void {
+    function update(stateChange: events.ScaleChangedEvent2): void {
 
-        let fill = function (d: StringNote, i: number): string {
-            return noteColours[i % 7];
+        let fill = function (d: StringNote): string {
+            return d.node.scaleNote.isScaleNote 
+                ? d.node.scaleNote.noteNumber === 0 ? "yellow" : "white" 
+                : "none";
         };
 
-        let stroke = function (d: StringNote, i: number): string {
-            let note = d.scaleNote;
-            if (note.chordNote === undefined) {
-                return "grey";
-            }
-            if (note.chordNote === 0) {
-                return "red";
-            }
-            if (note.chordNote === 1) {
-                return "green";
-            }
-            return "blue";
+        let stroke = function (d: StringNote): string {
+            return d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
 
-        let strokeWidth = function (d: StringNote, i: number): number {
-            let note = d.scaleNote;
-            if (note.chordNote === undefined) {
-                return 2;
-            }
-            return 5
+        let strokeWidth = function (d: StringNote): number {
+            return d.node.scaleNote.isScaleNote ? 2 : 0;
         };
 
-        let setText = function(d: StringNote, i: number): string {
-            return d.scaleNote.noteName;
+        let setText = function(d: StringNote): string {
+            return d.node.scaleNote.isScaleNote ? d.node.scaleNote.note.label : "";
         }
 
+        let data = repeatTo(stateChange.nodes, numberOfFrets);
+
         notes
-            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
+            .data(data, indexer)
             .attr("fill", fill)
             .attr("stroke", stroke)
-            .attr("stroke-width", strokeWidth)
-            .exit()
-            .attr("fill", "none")
-            .attr("stroke", "none");
-        noteLabels
-            .data(repeatTo(stateChange.scale2, numberOfFrets), indexer)
-            .text(setText)
-            .exit()
-            .each((d, i) => d.scaleNote = music.nullScaleNote)
-            .text("");
-
-        currentState = stateChange;
+            .attr("stroke-width", strokeWidth);
+        
+        noteLabels.data(data, indexer)
 
         setLabels();
+        currentState = stateChange;
+
     }
 
     function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
@@ -231,7 +202,7 @@ namespace gtr {
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                scaleNote: music.nullScaleNote
+                node: music2.nullNode
             });
         }
 
@@ -246,24 +217,21 @@ namespace gtr {
         return data;
     }
 
-    function repeatTo(scale: Array<music.ScaleNote>, count: number): Array<StringNote> {
-        let result: Array<StringNote> = [];
-
-        for (let i = 0; i < count; i++) {
-            let note = scale[i % scale.length];
-            result.push({
-                octave: Math.floor((i + 1) / 8),
-                index: note.index,
-                scaleNote: note
-            });
+    function repeatTo(nodes: music2.Node[], count: number): StringNote[] {
+        let stringNotes: StringNote[] = [];
+        for(let i=0; i <= Math.floor(count / 12); i++) {
+            stringNotes = stringNotes.concat(nodes.map(x => <StringNote>{
+                octave: i,
+                index: x.scaleNote.note.index,
+                node: x
+            }));
         }
-
-        return result;
+        return stringNotes;
     }
 
     interface StringNote {
         readonly octave: number;
         readonly index: number;
-        scaleNote: music.ScaleNote;
+        readonly node: music2.Node;
     }
 }
