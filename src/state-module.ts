@@ -3,9 +3,8 @@
 
 namespace state {
 
-    let currentMode: music.Mode = music.modes[1];
+    let currentMode: music2.Mode = music2.modes[1];
     let currentNoteSpec: music2.NoteSpec = music2.createNoteSpec(3, 3); // C natural is default
-    let currentNoteBase: music.NoteBase = music.noteBases[0];
     let currentIndex: number = 0;
     let currentChordIndex: number = -1
 
@@ -14,8 +13,7 @@ namespace state {
 
         if(cookieData.hasCookie) {
             currentIndex = cookieData.index;
-            currentNoteBase = music.noteBases[cookieData.noteBaseIndex];
-            currentMode = music.modes.filter((x) => x.index == cookieData.modeIndex)[0];
+            currentMode = music2.modes.filter((x) => x.index == cookieData.modeIndex)[0];
             currentChordIndex = cookieData.chordIndex;
         }
 
@@ -54,21 +52,7 @@ namespace state {
     }
 
     function updateScale(): void {
-        let scale = music.generateScale(currentNoteBase, currentIndex, music.modes.filter(x => x.name === currentMode.name)[0]);
         let nodes = music2.generateScaleShim(currentNoteSpec, currentMode);
-
-        if (currentChordIndex != -1) {
-            scale = music.appendTriad(scale, currentChordIndex);
-        }
-
-        events.scaleChange.publish({
-            mode: currentMode,
-            noteBase: currentNoteBase,
-            index: currentIndex,
-            scale2: scale,
-            chordIndex: currentChordIndex
-        });
-
         events.scaleChange2.publish({
             nodes: nodes
         });

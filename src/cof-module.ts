@@ -174,7 +174,6 @@ namespace cof {
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                scaleNote: music.nullScaleNote,
                 index: fifths[i],
                 node: music2.nullNode
             });
@@ -207,7 +206,6 @@ namespace cof {
     interface Segment {
         readonly startAngle: number;
         readonly endAngle: number;
-        readonly scaleNote: music.ScaleNote;
         readonly index: number;
         readonly node: music2.Node;
     }

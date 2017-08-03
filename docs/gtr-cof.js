@@ -383,6 +383,24 @@ var music2;
         });
     }
     music2.generateChordNumbers = generateChordNumbers;
+    function fifths() {
+        var indexes = [];
+        var current = 0;
+        for (var i = 0; i < 12; i++) {
+            indexes.push(current);
+            current = (current + 7) % 12;
+        }
+        return indexes;
+    }
+    music2.fifths = fifths;
+    function chromatic() {
+        var indexes = [];
+        for (var i = 0; i < 12; i++) {
+            indexes.push(i);
+        }
+        return indexes;
+    }
+    music2.chromatic = chromatic;
 })(music2 || (music2 = {}));
 var music;
 (function (music) {
@@ -600,17 +618,15 @@ var music;
 })(music || (music = {}));
 var state;
 (function (state) {
-    var currentMode = music.modes[1];
+    var currentMode = music2.modes[1];
     var currentNoteSpec = music2.createNoteSpec(3, 3); // C natural is default
-    var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
     var currentChordIndex = -1;
     function init() {
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
             currentIndex = cookieData.index;
-            currentNoteBase = music.noteBases[cookieData.noteBaseIndex];
-            currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
+            currentMode = music2.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
             currentChordIndex = cookieData.chordIndex;
         }
         // lets remember this while we reset everything.
@@ -643,18 +659,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var scale = music.generateScale(currentNoteBase, currentIndex, music.modes.filter(function (x) { return x.name === currentMode.name; })[0]);
         var nodes = music2.generateScaleShim(currentNoteSpec, currentMode);
-        if (currentChordIndex != -1) {
-            scale = music.appendTriad(scale, currentChordIndex);
-        }
-        events.scaleChange.publish({
-            mode: currentMode,
-            noteBase: currentNoteBase,
-            index: currentIndex,
-            scale2: scale,
-            chordIndex: currentChordIndex
-        });
         events.scaleChange2.publish({
             nodes: nodes
         });
@@ -806,7 +811,6 @@ var cof;
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
-                scaleNote: music.nullScaleNote,
                 index: fifths[i],
                 node: music2.nullNode
             });
@@ -1209,8 +1213,8 @@ var settings;
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init();
-var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
-var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
+var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music2.chromatic(), "Chromatic");
+var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music2.fifths(), "Circle of Fifths");
 gtr.init();
 tuning.init();
 state.init();

@@ -178,7 +178,7 @@ namespace music2 {
         }
     };
 
-    export function generateScaleShim(noteSpec: NoteSpec, mode: music.Mode): Node[] {
+    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode): Node[] {
         let scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
         return generateNodes(scale, mode);
@@ -308,5 +308,23 @@ namespace music2 {
                 type: ChordType.Major
             };
         });
+    }
+
+    export function fifths(): Array<number> {
+        let indexes: Array<number> = [];
+        let current: number = 0;
+        for (let i: number = 0; i < 12; i++) {
+            indexes.push(current);
+            current = (current + 7) % 12;
+        }
+        return indexes;
+    }
+
+    export function chromatic(): Array<number> {
+        let indexes: Array<number> = [];
+        for (let i: number = 0; i < 12; i++) {
+            indexes.push(i);
+        }
+        return indexes;
     }
 }
