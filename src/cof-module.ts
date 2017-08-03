@@ -183,21 +183,21 @@ namespace cof {
     }
 
     function handleNoteClick(segment: Segment, i: number): void {
-        let noteBase: music.NoteBase = segment.scaleNote.noteBase;
-
-        if (Math.abs(segment.scaleNote.offset) > 1) {
-            noteBase = music.noteBases.filter(x => x.index === segment.scaleNote.index)[0];
-
-            if(noteBase === undefined) {
-                noteBase = 
-                    music.noteBases.filter(x => x.index === (segment.scaleNote.index + (segment.scaleNote.offset > 0 ? -1 : 1)))[0];
-            }
-        }
-
         events.tonicChange.publish({
-            newNoteBase: noteBase,
-            index: segment.scaleNote.index
+            noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
         });
+    }
+
+    function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music2.NoteSpec): music2.NoteSpec {
+        if(Math.abs(noteSpec.offset) > 1) {
+            let naturalId = noteSpec.natural.id;
+            let newNaturalId = (noteSpec.offset > 0)
+                ? naturalId + 1 % 7
+                : naturalId == 0 ? 6 : naturalId - 1;
+            let newNatural = music2.naturals.filter(x => x.id === newNaturalId)[0];
+            return music2.createNoteSpec(newNatural.index, noteSpec.index)
+        }
+        return noteSpec;
     }
 
     function handleChordClick(segment: Segment, i: number): void {

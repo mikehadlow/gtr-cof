@@ -262,24 +262,16 @@ var music2;
             type: 0
         }
     };
-    function generateScaleShim(noteBase, index, mode) {
-        var naturalIndex = (noteBase.index + 3) % 12;
-        var newIndex = (index + 3) % 12;
-        var newMode = music2.modes.filter(function (x) { return x.name === mode.name; })[0];
-        var scaleSpec = {
-            noteSpec: createNoteSpec(naturalIndex, newIndex),
-            mode: newMode
-        };
-        var scale = generateScale(scaleSpec);
-        mod.zip(scale, generateChordNumbers(scale, newMode)).forEach(function (x) { return x[0].chord = x[1]; });
-        console.log(scale.filter(function (x) { return x.isScaleNote; }).map(function (x) { return x.note.label + " "; }).join());
-        return generateNodes(scale, newMode);
+    function generateScaleShim(noteSpec, mode) {
+        var scale = generateScale(noteSpec, mode);
+        mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
+        return generateNodes(scale, mode);
     }
     music2.generateScaleShim = generateScaleShim;
-    function generateScale(scaleSpec) {
-        music2.indexList.setStart(scaleSpec.noteSpec.index);
-        naturalList.setStart(scaleSpec.noteSpec.natural.id);
-        music2.diatonic.setStart(scaleSpec.mode.index);
+    function generateScale(noteSpec, mode) {
+        music2.indexList.setStart(noteSpec.index);
+        naturalList.setStart(noteSpec.natural.id);
+        music2.diatonic.setStart(mode.index);
         music2.intervals.setStart(0);
         var workingSet = music2.indexList.merge3(buildScaleCounter(music2.diatonic.toArray()), music2.intervals.toArray());
         return workingSet.map(function (item) {
@@ -609,6 +601,7 @@ var music;
 var state;
 (function (state) {
     var currentMode = music.modes[1];
+    var currentNoteSpec = music2.createNoteSpec(3, 3); // C natural is default
     var currentNoteBase = music.noteBases[0];
     var currentIndex = 0;
     var currentChordIndex = -1;
@@ -625,14 +618,13 @@ var state;
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
-        events.tonicChange.publish({ index: currentIndex, newNoteBase: currentNoteBase });
+        events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
-        currentNoteBase = tonicChangedEvent.newNoteBase;
-        currentIndex = tonicChangedEvent.index;
+        currentNoteSpec = tonicChangedEvent.noteSpec;
         currentChordIndex = -1;
         updateScale();
     }
@@ -651,8 +643,8 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
-        var nodes = music2.generateScaleShim(currentNoteBase, currentIndex, currentMode);
+        var scale = music.generateScale(currentNoteBase, currentIndex, music.modes.filter(function (x) { return x.name === currentMode.name; })[0]);
+        var nodes = music2.generateScaleShim(currentNoteSpec, currentMode);
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);
         }
@@ -822,18 +814,20 @@ var cof;
         return items;
     }
     function handleNoteClick(segment, i) {
-        var noteBase = segment.scaleNote.noteBase;
-        if (Math.abs(segment.scaleNote.offset) > 1) {
-            noteBase = music.noteBases.filter(function (x) { return x.index === segment.scaleNote.index; })[0];
-            if (noteBase === undefined) {
-                noteBase =
-                    music.noteBases.filter(function (x) { return x.index === (segment.scaleNote.index + (segment.scaleNote.offset > 0 ? -1 : 1)); })[0];
-            }
-        }
         events.tonicChange.publish({
-            newNoteBase: noteBase,
-            index: segment.scaleNote.index
+            noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
         });
+    }
+    function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
+        if (Math.abs(noteSpec.offset) > 1) {
+            var naturalId = noteSpec.natural.id;
+            var newNaturalId_1 = (noteSpec.offset > 0)
+                ? naturalId + 1 % 7
+                : naturalId == 0 ? 6 : naturalId - 1;
+            var newNatural = music2.naturals.filter(function (x) { return x.id === newNaturalId_1; })[0];
+            return music2.createNoteSpec(newNatural.index, noteSpec.index);
+        }
+        return noteSpec;
     }
     function handleChordClick(segment, i) {
         events.chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
@@ -843,13 +837,13 @@ var tonics;
 (function (tonics_1) {
     var buttons;
     ;
-    function bg(noteBase) {
-        var flatIndex = noteBase.index == 0 ? 11 : noteBase.index - 1;
-        var sharpIndex = (noteBase.index + 1) % 12;
+    function bg(natural) {
+        var flatIndex = natural.index == 0 ? 11 : natural.index - 1;
+        var sharpIndex = (natural.index + 1) % 12;
         return [
-            { noteBase: noteBase, label: noteBase.name + "♭", index: flatIndex, greyOut: music.indexIsNatural(flatIndex) },
-            { noteBase: noteBase, label: noteBase.name + "", index: noteBase.index, greyOut: false },
-            { noteBase: noteBase, label: noteBase.name + "♯", index: sharpIndex, greyOut: music.indexIsNatural(sharpIndex) }
+            { noteSpec: music2.createNoteSpec(natural.index, flatIndex) },
+            { noteSpec: music2.createNoteSpec(natural.index, natural.index) },
+            { noteSpec: music2.createNoteSpec(natural.index, sharpIndex) }
         ];
     }
     function init() {
@@ -858,7 +852,7 @@ var tonics;
         var svg = d3.select("#modes");
         var tonics = svg.append("g");
         var gs = tonics.selectAll("g")
-            .data(music.noteBases)
+            .data(music2.naturals)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
@@ -874,36 +868,32 @@ var tonics;
             .attr("strokeWidth", 2)
             .attr("width", 40)
             .attr("height", 25)
-            .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; })
-            .on("click", function (d, i) { return events.tonicChange.publish({
-            newNoteBase: d.noteBase,
-            index: d.index
-        }); });
+            .attr("class", function (d) { return isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button"; })
+            .on("click", function (d) { return events.tonicChange.publish({ noteSpec: d.noteSpec }); });
         gs
             .append("text")
             .attr("x", pad + 10)
             .attr("y", 17)
-            .text(function (x) { return x.label; })
+            .text(function (x) { return x.noteSpec.label; })
             .attr("class", "tonic-text");
-        events.scaleChange.subscribe(listener);
+        events.tonicChange.subscribe(listener);
     }
     tonics_1.init = init;
-    function listener(state) {
-        var tonic = state.scale2[0];
+    function listener(tonicChanged) {
         var ds = [{
-                noteBase: state.noteBase,
-                label: tonic.noteName,
-                index: tonic.index,
-                greyOut: (state.noteBase.index != tonic.index) && music.indexIsNatural(tonic.index)
+                noteSpec: tonicChanged.noteSpec
             }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
-            .attr("class", function (d) { return d.greyOut ? "tonic-button tonic-button-grey" : "tonic-button"; });
+            .attr("class", function (d) { return isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button"; });
     }
     function indexer(d) {
-        return d.label;
+        return d.noteSpec.label;
+    }
+    function isSameNoteAsNatural(noteSpec) {
+        return music2.naturals.some(function (x) { return x.index === noteSpec.index && x.index != noteSpec.natural.index; });
     }
 })(tonics || (tonics = {}));
 var modes;
@@ -917,7 +907,7 @@ var modes;
             .append("g")
             .attr("transform", "translate(0, 250)");
         var gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+            .data(music2.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });

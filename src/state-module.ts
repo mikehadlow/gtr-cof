@@ -4,6 +4,7 @@
 namespace state {
 
     let currentMode: music.Mode = music.modes[1];
+    let currentNoteSpec: music2.NoteSpec = music2.createNoteSpec(3, 3); // C natural is default
     let currentNoteBase: music.NoteBase = music.noteBases[0];
     let currentIndex: number = 0;
     let currentChordIndex: number = -1
@@ -25,14 +26,13 @@ namespace state {
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
 
-        events.tonicChange.publish({ index: currentIndex, newNoteBase: currentNoteBase });
+        events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
-        currentNoteBase = tonicChangedEvent.newNoteBase;
-        currentIndex = tonicChangedEvent.index;
+        currentNoteSpec = tonicChangedEvent.noteSpec;
         currentChordIndex = -1;
         updateScale();
     }
@@ -54,8 +54,8 @@ namespace state {
     }
 
     function updateScale(): void {
-        let scale = music.generateScale(currentNoteBase, currentIndex, currentMode);
-        let nodes = music2.generateScaleShim(currentNoteBase, currentIndex, currentMode);
+        let scale = music.generateScale(currentNoteBase, currentIndex, music.modes.filter(x => x.name === currentMode.name)[0]);
+        let nodes = music2.generateScaleShim(currentNoteSpec, currentMode);
 
         if (currentChordIndex != -1) {
             scale = music.appendTriad(scale, currentChordIndex);

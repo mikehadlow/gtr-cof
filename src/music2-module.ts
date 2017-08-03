@@ -178,28 +178,16 @@ namespace music2 {
         }
     };
 
-    export function generateScaleShim(noteBase: music.NoteBase, index: number, mode: music.Mode): Node[] {
-        let naturalIndex = (noteBase.index + 3) % 12;
-        let newIndex = (index + 3) % 12;
-        let newMode = modes.filter(x => x.name === mode.name)[0];
-
-        let scaleSpec: ScaleSpec = {
-            noteSpec: createNoteSpec(naturalIndex, newIndex),
-            mode: newMode
-        };
-
-        let scale = generateScale(scaleSpec);
-        mod.zip(scale, generateChordNumbers(scale, newMode)).forEach(x => x[0].chord = x[1]);
-
-        console.log(scale.filter(x => x.isScaleNote).map(x => x.note.label + " ").join())
-
-        return generateNodes(scale, newMode);
+    export function generateScaleShim(noteSpec: NoteSpec, mode: music.Mode): Node[] {
+        let scale = generateScale(noteSpec, mode);
+        mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
+        return generateNodes(scale, mode);
     }
 
-    export function generateScale(scaleSpec: ScaleSpec): ScaleNote[] {
-        indexList.setStart(scaleSpec.noteSpec.index);
-        naturalList.setStart(scaleSpec.noteSpec.natural.id);
-        diatonic.setStart(scaleSpec.mode.index);        
+    export function generateScale(noteSpec: NoteSpec, mode: Mode): ScaleNote[] {
+        indexList.setStart(noteSpec.index);
+        naturalList.setStart(noteSpec.natural.id);
+        diatonic.setStart(mode.index);        
         intervals.setStart(0);
         let workingSet = indexList.merge3(buildScaleCounter(diatonic.toArray()), intervals.toArray());
 

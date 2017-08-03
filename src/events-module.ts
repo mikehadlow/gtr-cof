@@ -32,14 +32,13 @@ namespace events {
     export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>();
 
     export interface TonicChangedEvent {
-        readonly newNoteBase: music.NoteBase;
-        readonly index: number;
+        readonly noteSpec: music2.NoteSpec;
     }
 
     export let modeChange: Bus<ModeChangedEvent> = new Bus<ModeChangedEvent>();
 
     export interface ModeChangedEvent {
-        readonly mode: music.Mode;
+        readonly mode: music2.Mode;
     }
 
     export let chordChange: Bus<ChordChangeEvent> = new Bus<ChordChangeEvent>();

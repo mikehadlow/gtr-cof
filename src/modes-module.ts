@@ -1,7 +1,7 @@
 
 namespace modes {
 
-    let buttons: d3.Selection<music.Mode>;
+    let buttons: d3.Selection<music2.Mode>;
 
     export function init(): void {
         let pad = 5;
@@ -12,7 +12,7 @@ namespace modes {
             .attr("transform", "translate(0, 250)");
 
         let gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+            .data(music2.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -38,7 +38,7 @@ namespace modes {
     }
 
     function update(modeChange: events.ModeChangedEvent): void {
-        let modes: Array<music.Mode> = [modeChange.mode];
+        let modes: Array<music2.Mode> = [modeChange.mode];
         buttons
             .data(modes, function (m) { return m.index.toString(); })
             .attr("class", "mode-button mode-button-selected")
