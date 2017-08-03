@@ -83,7 +83,6 @@ var events;
     }());
     events.Bus = Bus;
     events.scaleChange = new Bus();
-    events.scaleChange2 = new Bus();
     events.tonicChange = new Bus();
     events.modeChange = new Bus();
     events.chordChange = new Bus();
@@ -107,11 +106,12 @@ var cookies;
         var cookieExpiryDays = 30;
         var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
         var expires = "expires=" + expiryDate.toUTCString();
+        var tonicNode = scaleChange.nodes[0];
         document.cookie = "gtr-cof-state="
-            + scaleChange.index + "|"
-            + scaleChange.noteBase.id + "|"
-            + scaleChange.mode.index + "|"
-            + scaleChange.chordIndex
+            + tonicNode.scaleNote.note.index + "|"
+            + tonicNode.scaleNote.note.natural.index + "|"
+            + 1 + "|" // mode index 
+            + 0 // chordIndex
             + ";" + expires;
     }
     function readCookie() {
@@ -446,7 +446,7 @@ var state;
     }
     function updateScale() {
         var nodes = music.generateScaleShim(currentNoteSpec, currentMode);
-        events.scaleChange2.publish({
+        events.scaleChange.publish({
             nodes: nodes
         });
     }
@@ -537,7 +537,7 @@ var cof;
             // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
             //     instance.update(stateChange);
             // });
-            events.scaleChange2.subscribe(function (scaleChnaged) { return _this.update2(scaleChnaged); });
+            events.scaleChange.subscribe(function (scaleChnaged) { return _this.update2(scaleChnaged); });
         }
         NoteCircle.prototype.update2 = function (scaleChnaged) {
             var data = scaleChnaged.nodes.map(function (node) { return ({
@@ -747,7 +747,7 @@ var gtr;
     }
     function init() {
         events.tuningChange.subscribe(updateFretboard);
-        events.scaleChange2.subscribe(update);
+        events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }

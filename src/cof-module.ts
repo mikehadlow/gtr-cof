@@ -108,10 +108,10 @@ namespace cof {
             //     instance.update(stateChange);
             // });
 
-            events.scaleChange2.subscribe(scaleChnaged => this.update2(scaleChnaged));
+            events.scaleChange.subscribe(scaleChnaged => this.update2(scaleChnaged));
         }
 
-        update2(scaleChnaged: events.ScaleChangedEvent2): void {
+        update2(scaleChnaged: events.ScaleChangedEvent): void {
             let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
                     startAngle: 0,
                     endAngle: 0,

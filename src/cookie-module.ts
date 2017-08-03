@@ -8,11 +8,12 @@ namespace cookies {
         let cookieExpiryDays = 30;
         let expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
         let expires = "expires=" + expiryDate.toUTCString();
+        let tonicNode = scaleChange.nodes[0];
         document.cookie = "gtr-cof-state=" 
-            + scaleChange.index + "|" 
-            + scaleChange.noteBase.id + "|" 
-            + scaleChange.mode.index + "|" 
-            + scaleChange.chordIndex
+            + tonicNode.scaleNote.note.index + "|" 
+            + tonicNode.scaleNote.note.natural.index + "|" 
+            + 1 + "|" // mode index 
+            + 0 // chordIndex
             + ";" + expires;
     }
 

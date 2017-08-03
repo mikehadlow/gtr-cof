@@ -1,7 +1,7 @@
 
 namespace gtr {
 
-    let currentState: events.ScaleChangedEvent2;
+    let currentState: events.ScaleChangedEvent;
     let notes: d3.Selection<StringNote>;
     let noteLabels: d3.Selection<StringNote>;
     let numberOfFrets = 16;
@@ -21,7 +21,7 @@ namespace gtr {
 
     export function init() {
         events.tuningChange.subscribe(updateFretboard);
-        events.scaleChange2.subscribe(update);
+        events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
@@ -160,7 +160,7 @@ namespace gtr {
         }
     }
 
-    function update(stateChange: events.ScaleChangedEvent2): void {
+    function update(stateChange: events.ScaleChangedEvent): void {
 
         let fill = function (d: StringNote): string {
             return d.node.scaleNote.isScaleNote 

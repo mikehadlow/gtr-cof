@@ -16,14 +16,6 @@ namespace events {
     export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>();
 
     export interface ScaleChangedEvent {
-        readonly mode: music.Mode;
-        readonly index: number;
-        readonly chordIndex: number;
-    }
-
-    export let scaleChange2: Bus<ScaleChangedEvent2> = new Bus<ScaleChangedEvent2>();
-
-    export interface ScaleChangedEvent2 {
         readonly nodes: music.Node[];
     }
 

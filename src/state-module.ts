@@ -53,7 +53,7 @@ namespace state {
 
     function updateScale(): void {
         let nodes = music.generateScaleShim(currentNoteSpec, currentMode);
-        events.scaleChange2.publish({
+        events.scaleChange.publish({
             nodes: nodes
         });
     }
