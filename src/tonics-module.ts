@@ -4,16 +4,16 @@ namespace tonics {
     let buttons: d3.Selection<ButtonData>;
 
     interface ButtonData {
-        readonly noteSpec: music2.NoteSpec;
+        readonly noteSpec: music.NoteSpec;
     };
 
-    function bg(natural: music2.Natural): Array<ButtonData> {
+    function bg(natural: music.Natural): Array<ButtonData> {
         let flatIndex = natural.index == 0 ? 11 : natural.index - 1;
         let sharpIndex = (natural.index + 1) % 12;
         return [
-            { noteSpec: music2.createNoteSpec(natural.index, flatIndex) },
-            { noteSpec: music2.createNoteSpec(natural.index, natural.index) },
-            { noteSpec: music2.createNoteSpec(natural.index, sharpIndex) }
+            { noteSpec: music.createNoteSpec(natural.index, flatIndex) },
+            { noteSpec: music.createNoteSpec(natural.index, natural.index) },
+            { noteSpec: music.createNoteSpec(natural.index, sharpIndex) }
         ];
     }
 
@@ -25,7 +25,7 @@ namespace tonics {
         let tonics = svg.append("g");
 
         let gs = tonics.selectAll("g")
-            .data(music2.naturals)
+            .data(music.naturals)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
@@ -70,7 +70,7 @@ namespace tonics {
         return d.noteSpec.label;
     }
 
-    function isSameNoteAsNatural(noteSpec: music2.NoteSpec): boolean {
-        return music2.naturals.some(x => x.index === noteSpec.index && x.index != noteSpec.natural.index);
+    function isSameNoteAsNatural(noteSpec: music.NoteSpec): boolean {
+        return music.naturals.some(x => x.index === noteSpec.index && x.index != noteSpec.natural.index);
     }
 }

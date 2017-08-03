@@ -33,7 +33,7 @@ namespace tuning {
         let result: Array<number> = [];
         for(let i: number = 0; i < tuning.length; i++){
             let noteChar = tuning.charAt(i);
-            let natural = music2.naturals.filter(x => x.label === noteChar);
+            let natural = music.naturals.filter(x => x.label === noteChar);
             if(natural.length != 1) {
                 throw "Invalid tuning char";
             }

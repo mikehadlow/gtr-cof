@@ -202,7 +202,7 @@ namespace gtr {
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                node: music2.nullNode
+                node: music.nullNode
             });
         }
 
@@ -217,7 +217,7 @@ namespace gtr {
         return data;
     }
 
-    function repeatTo(nodes: music2.Node[], count: number): StringNote[] {
+    function repeatTo(nodes: music.Node[], count: number): StringNote[] {
         let stringNotes: StringNote[] = [];
         for(let i=0; i <= Math.floor(count / 12); i++) {
             stringNotes = stringNotes.concat(nodes.map(x => <StringNote>{
@@ -232,6 +232,6 @@ namespace gtr {
     interface StringNote {
         readonly octave: number;
         readonly index: number;
-        readonly node: music2.Node;
+        readonly node: music.Node;
     }
 }

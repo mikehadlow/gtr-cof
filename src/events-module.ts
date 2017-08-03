@@ -16,7 +16,7 @@ namespace events {
     export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>();
 
     export interface ScaleChangedEvent {
-        readonly mode: music2.Mode;
+        readonly mode: music.Mode;
         readonly index: number;
         readonly chordIndex: number;
     }
@@ -24,19 +24,19 @@ namespace events {
     export let scaleChange2: Bus<ScaleChangedEvent2> = new Bus<ScaleChangedEvent2>();
 
     export interface ScaleChangedEvent2 {
-        readonly nodes: music2.Node[];
+        readonly nodes: music.Node[];
     }
 
     export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>();
 
     export interface TonicChangedEvent {
-        readonly noteSpec: music2.NoteSpec;
+        readonly noteSpec: music.NoteSpec;
     }
 
     export let modeChange: Bus<ModeChangedEvent> = new Bus<ModeChangedEvent>();
 
     export interface ModeChangedEvent {
-        readonly mode: music2.Mode;
+        readonly mode: music.Mode;
     }
 
     export let chordChange: Bus<ChordChangeEvent> = new Bus<ChordChangeEvent>();

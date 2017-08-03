@@ -138,8 +138,8 @@ var cookies;
     }
     cookies.readCookie = readCookie;
 })(cookies || (cookies = {}));
-var music2;
-(function (music2) {
+var music;
+(function (music) {
     var IntervalType;
     (function (IntervalType) {
         IntervalType[IntervalType["Nat"] = 0] = "Nat";
@@ -147,17 +147,17 @@ var music2;
         IntervalType[IntervalType["Min"] = 2] = "Min";
         IntervalType[IntervalType["Aug"] = 3] = "Aug";
         IntervalType[IntervalType["Dim"] = 4] = "Dim";
-    })(IntervalType = music2.IntervalType || (music2.IntervalType = {}));
+    })(IntervalType = music.IntervalType || (music.IntervalType = {}));
     ;
-    music2.intervalName = {};
-    music2.intervalName[IntervalType.Nat] = "";
-    music2.intervalName[IntervalType.Maj] = "M";
-    music2.intervalName[IntervalType.Min] = "m";
-    music2.intervalName[IntervalType.Aug] = "A";
-    music2.intervalName[IntervalType.Dim] = "d";
+    music.intervalName = {};
+    music.intervalName[IntervalType.Nat] = "";
+    music.intervalName[IntervalType.Maj] = "M";
+    music.intervalName[IntervalType.Min] = "m";
+    music.intervalName[IntervalType.Aug] = "A";
+    music.intervalName[IntervalType.Dim] = "d";
     ;
-    music2.getIntervalName = function (interval) { return music2.intervalName[interval.type] + (interval.ord + 1); };
-    music2.intervals = new mod.Mod([
+    music.getIntervalName = function (interval) { return music.intervalName[interval.type] + (interval.ord + 1); };
+    music.intervals = new mod.Mod([
         [{ ord: 0, type: IntervalType.Nat }, { ord: 1, type: IntervalType.Dim }],
         [{ ord: 1, type: IntervalType.Min }, { ord: 0, type: IntervalType.Aug }],
         [{ ord: 1, type: IntervalType.Maj }, { ord: 2, type: IntervalType.Dim }],
@@ -172,11 +172,11 @@ var music2;
         [{ ord: 6, type: IntervalType.Maj }, { ord: 0, type: IntervalType.Dim }],
     ]);
     // root diatonic scale is major
-    music2.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
-    music2.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
+    music.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     function createNoteSpec(naturalIndex, index) {
-        var natural = music2.naturals.filter(function (x) { return x.index === naturalIndex; })[0];
-        if (!music2.naturals.some(function (x) { return x.index === naturalIndex; })) {
+        var natural = music.naturals.filter(function (x) { return x.index === naturalIndex; })[0];
+        if (!music.naturals.some(function (x) { return x.index === naturalIndex; })) {
             throw "naturalIndex is not valid: " + naturalIndex;
         }
         var offset = mod.diff(12, naturalIndex, index);
@@ -191,11 +191,11 @@ var music2;
             label: natural.label + noteLabel.label
         };
     }
-    music2.createNoteSpec = createNoteSpec;
+    music.createNoteSpec = createNoteSpec;
     // fixed index:
     // 0  1  2  3  4  5  6  7  8  9  10 11 
     // A     B  C     D     E  F     G
-    music2.naturals = [
+    music.naturals = [
         { id: 0, index: 0, label: "A" },
         { id: 1, index: 2, label: "B" },
         { id: 2, index: 3, label: "C" },
@@ -204,7 +204,7 @@ var music2;
         { id: 5, index: 8, label: "F" },
         { id: 6, index: 10, label: "G" }
     ];
-    var naturalList = new mod.Mod(music2.naturals);
+    var naturalList = new mod.Mod(music.naturals);
     var noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
@@ -213,7 +213,7 @@ var music2;
         { offset: -2, label: '♭♭' },
     ];
     ;
-    music2.modes = [
+    music.modes = [
         { name: 'Lydian', index: 5 },
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 7 },
@@ -225,19 +225,19 @@ var music2;
     function createScaleSpec(index, naturalIndex, modeIndex) {
         return {
             noteSpec: createNoteSpec(naturalIndex, index),
-            mode: music2.modes[modeIndex]
+            mode: music.modes[modeIndex]
         };
     }
-    music2.createScaleSpec = createScaleSpec;
+    music.createScaleSpec = createScaleSpec;
     var ChordType;
     (function (ChordType) {
         ChordType[ChordType["Major"] = 0] = "Major";
         ChordType[ChordType["Minor"] = 1] = "Minor";
         ChordType[ChordType["Diminished"] = 2] = "Diminished";
-    })(ChordType = music2.ChordType || (music2.ChordType = {}));
+    })(ChordType = music.ChordType || (music.ChordType = {}));
     ;
     ;
-    music2.nullNode = {
+    music.nullNode = {
         scaleNote: {
             note: {
                 natural: {
@@ -267,13 +267,13 @@ var music2;
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
         return generateNodes(scale, mode);
     }
-    music2.generateScaleShim = generateScaleShim;
+    music.generateScaleShim = generateScaleShim;
     function generateScale(noteSpec, mode) {
-        music2.indexList.setStart(noteSpec.index);
+        music.indexList.setStart(noteSpec.index);
         naturalList.setStart(noteSpec.natural.id);
-        music2.diatonic.setStart(mode.index);
-        music2.intervals.setStart(0);
-        var workingSet = music2.indexList.merge3(buildScaleCounter(music2.diatonic.toArray()), music2.intervals.toArray());
+        music.diatonic.setStart(mode.index);
+        music.intervals.setStart(0);
+        var workingSet = music.indexList.merge3(buildScaleCounter(music.diatonic.toArray()), music.intervals.toArray());
         return workingSet.map(function (item) {
             var index = item[0];
             var isScaleNote = item[1][0];
@@ -297,22 +297,22 @@ var music2;
             return {
                 note: createNoteSpec(natural.index, index),
                 interval: activeInterval,
-                intervalName: music2.getIntervalName(activeInterval),
+                intervalName: music.getIntervalName(activeInterval),
                 isScaleNote: isScaleNote,
                 noteNumber: noteNumber
             };
         });
     }
-    music2.generateScale = generateScale;
+    music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
     function generateNodes(scaleNotes, mode, chordIndex) {
         if (chordIndex === void 0) { chordIndex = 0; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
-        music2.intervals.setStart(12 - chordIndexOffset);
-        music2.diatonic.setStart(mode.index);
+        music.intervals.setStart(12 - chordIndexOffset);
+        music.diatonic.setStart(mode.index);
         var startAt = scaleNotes.filter(function (x) { return x.note.index === chordIndex; })[0].noteNumber;
-        var workingSet = music2.intervals.merge3(scaleNotes, buildScaleCounter(music2.diatonic.toArray(), startAt));
+        var workingSet = music.intervals.merge3(scaleNotes, buildScaleCounter(music.diatonic.toArray(), startAt));
         return workingSet.map(function (item) {
             var chordIntervalCandidates = item[0];
             var scaleNote = item[1];
@@ -330,7 +330,7 @@ var music2;
             };
         });
     }
-    music2.generateNodes = generateNodes;
+    music.generateNodes = generateNodes;
     function buildScaleCounter(diatonic, startAt) {
         if (startAt === void 0) { startAt = 0; }
         var noteCount = diatonic.filter(function (x) { return x; }).length;
@@ -382,202 +382,7 @@ var music2;
             };
         });
     }
-    music2.generateChordNumbers = generateChordNumbers;
-    function fifths() {
-        var indexes = [];
-        var current = 0;
-        for (var i = 0; i < 12; i++) {
-            indexes.push(current);
-            current = (current + 7) % 12;
-        }
-        return indexes;
-    }
-    music2.fifths = fifths;
-    function chromatic() {
-        var indexes = [];
-        for (var i = 0; i < 12; i++) {
-            indexes.push(i);
-        }
-        return indexes;
-    }
-    music2.chromatic = chromatic;
-})(music2 || (music2 = {}));
-var music;
-(function (music) {
-    music.noteBases = [
-        { id: 0, index: 0, name: 'C' },
-        { id: 1, index: 2, name: 'D' },
-        { id: 2, index: 4, name: 'E' },
-        { id: 3, index: 5, name: 'F' },
-        { id: 4, index: 7, name: 'G' },
-        { id: 5, index: 9, name: 'A' },
-        { id: 6, index: 11, name: 'B' }
-    ];
-    music.notes = {};
-    music.notes["C"] = 0;
-    music.notes["D"] = 2;
-    music.notes["E"] = 4;
-    music.notes["F"] = 5;
-    music.notes["G"] = 7;
-    music.notes["A"] = 9;
-    music.notes["B"] = 11;
-    var noteLabels = [
-        { offset: 0, label: '' },
-        { offset: 1, label: '♯' },
-        { offset: 2, label: 'x' },
-        { offset: -1, label: '♭' },
-        { offset: -2, label: '♭♭' },
-    ];
-    music.modes = [
-        { name: 'Lydian', index: 3 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 4 },
-        { name: 'Dorian', index: 1 },
-        { name: 'N Minor / Aeolian', index: 5 },
-        { name: 'Phrygian', index: 2 },
-        { name: 'Locrian', index: 6 },
-    ];
-    var scaleTones = [2, 2, 1, 2, 2, 2, 1];
-    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    var ChordType;
-    (function (ChordType) {
-        ChordType[ChordType["Major"] = 0] = "Major";
-        ChordType[ChordType["Minor"] = 1] = "Minor";
-        ChordType[ChordType["Diminished"] = 2] = "Diminished";
-    })(ChordType = music.ChordType || (music.ChordType = {}));
-    ;
-    ;
-    var nullChord = {
-        romanNumeral: "",
-        triad: [0, 0, 0],
-        type: ChordType.Major
-    };
-    music.nullScaleNote = {
-        index: 0,
-        degree: 0,
-        noteName: "",
-        chord: nullChord,
-        noteBase: {
-            id: 0,
-            index: 0,
-            name: ""
-        },
-        offset: 0,
-        intervalShort: "",
-        intervalLong: ""
-    };
-    ;
-    ;
-    // https://en.wikipedia.org/wiki/Interval_(music)
-    music.intervals = {};
-    // key is "<scale degree>.<semitones>"
-    music.intervals["1.0"] = { short: "1", text: "Unison" };
-    music.intervals["2.0"] = { short: "d2", text: "Diminished Second" };
-    music.intervals["2.1"] = { short: "m2", text: "Minor Second" };
-    music.intervals["1.1"] = { short: "A1", text: "Augmented Unison" };
-    music.intervals["2.2"] = { short: "M2", text: "Major Second" };
-    music.intervals["3.2"] = { short: "d3", text: "Diminished Third" };
-    music.intervals["3.3"] = { short: "m3", text: "Minor Third" };
-    music.intervals["2.3"] = { short: "A2", text: "Augmented Second" };
-    music.intervals["3.4"] = { short: "M3", text: "Major Third" };
-    music.intervals["4.4"] = { short: "d4", text: "Diminished Fourth" };
-    music.intervals["4.5"] = { short: "4", text: "Perfect Fourth" };
-    music.intervals["3.5"] = { short: "A3", text: "Augmented Third" };
-    music.intervals["5.6"] = { short: "d5", text: "Diminished Fifth" };
-    music.intervals["4.6"] = { short: "A4", text: "Augmented Fourth" };
-    music.intervals["5.7"] = { short: "5", text: "Perfect Fifth" };
-    music.intervals["6.7"] = { short: "d6", text: "Diminished Sixth" };
-    music.intervals["6.8"] = { short: "m6", text: "Minor Sixth" };
-    music.intervals["5.8"] = { short: "A5", text: "Augmented Fifth" };
-    music.intervals["6.9"] = { short: "M6", text: "Major Sixth" };
-    music.intervals["7.9"] = { short: "d7", text: "Diminished Seventh" };
-    music.intervals["7.10"] = { short: "m7", text: "Minor Seventh" };
-    music.intervals["6.10"] = { short: "A6", text: "Augmented Sixth" };
-    music.intervals["7.11"] = { short: "M7", text: "Major Seventh" };
-    music.intervals["8.11"] = { short: "d8", text: "Diminished Octave" };
-    function generateScale(noteBase, index, mode) {
-        var scale = [];
-        var currentIndex = index;
-        var currentNoteBase = noteBase;
-        var _loop_1 = function (i) {
-            var offset = currentIndex - currentNoteBase.index;
-            if (Math.abs(offset) > 2) {
-                offset = (currentIndex < currentNoteBase.index)
-                    ? (currentIndex + 12) - currentNoteBase.index
-                    : currentIndex - (currentNoteBase.index + 12);
-            }
-            // lookup noteLabel with offset
-            var noteLabel = noteLabels.filter(function (n) { return n.offset == offset; })[0];
-            // find interval
-            var noteInterval = music.intervals[(i + 1) + "." + findInterval(index, currentIndex)];
-            // add new ScaleNote to scale
-            scale.push({
-                index: currentIndex,
-                degree: i,
-                noteName: currentNoteBase.name + noteLabel.label,
-                noteBase: currentNoteBase,
-                offset: offset,
-                intervalShort: noteInterval.short,
-                intervalLong: noteInterval.text,
-                chord: nullChord
-            });
-            var interval = scaleTones[(mode.index + i) % 7];
-            currentIndex = (currentIndex + interval) % 12;
-            currentNoteBase = music.noteBases[(currentNoteBase.id + 1) % 7];
-        };
-        for (var i = 0; i < 7; i++) {
-            _loop_1(i);
-        }
-        var scalePlusChord = [];
-        for (var _i = 0, scale_1 = scale; _i < scale_1.length; _i++) {
-            var note = scale_1[_i];
-            scalePlusChord.push({
-                index: note.index,
-                degree: note.degree,
-                noteName: note.noteName,
-                noteBase: note.noteBase,
-                offset: note.offset,
-                intervalShort: note.intervalShort,
-                intervalLong: note.intervalLong,
-                chord: generateChord(scale, note)
-            });
-        }
-        return scalePlusChord;
-    }
-    music.generateScale = generateScale;
-    function generateChord(scale, root) {
-        var triad = [
-            root.index,
-            scale[(root.degree + 2) % 7].index,
-            scale[(root.degree + 4) % 7].index
-        ];
-        var chordType = getChordType(triad);
-        var roman = romanNumeral[root.degree];
-        if (chordType === ChordType.Major) {
-            roman = roman.toLocaleUpperCase();
-        }
-        if (chordType === ChordType.Diminished) {
-            roman = roman + "°";
-        }
-        return {
-            romanNumeral: roman,
-            triad: triad,
-            type: chordType
-        };
-    }
-    function appendTriad(scale, chordIndex) {
-        var chord = scale.filter(function (x) { return x.index == chordIndex; })[0].chord;
-        for (var _i = 0, scale_2 = scale; _i < scale_2.length; _i++) {
-            var note = scale_2[_i];
-            for (var i = 0; i < 3; i++) {
-                if (note.index === chord.triad[i]) {
-                    note.chordNote = i;
-                }
-            }
-        }
-        return scale;
-    }
-    music.appendTriad = appendTriad;
+    music.generateChordNumbers = generateChordNumbers;
     function fifths() {
         var indexes = [];
         var current = 0;
@@ -596,37 +401,18 @@ var music;
         return indexes;
     }
     music.chromatic = chromatic;
-    function getChordType(triad) {
-        // check for diminished
-        if (findInterval(triad[0], triad[2]) === 6)
-            return ChordType.Diminished;
-        // check for minor
-        if (findInterval(triad[0], triad[1]) === 3)
-            return ChordType.Minor;
-        // must be Major
-        return ChordType.Major;
-    }
-    function findInterval(a, b) {
-        return (a <= b) ? b - a : (b + 12) - a;
-    }
-    function indexIsNatural(index) {
-        return music.noteBases.filter(function (noteBase, i, a) {
-            return noteBase.index == index;
-        }).length != 0;
-    }
-    music.indexIsNatural = indexIsNatural;
 })(music || (music = {}));
 var state;
 (function (state) {
-    var currentMode = music2.modes[1];
-    var currentNoteSpec = music2.createNoteSpec(3, 3); // C natural is default
+    var currentMode = music.modes[1];
+    var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
     var currentIndex = 0;
     var currentChordIndex = -1;
     function init() {
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
             currentIndex = cookieData.index;
-            currentMode = music2.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
+            currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
             currentChordIndex = cookieData.chordIndex;
         }
         // lets remember this while we reset everything.
@@ -659,7 +445,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var nodes = music2.generateScaleShim(currentNoteSpec, currentMode);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode);
         events.scaleChange2.publish({
             nodes: nodes
         });
@@ -788,11 +574,11 @@ var cof;
     }());
     cof_1.NoteCircle = NoteCircle;
     function getChordSegmentClass(chord) {
-        if (chord.type === music2.ChordType.Diminished)
+        if (chord.type === music.ChordType.Diminished)
             return "chord-segment-dim";
-        if (chord.type === music2.ChordType.Minor)
+        if (chord.type === music.ChordType.Minor)
             return "chord-segment-minor";
-        if (chord.type === music2.ChordType.Major)
+        if (chord.type === music.ChordType.Major)
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
@@ -812,7 +598,7 @@ var cof;
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 index: fifths[i],
-                node: music2.nullNode
+                node: music.nullNode
             });
         }
         return items;
@@ -828,8 +614,8 @@ var cof;
             var newNaturalId_1 = (noteSpec.offset > 0)
                 ? naturalId + 1 % 7
                 : naturalId == 0 ? 6 : naturalId - 1;
-            var newNatural = music2.naturals.filter(function (x) { return x.id === newNaturalId_1; })[0];
-            return music2.createNoteSpec(newNatural.index, noteSpec.index);
+            var newNatural = music.naturals.filter(function (x) { return x.id === newNaturalId_1; })[0];
+            return music.createNoteSpec(newNatural.index, noteSpec.index);
         }
         return noteSpec;
     }
@@ -845,9 +631,9 @@ var tonics;
         var flatIndex = natural.index == 0 ? 11 : natural.index - 1;
         var sharpIndex = (natural.index + 1) % 12;
         return [
-            { noteSpec: music2.createNoteSpec(natural.index, flatIndex) },
-            { noteSpec: music2.createNoteSpec(natural.index, natural.index) },
-            { noteSpec: music2.createNoteSpec(natural.index, sharpIndex) }
+            { noteSpec: music.createNoteSpec(natural.index, flatIndex) },
+            { noteSpec: music.createNoteSpec(natural.index, natural.index) },
+            { noteSpec: music.createNoteSpec(natural.index, sharpIndex) }
         ];
     }
     function init() {
@@ -856,7 +642,7 @@ var tonics;
         var svg = d3.select("#modes");
         var tonics = svg.append("g");
         var gs = tonics.selectAll("g")
-            .data(music2.naturals)
+            .data(music.naturals)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
@@ -897,7 +683,7 @@ var tonics;
         return d.noteSpec.label;
     }
     function isSameNoteAsNatural(noteSpec) {
-        return music2.naturals.some(function (x) { return x.index === noteSpec.index && x.index != noteSpec.natural.index; });
+        return music.naturals.some(function (x) { return x.index === noteSpec.index && x.index != noteSpec.natural.index; });
     }
 })(tonics || (tonics = {}));
 var modes;
@@ -911,7 +697,7 @@ var modes;
             .append("g")
             .attr("transform", "translate(0, 250)");
         var gs = modes.selectAll("g")
-            .data(music2.modes, function (m) { return m.index.toString(); })
+            .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -1113,7 +899,7 @@ var gtr;
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
-                node: music2.nullNode
+                node: music.nullNode
             });
         }
         return items;
@@ -1127,7 +913,7 @@ var gtr;
     }
     function repeatTo(nodes, count) {
         var stringNotes = [];
-        var _loop_2 = function (i) {
+        var _loop_1 = function (i) {
             stringNotes = stringNotes.concat(nodes.map(function (x) { return ({
                 octave: i,
                 index: x.scaleNote.note.index,
@@ -1135,7 +921,7 @@ var gtr;
             }); }));
         };
         for (var i = 0; i <= Math.floor(count / 12); i++) {
-            _loop_2(i);
+            _loop_1(i);
         }
         return stringNotes;
     }
@@ -1165,16 +951,16 @@ var tuning;
     ];
     function parseTuning(tuning) {
         var result = [];
-        var _loop_3 = function (i) {
+        var _loop_2 = function (i) {
             var noteChar = tuning.charAt(i);
-            var natural = music2.naturals.filter(function (x) { return x.label === noteChar; });
+            var natural = music.naturals.filter(function (x) { return x.label === noteChar; });
             if (natural.length != 1) {
                 throw "Invalid tuning char";
             }
             result.push(natural[0].index);
         };
         for (var i = 0; i < tuning.length; i++) {
-            _loop_3(i);
+            _loop_2(i);
         }
         return result;
     }
@@ -1213,8 +999,8 @@ var settings;
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init();
-var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music2.chromatic(), "Chromatic");
-var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music2.fifths(), "Circle of Fifths");
+var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
+var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
 tuning.init();
 state.init();

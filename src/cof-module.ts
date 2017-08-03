@@ -151,10 +151,10 @@ namespace cof {
         }
     }
 
-    function getChordSegmentClass(chord: music2.Chord): string {
-        if (chord.type === music2.ChordType.Diminished) return "chord-segment-dim";
-        if (chord.type === music2.ChordType.Minor) return "chord-segment-minor";
-        if (chord.type === music2.ChordType.Major) return "chord-segment-major";
+    function getChordSegmentClass(chord: music.Chord): string {
+        if (chord.type === music.ChordType.Diminished) return "chord-segment-dim";
+        if (chord.type === music.ChordType.Minor) return "chord-segment-minor";
+        if (chord.type === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 
@@ -175,7 +175,7 @@ namespace cof {
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
                 index: fifths[i],
-                node: music2.nullNode
+                node: music.nullNode
             });
         }
         return items;
@@ -187,14 +187,14 @@ namespace cof {
         });
     }
 
-    function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music2.NoteSpec): music2.NoteSpec {
+    function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec): music.NoteSpec {
         if(Math.abs(noteSpec.offset) > 1) {
             let naturalId = noteSpec.natural.id;
             let newNaturalId = (noteSpec.offset > 0)
                 ? naturalId + 1 % 7
                 : naturalId == 0 ? 6 : naturalId - 1;
-            let newNatural = music2.naturals.filter(x => x.id === newNaturalId)[0];
-            return music2.createNoteSpec(newNatural.index, noteSpec.index)
+            let newNatural = music.naturals.filter(x => x.id === newNaturalId)[0];
+            return music.createNoteSpec(newNatural.index, noteSpec.index)
         }
         return noteSpec;
     }
@@ -207,6 +207,6 @@ namespace cof {
         readonly startAngle: number;
         readonly endAngle: number;
         readonly index: number;
-        readonly node: music2.Node;
+        readonly node: music.Node;
     }
 }
