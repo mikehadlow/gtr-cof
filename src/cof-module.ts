@@ -116,7 +116,7 @@ namespace cof {
                     startAngle: 0,
                     endAngle: 0,
                     scaleNote: {},
-                    index: node.scaleNote.index,
+                    index: node.scaleNote.note.index,
                     node: node
                 });
 
@@ -127,7 +127,7 @@ namespace cof {
 
             this.noteText
                 .data(data, this.indexer)
-                .text(d => d.node.scaleNote.label);
+                .text(d => d.node.scaleNote.note.label);
 
             this.intervalSegments
                 .data(data, this.indexer)
@@ -139,89 +139,31 @@ namespace cof {
 
             this.chordText
                 .data(data, this.indexer)
-                .text(d => d.node.scaleNote.chordNumber + "");
+                .text(d => d.node.scaleNote.chord!.romanNumeral + "");
 
             this.chordSegments
                 .data(data, this.indexer)
-                //.attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.scaleNote) : "chord-segment");
-                .attr("class", "chord-segment");
+                .attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord!) : "chord-segment");
 
             this.chordNotes
                 .data(data, this.indexer)
-                //.attr("class", d => d.node.scaleNote.isScaleNote ? getChordNoteClass(d.scaleNote) : "chord-segment-note");
-                .attr("chord-segment-note");
-        }
-
-        update(stateChange: events.ScaleChangedEvent): void {
-
-            let data: Array<Segment> = [];
-            for (let n of stateChange.scale2) {
-                data.push({
-                    startAngle: 0,
-                    endAngle: 0,
-                    scaleNote: n,
-                    index: n.index,
-                    node: music2.nullNode
-                });
-            }
-
-            this.noteSegments
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
-                .exit()
-                .attr("class", "note-segment");
-
-            this.noteText
-                .data(data, this.indexer)
-                .text(function (d) { return d.scaleNote.noteName; })
-                .exit()
-                .text("");
-
-            this.intervalSegments
-                .data(data, this.indexer)
-                .attr("class", "degree-segment-selected")
-                .exit()
-                .attr("class", "degree-segment")
-
-            this.intervalText
-                .data(data, this.indexer)
-                .text(function (d, i) { return d.scaleNote.intervalShort; })
-                .exit()
-                .text("");
-
-            this.chordText
-                .data(data, this.indexer)
-                .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
-                .exit()
-                .text("");
-
-            this.chordSegments
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
-                .exit()
-                .attr("class", "chord-segment");
-
-            this.chordNotes
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
-                .exit()
                 .attr("class", "chord-segment-note");
         }
     }
 
-    function getChordSegmentClass(note: music.ScaleNote): string {
-        if (note.chord.type === music.ChordType.Diminished) return "chord-segment-dim";
-        if (note.chord.type === music.ChordType.Minor) return "chord-segment-minor";
-        if (note.chord.type === music.ChordType.Major) return "chord-segment-major";
+    function getChordSegmentClass(chord: music2.Chord): string {
+        if (chord.type === music2.ChordType.Diminished) return "chord-segment-dim";
+        if (chord.type === music2.ChordType.Minor) return "chord-segment-minor";
+        if (chord.type === music2.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
 
-    function getChordNoteClass(note: music.ScaleNote): string {
-        if (note.chordNote === undefined) return "chord-segment-note";
-        if (note.chordNote === 0) return "chord-segment-note-root";
-        if (note.chordNote === 1) return "chord-segment-note-third";
-        return "chord-segment-note-fifth";
-    }
+    // function getChordNoteClass(chord: music2.Chord): string {
+    //     if (note.chordNote === undefined) return "chord-segment-note";
+    //     if (note.chordNote === 0) return "chord-segment-note-root";
+    //     if (note.chordNote === 1) return "chord-segment-note-third";
+    //     return "chord-segment-note-fifth";
+    // }
 
     function generateSegments(fifths: number[]): Segment[] {
         let count = fifths.length;
@@ -259,7 +201,7 @@ namespace cof {
     }
 
     function handleChordClick(segment: Segment, i: number): void {
-        events.chordChange.publish({ chordIndex: segment.scaleNote.index });
+        events.chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
     }
 
     interface Segment {

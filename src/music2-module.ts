@@ -42,29 +42,54 @@ namespace music2 {
     export let diatonic: mod.Mod<boolean> = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
     export let indexList: mod.Mod<number> = new mod.Mod([0,1,2,3,4,5,6,7,8,9,10,11]);
 
+    export interface NoteSpec {
+        readonly natural: Natural;
+        readonly index: number;
+        readonly offset: number;
+        readonly label: string;
+    }
+
+    export function createNoteSpec(naturalIndex: number, index: number): NoteSpec {
+        let natural = naturals.filter(x => x.index === naturalIndex)[0];
+        if(! naturals.some(x => x.index === naturalIndex)) {
+            throw "naturalIndex is not valid: " + naturalIndex;
+        }
+
+        let offset = mod.diff(12, naturalIndex, index);
+        if(Math.abs(offset) > 2) {
+            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+        }
+
+        let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
+
+        return {
+            natural: natural,
+            index: index,
+            offset: offset,
+            label: natural.label + noteLabel.label 
+        };
+    }
+
+    export interface Natural {
+        id: number, // order of the number in the natural set.
+        index: number, // number against the fixed chromatic series
+        label: string // the natural name, e.g: 'A'
+    }
+
     // fixed index:
     // 0  1  2  3  4  5  6  7  8  9  10 11 
     // A     B  C     D     E  F     G
-    export enum NoteName { A=0, B=2, C=3, D=5, E=7, F=8, G=10 };
+    export let naturals: Natural[] = [
+        { id: 0, index: 0, label: "A" },
+        { id: 1, index: 2, label: "B" },
+        { id: 2, index: 3, label: "C" },
+        { id: 3, index: 5, label: "D" },
+        { id: 4, index: 7, label: "E" },
+        { id: 5, index: 8, label: "F" },
+        { id: 6, index: 10, label: "G" }
+    ];
 
-    export let noteList: mod.Mod<NoteName> = new mod.Mod([
-        NoteName.A,
-        NoteName.B,
-        NoteName.C,
-        NoteName.D,
-        NoteName.E,
-        NoteName.F,
-        NoteName.G,
-    ]);
-
-    export let noteIndex: number[] = [];
-    noteIndex[NoteName.A] = 0;
-    noteIndex[NoteName.B] = 1;
-    noteIndex[NoteName.C] = 2;
-    noteIndex[NoteName.D] = 3;
-    noteIndex[NoteName.E] = 4;
-    noteIndex[NoteName.F] = 5;
-    noteIndex[NoteName.G] = 6;
+    let naturalList = new mod.Mod(naturals);
 
     interface NoteLabel {
         readonly offset: number;
@@ -84,7 +109,7 @@ namespace music2 {
         readonly index: number;
     };
 
-    export let modes: Array<Mode> = [
+    export let modes: Mode[] = [
         { name: 'Lydian', index: 5 },
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 7 },
@@ -94,20 +119,33 @@ namespace music2 {
         { name: 'Locrian', index: 11 },
     ];
 
+    export interface ScaleSpec {
+        noteSpec: NoteSpec;
+        mode: Mode;
+    }
+
+    export function createScaleSpec(index:number, naturalIndex:number, modeIndex:number): ScaleSpec {
+        return {
+            noteSpec: createNoteSpec(naturalIndex, index),
+            mode: modes[modeIndex]
+        };
+    }
+
+    export enum ChordType { Major, Minor, Diminished };
+
+    export interface Chord {
+        readonly romanNumeral: string;
+        readonly type: ChordType;
+    }
+
     export interface ScaleNote {
-        readonly index: number;
-        readonly label: string;
+        readonly note: NoteSpec;
         readonly interval: Interval;
         readonly intervalName: string;
         readonly isScaleNote: boolean;
         readonly noteNumber: number;
-        readonly diatonicOffset: number;
-        chordNumber?: string;
+        chord?: Chord;
     };
-
-    export interface ScaleNoteWithChordNumbers extends ScaleNote {
-        readonly chordNumber: string;
-    }
 
     export interface Node {
         readonly scaleNote: ScaleNote;
@@ -116,16 +154,22 @@ namespace music2 {
 
     export let nullNode: Node = {
         scaleNote: {
-            chordNumber: "",
-            diatonicOffset: 0,
-            index: 0,
+            note: {
+                natural: {
+                    id: 0,
+                    index: 0,
+                    label: ""
+                },
+                index: 0,
+                offset: 0,
+                label: ""
+            },
             interval: {
                 ord: 0,
                 type: 0
             },
             intervalName: "",
             isScaleNote: false,
-            label: "",
             noteNumber: 0
         },
         chordInterval: {
@@ -135,67 +179,71 @@ namespace music2 {
     };
 
     export function generateScaleShim(noteBase: music.NoteBase, index: number, mode: music.Mode): Node[] {
-        let note = (noteBase.index + 3) % 12;
+        let naturalIndex = (noteBase.index + 3) % 12;
         let newIndex = (index + 3) % 12;
         let newMode = modes.filter(x => x.name === mode.name)[0];
 
-        let scale = generateScale(newIndex, note, newMode);
+        let scaleSpec: ScaleSpec = {
+            noteSpec: createNoteSpec(naturalIndex, newIndex),
+            mode: newMode
+        };
 
-        console.log(scale.filter(x => x.isScaleNote).map(x => x.label + " ").join())
+        let scale = generateScale(scaleSpec);
+        mod.zip(scale, generateChordNumbers(scale, newMode)).forEach(x => x[0].chord = x[1]);
 
-        let chordNumbers = generateChordNumbers(scale);
-        mod.zip(scale, chordNumbers).forEach(x => x[0].chordNumber = x[1]);
-        return generateNodes(scale);
+        console.log(scale.filter(x => x.isScaleNote).map(x => x.note.label + " ").join())
+
+        return generateNodes(scale, newMode);
     }
 
-    export function generateScale(index: number, note: NoteName, mode: Mode): ScaleNote[] {
-        let scale: ScaleNote[] = [];
-        indexList.setStart(index);
-        diatonic.setStart(mode.index);        
-        noteList.setStart(noteIndex[note]);
+    export function generateScale(scaleSpec: ScaleSpec): ScaleNote[] {
+        indexList.setStart(scaleSpec.noteSpec.index);
+        naturalList.setStart(scaleSpec.noteSpec.natural.id);
+        diatonic.setStart(scaleSpec.mode.index);        
         intervals.setStart(0);
         let workingSet = indexList.merge3(buildScaleCounter(diatonic.toArray()), intervals.toArray());
-
-        let getLabel = (index:number, noteNum:number) => {
-            let noteIndex = noteList.itemAt(noteNum);
-            let offset = mod.diff(12, noteIndex, index);
-            let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
-            return NoteName[noteList.itemAt(noteNum)] + noteLabel.label;
-        }
 
         return workingSet.map(item => {
             let index = item[0];
             let isScaleNote = item[1][0];
-            let noteNumber = item[1][1];
-            let activeInterval = isScaleNote
-                ? item[2].filter(x => x.ord == noteNumber)[0]
-                : item[2][0];
-            let label = isScaleNote 
-                ? getLabel(index, noteNumber) 
-                : getLabel(index, activeInterval.ord);
 
-            // console.log("index: " + index + ", isScaleNote: " + isScaleNote + ", scaleCounter: " 
-            //     + noteNumber + ", label: " + label + ", interval: " + getIntervalName(activeInterval))
+            let noteNumber:number;
+            let natural:Natural;
+            let activeInterval:Interval;
 
+            if(isScaleNote) {
+                noteNumber = item[1][1];
+                natural = naturalList.itemAt(noteNumber);
+                activeInterval = item[2].filter(x => x.ord == noteNumber)[0];
+            }
+            else {
+                activeInterval = item[2][0];
+                noteNumber = activeInterval.ord;
+                natural = naturalList.itemAt(activeInterval.ord);
+            }
+
+            // console.log("index: " + index + ", isScaleNote: " + isScaleNote 
+            //     + ", noteNumber: " + noteNumber + ", natural.index: " + natural.index
+            //     + ", natural.label: " + natural.label
+            //     + ", interval: " + getIntervalName(activeInterval))
+            
             return {
-                index: index,
-                label: label,
+                note: createNoteSpec(natural.index, index),
                 interval: activeInterval,
                 intervalName: getIntervalName(activeInterval),
                 isScaleNote: isScaleNote,
-                noteNumber: noteNumber,
-                diatonicOffset: mode.index
+                noteNumber: noteNumber
             };
         });
     }
 
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    export function generateNodes(scaleNotes: ScaleNote[], chordIndex: number = 0): Node[] {
-        let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].index) % 12;
+    export function generateNodes(scaleNotes: ScaleNote[], mode:Mode, chordIndex: number = 0): Node[] {
+        let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         intervals.setStart(12 - chordIndexOffset);
-        diatonic.setStart(scaleNotes[0].diatonicOffset);
-        let startAt = scaleNotes.filter(x => x.index === chordIndex)[0].noteNumber;
+        diatonic.setStart(mode.index);
+        let startAt = scaleNotes.filter(x => x.note.index === chordIndex)[0].noteNumber;
         let workingSet = intervals.merge3(
             scaleNotes,
             buildScaleCounter(diatonic.toArray(), startAt));
@@ -235,20 +283,23 @@ namespace music2 {
 
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
 
-    export function generateChordNumbers(scaleNotes: ScaleNote[]): string[] {
+    export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode): Chord[] {
         return scaleNotes.map((scaleNote, i) => {
             if(scaleNote.isScaleNote) {
                 let roman = romanNumeral[scaleNote.noteNumber];
-                let nodes = generateNodes(scaleNotes, scaleNote.index);
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index);
                 let diminished = "";
                 let seventh = "";
+                let type: ChordType = ChordType.Minor;
                 // does it have a diminished 5th?
                 if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
                     diminished = "°";
+                    type = ChordType.Diminished;
                 }
                 // does it have a major 3rd?
                 if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
                     roman = roman.toLocaleUpperCase();
+                    type = ChordType.Major;
                 }
                 // does it have a natural 7th?
                 if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min)) {
@@ -256,12 +307,18 @@ namespace music2 {
                 }
                 // does it have a major 7th?
                 if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj)) {
-                    seventh = "maj7";
+                    seventh = "^7";
                 }
-                return roman + diminished + seventh;
+                return {
+                    romanNumeral: roman + diminished + seventh,
+                    type: type
+                };
             }
 
-            return "";
+            return {
+                romanNumeral: "",
+                type: ChordType.Major
+            };
         });
     }
 }

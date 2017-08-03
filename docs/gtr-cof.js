@@ -174,37 +174,37 @@ var music2;
     // root diatonic scale is major
     music2.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
     music2.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    function createNoteSpec(naturalIndex, index) {
+        var natural = music2.naturals.filter(function (x) { return x.index === naturalIndex; })[0];
+        if (!music2.naturals.some(function (x) { return x.index === naturalIndex; })) {
+            throw "naturalIndex is not valid: " + naturalIndex;
+        }
+        var offset = mod.diff(12, naturalIndex, index);
+        if (Math.abs(offset) > 2) {
+            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+        }
+        var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
+        return {
+            natural: natural,
+            index: index,
+            offset: offset,
+            label: natural.label + noteLabel.label
+        };
+    }
+    music2.createNoteSpec = createNoteSpec;
     // fixed index:
     // 0  1  2  3  4  5  6  7  8  9  10 11 
     // A     B  C     D     E  F     G
-    var NoteName;
-    (function (NoteName) {
-        NoteName[NoteName["A"] = 0] = "A";
-        NoteName[NoteName["B"] = 2] = "B";
-        NoteName[NoteName["C"] = 3] = "C";
-        NoteName[NoteName["D"] = 5] = "D";
-        NoteName[NoteName["E"] = 7] = "E";
-        NoteName[NoteName["F"] = 8] = "F";
-        NoteName[NoteName["G"] = 10] = "G";
-    })(NoteName = music2.NoteName || (music2.NoteName = {}));
-    ;
-    music2.noteList = new mod.Mod([
-        NoteName.A,
-        NoteName.B,
-        NoteName.C,
-        NoteName.D,
-        NoteName.E,
-        NoteName.F,
-        NoteName.G,
-    ]);
-    music2.noteIndex = [];
-    music2.noteIndex[NoteName.A] = 0;
-    music2.noteIndex[NoteName.B] = 1;
-    music2.noteIndex[NoteName.C] = 2;
-    music2.noteIndex[NoteName.D] = 3;
-    music2.noteIndex[NoteName.E] = 4;
-    music2.noteIndex[NoteName.F] = 5;
-    music2.noteIndex[NoteName.G] = 6;
+    music2.naturals = [
+        { id: 0, index: 0, label: "A" },
+        { id: 1, index: 2, label: "B" },
+        { id: 2, index: 3, label: "C" },
+        { id: 3, index: 5, label: "D" },
+        { id: 4, index: 7, label: "E" },
+        { id: 5, index: 8, label: "F" },
+        { id: 6, index: 10, label: "G" }
+    ];
+    var naturalList = new mod.Mod(music2.naturals);
     var noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
@@ -222,19 +222,39 @@ var music2;
         { name: 'Phrygian', index: 4 },
         { name: 'Locrian', index: 11 },
     ];
+    function createScaleSpec(index, naturalIndex, modeIndex) {
+        return {
+            noteSpec: createNoteSpec(naturalIndex, index),
+            mode: music2.modes[modeIndex]
+        };
+    }
+    music2.createScaleSpec = createScaleSpec;
+    var ChordType;
+    (function (ChordType) {
+        ChordType[ChordType["Major"] = 0] = "Major";
+        ChordType[ChordType["Minor"] = 1] = "Minor";
+        ChordType[ChordType["Diminished"] = 2] = "Diminished";
+    })(ChordType = music2.ChordType || (music2.ChordType = {}));
+    ;
     ;
     music2.nullNode = {
         scaleNote: {
-            chordNumber: "",
-            diatonicOffset: 0,
-            index: 0,
+            note: {
+                natural: {
+                    id: 0,
+                    index: 0,
+                    label: ""
+                },
+                index: 0,
+                offset: 0,
+                label: ""
+            },
             interval: {
                 ord: 0,
                 type: 0
             },
             intervalName: "",
             isScaleNote: false,
-            label: "",
             noteNumber: 0
         },
         chordInterval: {
@@ -243,61 +263,63 @@ var music2;
         }
     };
     function generateScaleShim(noteBase, index, mode) {
-        var note = (noteBase.index + 3) % 12;
+        var naturalIndex = (noteBase.index + 3) % 12;
         var newIndex = (index + 3) % 12;
         var newMode = music2.modes.filter(function (x) { return x.name === mode.name; })[0];
-        var scale = generateScale(newIndex, note, newMode);
-        console.log(scale.filter(function (x) { return x.isScaleNote; }).map(function (x) { return x.label + " "; }).join());
-        var chordNumbers = generateChordNumbers(scale);
-        mod.zip(scale, chordNumbers).forEach(function (x) { return x[0].chordNumber = x[1]; });
-        return generateNodes(scale);
+        var scaleSpec = {
+            noteSpec: createNoteSpec(naturalIndex, newIndex),
+            mode: newMode
+        };
+        var scale = generateScale(scaleSpec);
+        mod.zip(scale, generateChordNumbers(scale, newMode)).forEach(function (x) { return x[0].chord = x[1]; });
+        console.log(scale.filter(function (x) { return x.isScaleNote; }).map(function (x) { return x.note.label + " "; }).join());
+        return generateNodes(scale, newMode);
     }
     music2.generateScaleShim = generateScaleShim;
-    function generateScale(index, note, mode) {
-        var scale = [];
-        music2.indexList.setStart(index);
-        music2.diatonic.setStart(mode.index);
-        music2.noteList.setStart(music2.noteIndex[note]);
+    function generateScale(scaleSpec) {
+        music2.indexList.setStart(scaleSpec.noteSpec.index);
+        naturalList.setStart(scaleSpec.noteSpec.natural.id);
+        music2.diatonic.setStart(scaleSpec.mode.index);
         music2.intervals.setStart(0);
         var workingSet = music2.indexList.merge3(buildScaleCounter(music2.diatonic.toArray()), music2.intervals.toArray());
-        var getLabel = function (index, noteNum) {
-            var noteIndex = music2.noteList.itemAt(noteNum);
-            var offset = mod.diff(12, noteIndex, index);
-            var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
-            return NoteName[music2.noteList.itemAt(noteNum)] + noteLabel.label;
-        };
         return workingSet.map(function (item) {
             var index = item[0];
             var isScaleNote = item[1][0];
-            var noteNumber = item[1][1];
-            var activeInterval = isScaleNote
-                ? item[2].filter(function (x) { return x.ord == noteNumber; })[0]
-                : item[2][0];
-            var label = isScaleNote
-                ? getLabel(index, noteNumber)
-                : getLabel(index, activeInterval.ord);
-            // console.log("index: " + index + ", isScaleNote: " + isScaleNote + ", scaleCounter: " 
-            //     + noteNumber + ", label: " + label + ", interval: " + getIntervalName(activeInterval))
+            var noteNumber;
+            var natural;
+            var activeInterval;
+            if (isScaleNote) {
+                noteNumber = item[1][1];
+                natural = naturalList.itemAt(noteNumber);
+                activeInterval = item[2].filter(function (x) { return x.ord == noteNumber; })[0];
+            }
+            else {
+                activeInterval = item[2][0];
+                noteNumber = activeInterval.ord;
+                natural = naturalList.itemAt(activeInterval.ord);
+            }
+            // console.log("index: " + index + ", isScaleNote: " + isScaleNote 
+            //     + ", noteNumber: " + noteNumber + ", natural.index: " + natural.index
+            //     + ", natural.label: " + natural.label
+            //     + ", interval: " + getIntervalName(activeInterval))
             return {
-                index: index,
-                label: label,
+                note: createNoteSpec(natural.index, index),
                 interval: activeInterval,
                 intervalName: music2.getIntervalName(activeInterval),
                 isScaleNote: isScaleNote,
-                noteNumber: noteNumber,
-                diatonicOffset: mode.index
+                noteNumber: noteNumber
             };
         });
     }
     music2.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, chordIndex) {
+    function generateNodes(scaleNotes, mode, chordIndex) {
         if (chordIndex === void 0) { chordIndex = 0; }
-        var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].index) % 12;
+        var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music2.intervals.setStart(12 - chordIndexOffset);
-        music2.diatonic.setStart(scaleNotes[0].diatonicOffset);
-        var startAt = scaleNotes.filter(function (x) { return x.index === chordIndex; })[0].noteNumber;
+        music2.diatonic.setStart(mode.index);
+        var startAt = scaleNotes.filter(function (x) { return x.note.index === chordIndex; })[0].noteNumber;
         var workingSet = music2.intervals.merge3(scaleNotes, buildScaleCounter(music2.diatonic.toArray(), startAt));
         return workingSet.map(function (item) {
             var chordIntervalCandidates = item[0];
@@ -331,20 +353,23 @@ var music2;
         });
     }
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    function generateChordNumbers(scaleNotes) {
+    function generateChordNumbers(scaleNotes, mode) {
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
                 var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, scaleNote.index);
+                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index);
                 var diminished = "";
                 var seventh = "";
+                var type = ChordType.Minor;
                 // does it have a diminished 5th?
                 if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim; })) {
                     diminished = "°";
+                    type = ChordType.Diminished;
                 }
                 // does it have a major 3rd?
                 if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj; })) {
                     roman = roman.toLocaleUpperCase();
+                    type = ChordType.Major;
                 }
                 // does it have a natural 7th?
                 if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min; })) {
@@ -352,11 +377,17 @@ var music2;
                 }
                 // does it have a major 7th?
                 if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj; })) {
-                    seventh = "maj7";
+                    seventh = "^7";
                 }
-                return roman + diminished + seventh;
+                return {
+                    romanNumeral: roman + diminished + seventh,
+                    type: type
+                };
             }
-            return "";
+            return {
+                romanNumeral: "",
+                type: ChordType.Major
+            };
         });
     }
     music2.generateChordNumbers = generateChordNumbers;
@@ -730,7 +761,7 @@ var cof;
                 startAngle: 0,
                 endAngle: 0,
                 scaleNote: {},
-                index: node.scaleNote.index,
+                index: node.scaleNote.note.index,
                 node: node
             }); });
             this.noteSegments
@@ -739,7 +770,7 @@ var cof;
                 (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""); });
             this.noteText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.scaleNote.label; });
+                .text(function (d) { return d.node.scaleNote.note.label; });
             this.intervalSegments
                 .data(data, this.indexer)
                 .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment"; });
@@ -748,83 +779,32 @@ var cof;
                 .text(function (d) { return d.node.scaleNote.intervalName; });
             this.chordText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.scaleNote.chordNumber + ""; });
+                .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });
             this.chordSegments
                 .data(data, this.indexer)
-                .attr("class", "chord-segment");
+                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment"; });
             this.chordNotes
                 .data(data, this.indexer)
-                .attr("chord-segment-note");
-        };
-        NoteCircle.prototype.update = function (stateChange) {
-            var data = [];
-            for (var _i = 0, _a = stateChange.scale2; _i < _a.length; _i++) {
-                var n = _a[_i];
-                data.push({
-                    startAngle: 0,
-                    endAngle: 0,
-                    scaleNote: n,
-                    index: n.index,
-                    node: music2.nullNode
-                });
-            }
-            this.noteSegments
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return "note-segment " + ((i === 0) ? "note-segment-tonic" : "note-segment-scale"); })
-                .exit()
-                .attr("class", "note-segment");
-            this.noteText
-                .data(data, this.indexer)
-                .text(function (d) { return d.scaleNote.noteName; })
-                .exit()
-                .text("");
-            this.intervalSegments
-                .data(data, this.indexer)
-                .attr("class", "degree-segment-selected")
-                .exit()
-                .attr("class", "degree-segment");
-            this.intervalText
-                .data(data, this.indexer)
-                .text(function (d, i) { return d.scaleNote.intervalShort; })
-                .exit()
-                .text("");
-            this.chordText
-                .data(data, this.indexer)
-                .text(function (d, i) { return d.scaleNote.chord.romanNumeral; })
-                .exit()
-                .text("");
-            this.chordSegments
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return getChordSegmentClass(d.scaleNote); })
-                .exit()
-                .attr("class", "chord-segment");
-            this.chordNotes
-                .data(data, this.indexer)
-                .attr("class", function (d, i) { return getChordNoteClass(d.scaleNote); })
-                .exit()
                 .attr("class", "chord-segment-note");
         };
         return NoteCircle;
     }());
     cof_1.NoteCircle = NoteCircle;
-    function getChordSegmentClass(note) {
-        if (note.chord.type === music.ChordType.Diminished)
+    function getChordSegmentClass(chord) {
+        if (chord.type === music2.ChordType.Diminished)
             return "chord-segment-dim";
-        if (note.chord.type === music.ChordType.Minor)
+        if (chord.type === music2.ChordType.Minor)
             return "chord-segment-minor";
-        if (note.chord.type === music.ChordType.Major)
+        if (chord.type === music2.ChordType.Major)
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
-    function getChordNoteClass(note) {
-        if (note.chordNote === undefined)
-            return "chord-segment-note";
-        if (note.chordNote === 0)
-            return "chord-segment-note-root";
-        if (note.chordNote === 1)
-            return "chord-segment-note-third";
-        return "chord-segment-note-fifth";
-    }
+    // function getChordNoteClass(chord: music2.Chord): string {
+    //     if (note.chordNote === undefined) return "chord-segment-note";
+    //     if (note.chordNote === 0) return "chord-segment-note-root";
+    //     if (note.chordNote === 1) return "chord-segment-note-third";
+    //     return "chord-segment-note-fifth";
+    // }
     function generateSegments(fifths) {
         var count = fifths.length;
         var items = [];
@@ -856,7 +836,7 @@ var cof;
         });
     }
     function handleChordClick(segment, i) {
-        events.chordChange.publish({ chordIndex: segment.scaleNote.index });
+        events.chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
     }
 })(cof || (cof = {}));
 var tonics;
