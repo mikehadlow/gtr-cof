@@ -610,7 +610,6 @@ var cof;
             this.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", function (d) { return d.node.toggle ? "interval-note-selected" : "interval-note"; })
-                .attr("opacity", 50)
                 .style("fill", function (d) { return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none"; });
             this.chordText
                 .data(data, this.indexer)
@@ -827,10 +826,10 @@ var gtr;
     }
     function setLabels() {
         function setNoteName(note) {
-            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.note.label : "";
+            return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
         }
         function setInterval(note) {
-            return note.node.scaleNote.isScaleNote ? note.node.intervalName : "";
+            return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.intervalName : "";
         }
         switch (fretboardLabelType) {
             case events.FretboardLabelType.None:
@@ -918,19 +917,24 @@ var gtr;
         }
     }
     function update(stateChange) {
+        var hasToggledNotes = stateChange.nodes.some(function (x) { return x.toggle; });
         var fill = function (d) {
-            return d.node.scaleNote.isScaleNote
-                ? d.node.scaleNote.noteNumber === 0 ? "yellow" : "white"
-                : "none";
+            return d.node.toggle
+                ? "white"
+                : d.node.scaleNote.isScaleNote
+                    ? d.node.scaleNote.noteNumber === 0
+                        ? hasToggledNotes ? "white" : "yellow"
+                        : "white"
+                    : "none";
         };
         var stroke = function (d) {
-            return d.node.scaleNote.isScaleNote ? "grey" : "none";
+            return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
+                : hasToggledNotes ? "none"
+                    : d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
         var strokeWidth = function (d) {
-            return d.node.scaleNote.isScaleNote ? 2 : 0;
-        };
-        var setText = function (d) {
-            return d.node.scaleNote.isScaleNote ? d.node.scaleNote.note.label : "";
+            return d.node.toggle ? 4
+                : d.node.scaleNote.isScaleNote ? 2 : 0;
         };
         var data = repeatTo(stateChange.nodes, numberOfFrets);
         notes

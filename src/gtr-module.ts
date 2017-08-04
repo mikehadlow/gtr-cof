@@ -56,11 +56,11 @@ namespace gtr {
     function setLabels()
     {
         function setNoteName(note: StringNote): string {
-            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.note.label : "";
+            return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
         }
 
         function setInterval(note: StringNote): string {
-            return note.node.scaleNote.isScaleNote ? note.node.intervalName : "";
+            return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.intervalName : "";
         }
 
         switch (fretboardLabelType) {
@@ -162,23 +162,28 @@ namespace gtr {
 
     function update(stateChange: events.ScaleChangedEvent): void {
 
+        let hasToggledNotes = stateChange.nodes.some(x => x.toggle);
+
         let fill = function (d: StringNote): string {
-            return d.node.scaleNote.isScaleNote 
-                ? d.node.scaleNote.noteNumber === 0 ? "yellow" : "white" 
-                : "none";
+            return d.node.toggle 
+                ? "white" 
+                : d.node.scaleNote.isScaleNote 
+                    ? d.node.scaleNote.noteNumber === 0 
+                        ? hasToggledNotes ? "white" : "yellow" 
+                        : "white" 
+                    : "none";
         };
 
         let stroke = function (d: StringNote): string {
-            return d.node.scaleNote.isScaleNote ? "grey" : "none";
+            return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) 
+                : hasToggledNotes ? "none"
+                : d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
 
         let strokeWidth = function (d: StringNote): number {
-            return d.node.scaleNote.isScaleNote ? 2 : 0;
+            return d.node.toggle ? 4 
+                : d.node.scaleNote.isScaleNote ? 2 : 0;
         };
-
-        let setText = function(d: StringNote): string {
-            return d.node.scaleNote.isScaleNote ? d.node.scaleNote.note.label : "";
-        }
 
         let data = repeatTo(stateChange.nodes, numberOfFrets);
 
@@ -189,10 +194,8 @@ namespace gtr {
             .attr("stroke-width", strokeWidth);
         
         noteLabels.data(data, indexer)
-
         setLabels();
         currentState = stateChange;
-
     }
 
     function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
