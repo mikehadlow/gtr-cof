@@ -137,7 +137,6 @@ div {
     stroke: none;
 }
 .interval-note-selected {
-    fill: white;
     stroke: black;
     stroke-width: 2px;
 }

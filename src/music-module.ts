@@ -19,23 +19,24 @@ namespace music {
     export interface Interval {
         readonly ord: number;
         readonly type: IntervalType;
+        readonly colour: number;
     };
 
     export let getIntervalName: (x: Interval) => string = interval => intervalName[interval.type] + (interval.ord + 1); 
 
     export let intervals: mod.Mod<Interval[]> = new mod.Mod([
-        [{ ord: 0, type: IntervalType.Nat }, { ord: 1, type: IntervalType.Dim }],
-        [{ ord: 1, type: IntervalType.Min }, { ord: 0, type: IntervalType.Aug }],
-        [{ ord: 1, type: IntervalType.Maj }, { ord: 2, type: IntervalType.Dim }],
-        [{ ord: 2, type: IntervalType.Min }, { ord: 1, type: IntervalType.Aug }],
-        [{ ord: 2, type: IntervalType.Maj }, { ord: 3, type: IntervalType.Dim }],
-        [{ ord: 3, type: IntervalType.Nat }, { ord: 2, type: IntervalType.Aug }],
-        [{ ord: 4, type: IntervalType.Dim }, { ord: 3, type: IntervalType.Aug }],
-        [{ ord: 4, type: IntervalType.Nat }, { ord: 5, type: IntervalType.Dim }],
-        [{ ord: 5, type: IntervalType.Min }, { ord: 4, type: IntervalType.Aug }],
-        [{ ord: 5, type: IntervalType.Maj }, { ord: 6, type: IntervalType.Dim }],
-        [{ ord: 6, type: IntervalType.Min }, { ord: 5, type: IntervalType.Aug }],
-        [{ ord: 6, type: IntervalType.Maj }, { ord: 0, type: IntervalType.Dim }],
+        [{ ord: 0, type: IntervalType.Nat, colour: 0xf44b42 }, { ord: 1, type: IntervalType.Dim, colour: 0xf44b42 }],
+        [{ ord: 1, type: IntervalType.Min, colour: 0xf48942 }, { ord: 0, type: IntervalType.Aug, colour: 0xf48942 }],
+        [{ ord: 1, type: IntervalType.Maj, colour: 0xf4bf42 }, { ord: 2, type: IntervalType.Dim, colour: 0xf4bf42 }],
+        [{ ord: 2, type: IntervalType.Min, colour: 0xf4ee42 }, { ord: 1, type: IntervalType.Aug, colour: 0xf4ee42 }],
+        [{ ord: 2, type: IntervalType.Maj, colour: 0x8cf442 }, { ord: 3, type: IntervalType.Dim, colour: 0x8cf442 }],
+        [{ ord: 3, type: IntervalType.Nat, colour: 0x42f4bf }, { ord: 2, type: IntervalType.Aug, colour: 0x42f4bf }],
+        [{ ord: 4, type: IntervalType.Dim, colour: 0x42d4f4 }, { ord: 3, type: IntervalType.Aug, colour: 0x42d4f4 }],
+        [{ ord: 4, type: IntervalType.Nat, colour: 0x429ef4 }, { ord: 5, type: IntervalType.Dim, colour: 0x429ef4 }],
+        [{ ord: 5, type: IntervalType.Min, colour: 0xe542f4 }, { ord: 4, type: IntervalType.Aug, colour: 0xe542f4 }],
+        [{ ord: 5, type: IntervalType.Maj, colour: 0xf44289 }, { ord: 6, type: IntervalType.Dim, colour: 0xf44289 }],
+        [{ ord: 6, type: IntervalType.Min, colour: 0xff8282 }, { ord: 5, type: IntervalType.Aug, colour: 0xff8282 }],
+        [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
 
     // root diatonic scale is major
@@ -169,7 +170,8 @@ namespace music {
             },
             interval: {
                 ord: 0,
-                type: 0
+                type: 0,
+                colour: 0
             },
             intervalName: "",
             isScaleNote: false,
@@ -177,7 +179,8 @@ namespace music {
         },
         chordInterval: {
             ord: 0,
-            type: 0
+            type: 0,
+            colour: 0
         },
         intervalName: "",
         isChordRoot: false,
@@ -295,7 +298,7 @@ namespace music {
         return scaleNotes.map((scaleNote, i) => {
             if(scaleNote.isScaleNote) {
                 let roman = romanNumeral[scaleNote.noteNumber];
-                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, []);
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, 0);
                 let diminished = "";
                 let seventh = "";
                 let type: ChordType = ChordType.Minor;

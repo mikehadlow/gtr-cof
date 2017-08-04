@@ -152,7 +152,7 @@ namespace cof {
             this.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
-                .attr("style", d => d.node.toggle ? "fill: light-green; pointer-events: none;" : "fill: none");
+                .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none");
 
             this.chordText
                 .data(data, this.indexer)

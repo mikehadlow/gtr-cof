@@ -159,18 +159,18 @@ var music;
     ;
     music.getIntervalName = function (interval) { return music.intervalName[interval.type] + (interval.ord + 1); };
     music.intervals = new mod.Mod([
-        [{ ord: 0, type: IntervalType.Nat }, { ord: 1, type: IntervalType.Dim }],
-        [{ ord: 1, type: IntervalType.Min }, { ord: 0, type: IntervalType.Aug }],
-        [{ ord: 1, type: IntervalType.Maj }, { ord: 2, type: IntervalType.Dim }],
-        [{ ord: 2, type: IntervalType.Min }, { ord: 1, type: IntervalType.Aug }],
-        [{ ord: 2, type: IntervalType.Maj }, { ord: 3, type: IntervalType.Dim }],
-        [{ ord: 3, type: IntervalType.Nat }, { ord: 2, type: IntervalType.Aug }],
-        [{ ord: 4, type: IntervalType.Dim }, { ord: 3, type: IntervalType.Aug }],
-        [{ ord: 4, type: IntervalType.Nat }, { ord: 5, type: IntervalType.Dim }],
-        [{ ord: 5, type: IntervalType.Min }, { ord: 4, type: IntervalType.Aug }],
-        [{ ord: 5, type: IntervalType.Maj }, { ord: 6, type: IntervalType.Dim }],
-        [{ ord: 6, type: IntervalType.Min }, { ord: 5, type: IntervalType.Aug }],
-        [{ ord: 6, type: IntervalType.Maj }, { ord: 0, type: IntervalType.Dim }],
+        [{ ord: 0, type: IntervalType.Nat, colour: 0xf44b42 }, { ord: 1, type: IntervalType.Dim, colour: 0xf44b42 }],
+        [{ ord: 1, type: IntervalType.Min, colour: 0xf48942 }, { ord: 0, type: IntervalType.Aug, colour: 0xf48942 }],
+        [{ ord: 1, type: IntervalType.Maj, colour: 0xf4bf42 }, { ord: 2, type: IntervalType.Dim, colour: 0xf4bf42 }],
+        [{ ord: 2, type: IntervalType.Min, colour: 0xf4ee42 }, { ord: 1, type: IntervalType.Aug, colour: 0xf4ee42 }],
+        [{ ord: 2, type: IntervalType.Maj, colour: 0x8cf442 }, { ord: 3, type: IntervalType.Dim, colour: 0x8cf442 }],
+        [{ ord: 3, type: IntervalType.Nat, colour: 0x42f4bf }, { ord: 2, type: IntervalType.Aug, colour: 0x42f4bf }],
+        [{ ord: 4, type: IntervalType.Dim, colour: 0x42d4f4 }, { ord: 3, type: IntervalType.Aug, colour: 0x42d4f4 }],
+        [{ ord: 4, type: IntervalType.Nat, colour: 0x429ef4 }, { ord: 5, type: IntervalType.Dim, colour: 0x429ef4 }],
+        [{ ord: 5, type: IntervalType.Min, colour: 0xe542f4 }, { ord: 4, type: IntervalType.Aug, colour: 0xe542f4 }],
+        [{ ord: 5, type: IntervalType.Maj, colour: 0xf44289 }, { ord: 6, type: IntervalType.Dim, colour: 0xf44289 }],
+        [{ ord: 6, type: IntervalType.Min, colour: 0xff8282 }, { ord: 5, type: IntervalType.Aug, colour: 0xff8282 }],
+        [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
     // root diatonic scale is major
     music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
@@ -252,7 +252,8 @@ var music;
             },
             interval: {
                 ord: 0,
-                type: 0
+                type: 0,
+                colour: 0
             },
             intervalName: "",
             isScaleNote: false,
@@ -260,7 +261,8 @@ var music;
         },
         chordInterval: {
             ord: 0,
-            type: 0
+            type: 0,
+            colour: 0
         },
         intervalName: "",
         isChordRoot: false,
@@ -361,7 +363,7 @@ var music;
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
                 var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, []);
+                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, 0);
                 var diminished = "";
                 var seventh = "";
                 var type = ChordType.Minor;
@@ -608,7 +610,8 @@ var cof;
             this.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", function (d) { return d.node.toggle ? "interval-note-selected" : "interval-note"; })
-                .attr("style", function (d) { return d.node.toggle ? "fill: light-green; pointer-events: none;" : "fill: none"; });
+                .attr("opacity", 50)
+                .style("fill", function (d) { return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none"; });
             this.chordText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });
