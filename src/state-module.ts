@@ -7,7 +7,7 @@ namespace state {
     let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
     let currentIndex: number = 0;
     let currentChordIndex: number = -1;
-    let currentToggledIndexes: number[] = [];
+    let currentToggledIndexes: number = 0; // index bitflag
 
     export function init() {
         let cookieData = cookies.readCookie();
@@ -27,6 +27,7 @@ namespace state {
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
+        events.toggle.subscribe(toggle);
 
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
@@ -52,12 +53,24 @@ namespace state {
         else {
             currentChordIndex = chordChangedEvent.chordIndex;
         }
-        currentToggledIndexes = [];
+        currentToggledIndexes = 0;
+        updateScale();
+    }
+
+    function toggle(toggleEvent: events.ToggleEvent): void {
+        currentToggledIndexes = currentToggledIndexes ^ 2**toggleEvent.index;
         updateScale();
     }
 
     function updateScale(): void {
         let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
+
+        // update togges, because a chord may have been generated.
+        currentToggledIndexes = nodes
+            .filter(x => x.toggle)
+            .map(x => x.scaleNote.note.index)
+            .reduce((a, b) => a + 2**b, 0);
+
         events.scaleChange.publish({
             nodes: nodes
         });

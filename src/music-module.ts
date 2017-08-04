@@ -184,7 +184,7 @@ namespace music {
         toggle: false
     };
 
-    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode, chordIndex: number, toggledIndexes: number[]): Node[] {
+    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode, chordIndex: number, toggledIndexes: number): Node[] {
         let scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
         if(chordIndex === -1) {
@@ -242,7 +242,7 @@ namespace music {
         scaleNotes: ScaleNote[], 
         mode:Mode, 
         chordIndex: number, 
-        toggledIndexes: number[],
+        toggledIndexes: number,
         chordSelected: boolean = false
     ): Node[] {
         let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
@@ -271,7 +271,7 @@ namespace music {
                 chordInterval: activeInterval,
                 intervalName: getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: calculateToggle(activeInterval, scaleNote, chordSelected)
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes)
             };
         });
     }
@@ -331,8 +331,16 @@ namespace music {
     }
 
     let chordIntervals = [0, 2, 4]; // root, third, fifth
-    export function calculateToggle(activeInterval: Interval, scaleNote: ScaleNote, chordSelected: boolean): boolean {
-        return chordSelected && scaleNote.isScaleNote && chordIntervals.some(x => activeInterval.ord === x);
+    export function calculateToggle(
+        activeInterval: Interval, 
+        scaleNote: ScaleNote, 
+        chordSelected: boolean, 
+        toggledIndexes: number
+    ): boolean {
+        if(toggledIndexes === 0) {
+            return chordSelected && scaleNote.isScaleNote && chordIntervals.some(x => activeInterval.ord === x);
+        }
+        return (toggledIndexes & (2**scaleNote.note.index)) != 0;
     }
 
     export function fifths(): Array<number> {

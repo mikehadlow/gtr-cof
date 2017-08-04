@@ -66,7 +66,8 @@ namespace cof {
                 .enter()
                 .append("path")
                 .attr("d", degreeArc)
-                .attr("class", "degree-segment")
+                .attr("class", "interval-segment")
+                .on("click", handleIntervalClick);
 
             this.intervalNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
@@ -142,7 +143,7 @@ namespace cof {
 
             this.intervalSegments
                 .data(data, this.indexer)
-                .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment");
+                .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
 
             this.intervalText
                 .data(data, this.indexer)
@@ -151,7 +152,7 @@ namespace cof {
             this.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
-                .attr("style", d => d.node.toggle ? "fill: light-green;" : "fill: none");
+                .attr("style", d => d.node.toggle ? "fill: light-green; pointer-events: none;" : "fill: none");
 
             this.chordText
                 .data(data, this.indexer)
@@ -210,6 +211,10 @@ namespace cof {
 
     function handleChordClick(segment: Segment, i: number): void {
         events.chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
+    }
+
+    function handleIntervalClick(segment: Segment, i: number): void {
+        events.toggle.publish({ index: segment.node.scaleNote.note.index });
     }
 
     interface Segment {

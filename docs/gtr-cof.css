@@ -141,6 +141,10 @@ div {
     stroke: black;
     stroke-width: 2px;
 }
+.interval-segment {
+    fill: white;
+    stroke: none;
+}
 .interval-note {
     fill: none;
     stroke: none;

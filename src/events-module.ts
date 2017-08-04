@@ -37,6 +37,12 @@ namespace events {
         readonly chordIndex: number;
     }
 
+    export let toggle: Bus<ToggleEvent> = new Bus<ToggleEvent>();
+
+    export interface ToggleEvent {
+        readonly index: number;
+    }
+
     export let tuningChange: Bus<TuningChangedEvent> = new Bus<TuningChangedEvent>();
 
     export interface TuningChangedEvent {

@@ -86,6 +86,7 @@ var events;
     events.tonicChange = new Bus();
     events.modeChange = new Bus();
     events.chordChange = new Bus();
+    events.toggle = new Bus();
     events.tuningChange = new Bus();
     events.leftHandedChange = new Bus();
     events.fretboardLabelChange = new Bus();
@@ -337,7 +338,7 @@ var music;
                 chordInterval: activeInterval,
                 intervalName: music.getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: calculateToggle(activeInterval, scaleNote, chordSelected)
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes)
             };
         });
     }
@@ -395,8 +396,11 @@ var music;
     }
     music.generateChordNumbers = generateChordNumbers;
     var chordIntervals = [0, 2, 4]; // root, third, fifth
-    function calculateToggle(activeInterval, scaleNote, chordSelected) {
-        return chordSelected && scaleNote.isScaleNote && chordIntervals.some(function (x) { return activeInterval.ord === x; });
+    function calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes) {
+        if (toggledIndexes === 0) {
+            return chordSelected && scaleNote.isScaleNote && chordIntervals.some(function (x) { return activeInterval.ord === x; });
+        }
+        return (toggledIndexes & (Math.pow(2, scaleNote.note.index))) != 0;
     }
     music.calculateToggle = calculateToggle;
     function fifths() {
@@ -424,7 +428,7 @@ var state;
     var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
     var currentIndex = 0;
     var currentChordIndex = -1;
-    var currentToggledIndexes = [];
+    var currentToggledIndexes = 0; // index bitflag
     function init() {
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
@@ -440,6 +444,7 @@ var state;
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
+        events.toggle.subscribe(toggle);
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
@@ -462,11 +467,20 @@ var state;
         else {
             currentChordIndex = chordChangedEvent.chordIndex;
         }
-        currentToggledIndexes = [];
+        currentToggledIndexes = 0;
+        updateScale();
+    }
+    function toggle(toggleEvent) {
+        currentToggledIndexes = currentToggledIndexes ^ Math.pow(2, toggleEvent.index);
         updateScale();
     }
     function updateScale() {
         var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
+        // update togges, because a chord may have been generated.
+        currentToggledIndexes = nodes
+            .filter(function (x) { return x.toggle; })
+            .map(function (x) { return x.scaleNote.note.index; })
+            .reduce(function (a, b) { return a + Math.pow(2, b); }, 0);
         events.scaleChange.publish({
             nodes: nodes
         });
@@ -521,7 +535,8 @@ var cof;
                 .enter()
                 .append("path")
                 .attr("d", degreeArc)
-                .attr("class", "degree-segment");
+                .attr("class", "interval-segment")
+                .on("click", handleIntervalClick);
             this.intervalNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
                 .enter()
@@ -586,14 +601,14 @@ var cof;
                 .text(function (d) { return d.node.scaleNote.note.label; });
             this.intervalSegments
                 .data(data, this.indexer)
-                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment"; });
+                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment"; });
             this.intervalText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.intervalName; });
             this.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", function (d) { return d.node.toggle ? "interval-note-selected" : "interval-note"; })
-                .attr("style", function (d) { return d.node.toggle ? "fill: light-green;" : "fill: none"; });
+                .attr("style", function (d) { return d.node.toggle ? "fill: light-green; pointer-events: none;" : "fill: none"; });
             this.chordText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });
@@ -649,6 +664,9 @@ var cof;
     }
     function handleChordClick(segment, i) {
         events.chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
+    }
+    function handleIntervalClick(segment, i) {
+        events.toggle.publish({ index: segment.node.scaleNote.note.index });
     }
 })(cof || (cof = {}));
 var tonics;
