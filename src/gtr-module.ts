@@ -60,7 +60,7 @@ namespace gtr {
         }
 
         function setInterval(note: StringNote): string {
-            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.intervalName : "";
+            return note.node.scaleNote.isScaleNote ? note.node.intervalName : "";
         }
 
         switch (fretboardLabelType) {

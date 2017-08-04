@@ -150,6 +150,9 @@ namespace music {
     export interface Node {
         readonly scaleNote: ScaleNote;
         readonly chordInterval: Interval;
+        readonly intervalName: string;
+        readonly isChordRoot: boolean;
+        readonly toggle: boolean;
     }
 
     export let nullNode: Node = {
@@ -175,13 +178,21 @@ namespace music {
         chordInterval: {
             ord: 0,
             type: 0
-        }
+        },
+        intervalName: "",
+        isChordRoot: false,
+        toggle: false
     };
 
-    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode): Node[] {
+    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode, chordIndex: number): Node[] {
         let scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
-        return generateNodes(scale, mode);
+        if(chordIndex === -1) {
+            return generateNodes(scale, mode, scale[0].note.index);
+        }
+        else {
+            return generateNodes(scale, mode, chordIndex, true);
+        }
     }
 
     export function generateScale(noteSpec: NoteSpec, mode: Mode): ScaleNote[] {
@@ -227,7 +238,7 @@ namespace music {
 
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    export function generateNodes(scaleNotes: ScaleNote[], mode:Mode, chordIndex: number = 0): Node[] {
+    export function generateNodes(scaleNotes: ScaleNote[], mode:Mode, chordIndex: number, chordSelected: boolean = false): Node[] {
         let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         intervals.setStart(12 - chordIndexOffset);
         diatonic.setStart(mode.index);
@@ -251,7 +262,10 @@ namespace music {
 
             return {
                 scaleNote: scaleNote,
-                chordInterval: activeInterval
+                chordInterval: activeInterval,
+                intervalName: getIntervalName(activeInterval),
+                isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
+                toggle: false
             };
         });
     }

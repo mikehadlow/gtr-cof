@@ -136,21 +136,6 @@ div {
     fill: none;
     stroke: none;
 }
-.chord-segment-note-root {
-    fill: lightcoral;
-    stroke: black;
-    stroke-width: 2px;
-}
-.chord-segment-note-third {
-    fill: lightgreen;
-    stroke: black;
-    stroke-width: 2px;
-}
-.chord-segment-note-fifth {
-    fill: lightblue;
-    stroke: black;
-    stroke-width: 2px;
-}
 
 /* Modes */
 .mode-button {

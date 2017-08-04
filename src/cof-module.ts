@@ -135,7 +135,7 @@ namespace cof {
 
             this.intervalText
                 .data(data, this.indexer)
-                .text(d => d.node.scaleNote.intervalName);
+                .text(d => d.node.intervalName);
 
             this.chordText
                 .data(data, this.indexer)
@@ -147,7 +147,7 @@ namespace cof {
 
             this.chordNotes
                 .data(data, this.indexer)
-                .attr("class", "chord-segment-note");
+                .attr("class", d => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord!) : "chord-segment-note");
         }
     }
 
@@ -157,13 +157,6 @@ namespace cof {
         if (chord.type === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
     }
-
-    // function getChordNoteClass(chord: music2.Chord): string {
-    //     if (note.chordNote === undefined) return "chord-segment-note";
-    //     if (note.chordNote === 0) return "chord-segment-note-root";
-    //     if (note.chordNote === 1) return "chord-segment-note-third";
-    //     return "chord-segment-note-fifth";
-    // }
 
     function generateSegments(fifths: number[]): Segment[] {
         let count = fifths.length;

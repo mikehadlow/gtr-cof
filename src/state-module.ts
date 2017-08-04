@@ -13,7 +13,10 @@ namespace state {
 
         if(cookieData.hasCookie) {
             currentIndex = cookieData.index;
-            currentMode = music.modes.filter((x) => x.index == cookieData.modeIndex)[0];
+            let cookieModes = music.modes.filter((x) => x.index == cookieData.modeIndex);
+            if(cookieModes.length > 0) {
+                currentMode = cookieModes[0];
+            }
             currentChordIndex = cookieData.chordIndex;
         }
 
@@ -42,7 +45,7 @@ namespace state {
     }
 
     function chordChanged(chordChangedEvent: events.ChordChangeEvent): void {
-        if(chordChangedEvent.chordIndex == currentChordIndex) {
+        if(chordChangedEvent.chordIndex === currentChordIndex) {
             currentChordIndex = -1
         }
         else {
@@ -52,7 +55,7 @@ namespace state {
     }
 
     function updateScale(): void {
-        let nodes = music.generateScaleShim(currentNoteSpec, currentMode);
+        let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex);
         events.scaleChange.publish({
             nodes: nodes
         });

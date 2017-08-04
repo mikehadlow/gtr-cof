@@ -110,7 +110,7 @@ var cookies;
         document.cookie = "gtr-cof-state="
             + tonicNode.scaleNote.note.index + "|"
             + tonicNode.scaleNote.note.natural.index + "|"
-            + 1 + "|" // mode index 
+            + 0 + "|" // mode index 
             + 0 // chordIndex
             + ";" + expires;
     }
@@ -260,12 +260,20 @@ var music;
         chordInterval: {
             ord: 0,
             type: 0
-        }
+        },
+        intervalName: "",
+        isChordRoot: false,
+        toggle: false
     };
-    function generateScaleShim(noteSpec, mode) {
+    function generateScaleShim(noteSpec, mode, chordIndex) {
         var scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
-        return generateNodes(scale, mode);
+        if (chordIndex === -1) {
+            return generateNodes(scale, mode, scale[0].note.index);
+        }
+        else {
+            return generateNodes(scale, mode, chordIndex, true);
+        }
     }
     music.generateScaleShim = generateScaleShim;
     function generateScale(noteSpec, mode) {
@@ -306,8 +314,8 @@ var music;
     music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, mode, chordIndex) {
-        if (chordIndex === void 0) { chordIndex = 0; }
+    function generateNodes(scaleNotes, mode, chordIndex, chordSelected) {
+        if (chordSelected === void 0) { chordSelected = false; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music.intervals.setStart(12 - chordIndexOffset);
         music.diatonic.setStart(mode.index);
@@ -326,7 +334,10 @@ var music;
             //     ", scaleCount: " + scaleNote.noteNumber + " -> " + scaleCounter[1]);
             return {
                 scaleNote: scaleNote,
-                chordInterval: activeInterval
+                chordInterval: activeInterval,
+                intervalName: music.getIntervalName(activeInterval),
+                isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
+                toggle: false
             };
         });
     }
@@ -412,7 +423,10 @@ var state;
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
             currentIndex = cookieData.index;
-            currentMode = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; })[0];
+            var cookieModes = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; });
+            if (cookieModes.length > 0) {
+                currentMode = cookieModes[0];
+            }
             currentChordIndex = cookieData.chordIndex;
         }
         // lets remember this while we reset everything.
@@ -436,7 +450,7 @@ var state;
         updateScale();
     }
     function chordChanged(chordChangedEvent) {
-        if (chordChangedEvent.chordIndex == currentChordIndex) {
+        if (chordChangedEvent.chordIndex === currentChordIndex) {
             currentChordIndex = -1;
         }
         else {
@@ -445,7 +459,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex);
         events.scaleChange.publish({
             nodes: nodes
         });
@@ -559,7 +573,7 @@ var cof;
                 .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "degree-segment"; });
             this.intervalText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.scaleNote.intervalName; });
+                .text(function (d) { return d.node.intervalName; });
             this.chordText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });
@@ -568,7 +582,7 @@ var cof;
                 .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment"; });
             this.chordNotes
                 .data(data, this.indexer)
-                .attr("class", "chord-segment-note");
+                .attr("class", function (d) { return d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note"; });
         };
         return NoteCircle;
     }());
@@ -582,12 +596,6 @@ var cof;
             return "chord-segment-major";
         throw "Unexpected ChordType";
     }
-    // function getChordNoteClass(chord: music2.Chord): string {
-    //     if (note.chordNote === undefined) return "chord-segment-note";
-    //     if (note.chordNote === 0) return "chord-segment-note-root";
-    //     if (note.chordNote === 1) return "chord-segment-note-third";
-    //     return "chord-segment-note-fifth";
-    // }
     function generateSegments(fifths) {
         var count = fifths.length;
         var items = [];
@@ -781,7 +789,7 @@ var gtr;
             return note.node.scaleNote.isScaleNote ? note.node.scaleNote.note.label : "";
         }
         function setInterval(note) {
-            return note.node.scaleNote.isScaleNote ? note.node.scaleNote.intervalName : "";
+            return note.node.scaleNote.isScaleNote ? note.node.intervalName : "";
         }
         switch (fretboardLabelType) {
             case events.FretboardLabelType.None:

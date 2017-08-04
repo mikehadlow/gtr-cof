@@ -12,7 +12,7 @@ namespace cookies {
         document.cookie = "gtr-cof-state=" 
             + tonicNode.scaleNote.note.index + "|" 
             + tonicNode.scaleNote.note.natural.index + "|" 
-            + 1 + "|" // mode index 
+            + 0 + "|" // mode index 
             + 0 // chordIndex
             + ";" + expires;
     }
