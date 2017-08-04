@@ -265,14 +265,14 @@ var music;
         isChordRoot: false,
         toggle: false
     };
-    function generateScaleShim(noteSpec, mode, chordIndex) {
+    function generateScaleShim(noteSpec, mode, chordIndex, toggledIndexes) {
         var scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
         if (chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index);
+            return generateNodes(scale, mode, scale[0].note.index, toggledIndexes);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, true);
+            return generateNodes(scale, mode, chordIndex, toggledIndexes, true);
         }
     }
     music.generateScaleShim = generateScaleShim;
@@ -314,7 +314,7 @@ var music;
     music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, mode, chordIndex, chordSelected) {
+    function generateNodes(scaleNotes, mode, chordIndex, toggledIndexes, chordSelected) {
         if (chordSelected === void 0) { chordSelected = false; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music.intervals.setStart(12 - chordIndexOffset);
@@ -337,7 +337,7 @@ var music;
                 chordInterval: activeInterval,
                 intervalName: music.getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: false
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected)
             };
         });
     }
@@ -360,7 +360,7 @@ var music;
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
                 var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index);
+                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, []);
                 var diminished = "";
                 var seventh = "";
                 var type = ChordType.Minor;
@@ -394,6 +394,11 @@ var music;
         });
     }
     music.generateChordNumbers = generateChordNumbers;
+    var chordIntervals = [0, 2, 4]; // root, third, fifth
+    function calculateToggle(activeInterval, scaleNote, chordSelected) {
+        return chordSelected && scaleNote.isScaleNote && chordIntervals.some(function (x) { return activeInterval.ord === x; });
+    }
+    music.calculateToggle = calculateToggle;
     function fifths() {
         var indexes = [];
         var current = 0;
@@ -419,6 +424,7 @@ var state;
     var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
     var currentIndex = 0;
     var currentChordIndex = -1;
+    var currentToggledIndexes = [];
     function init() {
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
@@ -456,10 +462,11 @@ var state;
         else {
             currentChordIndex = chordChangedEvent.chordIndex;
         }
+        currentToggledIndexes = [];
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
         events.scaleChange.publish({
             nodes: nodes
         });
@@ -515,6 +522,15 @@ var cof;
                 .append("path")
                 .attr("d", degreeArc)
                 .attr("class", "degree-segment");
+            this.intervalNotes = cof.append("g").selectAll("circle")
+                .data(segments, this.indexer)
+                .enter()
+                .append("circle")
+                .style("pointer-events", "none")
+                .attr("r", 25)
+                .attr("cx", function (x) { return degreeArc.centroid(x)[0]; })
+                .attr("cy", function (x) { return degreeArc.centroid(x)[1]; })
+                .attr("class", "interval-note");
             this.intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
@@ -535,7 +551,7 @@ var cof;
                 .enter()
                 .append("circle")
                 .style("pointer-events", "none")
-                .attr("r", 25)
+                .attr("r", 28)
                 .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
@@ -551,9 +567,9 @@ var cof;
             // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
             //     instance.update(stateChange);
             // });
-            events.scaleChange.subscribe(function (scaleChnaged) { return _this.update2(scaleChnaged); });
+            events.scaleChange.subscribe(function (scaleChnaged) { return _this.update(scaleChnaged); });
         }
-        NoteCircle.prototype.update2 = function (scaleChnaged) {
+        NoteCircle.prototype.update = function (scaleChnaged) {
             var data = scaleChnaged.nodes.map(function (node) { return ({
                 startAngle: 0,
                 endAngle: 0,
@@ -574,6 +590,10 @@ var cof;
             this.intervalText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.intervalName; });
+            this.intervalNotes
+                .data(data, this.indexer)
+                .attr("class", function (d) { return d.node.toggle ? "interval-note-selected" : "interval-note"; })
+                .attr("style", function (d) { return d.node.toggle ? "fill: light-green;" : "fill: none"; });
             this.chordText
                 .data(data, this.indexer)
                 .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });

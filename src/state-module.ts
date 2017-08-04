@@ -6,7 +6,8 @@ namespace state {
     let currentMode: music.Mode = music.modes[1];
     let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
     let currentIndex: number = 0;
-    let currentChordIndex: number = -1
+    let currentChordIndex: number = -1;
+    let currentToggledIndexes: number[] = [];
 
     export function init() {
         let cookieData = cookies.readCookie();
@@ -51,11 +52,12 @@ namespace state {
         else {
             currentChordIndex = chordChangedEvent.chordIndex;
         }
+        currentToggledIndexes = [];
         updateScale();
     }
 
     function updateScale(): void {
-        let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex);
+        let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
         events.scaleChange.publish({
             nodes: nodes
         });

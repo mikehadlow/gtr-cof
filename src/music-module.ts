@@ -184,14 +184,14 @@ namespace music {
         toggle: false
     };
 
-    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode, chordIndex: number): Node[] {
+    export function generateScaleShim(noteSpec: NoteSpec, mode: Mode, chordIndex: number, toggledIndexes: number[]): Node[] {
         let scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
         if(chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index);
+            return generateNodes(scale, mode, scale[0].note.index, toggledIndexes);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, true);
+            return generateNodes(scale, mode, chordIndex, toggledIndexes, true);
         }
     }
 
@@ -238,7 +238,13 @@ namespace music {
 
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    export function generateNodes(scaleNotes: ScaleNote[], mode:Mode, chordIndex: number, chordSelected: boolean = false): Node[] {
+    export function generateNodes(
+        scaleNotes: ScaleNote[], 
+        mode:Mode, 
+        chordIndex: number, 
+        toggledIndexes: number[],
+        chordSelected: boolean = false
+    ): Node[] {
         let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         intervals.setStart(12 - chordIndexOffset);
         diatonic.setStart(mode.index);
@@ -265,7 +271,7 @@ namespace music {
                 chordInterval: activeInterval,
                 intervalName: getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: false
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected)
             };
         });
     }
@@ -289,7 +295,7 @@ namespace music {
         return scaleNotes.map((scaleNote, i) => {
             if(scaleNote.isScaleNote) {
                 let roman = romanNumeral[scaleNote.noteNumber];
-                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index);
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, []);
                 let diminished = "";
                 let seventh = "";
                 let type: ChordType = ChordType.Minor;
@@ -322,6 +328,11 @@ namespace music {
                 type: ChordType.Major
             };
         });
+    }
+
+    let chordIntervals = [0, 2, 4]; // root, third, fifth
+    export function calculateToggle(activeInterval: Interval, scaleNote: ScaleNote, chordSelected: boolean): boolean {
+        return chordSelected && scaleNote.isScaleNote && chordIntervals.some(x => activeInterval.ord === x);
     }
 
     export function fifths(): Array<number> {

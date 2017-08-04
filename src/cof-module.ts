@@ -6,6 +6,7 @@ namespace cof {
         noteText: d3.Selection<Segment>;
         intervalSegments: d3.Selection<Segment>;
         intervalText: d3.Selection<Segment>;
+        intervalNotes: d3.Selection<Segment>;
         chordText: d3.Selection<Segment>;
         chordSegments: d3.Selection<Segment>;
         chordNotes: d3.Selection<Segment>;
@@ -67,6 +68,16 @@ namespace cof {
                 .attr("d", degreeArc)
                 .attr("class", "degree-segment")
 
+            this.intervalNotes = cof.append("g").selectAll("circle")
+                .data(segments, this.indexer)
+                .enter()
+                .append("circle")
+                .style("pointer-events", "none")
+                .attr("r", 25)
+                .attr("cx", function (x) { return degreeArc.centroid(x)[0]; })
+                .attr("cy", function (x) { return degreeArc.centroid(x)[1]; })
+                .attr("class", "interval-note")
+
             this.intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
@@ -89,7 +100,7 @@ namespace cof {
                 .enter()
                 .append("circle")
                 .style("pointer-events", "none")
-                .attr("r", 25)
+                .attr("r", 28)
                 .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
@@ -108,10 +119,10 @@ namespace cof {
             //     instance.update(stateChange);
             // });
 
-            events.scaleChange.subscribe(scaleChnaged => this.update2(scaleChnaged));
+            events.scaleChange.subscribe(scaleChnaged => this.update(scaleChnaged));
         }
 
-        update2(scaleChnaged: events.ScaleChangedEvent): void {
+        update(scaleChnaged: events.ScaleChangedEvent): void {
             let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
                     startAngle: 0,
                     endAngle: 0,
@@ -136,6 +147,11 @@ namespace cof {
             this.intervalText
                 .data(data, this.indexer)
                 .text(d => d.node.intervalName);
+
+            this.intervalNotes
+                .data(data, this.indexer)
+                .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
+                .attr("style", d => d.node.toggle ? "fill: light-green;" : "fill: none");
 
             this.chordText
                 .data(data, this.indexer)
