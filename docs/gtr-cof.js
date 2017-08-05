@@ -433,14 +433,22 @@ var state;
     var currentChordIndex = -1;
     var currentToggledIndexes = 0; // index bitflag
     function init() {
-        var cookieData = cookies.readCookie();
-        if (cookieData.hasCookie) {
-            var cookieModes = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; });
-            if (cookieModes.length > 0) {
-                currentMode = cookieModes[0];
+        try {
+            var cookieData_1 = cookies.readCookie();
+            if (cookieData_1.hasCookie) {
+                var cookieModes = music.modes.filter(function (x) { return x.index == cookieData_1.modeIndex; });
+                if (cookieModes.length > 0) {
+                    currentMode = cookieModes[0];
+                }
+                currentChordIndex = cookieData_1.chordIndex;
+                currentNoteSpec = music.createNoteSpec(cookieData_1.naturalIndex, cookieData_1.index);
             }
-            currentChordIndex = cookieData.chordIndex;
-            currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
+        }
+        catch (e) {
+            // ignore the invalid cookie:
+            var currentMode_1 = music.modes[1];
+            var currentNoteSpec_1 = music.createNoteSpec(3, 3); // C natural is default
+            var currentChordIndex_1 = -1;
         }
         // lets remember this while we reset everything.
         var tempChordIndex = currentChordIndex;

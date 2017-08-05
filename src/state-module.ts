@@ -9,15 +9,23 @@ namespace state {
     let currentToggledIndexes: number = 0; // index bitflag
 
     export function init() {
-        let cookieData = cookies.readCookie();
+        try{
+            let cookieData = cookies.readCookie();
 
-        if(cookieData.hasCookie) {
-            let cookieModes = music.modes.filter((x) => x.index == cookieData.modeIndex);
-            if(cookieModes.length > 0) {
-                currentMode = cookieModes[0];
+            if(cookieData.hasCookie) {
+                let cookieModes = music.modes.filter((x) => x.index == cookieData.modeIndex);
+                if(cookieModes.length > 0) {
+                    currentMode = cookieModes[0];
+                }
+                currentChordIndex = cookieData.chordIndex;
+                currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
             }
-            currentChordIndex = cookieData.chordIndex;
-            currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
+        }
+        catch(e) {
+            // ignore the invalid cookie:
+            let currentMode: music.Mode = music.modes[1];
+            let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
+            let currentChordIndex: number = -1;
         }
 
         // lets remember this while we reset everything.
