@@ -111,8 +111,10 @@ var cookies;
         document.cookie = "gtr-cof-state="
             + tonicNode.scaleNote.note.index + "|"
             + tonicNode.scaleNote.note.natural.index + "|"
-            + 0 + "|" // mode index 
-            + 0 // chordIndex
+            + scaleChange.mode.index + "|"
+            + (scaleChange.nodes.some(function (x) { return x.isChordRoot; })
+                ? scaleChange.nodes.filter(function (x) { return x.isChordRoot; })[0].scaleNote.note.index
+                : -1) + ""
             + ";" + expires;
     }
     function readCookie() {
@@ -123,7 +125,7 @@ var cookies;
                 return {
                     hasCookie: true,
                     index: Number(items[0]),
-                    noteBaseIndex: Number(items[1]),
+                    naturalIndex: Number(items[1]),
                     modeIndex: Number(items[2]),
                     chordIndex: Number(items[3])
                 };
@@ -132,7 +134,7 @@ var cookies;
         return {
             hasCookie: false,
             index: 0,
-            noteBaseIndex: 0,
+            naturalIndex: 0,
             modeIndex: 0,
             chordIndex: -1
         };
@@ -428,18 +430,17 @@ var state;
 (function (state) {
     var currentMode = music.modes[1];
     var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
-    var currentIndex = 0;
     var currentChordIndex = -1;
     var currentToggledIndexes = 0; // index bitflag
     function init() {
         var cookieData = cookies.readCookie();
         if (cookieData.hasCookie) {
-            currentIndex = cookieData.index;
             var cookieModes = music.modes.filter(function (x) { return x.index == cookieData.modeIndex; });
             if (cookieModes.length > 0) {
                 currentMode = cookieModes[0];
             }
             currentChordIndex = cookieData.chordIndex;
+            currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
         }
         // lets remember this while we reset everything.
         var tempChordIndex = currentChordIndex;
@@ -484,7 +485,8 @@ var state;
             .map(function (x) { return x.scaleNote.note.index; })
             .reduce(function (a, b) { return a + Math.pow(2, b); }, 0);
         events.scaleChange.publish({
-            nodes: nodes
+            nodes: nodes,
+            mode: currentMode
         });
     }
 })(state || (state = {}));
@@ -899,8 +901,7 @@ var gtr;
             .attr("r", noteRadius)
             .attr("cy", stringGap / 2)
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
-            .attr("fill", "none")
-            .attr("stroke", "none");
+            .on("click", function (d) { return events.toggle.publish({ index: d.index }); });
         noteLabels = strings
             .selectAll("text")
             .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
@@ -925,7 +926,7 @@ var gtr;
                     ? d.node.scaleNote.noteNumber === 0
                         ? hasToggledNotes ? "white" : "yellow"
                         : "white"
-                    : "none";
+                    : "rgba(255, 255, 255, 0.01)";
         };
         var stroke = function (d) {
             return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)

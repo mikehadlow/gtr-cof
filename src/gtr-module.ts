@@ -139,8 +139,7 @@ namespace gtr {
             .attr("r", noteRadius)
             .attr("cy", stringGap / 2)
             .attr("cx", function (d, i) { return i * fretGap + pad + 30 })
-            .attr("fill", "none")
-            .attr("stroke", "none");
+            .on("click", d => events.toggle.publish({ index: d.index }));
 
         noteLabels = strings
             .selectAll("text")
@@ -171,7 +170,7 @@ namespace gtr {
                     ? d.node.scaleNote.noteNumber === 0 
                         ? hasToggledNotes ? "white" : "yellow" 
                         : "white" 
-                    : "none";
+                    : "rgba(255, 255, 255, 0.01)";
         };
 
         let stroke = function (d: StringNote): string {

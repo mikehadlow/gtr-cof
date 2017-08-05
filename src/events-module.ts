@@ -17,6 +17,7 @@ namespace events {
 
     export interface ScaleChangedEvent {
         readonly nodes: music.Node[];
+        readonly mode: music.Mode;
     }
 
     export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>();

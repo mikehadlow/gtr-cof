@@ -5,7 +5,6 @@ namespace state {
 
     let currentMode: music.Mode = music.modes[1];
     let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
-    let currentIndex: number = 0;
     let currentChordIndex: number = -1;
     let currentToggledIndexes: number = 0; // index bitflag
 
@@ -13,12 +12,12 @@ namespace state {
         let cookieData = cookies.readCookie();
 
         if(cookieData.hasCookie) {
-            currentIndex = cookieData.index;
             let cookieModes = music.modes.filter((x) => x.index == cookieData.modeIndex);
             if(cookieModes.length > 0) {
                 currentMode = cookieModes[0];
             }
             currentChordIndex = cookieData.chordIndex;
+            currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
         }
 
         // lets remember this while we reset everything.
@@ -72,7 +71,8 @@ namespace state {
             .reduce((a, b) => a + 2**b, 0);
 
         events.scaleChange.publish({
-            nodes: nodes
+            nodes: nodes,
+            mode: currentMode
         });
     }
 }

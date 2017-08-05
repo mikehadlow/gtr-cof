@@ -12,8 +12,10 @@ namespace cookies {
         document.cookie = "gtr-cof-state=" 
             + tonicNode.scaleNote.note.index + "|" 
             + tonicNode.scaleNote.note.natural.index + "|" 
-            + 0 + "|" // mode index 
-            + 0 // chordIndex
+            + scaleChange.mode.index + "|" 
+            + (scaleChange.nodes.some(x => x.isChordRoot) 
+                ? scaleChange.nodes.filter(x => x.isChordRoot)[0].scaleNote.note.index 
+                : -1) + "" 
             + ";" + expires;
     }
 
@@ -26,7 +28,7 @@ namespace cookies {
                 return {
                     hasCookie: true,
                     index: Number(items[0]),
-                    noteBaseIndex: Number(items[1]),
+                    naturalIndex: Number(items[1]),
                     modeIndex: Number(items[2]),
                     chordIndex: Number(items[3])
                 };
@@ -35,7 +37,7 @@ namespace cookies {
         return {
             hasCookie: false,
             index: 0,
-            noteBaseIndex: 0,
+            naturalIndex: 0,
             modeIndex: 0,
             chordIndex: -1
         };
@@ -44,7 +46,7 @@ namespace cookies {
     export interface CookieData {
         readonly hasCookie: boolean;
         readonly index: number;
-        readonly noteBaseIndex: number;
+        readonly naturalIndex: number;
         readonly modeIndex: number;
         readonly chordIndex: number;
     }
