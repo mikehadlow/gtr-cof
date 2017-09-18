@@ -270,14 +270,14 @@ var music;
         isChordRoot: false,
         toggle: false
     };
-    function generateScaleShim(noteSpec, mode, chordIndex, toggledIndexes) {
+    function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes) {
         var scale = generateScale(noteSpec, mode);
         mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
         if (chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, toggledIndexes);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, toggledIndexes, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, true);
         }
     }
     music.generateScaleShim = generateScaleShim;
@@ -319,7 +319,7 @@ var music;
     music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, mode, chordIndex, toggledIndexes, chordSelected) {
+    function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledIndexes, chordSelected) {
         if (chordSelected === void 0) { chordSelected = false; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music.intervals.setStart(12 - chordIndexOffset);
@@ -342,7 +342,7 @@ var music;
                 chordInterval: activeInterval,
                 intervalName: music.getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes)
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals)
             };
         });
     }
@@ -365,7 +365,7 @@ var music;
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
                 var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, 0);
+                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0);
                 var diminished = "";
                 var seventh = "";
                 var type = ChordType.Minor;
@@ -399,8 +399,7 @@ var music;
         });
     }
     music.generateChordNumbers = generateChordNumbers;
-    var chordIntervals = [0, 2, 4]; // root, third, fifth
-    function calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes) {
+    function calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals) {
         if (toggledIndexes === 0) {
             return chordSelected && scaleNote.isScaleNote && chordIntervals.some(function (x) { return activeInterval.ord === x; });
         }
@@ -431,6 +430,7 @@ var state;
     var currentMode = music.modes[1];
     var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
     var currentChordIndex = -1;
+    var currentChordIntervals = [0, 2, 4];
     var currentToggledIndexes = 0; // index bitflag
     function init() {
         try {
@@ -486,7 +486,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes);
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
             .filter(function (x) { return x.toggle; })

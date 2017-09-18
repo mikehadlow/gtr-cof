@@ -6,6 +6,7 @@ namespace state {
     let currentMode: music.Mode = music.modes[1];
     let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
     let currentChordIndex: number = -1;
+    let currentChordIntervals: number[] = [0, 2, 4];
     let currentToggledIndexes: number = 0; // index bitflag
 
     export function init() {
@@ -70,7 +71,12 @@ namespace state {
     }
 
     function updateScale(): void {
-        let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentToggledIndexes);
+        let nodes = music.generateScaleShim(
+            currentNoteSpec, 
+            currentMode, 
+            currentChordIndex, 
+            currentChordIntervals, 
+            currentToggledIndexes);
 
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
