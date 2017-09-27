@@ -9,7 +9,7 @@ namespace modes {
         let svg = d3.select("#modes");
         let modes = svg
             .append("g")
-            .attr("transform", "translate(0, 250)");
+            .attr("transform", "translate(0, 280)");
 
         let gs = modes.selectAll("g")
             .data(music.modes, function (m) { return m.index.toString(); })

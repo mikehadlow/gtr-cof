@@ -2,6 +2,7 @@
 
 tonics.init();
 modes.init();
+chordInterval.init();
 let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();

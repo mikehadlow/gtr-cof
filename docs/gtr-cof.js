@@ -96,6 +96,7 @@ var events;
         FretboardLabelType[FretboardLabelType["NoteName"] = 1] = "NoteName";
         FretboardLabelType[FretboardLabelType["Interval"] = 2] = "Interval";
     })(FretboardLabelType = events.FretboardLabelType || (events.FretboardLabelType = {}));
+    events.chordIntervalChange = new Bus();
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -456,9 +457,11 @@ var state;
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
+        events.chordIntervalChange.subscribe(function (x) { return currentChordIntervals = x.chordIntervals; });
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+        events.chordIntervalChange.publish({ chordIntervals: currentChordIntervals });
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
@@ -744,6 +747,55 @@ var tonics;
         return music.naturals.some(function (x) { return x.index === noteSpec.index && x.index != noteSpec.natural.index; });
     }
 })(tonics || (tonics = {}));
+var chordInterval;
+(function (chordInterval) {
+    var buttons;
+    var toggle = 0;
+    function init() {
+        var radius = 10;
+        var pad = 2;
+        var svg = d3.select("#modes");
+        var intervals = svg
+            .append("g")
+            .attr("transform", "translate(0, 240)");
+        var gs = intervals.selectAll("g")
+            .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)"; });
+        buttons = gs
+            .append("circle")
+            .attr("cx", radius)
+            .attr("cy", radius)
+            .attr("r", radius)
+            .attr("strokeWidth", 2)
+            .attr("class", "mode-button")
+            .on("click", onClick);
+        gs
+            .append("text")
+            .attr("x", radius)
+            .attr("y", radius + 5)
+            .attr("text-anchor", "middle")
+            .text(function (x) { return x + 1; });
+        events.chordIntervalChange.subscribe(update);
+    }
+    chordInterval.init = init;
+    function onClick(x) {
+        var updatedToggle = toggle ^ (Math.pow(2, x));
+        var chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(function (x) { return (Math.pow(2, x) & updatedToggle) === Math.pow(2, x); });
+        events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
+    }
+    function update(event) {
+        toggle = 0;
+        event.chordIntervals.forEach(function (x) { return toggle = toggle + Math.pow(2, x); });
+        buttons
+            .data(event.chordIntervals, function (m) { return m.toString(); })
+            .attr("class", "mode-button mode-button-selected")
+            .exit()
+            .attr("class", "mode-button");
+    }
+    chordInterval.update = update;
+})(chordInterval || (chordInterval = {}));
 var modes;
 (function (modes_1) {
     var buttons;
@@ -753,7 +805,7 @@ var modes;
         var svg = d3.select("#modes");
         var modes = svg
             .append("g")
-            .attr("transform", "translate(0, 250)");
+            .attr("transform", "translate(0, 280)");
         var gs = modes.selectAll("g")
             .data(music.modes, function (m) { return m.index.toString(); })
             .enter()
@@ -1061,6 +1113,7 @@ var settings;
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init();
+chordInterval.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();

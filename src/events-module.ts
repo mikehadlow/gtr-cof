@@ -70,4 +70,10 @@ namespace events {
         NoteName,
         Interval
     }
+
+    export let chordIntervalChange: Bus<ChordIntervalChangeEvent> = new Bus<ChordIntervalChangeEvent>();
+
+    export interface ChordIntervalChangeEvent {
+        readonly chordIntervals: number[];
+    }
 }

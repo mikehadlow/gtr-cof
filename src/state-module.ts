@@ -36,10 +36,12 @@ namespace state {
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
+        events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
 
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+        events.chordIntervalChange.publish( { chordIntervals: currentChordIntervals });
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {

@@ -16,6 +16,7 @@
         "src/state-module.ts",
         "src/cof-module.ts",
         "src/tonics-module.ts",
+        "src/chord-interval-module.ts",
         "src/modes-module.ts",
         "src/gtr-module.ts",
         "src/tuning-module.ts",
