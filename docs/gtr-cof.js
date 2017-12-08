@@ -1117,7 +1117,6 @@ var settings;
     }
     settings.onLeftHandedClick = onLeftHandedClick;
     function onFlipNut(e) {
-        console.log("Flip Nut");
         events.flipNutChange.publish({ isNutFlipped: e.checked });
     }
     settings.onFlipNut = onFlipNut;

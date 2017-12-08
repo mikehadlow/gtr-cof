@@ -6,7 +6,6 @@ namespace settings {
     }
 
     export function onFlipNut(e:HTMLInputElement) {
-        console.log("Flip Nut");
         events.flipNutChange.publish( { isNutFlipped: e.checked });
     }
 
