@@ -31,7 +31,9 @@ namespace gtr {
 
     function handleLeftHandedChanged(lhEvent: events.LeftHandedFretboardEvent) {
         isLeftHanded = lhEvent.isLeftHanded;
-        setHandedness();
+        if(currentTuning != null) {
+            updateFretboard(currentTuning);
+        }
     }
 
     function setHandedness()
@@ -98,7 +100,10 @@ namespace gtr {
             .attr("class", "mode-text")
             .attr("x", 30)
             .attr("y", 10)
-            .text(tuningInfo.tuning + " " + tuningInfo.description);
+            .text(tuningInfo.tuning + " " 
+                + tuningInfo.description 
+                + (isLeftHanded ? ", Left Handed" : "")
+                + (isNutFlipped ? ", Nut Flipped" : ""));
         let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = <SVGGElement>gtr.node();
 
