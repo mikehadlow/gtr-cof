@@ -1,12 +1,14 @@
 
 namespace gtr {
 
+    let currentTuning: events.TuningChangedEvent;
     let currentState: events.ScaleChangedEvent;
     let notes: d3.Selection<StringNote>;
     let noteLabels: d3.Selection<StringNote>;
     let numberOfFrets = 16;
     let fretboardElement: SVGGElement;
     let isLeftHanded: boolean = false;
+    let isNutFlipped: boolean = false;
     let fretboardLabelType: events.FretboardLabelType = events.FretboardLabelType.NoteName;
 
     let stringGap = 40;
@@ -23,6 +25,7 @@ namespace gtr {
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
+        events.flipNutChange.subscribe(handleFlipNutChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
 
@@ -45,6 +48,13 @@ namespace gtr {
             noteLabels
                 .attr("transform", (d, i) => "translate(0, 0) scale(1, 1)")
                 .attr("x", (d, i) => (i * fretGap + pad + 30))
+        }
+    }
+
+    function handleFlipNutChanged(fnEvent: events.FlipNutEvent) {
+        isNutFlipped = fnEvent.isNutFlipped;
+        if(currentTuning != null) {
+            updateFretboard(currentTuning);
         }
     }
 
@@ -78,6 +88,7 @@ namespace gtr {
 
     function updateFretboard(tuningInfo: events.TuningChangedEvent): void {
 
+        currentTuning = tuningInfo;
         let fretData: Array<number> = getFretData(numberOfFrets);
         let dots: Array<[number, number]> = tuningInfo.dots;
 
@@ -116,7 +127,7 @@ namespace gtr {
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
+            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });

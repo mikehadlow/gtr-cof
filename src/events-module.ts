@@ -59,6 +59,12 @@ namespace events {
         readonly isLeftHanded: boolean;
     }
 
+    export let flipNutChange: Bus<FlipNutEvent> = new Bus<FlipNutEvent>();
+
+    export interface FlipNutEvent {
+        readonly isNutFlipped: boolean;
+    }
+
     export let fretboardLabelChange: Bus<FretboardLabelChangeEvent> = new Bus<FretboardLabelChangeEvent>();
 
     export interface FretboardLabelChangeEvent {

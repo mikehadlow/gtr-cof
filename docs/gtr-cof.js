@@ -89,6 +89,7 @@ var events;
     events.toggle = new Bus();
     events.tuningChange = new Bus();
     events.leftHandedChange = new Bus();
+    events.flipNutChange = new Bus();
     events.fretboardLabelChange = new Bus();
     var FretboardLabelType;
     (function (FretboardLabelType) {
@@ -840,12 +841,14 @@ var modes;
 })(modes || (modes = {}));
 var gtr;
 (function (gtr_1) {
+    var currentTuning;
     var currentState;
     var notes;
     var noteLabels;
     var numberOfFrets = 16;
     var fretboardElement;
     var isLeftHanded = false;
+    var isNutFlipped = false;
     var fretboardLabelType = events.FretboardLabelType.NoteName;
     var stringGap = 40;
     var fretGap = 70;
@@ -859,6 +862,7 @@ var gtr;
         events.tuningChange.subscribe(updateFretboard);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
+        events.flipNutChange.subscribe(handleFlipNutChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
     gtr_1.init = init;
@@ -880,6 +884,12 @@ var gtr;
             noteLabels
                 .attr("transform", function (d, i) { return "translate(0, 0) scale(1, 1)"; })
                 .attr("x", function (d, i) { return (i * fretGap + pad + 30); });
+        }
+    }
+    function handleFlipNutChanged(fnEvent) {
+        isNutFlipped = fnEvent.isNutFlipped;
+        if (currentTuning != null) {
+            updateFretboard(currentTuning);
         }
     }
     function handleLabelChange(lcEvent) {
@@ -906,6 +916,7 @@ var gtr;
         }
     }
     function updateFretboard(tuningInfo) {
+        currentTuning = tuningInfo;
         var fretData = getFretData(numberOfFrets);
         var dots = tuningInfo.dots;
         d3.selectAll("#gtr > *").remove();
@@ -940,7 +951,7 @@ var gtr;
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
+            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -1105,6 +1116,11 @@ var settings;
         events.leftHandedChange.publish({ isLeftHanded: e.checked });
     }
     settings.onLeftHandedClick = onLeftHandedClick;
+    function onFlipNut(e) {
+        console.log("Flip Nut");
+        events.flipNutChange.publish({ isNutFlipped: e.checked });
+    }
+    settings.onFlipNut = onFlipNut;
     function onFbNoteTextClick(e) {
         events.fretboardLabelChange.publish({ labelType: parseInt(e.value) });
     }
