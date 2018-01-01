@@ -67,13 +67,16 @@ var modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
 var events;
 (function (events) {
     var Bus = (function () {
-        function Bus() {
+        // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
+        function Bus(name) {
             this.listeners = [];
+            this.name = name;
         }
         Bus.prototype.subscribe = function (listener) {
             this.listeners.push(listener);
         };
         Bus.prototype.publish = function (event) {
+            //console.log("Published event: '" + this.name + "'")
             for (var _i = 0, _a = this.listeners; _i < _a.length; _i++) {
                 var listener = _a[_i];
                 listener(event);
@@ -82,22 +85,25 @@ var events;
         return Bus;
     }());
     events.Bus = Bus;
-    events.scaleChange = new Bus();
-    events.tonicChange = new Bus();
-    events.modeChange = new Bus();
-    events.chordChange = new Bus();
-    events.toggle = new Bus();
-    events.tuningChange = new Bus();
-    events.leftHandedChange = new Bus();
-    events.flipNutChange = new Bus();
-    events.fretboardLabelChange = new Bus();
+    function genericName(type) {
+        return type.constructor.toString();
+    }
+    events.scaleChange = new Bus("scaleChange");
+    events.tonicChange = new Bus("tonicChange");
+    events.modeChange = new Bus("modeChange");
+    events.chordChange = new Bus("chordChange");
+    events.toggle = new Bus("toggle");
+    events.tuningChange = new Bus("tuningChange");
+    events.leftHandedChange = new Bus("leftHandedChange");
+    events.flipNutChange = new Bus("flipNutChange");
+    events.fretboardLabelChange = new Bus("fretboardLabelChange");
     var FretboardLabelType;
     (function (FretboardLabelType) {
         FretboardLabelType[FretboardLabelType["None"] = 0] = "None";
         FretboardLabelType[FretboardLabelType["NoteName"] = 1] = "NoteName";
         FretboardLabelType[FretboardLabelType["Interval"] = 2] = "Interval";
     })(FretboardLabelType = events.FretboardLabelType || (events.FretboardLabelType = {}));
-    events.chordIntervalChange = new Bus();
+    events.chordIntervalChange = new Bus("chordIntervalChange");
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
