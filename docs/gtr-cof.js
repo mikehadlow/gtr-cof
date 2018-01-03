@@ -1,7 +1,7 @@
 "use strict";
 var mod;
 (function (mod) {
-    var Mod = (function () {
+    var Mod = /** @class */ (function () {
         function Mod(items) {
             this.size = 0;
             this.start = 0;
@@ -66,7 +66,7 @@ var mod;
 var modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
 var events;
 (function (events) {
-    var Bus = (function () {
+    var Bus = /** @class */ (function () {
         // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
         function Bus(name) {
             this.listeners = [];
@@ -510,7 +510,7 @@ var state;
 })(state || (state = {}));
 var cof;
 (function (cof_1) {
-    var NoteCircle = (function () {
+    var NoteCircle = /** @class */ (function () {
         function NoteCircle(svg, noteIndexes, label) {
             var _this = this;
             this.indexer = function (x) { return x.index + ""; };
