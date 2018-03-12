@@ -18,8 +18,10 @@ namespace tuning {
 
     let tunings: Array<TuningInfo> = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
+        { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
+        { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
-        { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
+        { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },

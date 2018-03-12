@@ -1075,6 +1075,8 @@ var tuning;
     ];
     var tunings = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
+        { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
+        { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
         { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
