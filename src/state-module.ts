@@ -8,6 +8,7 @@ namespace state {
     let currentChordIndex: number = -1;
     let currentChordIntervals: number[] = [0, 2, 4];
     let currentToggledIndexes: number = 0; // index bitflag
+    let currentScaleFamily: mod.Mod<boolean> = music.diatonic;
 
     export function init() {
         try{
@@ -78,7 +79,8 @@ namespace state {
             currentMode, 
             currentChordIndex, 
             currentChordIntervals, 
-            currentToggledIndexes);
+            currentToggledIndexes,
+            currentScaleFamily);
 
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes

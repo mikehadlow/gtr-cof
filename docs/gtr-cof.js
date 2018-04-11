@@ -278,23 +278,23 @@ var music;
         isChordRoot: false,
         toggle: false
     };
-    function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes) {
-        var scale = generateScale(noteSpec, mode);
-        mod.zip(scale, generateChordNumbers(scale, mode)).forEach(function (x) { return x[0].chord = x[1]; });
+    function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily) {
+        var scale = generateScale(noteSpec, mode, scaleFamily);
+        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily)).forEach(function (x) { return x[0].chord = x[1]; });
         if (chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, true);
         }
     }
     music.generateScaleShim = generateScaleShim;
-    function generateScale(noteSpec, mode) {
+    function generateScale(noteSpec, mode, scaleFamily) {
         music.indexList.setStart(noteSpec.index);
         naturalList.setStart(noteSpec.natural.id);
-        music.diatonic.setStart(mode.index);
+        scaleFamily.setStart(mode.index);
         music.intervals.setStart(0);
-        var workingSet = music.indexList.merge3(buildScaleCounter(music.diatonic.toArray()), music.intervals.toArray());
+        var workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.toArray()), music.intervals.toArray());
         return workingSet.map(function (item) {
             var index = item[0];
             var isScaleNote = item[1][0];
@@ -327,13 +327,13 @@ var music;
     music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledIndexes, chordSelected) {
+    function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, chordSelected) {
         if (chordSelected === void 0) { chordSelected = false; }
         var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music.intervals.setStart(12 - chordIndexOffset);
-        music.diatonic.setStart(mode.index);
+        scaleFamily.setStart(mode.index);
         var startAt = scaleNotes.filter(function (x) { return x.note.index === chordIndex; })[0].noteNumber;
-        var workingSet = music.intervals.merge3(scaleNotes, buildScaleCounter(music.diatonic.toArray(), startAt));
+        var workingSet = music.intervals.merge3(scaleNotes, buildScaleCounter(scaleFamily.toArray(), startAt));
         return workingSet.map(function (item) {
             var chordIntervalCandidates = item[0];
             var scaleNote = item[1];
@@ -369,11 +369,11 @@ var music;
         });
     }
     var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
-    function generateChordNumbers(scaleNotes, mode) {
+    function generateChordNumbers(scaleNotes, mode, scaleFamily) {
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
                 var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0);
+                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, scaleFamily);
                 var diminished = "";
                 var seventh = "";
                 var type = ChordType.Minor;
@@ -440,6 +440,7 @@ var state;
     var currentChordIndex = -1;
     var currentChordIntervals = [0, 2, 4];
     var currentToggledIndexes = 0; // index bitflag
+    var currentScaleFamily = music.diatonic;
     function init() {
         try {
             var cookieData_1 = cookies.readCookie();
@@ -496,7 +497,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily);
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
             .filter(function (x) { return x.toggle; })
@@ -1078,7 +1079,7 @@ var tuning;
         { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
-        { tuning: "DADGAD", dots: guitarDots, description: "Guitar" },
+        { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },

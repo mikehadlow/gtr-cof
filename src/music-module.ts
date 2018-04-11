@@ -192,24 +192,25 @@ namespace music {
         mode: Mode, 
         chordIndex: number, 
         chordIntervals: number[], 
-        toggledIndexes: number): Node[] {
+        toggledIndexes: number,
+        scaleFamily: mod.Mod<boolean>): Node[] {
 
-        let scale = generateScale(noteSpec, mode);
-        mod.zip(scale, generateChordNumbers(scale, mode)).forEach(x => x[0].chord = x[1]);
+        let scale = generateScale(noteSpec, mode, scaleFamily);
+        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily)).forEach(x => x[0].chord = x[1]);
         if(chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, true);
         }
     }
 
-    export function generateScale(noteSpec: NoteSpec, mode: Mode): ScaleNote[] {
+    export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamily: mod.Mod<boolean>): ScaleNote[] {
         indexList.setStart(noteSpec.index);
         naturalList.setStart(noteSpec.natural.id);
-        diatonic.setStart(mode.index);        
+        scaleFamily.setStart(mode.index);        
         intervals.setStart(0);
-        let workingSet = indexList.merge3(buildScaleCounter(diatonic.toArray()), intervals.toArray());
+        let workingSet = indexList.merge3(buildScaleCounter(scaleFamily.toArray()), intervals.toArray());
 
         return workingSet.map(item => {
             let index = item[0];
@@ -253,15 +254,16 @@ namespace music {
         chordIndex: number, 
         chordIntervals: number[],
         toggledIndexes: number,
+        scaleFamily: mod.Mod<boolean>,
         chordSelected: boolean = false
     ): Node[] {
         let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         intervals.setStart(12 - chordIndexOffset);
-        diatonic.setStart(mode.index);
+        scaleFamily.setStart(mode.index);
         let startAt = scaleNotes.filter(x => x.note.index === chordIndex)[0].noteNumber;
         let workingSet = intervals.merge3(
             scaleNotes,
-            buildScaleCounter(diatonic.toArray(), startAt));
+            buildScaleCounter(scaleFamily.toArray(), startAt));
 
         return workingSet.map(item => {
             let chordIntervalCandidates = item[0];
@@ -301,11 +303,11 @@ namespace music {
 
     let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
 
-    export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode): Chord[] {
+    export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleFamily: mod.Mod<boolean>): Chord[] {
         return scaleNotes.map((scaleNote, i) => {
             if(scaleNote.isScaleNote) {
                 let roman = romanNumeral[scaleNote.noteNumber];
-                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0);
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, scaleFamily);
                 let diminished = "";
                 let seventh = "";
                 let type: ChordType = ChordType.Minor;
