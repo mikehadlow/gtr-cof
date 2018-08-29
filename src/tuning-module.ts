@@ -58,11 +58,13 @@ namespace tuning {
     }
 
     function raiseTuningChangedEvent(info: TuningInfo): void{
+        let notes = parseTuning(info.tuning);
+
         events.tuningChange.publish({
             tuning: info.tuning,
             dots: info.dots,
             description: info.description,
-            notes: parseTuning(info.tuning)
+            notes: notes
         });
     }
 }

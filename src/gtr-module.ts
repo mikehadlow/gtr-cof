@@ -132,7 +132,7 @@ namespace gtr {
             .attr("stroke", "none");
 
         let strings = gtr.append("g").selectAll("g")
-            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
+            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => i + "")
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });

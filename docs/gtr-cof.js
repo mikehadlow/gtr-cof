@@ -967,7 +967,7 @@ var gtr;
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
         var strings = gtr.append("g").selectAll("g")
-            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (n) { return n + ""; })
+            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (_, i) { return i + ""; })
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -1120,11 +1120,12 @@ var tuning;
     }
     tuning_1.init = init;
     function raiseTuningChangedEvent(info) {
+        var notes = parseTuning(info.tuning);
         events.tuningChange.publish({
             tuning: info.tuning,
             dots: info.dots,
             description: info.description,
-            notes: parseTuning(info.tuning)
+            notes: notes
         });
     }
 })(tuning || (tuning = {}));
