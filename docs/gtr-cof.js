@@ -194,13 +194,13 @@ var music;
         { name: 'Locrian', index: 11 },
     ];
     var harmonicMinorModes = [
-        { name: 'Lydian', index: 5 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 7 },
-        { name: 'Dorian', index: 2 },
-        { name: 'N Minor / Aeolian', index: 9 },
-        { name: 'Phrygian', index: 4 },
-        { name: 'Locrian', index: 11 },
+        { name: 'Lydian ♯2', index: 5 },
+        { name: 'Ionian ♯5', index: 0 },
+        { name: 'Superlocrian', index: 7 },
+        { name: 'Dorian ♯4', index: 2 },
+        { name: 'Harmonic Minor', index: 9 },
+        { name: 'Phrygian Dominant', index: 4 },
+        { name: 'Locrian ♯6', index: 11 },
     ];
     var jazzMinorModes = [
         { name: 'Lydian Dominant', index: 5 },
