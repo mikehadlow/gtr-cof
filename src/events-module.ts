@@ -93,4 +93,10 @@ namespace events {
     export interface ChordIntervalChangeEvent {
         readonly chordIntervals: number[];
     }
+
+    export let scaleFamilyChange: Bus<ScaleFamilyChangeEvent> = new Bus<ScaleFamilyChangeEvent>("scaleFamilyChange");
+
+    export interface ScaleFamilyChangeEvent {
+        readonly scaleFamily: music.ScaleFamily;
+    }
 }

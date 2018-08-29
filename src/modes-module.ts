@@ -2,20 +2,35 @@
 namespace modes {
 
     let buttons: d3.Selection<music.Mode>;
+    let modes: d3.Selection<any>;
 
-    export function init(): void {
-        let pad = 5;
-        let buttonHeight = 25;
+    export function init(scaleFamily: music.ScaleFamily): void {
         let svg = d3.select("#modes");
-        let modes = svg
+        modes = svg
             .append("g")
             .attr("transform", "translate(0, 280)");
 
-        let gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+        drawButtons(scaleFamily);
+
+        events.modeChange.subscribe(update);
+        events.scaleFamilyChange.subscribe(handleScaleFamilyChangedEvent);
+    }
+
+    function drawButtons(scaleFamily: music.ScaleFamily): void {
+        let pad = 5;
+        let buttonHeight = 25;
+
+        modes.selectAll("g").remove();
+        let gs = modes.selectAll("g").data(scaleFamily.modes, index);
+
+        gs
+            .exit()
+            .remove();
+
+        gs
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
+            .attr("transform", (d, i) => "translate(0, " + (i * (buttonHeight + pad) + pad) + ")");
 
         buttons = gs
             .append("rect")
@@ -31,18 +46,26 @@ namespace modes {
             .append("text")
             .attr("x", pad + 10)
             .attr("y", 17)
-            .text(function (x) { return x.name; })
+            .text((x) => x.name)
             .attr("class", "mode-text");
 
-        events.modeChange.subscribe(update);
+        events.modeChange.publish({ mode: scaleFamily.modes.filter(x => x.index == scaleFamily.defaultModeIndex)[0] })
     }
 
     function update(modeChange: events.ModeChangedEvent): void {
         let modes: Array<music.Mode> = [modeChange.mode];
         buttons
-            .data(modes, function (m) { return m.index.toString(); })
+            .data(modes, index)
             .attr("class", "mode-button mode-button-selected")
             .exit()
             .attr("class", "mode-button")
+    }
+
+    function handleScaleFamilyChangedEvent(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent) {
+        drawButtons(scaleFamilyChangedEvent.scaleFamily);
+    }
+
+    function index(mode: music.Mode): string {
+        return mode.index.toString();
     }
 }

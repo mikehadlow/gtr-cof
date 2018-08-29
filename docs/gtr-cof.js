@@ -104,6 +104,7 @@ var events;
         FretboardLabelType[FretboardLabelType["Interval"] = 2] = "Interval";
     })(FretboardLabelType = events.FretboardLabelType || (events.FretboardLabelType = {}));
     events.chordIntervalChange = new Bus("chordIntervalChange");
+    events.scaleFamilyChange = new Bus("scaleFamilyChange");
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -183,8 +184,39 @@ var music;
         [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
     ;
+    var diatonicModes = [
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
+    ];
+    var harmonicMinorModes = [
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
+    ];
+    var jazzMinorModes = [
+        { name: 'Lydian Dominant', index: 5 },
+        { name: 'Jazz Minor', index: 0 },
+        { name: 'Mixolydian ♭6', index: 7 },
+        { name: 'Assyrian', index: 2 },
+        { name: 'Locrian ♮2', index: 9 },
+        { name: 'Lydian Augmented', index: 4 },
+        { name: 'Altered scale', index: 11 },
+    ];
     music.scaleFamily = [
-        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]) }
+        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
+        { name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
+        { name: "jazz minor", intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
+        { name: "whole tone", intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0 }], defaultModeIndex: 0 },
+        { name: "diminished", intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0 }], defaultModeIndex: 0 }
     ];
     // root diatonic scale is major
     music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
@@ -228,19 +260,10 @@ var music;
         { offset: -2, label: '♭♭' },
     ];
     ;
-    music.modes = [
-        { name: 'Lydian', index: 5 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 7 },
-        { name: 'Dorian', index: 2 },
-        { name: 'N Minor / Aeolian', index: 9 },
-        { name: 'Phrygian', index: 4 },
-        { name: 'Locrian', index: 11 },
-    ];
     function createScaleSpec(index, naturalIndex, modeIndex) {
         return {
             noteSpec: createNoteSpec(naturalIndex, index),
-            mode: music.modes[modeIndex]
+            mode: music.scaleFamily[0].modes[modeIndex]
         };
     }
     music.createScaleSpec = createScaleSpec;
@@ -309,6 +332,9 @@ var music;
                 noteNumber = item[1][1];
                 natural = naturalList.itemAt(noteNumber);
                 activeInterval = item[2].filter(function (x) { return x.ord == noteNumber; })[0];
+                if (activeInterval == null) {
+                    activeInterval = item[2][0];
+                }
             }
             else {
                 activeInterval = item[2][0];
@@ -345,6 +371,9 @@ var music;
             var activeInterval = scaleNote.isScaleNote
                 ? chordIntervalCandidates.filter(function (x) { return x.ord === scaleCounter[1]; })[0]
                 : chordIntervalCandidates[0];
+            if (activeInterval == null) {
+                activeInterval = chordIntervalCandidates[0];
+            }
             // console.log("index: " + scaleNote.index + ", isScaleNote: " + scaleNote.isScaleNote +
             //     ", note: " + scaleNote.label + ", interval: " + scaleNote.intervalName + " -> " + 
             //     getIntervalName(activeInterval) +
@@ -372,7 +401,7 @@ var music;
             return [false, 0];
         });
     }
-    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
     function generateChordNumbers(scaleNotes, mode, scaleFamily) {
         return scaleNotes.map(function (scaleNote, i) {
             if (scaleNote.isScaleNote) {
@@ -439,17 +468,17 @@ var music;
 })(music || (music = {}));
 var state;
 (function (state) {
-    var currentMode = music.modes[1];
     var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
     var currentChordIndex = -1;
     var currentChordIntervals = [0, 2, 4];
     var currentToggledIndexes = 0; // index bitflag
-    var currentScaleFamily = music.diatonic;
+    var currentScaleFamily = music.scaleFamily[0];
+    var currentMode = currentScaleFamily.modes[1];
     function init() {
         try {
             var cookieData_1 = cookies.readCookie();
             if (cookieData_1.hasCookie) {
-                var cookieModes = music.modes.filter(function (x) { return x.index == cookieData_1.modeIndex; });
+                var cookieModes = currentScaleFamily.modes.filter(function (x) { return x.index == cookieData_1.modeIndex; });
                 if (cookieModes.length > 0) {
                     currentMode = cookieModes[0];
                 }
@@ -459,9 +488,9 @@ var state;
         }
         catch (e) {
             // ignore the invalid cookie:
-            var currentMode_1 = music.modes[1];
-            var currentNoteSpec_1 = music.createNoteSpec(3, 3); // C natural is default
-            var currentChordIndex_1 = -1;
+            currentMode = currentScaleFamily.modes[1];
+            currentChordIndex = -1;
+            currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
         // lets remember this while we reset everything.
         var tempChordIndex = currentChordIndex;
@@ -470,6 +499,7 @@ var state;
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
         events.chordIntervalChange.subscribe(function (x) { return currentChordIntervals = x.chordIntervals; });
+        events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
@@ -496,12 +526,17 @@ var state;
         currentToggledIndexes = 0;
         updateScale();
     }
+    function scaleFamilyChanged(scaleFamilyChangedEvent) {
+        currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        currentChordIndex = -1;
+        updateScale();
+    }
     function toggle(toggleEvent) {
         currentToggledIndexes = currentToggledIndexes ^ Math.pow(2, toggleEvent.index);
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily.intervals);
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
             .filter(function (x) { return x.toggle; })
@@ -811,15 +846,26 @@ var chordInterval;
 var modes;
 (function (modes_1) {
     var buttons;
-    function init() {
-        var pad = 5;
-        var buttonHeight = 25;
+    var modes;
+    function init(scaleFamily) {
         var svg = d3.select("#modes");
-        var modes = svg
+        modes = svg
             .append("g")
             .attr("transform", "translate(0, 280)");
-        var gs = modes.selectAll("g")
-            .data(music.modes, function (m) { return m.index.toString(); })
+        drawButtons(scaleFamily);
+        events.modeChange.subscribe(update);
+        events.scaleFamilyChange.subscribe(handleScaleFamilyChangedEvent);
+    }
+    modes_1.init = init;
+    function drawButtons(scaleFamily) {
+        var pad = 5;
+        var buttonHeight = 25;
+        modes.selectAll("g").remove();
+        var gs = modes.selectAll("g").data(scaleFamily.modes, index);
+        gs
+            .exit()
+            .remove();
+        gs
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
@@ -838,16 +884,21 @@ var modes;
             .attr("y", 17)
             .text(function (x) { return x.name; })
             .attr("class", "mode-text");
-        events.modeChange.subscribe(update);
+        events.modeChange.publish({ mode: scaleFamily.modes.filter(function (x) { return x.index == scaleFamily.defaultModeIndex; })[0] });
     }
-    modes_1.init = init;
     function update(modeChange) {
         var modes = [modeChange.mode];
         buttons
-            .data(modes, function (m) { return m.index.toString(); })
+            .data(modes, index)
             .attr("class", "mode-button mode-button-selected")
             .exit()
             .attr("class", "mode-button");
+    }
+    function handleScaleFamilyChangedEvent(scaleFamilyChangedEvent) {
+        drawButtons(scaleFamilyChangedEvent.scaleFamily);
+    }
+    function index(mode) {
+        return mode.index.toString();
     }
 })(modes || (modes = {}));
 var gtr;
@@ -1144,14 +1195,34 @@ var settings;
     }
     settings.onFbNoteTextClick = onFbNoteTextClick;
 })(settings || (settings = {}));
+var scaleFamily;
+(function (scaleFamily_1) {
+    function init() {
+        d3.select("#scale-dropdown")
+            .selectAll("div")
+            .data(music.scaleFamily)
+            .enter()
+            .append("div")
+            .attr("class", "dropdown-content-item")
+            .on("click", function (x) { return raiseScaleFamilyChangedEvent(x); })
+            .text(function (x) { return x.name; });
+    }
+    scaleFamily_1.init = init;
+    function raiseScaleFamilyChangedEvent(scaleFamily) {
+        events.scaleFamilyChange.publish({
+            scaleFamily: scaleFamily
+        });
+    }
+})(scaleFamily || (scaleFamily = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
-modes.init();
+modes.init(music.scaleFamily[0]);
 chordInterval.init();
 var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
 tuning.init();
+scaleFamily.init();
 state.init();
 cookies.init();
 //# sourceMappingURL=gtr-cof.js.map

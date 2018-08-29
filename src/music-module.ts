@@ -42,10 +42,46 @@ namespace music {
     export interface ScaleFamily {
         readonly name: string;
         readonly intervals: mod.Mod<boolean>;
+        readonly modes: Mode[];
+        readonly defaultModeIndex: number;
     };
 
+    let diatonicModes: Mode[] = [
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
+    ];
+
+    let harmonicMinorModes: Mode[] = [
+        { name: 'Lydian', index: 5 },
+        { name: 'Major / Ionian', index: 0 },
+        { name: 'Mixolydian', index: 7 },
+        { name: 'Dorian', index: 2 },
+        { name: 'N Minor / Aeolian', index: 9 },
+        { name: 'Phrygian', index: 4 },
+        { name: 'Locrian', index: 11 },
+    ];
+
+    let jazzMinorModes: Mode[] = [
+        { name: 'Lydian Dominant', index: 5 },
+        { name: 'Jazz Minor', index: 0 },
+        { name: 'Mixolydian ♭6', index: 7 },
+        { name: 'Assyrian', index: 2 },
+        { name: 'Locrian ♮2', index: 9 },
+        { name: 'Lydian Augmented', index: 4 },
+        { name: 'Altered scale', index: 11 },
+    ];
+
     export let scaleFamily: ScaleFamily[] = [
-        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]) }
+        { name: "diatonic",       intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
+        { name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
+        { name: "jazz minor",     intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
+        { name: "whole tone",     intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0}], defaultModeIndex: 0 },
+        { name: "diminished",     intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0}], defaultModeIndex: 0 }
     ];
 
     // root diatonic scale is major
@@ -119,16 +155,6 @@ namespace music {
         readonly index: number;
     };
 
-    export let modes: Mode[] = [
-        { name: 'Lydian', index: 5 },
-        { name: 'Major / Ionian', index: 0 },
-        { name: 'Mixolydian', index: 7 },
-        { name: 'Dorian', index: 2 },
-        { name: 'N Minor / Aeolian', index: 9 },
-        { name: 'Phrygian', index: 4 },
-        { name: 'Locrian', index: 11 },
-    ];
-
     export interface ScaleSpec {
         noteSpec: NoteSpec;
         mode: Mode;
@@ -137,7 +163,7 @@ namespace music {
     export function createScaleSpec(index:number, naturalIndex:number, modeIndex:number): ScaleSpec {
         return {
             noteSpec: createNoteSpec(naturalIndex, index),
-            mode: modes[modeIndex]
+            mode: scaleFamily[0].modes[modeIndex]
         };
     }
 
@@ -233,6 +259,9 @@ namespace music {
                 noteNumber = item[1][1];
                 natural = naturalList.itemAt(noteNumber);
                 activeInterval = item[2].filter(x => x.ord == noteNumber)[0];
+                if(activeInterval == null) {
+                    activeInterval = item[2][0];
+                }
             }
             else {
                 activeInterval = item[2][0];
@@ -281,6 +310,9 @@ namespace music {
             let activeInterval = scaleNote.isScaleNote
                 ? chordIntervalCandidates.filter(x => x.ord === scaleCounter[1])[0]
                 : chordIntervalCandidates[0];
+            if(activeInterval == null) {
+                activeInterval = chordIntervalCandidates[0];
+            }
 
             // console.log("index: " + scaleNote.index + ", isScaleNote: " + scaleNote.isScaleNote +
             //     ", note: " + scaleNote.label + ", interval: " + scaleNote.intervalName + " -> " + 
@@ -310,7 +342,7 @@ namespace music {
         });
     }
 
-    let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
 
     export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleFamily: mod.Mod<boolean>): Chord[] {
         return scaleNotes.map((scaleNote, i) => {

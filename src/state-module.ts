@@ -3,19 +3,19 @@
 
 namespace state {
 
-    let currentMode: music.Mode = music.modes[1];
     let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
     let currentChordIndex: number = -1;
     let currentChordIntervals: number[] = [0, 2, 4];
     let currentToggledIndexes: number = 0; // index bitflag
-    let currentScaleFamily: mod.Mod<boolean> = music.diatonic;
+    let currentScaleFamily: music.ScaleFamily = music.scaleFamily[0];
+    let currentMode: music.Mode = currentScaleFamily.modes[1];
 
     export function init() {
         try{
             let cookieData = cookies.readCookie();
 
             if(cookieData.hasCookie) {
-                let cookieModes = music.modes.filter((x) => x.index == cookieData.modeIndex);
+                let cookieModes = currentScaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
                 if(cookieModes.length > 0) {
                     currentMode = cookieModes[0];
                 }
@@ -25,9 +25,9 @@ namespace state {
         }
         catch(e) {
             // ignore the invalid cookie:
-            let currentMode: music.Mode = music.modes[1];
-            let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
-            let currentChordIndex: number = -1;
+            currentMode = currentScaleFamily.modes[1];
+            currentChordIndex = -1;
+            currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
 
         // lets remember this while we reset everything.
@@ -38,6 +38,7 @@ namespace state {
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
         events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
+        events.scaleFamilyChange.subscribe(scaleFamilyChanged);
 
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
@@ -68,6 +69,12 @@ namespace state {
         updateScale();
     }
 
+    function scaleFamilyChanged(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent): void {
+        currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        currentChordIndex = -1
+        updateScale();
+    }
+
     function toggle(toggleEvent: events.ToggleEvent): void {
         currentToggledIndexes = currentToggledIndexes ^ 2**toggleEvent.index;
         updateScale();
@@ -80,7 +87,7 @@ namespace state {
             currentChordIndex, 
             currentChordIntervals, 
             currentToggledIndexes,
-            currentScaleFamily);
+            currentScaleFamily.intervals);
 
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes

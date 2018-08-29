@@ -21,6 +21,7 @@
         "src/gtr-module.ts",
         "src/tuning-module.ts",
         "src/settings-module.ts",
+        "src/scale-family-module.ts",
         "src/gtr-cof.ts"
     ]
 }
