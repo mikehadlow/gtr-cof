@@ -182,6 +182,10 @@ var music;
         [{ ord: 6, type: IntervalType.Min, colour: 0xff8282 }, { ord: 5, type: IntervalType.Aug, colour: 0xff8282 }],
         [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
+    ;
+    music.scaleFamily = [
+        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]) }
+    ];
     // root diatonic scale is major
     music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
     music.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);

@@ -39,6 +39,15 @@ namespace music {
         [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
 
+    export interface ScaleFamily {
+        readonly name: string;
+        readonly intervals: mod.Mod<boolean>;
+    };
+
+    export let scaleFamily: ScaleFamily[] = [
+        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]) }
+    ];
+
     // root diatonic scale is major
     export let diatonic: mod.Mod<boolean> = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
     export let indexList: mod.Mod<number> = new mod.Mod([0,1,2,3,4,5,6,7,8,9,10,11]);
