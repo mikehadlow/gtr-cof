@@ -343,7 +343,7 @@ var music;
             }
             else {
                 activeInterval = item[2][0];
-                noteNumber = activeInterval.ord;
+                noteNumber = isScaleNote ? item[1][1] : activeInterval.ord;
                 natural = naturalList.itemAt(activeInterval.ord);
             }
             // console.log("index: " + index + ", isScaleNote: " + isScaleNote 
@@ -379,10 +379,14 @@ var music;
             if (activeInterval == null) {
                 activeInterval = chordIntervalCandidates[0];
             }
-            // console.log("index: " + scaleNote.index + ", isScaleNote: " + scaleNote.isScaleNote +
-            //     ", note: " + scaleNote.label + ", interval: " + scaleNote.intervalName + " -> " + 
-            //     getIntervalName(activeInterval) +
-            //     ", scaleCount: " + scaleNote.noteNumber + " -> " + scaleCounter[1]);
+            // if(chordSelected) {
+            //     console.log("chordIndex: " + chordIndex + 
+            //         ", scaleNote.isScaleNote: " + scaleNote.isScaleNote +
+            //         ", scaleNote.notenumber: " + scaleNote.noteNumber +
+            //         ", scaleCounter: " + scaleCounter +
+            //         ", activeInterval: " + getIntervalName(activeInterval) + 
+            //         ", toggle: " + calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals));
+            // }
             return {
                 scaleNote: scaleNote,
                 chordInterval: activeInterval,
