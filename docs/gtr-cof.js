@@ -196,7 +196,7 @@ var music;
     var harmonicMinorModes = [
         { name: 'Lydian ♯2', index: 5 },
         { name: 'Ionian ♯5', index: 0 },
-        { name: 'Superlocrian', index: 7 },
+        { name: 'Superlocrian', index: 8 },
         { name: 'Dorian ♯4', index: 2 },
         { name: 'Harmonic Minor', index: 9 },
         { name: 'Phrygian Dominant', index: 4 },
@@ -208,7 +208,7 @@ var music;
         { name: 'Mixolydian ♭6', index: 7 },
         { name: 'Assyrian', index: 2 },
         { name: 'Locrian ♮2', index: 9 },
-        { name: 'Lydian Augmented', index: 4 },
+        { name: 'Lydian Augmented', index: 3 },
         { name: 'Altered scale', index: 11 },
     ];
     music.scaleFamily = [
