@@ -87,7 +87,7 @@ namespace state {
             currentChordIndex, 
             currentChordIntervals, 
             currentToggledIndexes,
-            currentScaleFamily.intervals);
+            currentScaleFamily);
 
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes

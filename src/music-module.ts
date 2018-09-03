@@ -103,7 +103,7 @@ namespace music {
 
         let offset = mod.diff(12, naturalIndex, index);
         if(Math.abs(offset) > 2) {
-            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+            // throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
         }
 
         let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
@@ -228,24 +228,24 @@ namespace music {
         chordIndex: number, 
         chordIntervals: number[], 
         toggledIndexes: number,
-        scaleFamily: mod.Mod<boolean>): Node[] {
+        scaleFamily: ScaleFamily): Node[] {
 
         let scale = generateScale(noteSpec, mode, scaleFamily);
-        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily)).forEach(x => x[0].chord = x[1]);
+        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily.intervals)).forEach(x => x[0].chord = x[1]);
         if(chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily.intervals);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily.intervals, true);
         }
     }
 
-    export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamily: mod.Mod<boolean>): ScaleNote[] {
+    export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamily: ScaleFamily): ScaleNote[] {
         indexList.setStart(noteSpec.index);
         naturalList.setStart(noteSpec.natural.id);
-        scaleFamily.setStart(mode.index);        
+        scaleFamily.intervals.setStart(mode.index);        
         intervals.setStart(0);
-        let workingSet = indexList.merge3(buildScaleCounter(scaleFamily.toArray()), intervals.toArray());
+        let workingSet = indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), intervals.toArray());
 
         return workingSet.map(item => {
             let index = item[0];

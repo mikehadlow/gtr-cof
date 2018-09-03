@@ -228,7 +228,7 @@ var music;
         }
         var offset = mod.diff(12, naturalIndex, index);
         if (Math.abs(offset) > 2) {
-            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+            // throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
         }
         var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
         return {
@@ -307,21 +307,21 @@ var music;
     };
     function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily) {
         var scale = generateScale(noteSpec, mode, scaleFamily);
-        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily)).forEach(function (x) { return x[0].chord = x[1]; });
+        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily.intervals)).forEach(function (x) { return x[0].chord = x[1]; });
         if (chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily.intervals);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily.intervals, true);
         }
     }
     music.generateScaleShim = generateScaleShim;
     function generateScale(noteSpec, mode, scaleFamily) {
         music.indexList.setStart(noteSpec.index);
         naturalList.setStart(noteSpec.natural.id);
-        scaleFamily.setStart(mode.index);
+        scaleFamily.intervals.setStart(mode.index);
         music.intervals.setStart(0);
-        var workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.toArray()), music.intervals.toArray());
+        var workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), music.intervals.toArray());
         return workingSet.map(function (item) {
             var index = item[0];
             var isScaleNote = item[1][0];
@@ -536,7 +536,7 @@ var state;
         updateScale();
     }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily.intervals);
+        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily);
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
             .filter(function (x) { return x.toggle; })
