@@ -46,6 +46,10 @@ namespace music {
         readonly defaultModeIndex: number;
     };
 
+    export function notesInScaleFamily(scaleFamily: ScaleFamily): number {
+        return scaleFamily.intervals.items.filter(x => x).length;
+    }
+
     let diatonicModes: Mode[] = [
         { name: 'Lydian', index: 5 },
         { name: 'Major / Ionian', index: 0 },
@@ -103,7 +107,7 @@ namespace music {
 
         let offset = mod.diff(12, naturalIndex, index);
         if(Math.abs(offset) > 2) {
-            // throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
         }
 
         let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
@@ -246,6 +250,7 @@ namespace music {
         scaleFamily.intervals.setStart(mode.index);        
         intervals.setStart(0);
         let workingSet = indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), intervals.toArray());
+        let isSevenNoteScale = notesInScaleFamily(scaleFamily) == 7;
 
         return workingSet.map(item => {
             let index = item[0];
@@ -255,7 +260,7 @@ namespace music {
             let natural:Natural;
             let activeInterval:Interval;
 
-            if(isScaleNote) {
+            if(isScaleNote &&  isSevenNoteScale) {
                 noteNumber = item[1][1];
                 natural = naturalList.itemAt(noteNumber);
                 activeInterval = item[2].filter(x => x.ord == noteNumber)[0];

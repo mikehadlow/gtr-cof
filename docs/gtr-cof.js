@@ -184,6 +184,10 @@ var music;
         [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
     ]);
     ;
+    function notesInScaleFamily(scaleFamily) {
+        return scaleFamily.intervals.items.filter(function (x) { return x; }).length;
+    }
+    music.notesInScaleFamily = notesInScaleFamily;
     var diatonicModes = [
         { name: 'Lydian', index: 5 },
         { name: 'Major / Ionian', index: 0 },
@@ -228,7 +232,7 @@ var music;
         }
         var offset = mod.diff(12, naturalIndex, index);
         if (Math.abs(offset) > 2) {
-            // throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+            throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
         }
         var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
         return {
@@ -322,13 +326,14 @@ var music;
         scaleFamily.intervals.setStart(mode.index);
         music.intervals.setStart(0);
         var workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), music.intervals.toArray());
+        var isSevenNoteScale = notesInScaleFamily(scaleFamily) == 7;
         return workingSet.map(function (item) {
             var index = item[0];
             var isScaleNote = item[1][0];
             var noteNumber;
             var natural;
             var activeInterval;
-            if (isScaleNote) {
+            if (isScaleNote && isSevenNoteScale) {
                 noteNumber = item[1][1];
                 natural = naturalList.itemAt(noteNumber);
                 activeInterval = item[2].filter(function (x) { return x.ord == noteNumber; })[0];
