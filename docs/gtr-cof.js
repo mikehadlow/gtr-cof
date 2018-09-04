@@ -1,58 +1,57 @@
 "use strict";
 var mod;
 (function (mod) {
-    var Mod = /** @class */ (function () {
-        function Mod(items) {
+    class Mod {
+        constructor(items) {
             this.size = 0;
             this.start = 0;
             this.items = items;
             this.size = items.length;
         }
-        Mod.prototype.setStart = function (start) {
+        setStart(start) {
             this.start = start % this.size;
-        };
-        Mod.prototype.itemAt = function (index) {
+        }
+        itemAt(index) {
             return this.items[(this.start + index) % this.size];
-        };
-        Mod.prototype.toArray = function () {
-            var newArray = [];
-            for (var i = 0; i < this.size; i++) {
+        }
+        toArray() {
+            let newArray = [];
+            for (let i = 0; i < this.size; i++) {
                 newArray.push(this.items[(i + this.start) % this.size]);
             }
             return newArray;
-        };
-        Mod.prototype.merge = function (items) {
-            var theseItems = this.toArray();
+        }
+        merge(items) {
+            let theseItems = this.toArray();
             return zip(theseItems, items);
-        };
-        Mod.prototype.merge3 = function (items2, items3) {
-            var theseItems = this.toArray();
+        }
+        merge3(items2, items3) {
+            let theseItems = this.toArray();
             return zip3(theseItems, items2, items3);
-        };
-        return Mod;
-    }());
+        }
+    }
     mod.Mod = Mod;
     function zip(a, b) {
         if (a.length != b.length) {
             throw "Cannot merge arrays of different lengths";
         }
-        return a.map(function (x, i) { return [x, b[i]]; });
+        return a.map((x, i) => [x, b[i]]);
     }
     mod.zip = zip;
     function zip3(a, b, c) {
         if (a.length != b.length || a.length != c.length) {
             throw "Cannot merge arrays of different lengths";
         }
-        return a.map(function (x, i) { return [x, b[i], c[i]]; });
+        return a.map((x, i) => [x, b[i], c[i]]);
     }
     mod.zip3 = zip3;
     function diff(size, a, b) {
-        var ax = a % size;
-        var bx = b % size;
+        let ax = a % size;
+        let bx = b % size;
         if (ax == bx)
             return 0;
-        var d1 = bx - ax;
-        var d2 = 0;
+        let d1 = bx - ax;
+        let d2 = 0;
         if (d1 > 0) {
             d2 = -((ax + size) - bx);
         }
@@ -63,27 +62,25 @@ var mod;
     }
     mod.diff = diff;
 })(mod || (mod = {}));
-var modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
+let modTest = new mod.Mod([0, 1, 2, 3, 4, 5]);
 var events;
 (function (events) {
-    var Bus = /** @class */ (function () {
+    class Bus {
         // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
-        function Bus(name) {
+        constructor(name) {
             this.listeners = [];
             this.name = name;
         }
-        Bus.prototype.subscribe = function (listener) {
+        subscribe(listener) {
             this.listeners.push(listener);
-        };
-        Bus.prototype.publish = function (event) {
+        }
+        publish(event) {
             //console.log("Published event: '" + this.name + "'")
-            for (var _i = 0, _a = this.listeners; _i < _a.length; _i++) {
-                var listener = _a[_i];
+            for (let listener of this.listeners) {
                 listener(event);
             }
-        };
-        return Bus;
-    }());
+        }
+    }
     events.Bus = Bus;
     function genericName(type) {
         return type.constructor.toString();
@@ -97,7 +94,7 @@ var events;
     events.leftHandedChange = new Bus("leftHandedChange");
     events.flipNutChange = new Bus("flipNutChange");
     events.fretboardLabelChange = new Bus("fretboardLabelChange");
-    var FretboardLabelType;
+    let FretboardLabelType;
     (function (FretboardLabelType) {
         FretboardLabelType[FretboardLabelType["None"] = 0] = "None";
         FretboardLabelType[FretboardLabelType["NoteName"] = 1] = "NoteName";
@@ -105,6 +102,7 @@ var events;
     })(FretboardLabelType = events.FretboardLabelType || (events.FretboardLabelType = {}));
     events.chordIntervalChange = new Bus("chordIntervalChange");
     events.scaleFamilyChange = new Bus("scaleFamilyChange");
+    events.midiNote = new Bus("midiNoteEvent");
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -113,23 +111,23 @@ var cookies;
     }
     cookies.init = init;
     function bakeCookie(scaleChange) {
-        var cookieExpiryDays = 30;
-        var expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
-        var expires = "expires=" + expiryDate.toUTCString();
-        var tonicNode = scaleChange.nodes[0];
+        let cookieExpiryDays = 30;
+        let expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + expiryDate.toUTCString();
+        let tonicNode = scaleChange.nodes[0];
         document.cookie = "gtr-cof-state="
             + tonicNode.scaleNote.note.index + "|"
             + tonicNode.scaleNote.note.natural.index + "|"
             + scaleChange.mode.index + "|"
-            + (scaleChange.nodes.some(function (x) { return x.isChordRoot; })
-                ? scaleChange.nodes.filter(function (x) { return x.isChordRoot; })[0].scaleNote.note.index
+            + (scaleChange.nodes.some(x => x.isChordRoot)
+                ? scaleChange.nodes.filter(x => x.isChordRoot)[0].scaleNote.note.index
                 : -1) + ""
             + ";" + expires;
     }
     function readCookie() {
-        var result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
+        let result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
         if (result != null) {
-            var items = result[1].split("|");
+            let items = result[1].split("|");
             if (items.length == 4) {
                 return {
                     hasCookie: true,
@@ -152,7 +150,7 @@ var cookies;
 })(cookies || (cookies = {}));
 var music;
 (function (music) {
-    var IntervalType;
+    let IntervalType;
     (function (IntervalType) {
         IntervalType[IntervalType["Nat"] = 0] = "Nat";
         IntervalType[IntervalType["Maj"] = 1] = "Maj";
@@ -168,7 +166,7 @@ var music;
     music.intervalName[IntervalType.Aug] = "A";
     music.intervalName[IntervalType.Dim] = "d";
     ;
-    music.getIntervalName = function (interval) { return music.intervalName[interval.type] + (interval.ord + 1); };
+    music.getIntervalName = interval => music.intervalName[interval.type] + (interval.ord + 1);
     music.intervals = new mod.Mod([
         [{ ord: 0, type: IntervalType.Nat, colour: 0xf44b42 }, { ord: 1, type: IntervalType.Dim, colour: 0xf44b42 }],
         [{ ord: 1, type: IntervalType.Min, colour: 0xf48942 }, { ord: 0, type: IntervalType.Aug, colour: 0xf48942 }],
@@ -185,10 +183,10 @@ var music;
     ]);
     ;
     function notesInScaleFamily(scaleFamily) {
-        return scaleFamily.intervals.items.filter(function (x) { return x; }).length;
+        return scaleFamily.intervals.items.filter(x => x).length;
     }
     music.notesInScaleFamily = notesInScaleFamily;
-    var diatonicModes = [
+    let diatonicModes = [
         { name: 'Lydian', index: 5 },
         { name: 'Major / Ionian', index: 0 },
         { name: 'Mixolydian', index: 7 },
@@ -197,7 +195,7 @@ var music;
         { name: 'Phrygian', index: 4 },
         { name: 'Locrian', index: 11 },
     ];
-    var harmonicMinorModes = [
+    let harmonicMinorModes = [
         { name: 'Lydian ♯2', index: 5 },
         { name: 'Ionian ♯5', index: 0 },
         { name: 'Superlocrian', index: 8 },
@@ -206,7 +204,7 @@ var music;
         { name: 'Phrygian Dominant', index: 4 },
         { name: 'Locrian ♯6', index: 11 },
     ];
-    var jazzMinorModes = [
+    let jazzMinorModes = [
         { name: 'Lydian Dominant', index: 5 },
         { name: 'Jazz Minor', index: 0 },
         { name: 'Mixolydian ♭6', index: 7 },
@@ -226,15 +224,15 @@ var music;
     music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
     music.indexList = new mod.Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     function createNoteSpec(naturalIndex, index) {
-        var natural = music.naturals.filter(function (x) { return x.index === naturalIndex; })[0];
-        if (!music.naturals.some(function (x) { return x.index === naturalIndex; })) {
+        let natural = music.naturals.filter(x => x.index === naturalIndex)[0];
+        if (!music.naturals.some(x => x.index === naturalIndex)) {
             throw "naturalIndex is not valid: " + naturalIndex;
         }
-        var offset = mod.diff(12, naturalIndex, index);
+        let offset = mod.diff(12, naturalIndex, index);
         if (Math.abs(offset) > 2) {
             throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
         }
-        var noteLabel = noteLabels.filter(function (x) { return x.offset === offset; })[0];
+        let noteLabel = noteLabels.filter(x => x.offset === offset)[0];
         return {
             natural: natural,
             index: index,
@@ -255,8 +253,8 @@ var music;
         { id: 5, index: 8, label: "F" },
         { id: 6, index: 10, label: "G" }
     ];
-    var naturalList = new mod.Mod(music.naturals);
-    var noteLabels = [
+    let naturalList = new mod.Mod(music.naturals);
+    let noteLabels = [
         { offset: 0, label: '' },
         { offset: 1, label: '♯' },
         { offset: 2, label: 'x' },
@@ -271,7 +269,7 @@ var music;
         };
     }
     music.createScaleSpec = createScaleSpec;
-    var ChordType;
+    let ChordType;
     (function (ChordType) {
         ChordType[ChordType["Major"] = 0] = "Major";
         ChordType[ChordType["Minor"] = 1] = "Minor";
@@ -307,16 +305,17 @@ var music;
         },
         intervalName: "",
         isChordRoot: false,
-        toggle: false
+        toggle: false,
+        midiToggle: false
     };
-    function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily) {
-        var scale = generateScale(noteSpec, mode, scaleFamily);
-        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily.intervals)).forEach(function (x) { return x[0].chord = x[1]; });
+    function generateScaleShim(noteSpec, mode, chordIndex, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily) {
+        let scale = generateScale(noteSpec, mode, scaleFamily);
+        mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily.intervals)).forEach(x => x[0].chord = x[1]);
         if (chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily.intervals);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily.intervals);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily.intervals, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily.intervals, true);
         }
     }
     music.generateScaleShim = generateScaleShim;
@@ -325,18 +324,18 @@ var music;
         naturalList.setStart(noteSpec.natural.id);
         scaleFamily.intervals.setStart(mode.index);
         music.intervals.setStart(0);
-        var workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), music.intervals.toArray());
-        var isSevenNoteScale = notesInScaleFamily(scaleFamily) == 7;
-        return workingSet.map(function (item) {
-            var index = item[0];
-            var isScaleNote = item[1][0];
-            var noteNumber;
-            var natural;
-            var activeInterval;
+        let workingSet = music.indexList.merge3(buildScaleCounter(scaleFamily.intervals.toArray()), music.intervals.toArray());
+        let isSevenNoteScale = notesInScaleFamily(scaleFamily) == 7;
+        return workingSet.map(item => {
+            let index = item[0];
+            let isScaleNote = item[1][0];
+            let noteNumber;
+            let natural;
+            let activeInterval;
             if (isScaleNote && isSevenNoteScale) {
                 noteNumber = item[1][1];
                 natural = naturalList.itemAt(noteNumber);
-                activeInterval = item[2].filter(function (x) { return x.ord == noteNumber; })[0];
+                activeInterval = item[2].filter(x => x.ord == noteNumber)[0];
                 if (activeInterval == null) {
                     activeInterval = item[2][0];
                 }
@@ -362,19 +361,18 @@ var music;
     music.generateScale = generateScale;
     // generateNodes creates an 'outer' sliding interval ring that can change with
     // chord selections.
-    function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily, chordSelected) {
-        if (chordSelected === void 0) { chordSelected = false; }
-        var chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
+    function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily, chordSelected = false) {
+        let chordIndexOffset = ((chordIndex + 12) - scaleNotes[0].note.index) % 12;
         music.intervals.setStart(12 - chordIndexOffset);
         scaleFamily.setStart(mode.index);
-        var startAt = scaleNotes.filter(function (x) { return x.note.index === chordIndex; })[0].noteNumber;
-        var workingSet = music.intervals.merge3(scaleNotes, buildScaleCounter(scaleFamily.toArray(), startAt));
-        return workingSet.map(function (item) {
-            var chordIntervalCandidates = item[0];
-            var scaleNote = item[1];
-            var scaleCounter = item[2];
-            var activeInterval = scaleNote.isScaleNote
-                ? chordIntervalCandidates.filter(function (x) { return x.ord === scaleCounter[1]; })[0]
+        let startAt = scaleNotes.filter(x => x.note.index === chordIndex)[0].noteNumber;
+        let workingSet = music.intervals.merge3(scaleNotes, buildScaleCounter(scaleFamily.toArray(), startAt));
+        return workingSet.map(item => {
+            let chordIntervalCandidates = item[0];
+            let scaleNote = item[1];
+            let scaleCounter = item[2];
+            let activeInterval = scaleNote.isScaleNote
+                ? chordIntervalCandidates.filter(x => x.ord === scaleCounter[1])[0]
                 : chordIntervalCandidates[0];
             if (activeInterval == null) {
                 activeInterval = chordIntervalCandidates[0];
@@ -392,49 +390,49 @@ var music;
                 chordInterval: activeInterval,
                 intervalName: music.getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals)
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals),
+                midiToggle: (toggledMidiNotes & (Math.pow(2, scaleNote.note.index))) != 0
             };
         });
     }
     music.generateNodes = generateNodes;
-    function buildScaleCounter(diatonic, startAt) {
-        if (startAt === void 0) { startAt = 0; }
-        var noteCount = diatonic.filter(function (x) { return x; }).length;
-        var i = (noteCount - startAt) % noteCount;
-        return diatonic.map(function (isNote) {
+    function buildScaleCounter(diatonic, startAt = 0) {
+        let noteCount = diatonic.filter(x => x).length;
+        let i = (noteCount - startAt) % noteCount;
+        return diatonic.map(isNote => {
             if (isNote) {
-                var value = [true, i];
+                let value = [true, i];
                 i = (i + 1) % noteCount;
                 return value;
             }
             return [false, 0];
         });
     }
-    var romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
+    let romanNumeral = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
     function generateChordNumbers(scaleNotes, mode, scaleFamily) {
-        return scaleNotes.map(function (scaleNote, i) {
+        return scaleNotes.map((scaleNote, i) => {
             if (scaleNote.isScaleNote) {
-                var roman = romanNumeral[scaleNote.noteNumber];
-                var nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, scaleFamily);
-                var diminished = "";
-                var seventh = "";
-                var type = ChordType.Minor;
+                let roman = romanNumeral[scaleNote.noteNumber];
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamily);
+                let diminished = "";
+                let seventh = "";
+                let type = ChordType.Minor;
                 // does it have a diminished 5th?
-                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim; })) {
+                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
                     diminished = "°";
                     type = ChordType.Diminished;
                 }
                 // does it have a major 3rd?
-                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj; })) {
+                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
                     roman = roman.toLocaleUpperCase();
                     type = ChordType.Major;
                 }
                 // does it have a natural 7th?
-                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min; })) {
+                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min)) {
                     seventh = "7";
                 }
                 // does it have a major 7th?
-                if (nodes.some(function (x) { return x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj; })) {
+                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj)) {
                     seventh = "^7";
                 }
                 return {
@@ -451,15 +449,15 @@ var music;
     music.generateChordNumbers = generateChordNumbers;
     function calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals) {
         if (toggledIndexes === 0) {
-            return chordSelected && scaleNote.isScaleNote && chordIntervals.some(function (x) { return activeInterval.ord === x; });
+            return chordSelected && scaleNote.isScaleNote && chordIntervals.some(x => activeInterval.ord === x);
         }
         return (toggledIndexes & (Math.pow(2, scaleNote.note.index))) != 0;
     }
     music.calculateToggle = calculateToggle;
     function fifths() {
-        var indexes = [];
-        var current = 0;
-        for (var i = 0; i < 12; i++) {
+        let indexes = [];
+        let current = 0;
+        for (let i = 0; i < 12; i++) {
             indexes.push(current);
             current = (current + 7) % 12;
         }
@@ -467,8 +465,8 @@ var music;
     }
     music.fifths = fifths;
     function chromatic() {
-        var indexes = [];
-        for (var i = 0; i < 12; i++) {
+        let indexes = [];
+        for (let i = 0; i < 12; i++) {
             indexes.push(i);
         }
         return indexes;
@@ -477,22 +475,23 @@ var music;
 })(music || (music = {}));
 var state;
 (function (state) {
-    var currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
-    var currentChordIndex = -1;
-    var currentChordIntervals = [0, 2, 4];
-    var currentToggledIndexes = 0; // index bitflag
-    var currentScaleFamily = music.scaleFamily[0];
-    var currentMode = currentScaleFamily.modes[1];
+    let currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
+    let currentChordIndex = -1;
+    let currentChordIntervals = [0, 2, 4];
+    let currentToggledIndexes = 0; // index bitflag
+    let currentScaleFamily = music.scaleFamily[0];
+    let currentMode = currentScaleFamily.modes[1];
+    let currentMidiToggledIndexes = 0;
     function init() {
         try {
-            var cookieData_1 = cookies.readCookie();
-            if (cookieData_1.hasCookie) {
-                var cookieModes = currentScaleFamily.modes.filter(function (x) { return x.index == cookieData_1.modeIndex; });
+            let cookieData = cookies.readCookie();
+            if (cookieData.hasCookie) {
+                let cookieModes = currentScaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
                 if (cookieModes.length > 0) {
                     currentMode = cookieModes[0];
                 }
-                currentChordIndex = cookieData_1.chordIndex;
-                currentNoteSpec = music.createNoteSpec(cookieData_1.naturalIndex, cookieData_1.index);
+                currentChordIndex = cookieData.chordIndex;
+                currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
             }
         }
         catch (e) {
@@ -502,13 +501,14 @@ var state;
             currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
         // lets remember this while we reset everything.
-        var tempChordIndex = currentChordIndex;
+        let tempChordIndex = currentChordIndex;
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
-        events.chordIntervalChange.subscribe(function (x) { return currentChordIntervals = x.chordIntervals; });
+        events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
+        events.midiNote.subscribe(midiNote);
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
@@ -544,13 +544,17 @@ var state;
         currentToggledIndexes = currentToggledIndexes ^ Math.pow(2, toggleEvent.index);
         updateScale();
     }
+    function midiNote(midiNoteEvent) {
+        currentMidiToggledIndexes = midiNoteEvent.toggledIndexes;
+        updateScale();
+    }
     function updateScale() {
-        var nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentScaleFamily);
+        let nodes = music.generateScaleShim(currentNoteSpec, currentMode, currentChordIndex, currentChordIntervals, currentToggledIndexes, currentMidiToggledIndexes, currentScaleFamily);
         // update togges, because a chord may have been generated.
         currentToggledIndexes = nodes
-            .filter(function (x) { return x.toggle; })
-            .map(function (x) { return x.scaleNote.note.index; })
-            .reduce(function (a, b) { return a + Math.pow(2, b); }, 0);
+            .filter(x => x.toggle)
+            .map(x => x.scaleNote.note.index)
+            .reduce((a, b) => a + Math.pow(2, b), 0);
         events.scaleChange.publish({
             nodes: nodes,
             mode: currentMode
@@ -559,16 +563,15 @@ var state;
 })(state || (state = {}));
 var cof;
 (function (cof_1) {
-    var NoteCircle = /** @class */ (function () {
-        function NoteCircle(svg, noteIndexes, label) {
-            var _this = this;
-            this.indexer = function (x) { return x.index + ""; };
-            var pad = 50;
-            var chordRadius = 240;
-            var noteRadius = 200;
-            var degreeRadius = 135;
-            var innerRadius = 90;
-            var cof = svg
+    class NoteCircle {
+        constructor(svg, noteIndexes, label) {
+            this.indexer = (x) => x.index + "";
+            let pad = 50;
+            let chordRadius = 240;
+            let noteRadius = 200;
+            let degreeRadius = 135;
+            let innerRadius = 90;
+            let cof = svg
                 .append("g")
                 .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
             cof.append("text")
@@ -576,14 +579,14 @@ var cof;
                 .attr("x", 0)
                 .attr("y", 0)
                 .text(label);
-            var segments = generateSegments(noteIndexes);
-            var noteArc = d3.svg.arc()
+            let segments = generateSegments(noteIndexes);
+            let noteArc = d3.svg.arc()
                 .innerRadius(degreeRadius)
                 .outerRadius(noteRadius);
-            var degreeArc = d3.svg.arc()
+            let degreeArc = d3.svg.arc()
                 .innerRadius(innerRadius)
                 .outerRadius(degreeRadius);
-            var chordArc = d3.svg.arc()
+            let chordArc = d3.svg.arc()
                 .innerRadius(noteRadius)
                 .outerRadius(chordRadius);
             this.noteSegments = cof.append("g").selectAll("path")
@@ -653,45 +656,46 @@ var cof;
             // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
             //     instance.update(stateChange);
             // });
-            events.scaleChange.subscribe(function (scaleChnaged) { return _this.update(scaleChnaged); });
+            events.scaleChange.subscribe(scaleChnaged => this.update(scaleChnaged));
         }
-        NoteCircle.prototype.update = function (scaleChnaged) {
-            var data = scaleChnaged.nodes.map(function (node) { return ({
+        update(scaleChnaged) {
+            let data = scaleChnaged.nodes.map(node => ({
                 startAngle: 0,
                 endAngle: 0,
                 scaleNote: {},
                 index: node.scaleNote.note.index,
                 node: node
-            }); });
+            }));
             this.noteSegments
                 .data(data, this.indexer)
-                .attr("class", function (d, i) { return "note-segment " +
-                (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""); });
+                .attr("class", (d, i) => "note-segment " +
+                (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""));
             this.noteText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.scaleNote.note.label; });
+                .text(d => d.node.scaleNote.note.label);
             this.intervalSegments
                 .data(data, this.indexer)
-                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment"; });
+                .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
             this.intervalText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.intervalName; });
+                .text(d => d.node.intervalName);
             this.intervalNotes
                 .data(data, this.indexer)
-                .attr("class", function (d) { return d.node.toggle ? "interval-note-selected" : "interval-note"; })
-                .style("fill", function (d) { return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none"; });
+                .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
+                .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none")
+                .style("stroke-width", d => d.node.midiToggle ? "20px" : "2px")
+                .style("stroke", d => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
             this.chordText
                 .data(data, this.indexer)
-                .text(function (d) { return d.node.scaleNote.chord.romanNumeral + ""; });
+                .text(d => d.node.scaleNote.chord.romanNumeral + "");
             this.chordSegments
                 .data(data, this.indexer)
-                .attr("class", function (d) { return d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment"; });
+                .attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
             this.chordNotes
                 .data(data, this.indexer)
-                .attr("class", function (d) { return d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note"; });
-        };
-        return NoteCircle;
-    }());
+                .attr("class", d => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
+        }
+    }
     cof_1.NoteCircle = NoteCircle;
     function getChordSegmentClass(chord) {
         if (chord.type === music.ChordType.Diminished)
@@ -703,11 +707,11 @@ var cof;
         throw "Unexpected ChordType";
     }
     function generateSegments(fifths) {
-        var count = fifths.length;
-        var items = [];
-        var angle = (Math.PI * (2 / count));
-        for (var i = 0; i < count; i++) {
-            var itemAngle = (angle * i) - (angle / 2);
+        let count = fifths.length;
+        let items = [];
+        let angle = (Math.PI * (2 / count));
+        for (let i = 0; i < count; i++) {
+            let itemAngle = (angle * i) - (angle / 2);
             items.push({
                 startAngle: itemAngle,
                 endAngle: itemAngle + angle,
@@ -724,11 +728,11 @@ var cof;
     }
     function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
         if (Math.abs(noteSpec.offset) > 1) {
-            var naturalId = noteSpec.natural.id;
-            var newNaturalId_1 = (noteSpec.offset > 0)
+            let naturalId = noteSpec.natural.id;
+            let newNaturalId = (noteSpec.offset > 0)
                 ? naturalId + 1 % 7
                 : naturalId == 0 ? 6 : naturalId - 1;
-            var newNatural = music.naturals.filter(function (x) { return x.id === newNaturalId_1; })[0];
+            let newNatural = music.naturals.filter(x => x.id === newNaturalId)[0];
             return music.createNoteSpec(newNatural.index, noteSpec.index);
         }
         return noteSpec;
@@ -742,11 +746,11 @@ var cof;
 })(cof || (cof = {}));
 var tonics;
 (function (tonics_1) {
-    var buttons;
+    let buttons;
     ;
     function bg(natural) {
-        var flatIndex = natural.index == 0 ? 11 : natural.index - 1;
-        var sharpIndex = (natural.index + 1) % 12;
+        let flatIndex = natural.index == 0 ? 11 : natural.index - 1;
+        let sharpIndex = (natural.index + 1) % 12;
         return [
             { noteSpec: music.createNoteSpec(natural.index, flatIndex) },
             { noteSpec: music.createNoteSpec(natural.index, natural.index) },
@@ -754,17 +758,17 @@ var tonics;
         ];
     }
     function init() {
-        var pad = 5;
-        var buttonHeight = 25;
-        var svg = d3.select("#modes");
-        var tonics = svg.append("g");
-        var gs = tonics.selectAll("g")
+        let pad = 5;
+        let buttonHeight = 25;
+        let svg = d3.select("#modes");
+        let tonics = svg.append("g");
+        let gs = tonics.selectAll("g")
             .data(music.naturals)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
             .selectAll("g")
-            .data(function (d) { return bg(d); }, indexer)
+            .data(d => bg(d), indexer)
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(" + (i * 55) + ", 0)"; });
@@ -775,8 +779,8 @@ var tonics;
             .attr("strokeWidth", 2)
             .attr("width", 40)
             .attr("height", 25)
-            .attr("class", function (d) { return isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button"; })
-            .on("click", function (d) { return events.tonicChange.publish({ noteSpec: d.noteSpec }); });
+            .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button")
+            .on("click", d => events.tonicChange.publish({ noteSpec: d.noteSpec }));
         gs
             .append("text")
             .attr("x", pad + 10)
@@ -787,34 +791,34 @@ var tonics;
     }
     tonics_1.init = init;
     function listener(tonicChanged) {
-        var ds = [{
+        let ds = [{
                 noteSpec: tonicChanged.noteSpec
             }];
         buttons
             .data(ds, indexer)
             .attr("class", "tonic-button tonic-button-selected")
             .exit()
-            .attr("class", function (d) { return isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button"; });
+            .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
     }
     function indexer(d) {
         return d.noteSpec.label;
     }
     function isSameNoteAsNatural(noteSpec) {
-        return music.naturals.some(function (x) { return x.index === noteSpec.index && x.index != noteSpec.natural.index; });
+        return music.naturals.some(x => x.index === noteSpec.index && x.index != noteSpec.natural.index);
     }
 })(tonics || (tonics = {}));
 var chordInterval;
 (function (chordInterval) {
-    var buttons;
-    var toggle = 0;
+    let buttons;
+    let toggle = 0;
     function init() {
-        var radius = 10;
-        var pad = 2;
-        var svg = d3.select("#modes");
-        var intervals = svg
+        let radius = 10;
+        let pad = 2;
+        let svg = d3.select("#modes");
+        let intervals = svg
             .append("g")
             .attr("transform", "translate(0, 240)");
-        var gs = intervals.selectAll("g")
+        let gs = intervals.selectAll("g")
             .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
             .enter()
             .append("g")
@@ -837,13 +841,13 @@ var chordInterval;
     }
     chordInterval.init = init;
     function onClick(x) {
-        var updatedToggle = toggle ^ (Math.pow(2, x));
-        var chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(function (x) { return (Math.pow(2, x) & updatedToggle) === Math.pow(2, x); });
+        let updatedToggle = toggle ^ (Math.pow(2, x));
+        let chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (Math.pow(2, x) & updatedToggle) === Math.pow(2, x));
         events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
     }
     function update(event) {
         toggle = 0;
-        event.chordIntervals.forEach(function (x) { return toggle = toggle + Math.pow(2, x); });
+        event.chordIntervals.forEach(x => toggle = toggle + Math.pow(2, x));
         buttons
             .data(event.chordIntervals, function (m) { return m.toString(); })
             .attr("class", "mode-button mode-button-selected")
@@ -854,10 +858,10 @@ var chordInterval;
 })(chordInterval || (chordInterval = {}));
 var modes;
 (function (modes_1) {
-    var buttons;
-    var modes;
+    let buttons;
+    let modes;
     function init(scaleFamily) {
-        var svg = d3.select("#modes");
+        let svg = d3.select("#modes");
         modes = svg
             .append("g")
             .attr("transform", "translate(0, 280)");
@@ -867,17 +871,17 @@ var modes;
     }
     modes_1.init = init;
     function drawButtons(scaleFamily) {
-        var pad = 5;
-        var buttonHeight = 25;
+        let pad = 5;
+        let buttonHeight = 25;
         modes.selectAll("g").remove();
-        var gs = modes.selectAll("g").data(scaleFamily.modes, index);
+        let gs = modes.selectAll("g").data(scaleFamily.modes, index);
         gs
             .exit()
             .remove();
         gs
             .enter()
             .append("g")
-            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; });
+            .attr("transform", (d, i) => "translate(0, " + (i * (buttonHeight + pad) + pad) + ")");
         buttons = gs
             .append("rect")
             .attr("x", pad)
@@ -886,17 +890,17 @@ var modes;
             .attr("width", 150)
             .attr("height", 25)
             .attr("class", "mode-button")
-            .on("click", function (d) { return events.modeChange.publish({ mode: d }); });
+            .on("click", (d) => events.modeChange.publish({ mode: d }));
         gs
             .append("text")
             .attr("x", pad + 10)
             .attr("y", 17)
-            .text(function (x) { return x.name; })
+            .text((x) => x.name)
             .attr("class", "mode-text");
-        events.modeChange.publish({ mode: scaleFamily.modes.filter(function (x) { return x.index == scaleFamily.defaultModeIndex; })[0] });
+        events.modeChange.publish({ mode: scaleFamily.modes.filter(x => x.index == scaleFamily.defaultModeIndex)[0] });
     }
     function update(modeChange) {
-        var modes = [modeChange.mode];
+        let modes = [modeChange.mode];
         buttons
             .data(modes, index)
             .attr("class", "mode-button mode-button-selected")
@@ -912,20 +916,20 @@ var modes;
 })(modes || (modes = {}));
 var gtr;
 (function (gtr_1) {
-    var currentTuning;
-    var currentState;
-    var notes;
-    var noteLabels;
-    var numberOfFrets = 16;
-    var fretboardElement;
-    var isLeftHanded = false;
-    var isNutFlipped = false;
-    var fretboardLabelType = events.FretboardLabelType.NoteName;
-    var stringGap = 40;
-    var fretGap = 70;
-    var fretWidth = 5;
-    var noteRadius = 15;
-    var pad = 20;
+    let currentTuning;
+    let currentState;
+    let notes;
+    let noteLabels;
+    let numberOfFrets = 16;
+    let fretboardElement;
+    let isLeftHanded = false;
+    let isNutFlipped = false;
+    let fretboardLabelType = events.FretboardLabelType.NoteName;
+    let stringGap = 40;
+    let fretGap = 70;
+    let fretWidth = 5;
+    let noteRadius = 15;
+    let pad = 20;
     function indexer(stringNote) {
         return stringNote.index + "_" + stringNote.octave;
     }
@@ -948,15 +952,15 @@ var gtr;
             fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
             noteLabels
-                .attr("transform", function (d, i) { return "translate(0, 0) scale(-1, 1)"; })
-                .attr("x", function (d, i) { return -(i * fretGap + pad + 30); });
+                .attr("transform", (d, i) => "translate(0, 0) scale(-1, 1)")
+                .attr("x", (d, i) => -(i * fretGap + pad + 30));
         }
         else {
             fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
             fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
             noteLabels
-                .attr("transform", function (d, i) { return "translate(0, 0) scale(1, 1)"; })
-                .attr("x", function (d, i) { return (i * fretGap + pad + 30); });
+                .attr("transform", (d, i) => "translate(0, 0) scale(1, 1)")
+                .attr("x", (d, i) => (i * fretGap + pad + 30));
         }
     }
     function handleFlipNutChanged(fnEvent) {
@@ -990,10 +994,10 @@ var gtr;
     }
     function updateFretboard(tuningInfo) {
         currentTuning = tuningInfo;
-        var fretData = getFretData(numberOfFrets);
-        var dots = tuningInfo.dots;
+        let fretData = getFretData(numberOfFrets);
+        let dots = tuningInfo.dots;
         d3.selectAll("#gtr > *").remove();
-        var svg = d3.select("#gtr");
+        let svg = d3.select("#gtr");
         svg.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
@@ -1002,7 +1006,7 @@ var gtr;
             + tuningInfo.description
             + (isLeftHanded ? ", Left Handed" : "")
             + (isNutFlipped ? ", Nut Flipped" : ""));
-        var gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
+        let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = gtr.node();
         // frets
         gtr.append("g").selectAll("rect")
@@ -1026,8 +1030,8 @@ var gtr;
             .attr("cy", function (d) { return (tuningInfo.notes.length) * stringGap + pad + 15; })
             .attr("fill", "lightgrey")
             .attr("stroke", "none");
-        var strings = gtr.append("g").selectAll("g")
-            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), function (_, i) { return i + ""; })
+        let strings = gtr.append("g").selectAll("g")
+            .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => i + "")
             .enter()
             .append("g")
             .attr("transform", function (d, i) { return "translate(0, " + ((i * stringGap) + pad) + ")"; });
@@ -1048,7 +1052,7 @@ var gtr;
             .attr("r", noteRadius)
             .attr("cy", stringGap / 2)
             .attr("cx", function (d, i) { return i * fretGap + pad + 30; })
-            .on("click", function (d) { return events.toggle.publish({ index: d.index }); });
+            .on("click", d => events.toggle.publish({ index: d.index }));
         noteLabels = strings
             .selectAll("text")
             .data(function (d) { return allNotesFrom(d, numberOfFrets); }, indexer)
@@ -1056,7 +1060,7 @@ var gtr;
             .append("text")
             .attr("transform", "translate(0, 0) scale(1, 1)")
             .attr("text-anchor", "middle")
-            .attr("x", function (d, i) { return i * fretGap + pad + 30; })
+            .attr("x", (d, i) => i * fretGap + pad + 30)
             .attr("y", (stringGap / 2) + 5)
             .text("");
         setHandedness();
@@ -1065,8 +1069,8 @@ var gtr;
         }
     }
     function update(stateChange) {
-        var hasToggledNotes = stateChange.nodes.some(function (x) { return x.toggle; });
-        var fill = function (d) {
+        let hasToggledNotes = stateChange.nodes.some(x => x.toggle);
+        let fill = function (d) {
             return d.node.toggle
                 ? "white"
                 : d.node.scaleNote.isScaleNote
@@ -1075,16 +1079,19 @@ var gtr;
                         : "white"
                     : "rgba(255, 255, 255, 0.01)";
         };
-        var stroke = function (d) {
-            return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
-                : hasToggledNotes ? "none"
-                    : d.node.scaleNote.isScaleNote ? "grey" : "none";
+        let stroke = function (d) {
+            return d.node.midiToggle ? "OrangeRed"
+                : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
+                    : hasToggledNotes ? "none"
+                        : d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
-        var strokeWidth = function (d) {
-            return d.node.toggle ? 4
-                : d.node.scaleNote.isScaleNote ? 2 : 0;
+        let strokeWidth = function (d) {
+            return d.node.midiToggle ? 10
+                : d.node.toggle ? 4
+                    : d.node.scaleNote.isScaleNote ? 2
+                        : 0;
         };
-        var data = repeatTo(stateChange.nodes, numberOfFrets);
+        let data = repeatTo(stateChange.nodes, numberOfFrets);
         notes
             .data(data, indexer)
             .attr("fill", fill)
@@ -1095,8 +1102,8 @@ var gtr;
         currentState = stateChange;
     }
     function allNotesFrom(index, numberOfNotes) {
-        var items = [];
-        for (var i = 0; i < numberOfNotes; i++) {
+        let items = [];
+        for (let i = 0; i < numberOfNotes; i++) {
             items.push({
                 octave: Math.floor((i + 1) / 12),
                 index: (i + index) % 12,
@@ -1106,30 +1113,27 @@ var gtr;
         return items;
     }
     function getFretData(numberOfFrets) {
-        var data = [];
-        for (var i = 0; i < numberOfFrets; i++) {
+        let data = [];
+        for (let i = 0; i < numberOfFrets; i++) {
             data.push(i);
         }
         return data;
     }
     function repeatTo(nodes, count) {
-        var stringNotes = [];
-        var _loop_1 = function (i) {
-            stringNotes = stringNotes.concat(nodes.map(function (x) { return ({
+        let stringNotes = [];
+        for (let i = 0; i <= Math.floor(count / 12); i++) {
+            stringNotes = stringNotes.concat(nodes.map(x => ({
                 octave: i,
                 index: x.scaleNote.note.index,
                 node: x
-            }); }));
-        };
-        for (var i = 0; i <= Math.floor(count / 12); i++) {
-            _loop_1(i);
+            })));
         }
         return stringNotes;
     }
 })(gtr || (gtr = {}));
 var tuning;
 (function (tuning_1) {
-    var guitarDots = [
+    let guitarDots = [
         [3, 0],
         [5, 0],
         [7, 0],
@@ -1138,7 +1142,7 @@ var tuning;
         [12, 1],
         [15, 0]
     ];
-    var tunings = [
+    let tunings = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
@@ -1153,17 +1157,14 @@ var tuning;
         { tuning: "CGDA", dots: guitarDots, description: "Viola" },
     ];
     function parseTuning(tuning) {
-        var result = [];
-        var _loop_2 = function (i) {
-            var noteChar = tuning.charAt(i);
-            var natural = music.naturals.filter(function (x) { return x.label === noteChar; });
+        let result = [];
+        for (let i = 0; i < tuning.length; i++) {
+            let noteChar = tuning.charAt(i);
+            let natural = music.naturals.filter(x => x.label === noteChar);
             if (natural.length != 1) {
                 throw "Invalid tuning char";
             }
             result.push(natural[0].index);
-        };
-        for (var i = 0; i < tuning.length; i++) {
-            _loop_2(i);
         }
         return result;
     }
@@ -1174,13 +1175,13 @@ var tuning;
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", function (x) { return raiseTuningChangedEvent(x); })
-            .text(function (x) { return x.tuning + "   " + x.description; });
+            .on("click", x => raiseTuningChangedEvent(x))
+            .text(x => x.tuning + "   " + x.description);
         raiseTuningChangedEvent(tunings[0]);
     }
     tuning_1.init = init;
     function raiseTuningChangedEvent(info) {
-        var notes = parseTuning(info.tuning);
+        let notes = parseTuning(info.tuning);
         events.tuningChange.publish({
             tuning: info.tuning,
             dots: info.dots,
@@ -1213,8 +1214,8 @@ var scaleFamily;
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
-            .on("click", function (x) { return raiseScaleFamilyChangedEvent(x); })
-            .text(function (x) { return x.name; });
+            .on("click", x => raiseScaleFamilyChangedEvent(x))
+            .text(x => x.name);
     }
     scaleFamily_1.init = init;
     function raiseScaleFamilyChangedEvent(scaleFamily) {
@@ -1223,12 +1224,56 @@ var scaleFamily;
         });
     }
 })(scaleFamily || (scaleFamily = {}));
+///<reference path="../node_modules/@types/webmidi/index.d.ts" />
+var midiControl;
+(function (midiControl) {
+    // bit flag for on/off MIDI notes
+    let currentToggledIndexes = 0;
+    function init() {
+        let nav = window.navigator;
+        if (!nav.requestMIDIAccess) {
+            console.log("Browser does not support MIDI.");
+            return;
+        }
+        nav.requestMIDIAccess()
+            .then((midiAccess) => {
+            console.log("MIDI Ready!");
+            for (let entry of midiAccess.inputs) {
+                entry[1].onmidimessage = onMidiMessage;
+            }
+        })
+            .catch((error) => {
+            console.log("Error accessing MIDI devices: " + error);
+        });
+    }
+    midiControl.init = init;
+    function onMidiMessage(midiEvent) {
+        let data = midiEvent.data;
+        if (data.length === 3) {
+            let status = data[0];
+            // command is the four most significant bits of the status byte.
+            let command = status >>> 4;
+            //let octave = Math.trunc(data[1] / 12);
+            // MIDI starts with C0 = 0, but guitar dashboard index 0 = A, so add three to the midi note number.
+            let index = (data[1] + 3) % 12;
+            if (command === 0x9) {
+                // MIDI note on.
+                currentToggledIndexes = currentToggledIndexes | Math.pow(2, index);
+            }
+            if (command === 0x8) {
+                // MIDI note off.
+                currentToggledIndexes = currentToggledIndexes & ~(Math.pow(2, index));
+            }
+            events.midiNote.publish({ toggledIndexes: currentToggledIndexes });
+        }
+    }
+})(midiControl || (midiControl = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init(music.scaleFamily[0]);
 chordInterval.init();
-var chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
-var circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
+let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
+let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();
 tuning.init();
 scaleFamily.init();

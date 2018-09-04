@@ -193,6 +193,7 @@ namespace music {
         readonly intervalName: string;
         readonly isChordRoot: boolean;
         readonly toggle: boolean;
+        readonly midiToggle: boolean;
     }
 
     export let nullNode: Node = {
@@ -223,7 +224,8 @@ namespace music {
         },
         intervalName: "",
         isChordRoot: false,
-        toggle: false
+        toggle: false,
+        midiToggle: false
     };
 
     export function generateScaleShim(
@@ -232,15 +234,16 @@ namespace music {
         chordIndex: number, 
         chordIntervals: number[], 
         toggledIndexes: number,
+        toggledMidiNotes: number,
         scaleFamily: ScaleFamily): Node[] {
 
         let scale = generateScale(noteSpec, mode, scaleFamily);
         mod.zip(scale, generateChordNumbers(scale, mode, scaleFamily.intervals)).forEach(x => x[0].chord = x[1]);
         if(chordIndex === -1) {
-            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, scaleFamily.intervals);
+            return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily.intervals);
         }
         else {
-            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, scaleFamily.intervals, true);
+            return generateNodes(scale, mode, chordIndex, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamily.intervals, true);
         }
     }
 
@@ -297,6 +300,7 @@ namespace music {
         chordIndex: number, 
         chordIntervals: number[],
         toggledIndexes: number,
+        toggledMidiNotes: number,
         scaleFamily: mod.Mod<boolean>,
         chordSelected: boolean = false
     ): Node[] {
@@ -333,7 +337,8 @@ namespace music {
                 chordInterval: activeInterval,
                 intervalName: getIntervalName(activeInterval),
                 isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
-                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals)
+                toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals),
+                midiToggle: (toggledMidiNotes & (2**scaleNote.note.index)) != 0
             };
         });
     }
@@ -357,7 +362,7 @@ namespace music {
         return scaleNotes.map((scaleNote, i) => {
             if(scaleNote.isScaleNote) {
                 let roman = romanNumeral[scaleNote.noteNumber];
-                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, scaleFamily);
+                let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamily);
                 let diminished = "";
                 let seventh = "";
                 let type: ChordType = ChordType.Minor;

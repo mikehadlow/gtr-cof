@@ -99,4 +99,10 @@ namespace events {
     export interface ScaleFamilyChangeEvent {
         readonly scaleFamily: music.ScaleFamily;
     }
+
+    export let midiNote: Bus<MidiNoteEvent> = new Bus<MidiNoteEvent>("midiNoteEvent");
+
+    export interface MidiNoteEvent {
+        readonly toggledIndexes: number;
+    }
 }

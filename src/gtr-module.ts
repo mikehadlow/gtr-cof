@@ -190,14 +190,17 @@ namespace gtr {
         };
 
         let stroke = function (d: StringNote): string {
-            return d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) 
+            return d.node.midiToggle ? "OrangeRed" 
+                : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) 
                 : hasToggledNotes ? "none"
                 : d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
 
         let strokeWidth = function (d: StringNote): number {
-            return d.node.toggle ? 4 
-                : d.node.scaleNote.isScaleNote ? 2 : 0;
+            return d.node.midiToggle ? 10 
+                : d.node.toggle ? 4 
+                : d.node.scaleNote.isScaleNote ? 2 
+                : 0;
         };
 
         let data = repeatTo(stateChange.nodes, numberOfFrets);

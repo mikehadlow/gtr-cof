@@ -9,6 +9,7 @@ namespace state {
     let currentToggledIndexes: number = 0; // index bitflag
     let currentScaleFamily: music.ScaleFamily = music.scaleFamily[0];
     let currentMode: music.Mode = currentScaleFamily.modes[1];
+    let currentMidiToggledIndexes: number = 0;
 
     export function init() {
         try{
@@ -39,6 +40,7 @@ namespace state {
         events.toggle.subscribe(toggle);
         events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
+        events.midiNote.subscribe(midiNote);
 
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
         events.modeChange.publish({ mode: currentMode });
@@ -80,6 +82,11 @@ namespace state {
         updateScale();
     }
 
+    function midiNote(midiNoteEvent: events.MidiNoteEvent): void {
+        currentMidiToggledIndexes = midiNoteEvent.toggledIndexes;
+        updateScale();
+    }
+
     function updateScale(): void {
         let nodes = music.generateScaleShim(
             currentNoteSpec, 
@@ -87,6 +94,7 @@ namespace state {
             currentChordIndex, 
             currentChordIntervals, 
             currentToggledIndexes,
+            currentMidiToggledIndexes,
             currentScaleFamily);
 
         // update togges, because a chord may have been generated.
