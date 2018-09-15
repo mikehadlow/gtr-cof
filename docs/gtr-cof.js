@@ -1001,7 +1001,7 @@ var gtr;
         svg.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
-            .attr("y", 10)
+            .attr("y", 11)
             .text(tuningInfo.tuning + " "
             + tuningInfo.description
             + (isLeftHanded ? ", Left Handed" : "")
