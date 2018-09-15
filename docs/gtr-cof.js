@@ -1152,6 +1152,7 @@ var tuning;
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
+        { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho" },
         { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
         { tuning: "CGDA", dots: guitarDots, description: "Cello" },
         { tuning: "GDAE", dots: guitarDots, description: "Violin" },
