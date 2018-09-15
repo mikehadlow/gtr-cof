@@ -10,6 +10,16 @@ namespace tuning {
         [15, 0]
     ];
 
+    // Viola/violin for beginners.
+    let violaDots: Array<[number, number]> = [
+        [2, 0],   // 1st finger
+        [4, 0],   // 2nd finger
+        [5, 0],   // 3rd finger
+        [7, 0],   // 4th finger
+        [12, -1],
+        [12, 1]
+    ];
+
     interface TuningInfo {
         readonly tuning: string;
         readonly dots: Array<[number, number]>;
@@ -26,9 +36,9 @@ namespace tuning {
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
-        { tuning: "CGDA", dots: guitarDots, description: "Cello" },
-        { tuning: "GDAE", dots: guitarDots, description: "Violin" },
-        { tuning: "CGDA", dots: guitarDots, description: "Viola" },
+        { tuning: "CGDA", dots: violaDots, description: "Cello" },
+        { tuning: "GDAE", dots: violaDots, description: "Violin" },
+        { tuning: "CGDA", dots: violaDots, description: "Viola" },
     ]
 
     function parseTuning(tuning: string) : Array<number> {
