@@ -15,3 +15,7 @@ Guitar Dashboard is written in Typescript using VS Code. Make all code changes i
 5. Browse to http://localhost:10001/
 6. Edit the src/*.ts, index.html and gtr-cof.css files.
 8. Commit, push to GitHub and create a pull request :)
+
+## Developing with your browser
+
+[Open in Gitpod](https://gitpod.io#https://github.com/mikehadlow/gtr-cof) - launches a cloud container, install dependencies, start a dev server and opens it in a VS-code like browser IDE.
