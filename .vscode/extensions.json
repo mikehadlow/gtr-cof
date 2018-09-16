@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "christian-kohler.npm-intellisense",
+    "eg2.tslint",
+    "esbenp.prettier-vscode"
+  ]
+}

@@ -1,28 +1,17 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "strict": true,
-        "module": "none",
-        "sourceMap": true,
-        "outDir": "docs",
-        "outFile": "docs/gtr-cof.js",
-        "types": []
-    },
-    "files": [
-        "src/mod-module.ts",
-        "src/events-module.ts",
-        "src/cookie-module.ts",
-        "src/music-module.ts",
-        "src/state-module.ts",
-        "src/cof-module.ts",
-        "src/tonics-module.ts",
-        "src/chord-interval-module.ts",
-        "src/modes-module.ts",
-        "src/gtr-module.ts",
-        "src/tuning-module.ts",
-        "src/settings-module.ts",
-        "src/scale-family-module.ts",
-        "src/midi-module.ts",
-        "src/gtr-cof.ts"
-    ]
+  "compilerOptions": {
+    "baseUrl": "src",
+    "module": "none",
+    "moduleResolution": "node",
+    "outDir": "docs",
+    "outFile": "docs/gtr-cof.js",
+    "pretty": true,
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es6",
+    "types": []
+  },
+  "include": ["typings/*.d.ts", "src/gtr-cof.ts"],
+  "exclude": ["node_modules", "docs"]
 }

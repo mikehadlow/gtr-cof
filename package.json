@@ -3,18 +3,45 @@
   "version": "1.0.0",
   "description": "gtr-cof",
   "scripts": {
+    "compile": "tsc",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
     "lite": "lite-server --baseDir=\"docs\" --port 10001",
     "start": "npm run lite",
-    "dev": "concurrently --raw --kill-others 'npm start' 'tsc -w'"
+    "dev": "concurrently --raw --kill-others 'npm start' 'tsc -w'",
+    "precommit": "lint-staged",
+    "prepush": "yarn run type-check",
+    "prettier": "prettier",
+    "type-check": "yarn tsc --noEmit --pretty"
   },
   "author": "Mike Hadlow",
   "license": "MIT",
   "devDependencies": {
-    "@types/d3": "^3.0.0",
-    "@types/webmidi": "^2.0.2",
+    "@types/d3": "3.5.41",
+    "@types/webmidi": "2.0.2",
     "concurrently": "4.0.1",
     "d3": "^3.0.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.2",
     "lite-server": "^1.3.1",
-    "typescript": "^2.3.4"
+    "prettier": "^1.14.2",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^2.3.4",
+    "webmidi": "2.2.0"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": false,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "tabWidth": 4,
+    "printWidth": 120
+  },
+  "lint-staged": {
+    "*.@(ts|tsx)": [
+      "tslint -c tslint.json --fix",
+      "yarn prettier",
+      "git add"
+    ]
   }
 }
