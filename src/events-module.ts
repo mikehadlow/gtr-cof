@@ -3,6 +3,7 @@ import * as music from "./music-module"
 export class Bus<T> {
     private listeners: Array<(x: T) => void> = []
     private name: string
+    private debug: boolean = false
 
     // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
     constructor(name: string) {
@@ -14,16 +15,21 @@ export class Bus<T> {
     }
 
     public publish(event: T): void {
-        // console.log("Published event: '" + this.name + "'")
+        if (this.debug) {
+            // tslint:disable-next-line
+            console.log("Published event: '" + this.name + "'")
+        }
+
         for (const listener of this.listeners) {
             listener(event)
         }
     }
 }
 
-function genericName<U>(type: { new (): U }): string {
-    return type.constructor.toString()
-}
+// FIXME: TSLint: This isn't used in project
+// function genericName<U>(type: { new (): U }): string {
+//     return type.constructor.toString()
+// }
 
 export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>("scaleChange")
 

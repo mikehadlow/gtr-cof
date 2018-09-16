@@ -60,7 +60,8 @@ export function update(event: events.ChordIntervalChangeEvent): void {
         .attr("class", "mode-button")
 }
 
-interface button {
-    readonly id: number
-    selected: boolean
-}
+// FIXME: TSLint: this isn't used
+// interface button {
+//     readonly id: number
+//     selected: boolean
+// }

@@ -1,17 +1,14 @@
 {
-  "compilerOptions": {
-    "baseUrl": "src",
-    "module": "none",
-    "moduleResolution": "node",
-    "outDir": "docs",
-    "outFile": "docs/gtr-cof.js",
-    "pretty": true,
-    "rootDir": "src",
-    "sourceMap": true,
-    "strict": true,
-    "target": "es6",
-    "types": []
-  },
-  "include": ["typings/*.d.ts", "src/gtr-cof.ts"],
-  "exclude": ["node_modules", "docs"]
+    "compilerOptions": {
+        "baseUrl": "src",
+        "downlevelIteration": true,
+        "lib": ["dom", "es2015", "es2016", "es2017"],
+        "module": "es2015",
+        "moduleResolution": "node",
+        "pretty": true,
+        "strict": true,
+        "types": ["@types/d3", "@types/webmidi"]
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "docs"]
 }

@@ -10,14 +10,17 @@ import * as state from "./state-module"
 import * as tonics from "./tonics-module"
 import * as tuning from "./tuning-module"
 
-tonics.init()
-modes.init(music.scaleFamily[0])
-chordInterval.init()
-const chromatic = new NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic")
-const circleOfFifths = new NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths")
+export function boot(): void {
+    tonics.init()
+    modes.init(music.scaleFamily[0])
+    chordInterval.init()
 
-gtr.init()
-tuning.init()
-scaleFamily.init()
-state.init()
-cookies.init()
+    const chromatic = new NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic")
+    const circleOfFifths = new NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths")
+
+    gtr.init()
+    tuning.init()
+    scaleFamily.init()
+    state.init()
+    cookies.init()
+}
