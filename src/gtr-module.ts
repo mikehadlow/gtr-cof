@@ -99,9 +99,9 @@ namespace gtr {
         svg.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
-            .attr("y", 10)
-            .text(tuningInfo.tuning + " " 
-                + tuningInfo.description 
+            .attr("y", 11)
+            .text(tuningInfo.tuning + " "
+                + tuningInfo.description
                 + (isLeftHanded ? ", Left Handed" : "")
                 + (isNutFlipped ? ", Nut Flipped" : ""));
         let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
@@ -180,26 +180,26 @@ namespace gtr {
         let hasToggledNotes = stateChange.nodes.some(x => x.toggle);
 
         let fill = function (d: StringNote): string {
-            return d.node.toggle 
-                ? "white" 
-                : d.node.scaleNote.isScaleNote 
-                    ? d.node.scaleNote.noteNumber === 0 
-                        ? hasToggledNotes ? "white" : "yellow" 
-                        : "white" 
+            return d.node.toggle
+                ? "white"
+                : d.node.scaleNote.isScaleNote
+                    ? d.node.scaleNote.noteNumber === 0
+                        ? hasToggledNotes ? "white" : "yellow"
+                        : "white"
                     : "rgba(255, 255, 255, 0.01)";
         };
 
         let stroke = function (d: StringNote): string {
-            return d.node.midiToggle ? "OrangeRed" 
-                : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) 
+            return d.node.midiToggle ? "OrangeRed"
+                : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
                 : hasToggledNotes ? "none"
                 : d.node.scaleNote.isScaleNote ? "grey" : "none";
         };
 
         let strokeWidth = function (d: StringNote): number {
-            return d.node.midiToggle ? 10 
-                : d.node.toggle ? 4 
-                : d.node.scaleNote.isScaleNote ? 2 
+            return d.node.midiToggle ? 10
+                : d.node.toggle ? 4
+                : d.node.scaleNote.isScaleNote ? 2
                 : 0;
         };
 
@@ -210,7 +210,7 @@ namespace gtr {
             .attr("fill", fill)
             .attr("stroke", stroke)
             .attr("stroke-width", strokeWidth);
-        
+
         noteLabels.data(data, indexer)
         setLabels();
         currentState = stateChange;
