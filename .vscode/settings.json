@@ -1,3 +1,20 @@
 // Place your settings in this file to overwrite default and user settings.
 {
+  "files.exclude": {
+      ".git/": true,
+      "node_modules/": false,
+      "docs/": false
+  },
+  "search.exclude": {
+      "**/node_modules": true,
+      "**/docs": true
+  },
+  "editor.rulers": [120],
+  "editor.tabSize": 4,
+  "editor.formatOnSave": true,
+  "[json]": {
+      "editor.formatOnSave": false
+  },
+  "tslint.autoFixOnSave": true,
+  "typescript.tsdk": "./node_modules/typescript/lib"
 }
