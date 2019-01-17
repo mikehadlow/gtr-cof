@@ -25,6 +25,7 @@ namespace tuning {
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
+        { tuning: "BEADG", dots: guitarDots, description: "Bass Standard 5" },
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
         { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho"},
         { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },

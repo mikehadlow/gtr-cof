@@ -12,6 +12,7 @@ Guitar Dashboard is written in Typescript using VS Code. Make all code changes i
 4. To develop locally using lite-server:
     - npm install
     - npm dev
+        - note for Windows users: the scripts.dev line in package.json will have to be changed to "dev": "concurrently --raw --kill-others \"npm start\" \"tsc -w\""
 5. Browse to http://localhost:10001/
 6. Edit the src/*.ts, index.html and gtr-cof.css files.
 8. Commit, push to GitHub and create a pull request :)
