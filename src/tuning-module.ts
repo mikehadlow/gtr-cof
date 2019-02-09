@@ -23,6 +23,7 @@ namespace tuning {
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
         { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
+        { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },        
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
