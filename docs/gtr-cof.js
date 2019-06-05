@@ -103,6 +103,7 @@ var events;
     events.chordIntervalChange = new Bus("chordIntervalChange");
     events.scaleFamilyChange = new Bus("scaleFamilyChange");
     events.midiNote = new Bus("midiNoteEvent");
+    events.setCToNoon = new Bus("setCToNoonEvent");
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
@@ -1207,6 +1208,10 @@ var settings;
         events.fretboardLabelChange.publish({ labelType: parseInt(e.value) });
     }
     settings.onFbNoteTextClick = onFbNoteTextClick;
+    function onSetCToNoon(e) {
+        events.setCToNoon.publish({ isC: e.checked });
+    }
+    settings.onSetCToNoon = onSetCToNoon;
 })(settings || (settings = {}));
 var scaleFamily;
 (function (scaleFamily_1) {

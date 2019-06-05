@@ -105,4 +105,10 @@ namespace events {
     export interface MidiNoteEvent {
         readonly toggledIndexes: number;
     }
+
+    export let setCToNoon: Bus<SetCToNoonEvent> = new Bus<SetCToNoonEvent>("setCToNoonEvent");
+
+    export interface SetCToNoonEvent {
+        readonly isC: boolean;
+    }
 }
