@@ -23,7 +23,6 @@ namespace cof {
                 this.update(scaleChnaged, state);
 
                 setCToNoonSubscriptionIndex = events.setCToNoon.resubscribe(setCToNoonEvent => {
-                    console.log("setCToNoon event. noteIndexes.length " + noteIndexes.length + ", label " + label)
                     let offset = setCToNoonEvent.isC ? 3 : 0;
                     svg.selectAll("*").remove();
                     state = this.draw(svg, rotate(noteIndexes, offset), label);
