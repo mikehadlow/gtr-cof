@@ -1,7 +1,7 @@
 
 namespace cof {
 
-    export class NoteCircle {
+    interface NoteCircleState {
         noteSegments: d3.Selection<Segment>;
         noteText: d3.Selection<Segment>;
         intervalSegments: d3.Selection<Segment>;
@@ -10,9 +10,29 @@ namespace cof {
         chordText: d3.Selection<Segment>;
         chordSegments: d3.Selection<Segment>;
         chordNotes: d3.Selection<Segment>;
+    }
+
+    export class NoteCircle {
         indexer: (x: Segment) => string = (x) => x.index + "";
 
         constructor(svg: d3.Selection<any>, noteIndexes: number[], label: string) {
+            let state = this.draw(svg, noteIndexes, label);
+            let setCToNoonSubscriptionIndex = -1;
+
+            events.scaleChange.subscribe(scaleChnaged => { 
+                this.update(scaleChnaged, state);
+
+                setCToNoonSubscriptionIndex = events.setCToNoon.resubscribe(setCToNoonEvent => {
+                    console.log("setCToNoon event. noteIndexes.length " + noteIndexes.length + ", label " + label)
+                    let offset = setCToNoonEvent.isC ? 3 : 0;
+                    svg.selectAll("*").remove();
+                    state = this.draw(svg, rotate(noteIndexes, offset), label);
+                    this.update(scaleChnaged, state);
+                }, setCToNoonSubscriptionIndex);
+            });
+        }
+
+        draw (svg: d3.Selection<any>, noteIndexes: number[], label: string) : NoteCircleState {
             let pad = 50;
 
             let chordRadius = 240;
@@ -44,7 +64,7 @@ namespace cof {
                 .innerRadius(noteRadius)
                 .outerRadius(chordRadius);
 
-            this.noteSegments = cof.append("g").selectAll("path")
+            let noteSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
@@ -52,7 +72,7 @@ namespace cof {
                 .attr("class", "note-segment")
                 .on("click", handleNoteClick);
 
-            this.noteText = cof.append("g").selectAll("text")
+            let noteText = cof.append("g").selectAll("text")
                 .data(segments)
                 .enter()
                 .append("text")
@@ -61,7 +81,7 @@ namespace cof {
                 .text("")
                 .attr("class", "note-segment-text");
 
-            this.intervalSegments = cof.append("g").selectAll("path")
+            let intervalSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
@@ -69,7 +89,7 @@ namespace cof {
                 .attr("class", "interval-segment")
                 .on("click", handleIntervalClick);
 
-            this.intervalNotes = cof.append("g").selectAll("circle")
+            let intervalNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
                 .enter()
                 .append("circle")
@@ -79,7 +99,7 @@ namespace cof {
                 .attr("cy", function (x) { return degreeArc.centroid(x)[1]; })
                 .attr("class", "interval-note")
 
-            this.intervalText = cof.append("g").selectAll("text")
+            let intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -88,7 +108,7 @@ namespace cof {
                 .text("")
                 .attr("class", "degree-segment-text");
 
-            this.chordSegments = cof.append("g").selectAll("path")
+            let chordSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
@@ -96,7 +116,7 @@ namespace cof {
                 .attr("class", "chord-segment")
                 .on("click", handleChordClick);
 
-            this.chordNotes = cof.append("g").selectAll("circle")
+            let chordNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
                 .enter()
                 .append("circle")
@@ -106,7 +126,7 @@ namespace cof {
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
 
-            this.chordText = cof.append("g").selectAll("text")
+            let chordText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -115,15 +135,19 @@ namespace cof {
                 .text("")
                 .attr("class", "degree-segment-text");
 
-            // let instance = this;
-            // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
-            //     instance.update(stateChange);
-            // });
-
-            events.scaleChange.subscribe(scaleChnaged => this.update(scaleChnaged));
+            return {
+                noteSegments: noteSegments,
+                noteText: noteText,
+                intervalSegments: intervalSegments,
+                intervalNotes: intervalNotes,
+                intervalText: intervalText,
+                chordSegments: chordSegments,
+                chordNotes: chordNotes,
+                chordText: chordText
+            };
         }
 
-        update(scaleChnaged: events.ScaleChangedEvent): void {
+        update(scaleChnaged: events.ScaleChangedEvent, state: NoteCircleState): void {
             let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
                     startAngle: 0,
                     endAngle: 0,
@@ -132,39 +156,39 @@ namespace cof {
                     node: node
                 });
 
-            this.noteSegments
+            state.noteSegments
                 .data(data, this.indexer)
                 .attr("class", (d, i) => "note-segment " + 
                     (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""));
 
-            this.noteText
+            state.noteText
                 .data(data, this.indexer)
                 .text(d => d.node.scaleNote.note.label);
 
-            this.intervalSegments
+            state.intervalSegments
                 .data(data, this.indexer)
                 .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
 
-            this.intervalText
+            state.intervalText
                 .data(data, this.indexer)
                 .text(d => d.node.intervalName);
 
-            this.intervalNotes
+            state.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
                 .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none")
                 .style("stroke-width", d => d.node.midiToggle ? "20px" : "2px")
                 .style("stroke", d => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
 
-            this.chordText
+            state.chordText
                 .data(data, this.indexer)
                 .text(d => d.node.scaleNote.chord!.romanNumeral + "");
 
-            this.chordSegments
+            state.chordSegments
                 .data(data, this.indexer)
                 .attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord!) : "chord-segment");
 
-            this.chordNotes
+            state.chordNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord!) : "chord-segment-note");
         }
@@ -217,6 +241,14 @@ namespace cof {
 
     function handleIntervalClick(segment: Segment, i: number): void {
         events.toggle.publish({ index: segment.node.scaleNote.note.index });
+    }
+
+    function rotate(array: number[], offset: number): number[] {
+        let newArray: number[] = [];
+        for(let item of array) {
+            newArray.push((item + offset) % 12);
+        }
+        return newArray;
     }
 
     interface Segment {

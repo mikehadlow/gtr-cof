@@ -74,6 +74,14 @@ var events;
         subscribe(listener) {
             this.listeners.push(listener);
         }
+        // first call should be passed index = -1
+        resubscribe(listener, index) {
+            if (index === -1) {
+                return this.listeners.push(listener) - 1;
+            }
+            this.listeners[index] = listener;
+            return index;
+        }
         publish(event) {
             //console.log("Published event: '" + this.name + "'")
             for (let listener of this.listeners) {
@@ -567,6 +575,20 @@ var cof;
     class NoteCircle {
         constructor(svg, noteIndexes, label) {
             this.indexer = (x) => x.index + "";
+            let state = this.draw(svg, noteIndexes, label);
+            let setCToNoonSubscriptionIndex = -1;
+            events.scaleChange.subscribe(scaleChnaged => {
+                this.update(scaleChnaged, state);
+                setCToNoonSubscriptionIndex = events.setCToNoon.resubscribe(setCToNoonEvent => {
+                    console.log("setCToNoon event. noteIndexes.length " + noteIndexes.length + ", label " + label);
+                    let offset = setCToNoonEvent.isC ? 3 : 0;
+                    svg.selectAll("*").remove();
+                    state = this.draw(svg, rotate(noteIndexes, offset), label);
+                    this.update(scaleChnaged, state);
+                }, setCToNoonSubscriptionIndex);
+            });
+        }
+        draw(svg, noteIndexes, label) {
             let pad = 50;
             let chordRadius = 240;
             let noteRadius = 200;
@@ -590,14 +612,14 @@ var cof;
             let chordArc = d3.svg.arc()
                 .innerRadius(noteRadius)
                 .outerRadius(chordRadius);
-            this.noteSegments = cof.append("g").selectAll("path")
+            let noteSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
                 .attr("d", noteArc)
                 .attr("class", "note-segment")
                 .on("click", handleNoteClick);
-            this.noteText = cof.append("g").selectAll("text")
+            let noteText = cof.append("g").selectAll("text")
                 .data(segments)
                 .enter()
                 .append("text")
@@ -605,14 +627,14 @@ var cof;
                 .attr("y", function (x) { return noteArc.centroid(x)[1] + 11; })
                 .text("")
                 .attr("class", "note-segment-text");
-            this.intervalSegments = cof.append("g").selectAll("path")
+            let intervalSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
                 .attr("d", degreeArc)
                 .attr("class", "interval-segment")
                 .on("click", handleIntervalClick);
-            this.intervalNotes = cof.append("g").selectAll("circle")
+            let intervalNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
                 .enter()
                 .append("circle")
@@ -621,7 +643,7 @@ var cof;
                 .attr("cx", function (x) { return degreeArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return degreeArc.centroid(x)[1]; })
                 .attr("class", "interval-note");
-            this.intervalText = cof.append("g").selectAll("text")
+            let intervalText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -629,14 +651,14 @@ var cof;
                 .attr("y", function (x) { return degreeArc.centroid(x)[1] + 8; })
                 .text("")
                 .attr("class", "degree-segment-text");
-            this.chordSegments = cof.append("g").selectAll("path")
+            let chordSegments = cof.append("g").selectAll("path")
                 .data(segments, this.indexer)
                 .enter()
                 .append("path")
                 .attr("d", chordArc)
                 .attr("class", "chord-segment")
                 .on("click", handleChordClick);
-            this.chordNotes = cof.append("g").selectAll("circle")
+            let chordNotes = cof.append("g").selectAll("circle")
                 .data(segments, this.indexer)
                 .enter()
                 .append("circle")
@@ -645,7 +667,7 @@ var cof;
                 .attr("cx", function (x) { return chordArc.centroid(x)[0]; })
                 .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
                 .attr("class", "chord-segment-note");
-            this.chordText = cof.append("g").selectAll("text")
+            let chordText = cof.append("g").selectAll("text")
                 .data(segments, this.indexer)
                 .enter()
                 .append("text")
@@ -653,13 +675,18 @@ var cof;
                 .attr("y", function (x) { return chordArc.centroid(x)[1] + 8; })
                 .text("")
                 .attr("class", "degree-segment-text");
-            // let instance = this;
-            // events.scaleChange.subscribe(function (stateChange: events.ScaleChangedEvent) {
-            //     instance.update(stateChange);
-            // });
-            events.scaleChange.subscribe(scaleChnaged => this.update(scaleChnaged));
+            return {
+                noteSegments: noteSegments,
+                noteText: noteText,
+                intervalSegments: intervalSegments,
+                intervalNotes: intervalNotes,
+                intervalText: intervalText,
+                chordSegments: chordSegments,
+                chordNotes: chordNotes,
+                chordText: chordText
+            };
         }
-        update(scaleChnaged) {
+        update(scaleChnaged, state) {
             let data = scaleChnaged.nodes.map(node => ({
                 startAngle: 0,
                 endAngle: 0,
@@ -667,32 +694,32 @@ var cof;
                 index: node.scaleNote.note.index,
                 node: node
             }));
-            this.noteSegments
+            state.noteSegments
                 .data(data, this.indexer)
                 .attr("class", (d, i) => "note-segment " +
                 (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""));
-            this.noteText
+            state.noteText
                 .data(data, this.indexer)
                 .text(d => d.node.scaleNote.note.label);
-            this.intervalSegments
+            state.intervalSegments
                 .data(data, this.indexer)
                 .attr("class", d => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
-            this.intervalText
+            state.intervalText
                 .data(data, this.indexer)
                 .text(d => d.node.intervalName);
-            this.intervalNotes
+            state.intervalNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
                 .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none")
                 .style("stroke-width", d => d.node.midiToggle ? "20px" : "2px")
                 .style("stroke", d => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
-            this.chordText
+            state.chordText
                 .data(data, this.indexer)
                 .text(d => d.node.scaleNote.chord.romanNumeral + "");
-            this.chordSegments
+            state.chordSegments
                 .data(data, this.indexer)
                 .attr("class", d => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
-            this.chordNotes
+            state.chordNotes
                 .data(data, this.indexer)
                 .attr("class", d => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
         }
@@ -743,6 +770,13 @@ var cof;
     }
     function handleIntervalClick(segment, i) {
         events.toggle.publish({ index: segment.node.scaleNote.note.index });
+    }
+    function rotate(array, offset) {
+        let newArray = [];
+        for (let item of array) {
+            newArray.push((item + offset) % 12);
+        }
+        return newArray;
     }
 })(cof || (cof = {}));
 var tonics;
