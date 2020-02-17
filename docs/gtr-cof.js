@@ -1184,7 +1184,7 @@ var tuning;
         { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
         { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },
-        { tuning: "BAEBAD", dots: guitarDots, description: "Guitar Portuguese" },
+        { tuning: "DABEAB", dots: guitarDots, description: "Guitar Portuguese" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
