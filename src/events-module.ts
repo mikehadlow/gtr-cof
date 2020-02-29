@@ -12,6 +12,15 @@ namespace events {
             this.listeners.push(listener);
         }
 
+        // first call should be passed index = -1
+        public resubscribe(listener: (x:T)=>void, index: number): number {
+            if(index === -1) {
+                return this.listeners.push(listener) - 1;
+            }
+            this.listeners[index] = listener;
+            return index;
+        }
+
         public publish(event: T): void {
             //console.log("Published event: '" + this.name + "'")
             for (let listener of this.listeners) {
@@ -104,5 +113,11 @@ namespace events {
 
     export interface MidiNoteEvent {
         readonly toggledIndexes: number;
+    }
+
+    export let setCToNoon: Bus<SetCToNoonEvent> = new Bus<SetCToNoonEvent>("setCToNoonEvent");
+
+    export interface SetCToNoonEvent {
+        readonly isC: boolean;
     }
 }

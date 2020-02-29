@@ -12,4 +12,8 @@ namespace settings {
     export function onFbNoteTextClick(e:HTMLInputElement) {
         events.fretboardLabelChange.publish({ labelType: parseInt(e.value) })
     }
+
+    export function onSetCToNoon(e:HTMLInputElement) {
+        events.setCToNoon.publish({ isC: e.checked });
+    }
 }
