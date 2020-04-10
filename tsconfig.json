@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "strict": true,
         "module": "none",
         "sourceMap": true,
         "outDir": "docs",
