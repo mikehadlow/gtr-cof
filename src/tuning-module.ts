@@ -26,6 +26,7 @@ namespace tuning {
         { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },        
         { tuning: "DABEAB", dots: guitarDots, description: "Guitar Portuguese" },        
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
+        { tuning: "BEADG", dots: guitarDots, description: "5-String Bass" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
         { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho"},
