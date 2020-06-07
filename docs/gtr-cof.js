@@ -1,4 +1,3 @@
-"use strict";
 var mod;
 (function (mod) {
     class Mod {
@@ -1182,7 +1181,7 @@ var tuning;
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
         { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
-        { tuning: "CGDAEA", dots: guitarDots, description: "Guitar Fripp NST" },
+        { tuning: "CGDAEG", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },
         { tuning: "DABEAB", dots: guitarDots, description: "Guitar Portuguese" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
