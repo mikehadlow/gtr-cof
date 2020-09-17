@@ -1175,6 +1175,15 @@ var tuning;
         [12, 1],
         [15, 0]
     ];
+    // Viola/violin for beginners.
+    let violaDots = [
+        [2, 0],
+        [4, 0],
+        [5, 0],
+        [7, 0],
+        [12, -1],
+        [12, 1]
+    ];
     let tunings = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
@@ -1189,9 +1198,9 @@ var tuning;
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
         { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho" },
         { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
-        { tuning: "CGDA", dots: guitarDots, description: "Cello" },
-        { tuning: "GDAE", dots: guitarDots, description: "Violin" },
-        { tuning: "CGDA", dots: guitarDots, description: "Viola" },
+        { tuning: "CGDA", dots: violaDots, description: "Cello" },
+        { tuning: "GDAE", dots: violaDots, description: "Violin" },
+        { tuning: "CGDA", dots: violaDots, description: "Viola" },
     ];
     function parseTuning(tuning) {
         let result = [];
