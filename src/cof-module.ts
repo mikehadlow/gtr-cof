@@ -16,7 +16,7 @@ namespace cof {
         indexer: (x: Segment) => string = (x) => x.index + "";
 
         constructor(svg: d3.Selection<any>, noteIndexes: number[], label: string) {
-            let state = this.draw(svg, noteIndexes, label);
+            let state = this.draw(svg, rotate(noteIndexes, 3), label);
             let setCToNoonSubscriptionIndex = -1;
 
             events.scaleChange.subscribe(scaleChnaged => { 

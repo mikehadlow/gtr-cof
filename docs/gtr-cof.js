@@ -574,7 +574,7 @@ var cof;
     class NoteCircle {
         constructor(svg, noteIndexes, label) {
             this.indexer = (x) => x.index + "";
-            let state = this.draw(svg, noteIndexes, label);
+            let state = this.draw(svg, rotate(noteIndexes, 3), label);
             let setCToNoonSubscriptionIndex = -1;
             events.scaleChange.subscribe(scaleChnaged => {
                 this.update(scaleChnaged, state);
