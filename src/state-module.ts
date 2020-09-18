@@ -38,7 +38,7 @@ namespace state {
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
-        events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
+        events.chordIntervalChange.subscribe(chordIntervalChanged);
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
 
@@ -71,14 +71,20 @@ namespace state {
         updateScale();
     }
 
-    function scaleFamilyChanged(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent): void {
-        currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
-        currentChordIndex = -1
+    function toggle(toggleEvent: events.ToggleEvent): void {
+        currentToggledIndexes = currentToggledIndexes ^ 2**toggleEvent.index;
         updateScale();
     }
 
-    function toggle(toggleEvent: events.ToggleEvent): void {
-        currentToggledIndexes = currentToggledIndexes ^ 2**toggleEvent.index;
+    function chordIntervalChanged(chordIntervalChangedEvent: events.ChordIntervalChangeEvent): void {
+        currentChordIntervals = chordIntervalChangedEvent.chordIntervals;
+        currentToggledIndexes = 0;
+        updateScale();
+    }
+
+    function scaleFamilyChanged(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent): void {
+        currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        currentChordIndex = -1
         updateScale();
     }
 

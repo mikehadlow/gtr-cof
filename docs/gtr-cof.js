@@ -514,7 +514,7 @@ var state;
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
         events.toggle.subscribe(toggle);
-        events.chordIntervalChange.subscribe(x => currentChordIntervals = x.chordIntervals);
+        events.chordIntervalChange.subscribe(chordIntervalChanged);
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
         events.tonicChange.publish({ noteSpec: currentNoteSpec });
@@ -543,13 +543,18 @@ var state;
         currentToggledIndexes = 0;
         updateScale();
     }
+    function toggle(toggleEvent) {
+        currentToggledIndexes = currentToggledIndexes ^ Math.pow(2, toggleEvent.index);
+        updateScale();
+    }
+    function chordIntervalChanged(chordIntervalChangedEvent) {
+        currentChordIntervals = chordIntervalChangedEvent.chordIntervals;
+        currentToggledIndexes = 0;
+        updateScale();
+    }
     function scaleFamilyChanged(scaleFamilyChangedEvent) {
         currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
         currentChordIndex = -1;
-        updateScale();
-    }
-    function toggle(toggleEvent) {
-        currentToggledIndexes = currentToggledIndexes ^ Math.pow(2, toggleEvent.index);
         updateScale();
     }
     function midiNote(midiNoteEvent) {
