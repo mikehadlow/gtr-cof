@@ -32,12 +32,13 @@ namespace tuning {
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
         { tuning: "BFBFBF", dots: guitarDots, description: "Augmented Fourths" },
         { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
-        { tuning: "DADGAD", dots: guitarDots, description: "Celtic Tuning" },
+        { tuning: "DADGAD", dots: guitarDots, description: "Celtic" },
         { tuning: "CGDAEG", dots: guitarDots, description: "Guitar Fripp NST" },
         { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },        
         { tuning: "DABEAB", dots: guitarDots, description: "Guitar Portuguese" },        
         { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G" },        
-        { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert Tuning" },        
+        { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert" },        
+        { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)" },        
 
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
@@ -53,16 +54,38 @@ namespace tuning {
         { tuning: "CGDA", dots: violaDots, description: "Viola" },
     ]
 
-    function parseTuning(tuning: string) : Array<number> {
+    export function parseTuning(tuning: string) : Array<number> {
+        let tokens: Array<string> = [];
         let result: Array<number> = [];
-        for(let i: number = 0; i < tuning.length; i++){
+
+        let tokenIndex = 0;
+        let lastWasChar = false;
+
+        for(let i:number =0; i < tuning.length; i++) {
             let noteChar = tuning.charAt(i);
-            let natural = music.naturals.filter(x => x.label === noteChar);
-            if(natural.length != 1) {
+            console.log(noteChar);
+            if("ABCDEFG".indexOf(noteChar) >= 0) {
+                tokens[tokenIndex] = noteChar;
+                tokenIndex++;
+                lastWasChar = true;
+            }
+            else if("♯♭".indexOf(noteChar) >= 0 && lastWasChar) {
+                tokens[tokenIndex-1] = tokens[tokenIndex-1] + noteChar;
+                lastWasChar = false;
+            }
+            else {
                 throw "Invalid tuning char";
             }
-            result.push(natural[0].index);
         }
+
+        for(let token of tokens){
+            let noteName = music.noteNames.filter(x => x.name === token);
+            if(noteName.length != 1) {
+                throw "Invalid token";
+            }
+            result.push(noteName[0].index);
+        }
+
         return result;
     }
 

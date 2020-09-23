@@ -141,6 +141,41 @@ namespace music {
 
     let naturalList = new mod.Mod(naturals);
 
+    interface NoteName {
+        readonly name: string;
+        readonly index: number;
+    }
+
+    export let noteNames: NoteName[] = [
+        { name: "A", index: 0 },
+        { name: "A♯", index: 1 },
+        { name: "A♭", index: 11 },
+
+        { name: "B", index: 2 },
+        { name: "B♯", index: 3 },
+        { name: "B♭", index: 1 },
+
+        { name: "C", index: 3 },
+        { name: "C♯", index: 4 },
+        { name: "C♭", index: 2 },
+
+        { name: "D", index: 5 },
+        { name: "D♯", index: 6 },
+        { name: "D♭", index: 4 },
+
+        { name: "E", index: 7 },
+        { name: "E♯", index: 8 },
+        { name: "E♭", index: 6 },
+
+        { name: "F", index: 8 },
+        { name: "F♯", index: 7 },
+        { name: "F♭", index: 9 },
+
+        { name: "G", index: 10 },
+        { name: "G♯", index: 9 },
+        { name: "G♭", index: 11 },
+    ];
+
     interface NoteLabel {
         readonly offset: number;
         readonly label: string;
