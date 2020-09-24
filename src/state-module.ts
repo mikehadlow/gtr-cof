@@ -1,38 +1,48 @@
-
-
-
 namespace state {
 
-    let currentNoteSpec: music.NoteSpec = music.createNoteSpec(3, 3); // C natural is default
-    let currentChordIndex: number = -1;
-    let currentChordIntervals: number[] = [0, 2, 4];
-    let currentToggledIndexes: number = 0; // index bitflag
-    let currentScaleFamily: music.ScaleFamily = music.scaleFamily[0];
-    let currentMode: music.Mode = currentScaleFamily.modes[1];
-    let currentMidiToggledIndexes: number = 0;
+    export interface State {
+        noteSpec: music.NoteSpec;
+        chordIndex: number;
+        chordIntervals: number[];
+        toggledIndexes: number;
+        scaleFamily: music.ScaleFamily;
+        mode: music.Mode;
+        midiToggledIndexes: number;
+    }
+
+    // default initial state
+    let current: State = {
+        noteSpec: music.createNoteSpec(3, 3), // C natural is default
+        chordIndex: -1, // no chord
+        chordIntervals: [0, 2, 4], // standard triad
+        toggledIndexes: 0, // index bitflag
+        scaleFamily: music.scaleFamily[0], // diatornic
+        mode: music.scaleFamily[0].modes[1], // major
+        midiToggledIndexes: 0,
+    }
 
     export function init() {
         try{
             let cookieData = cookies.readCookie();
 
             if(cookieData.hasCookie) {
-                let cookieModes = currentScaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
+                let cookieModes = current.scaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
                 if(cookieModes.length > 0) {
-                    currentMode = cookieModes[0];
+                    current.mode = cookieModes[0];
                 }
-                currentChordIndex = cookieData.chordIndex;
-                currentNoteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
+                current.chordIndex = cookieData.chordIndex;
+                current.noteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
             }
         }
         catch(e) {
             // ignore the invalid cookie:
-            currentMode = currentScaleFamily.modes[1];
-            currentChordIndex = -1;
-            currentNoteSpec = music.createNoteSpec(3, 3); // C natural is default
+            current.mode = current.scaleFamily.modes[1];
+            current.chordIndex = -1;
+            current.noteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
 
         // lets remember this while we reset everything.
-        let tempChordIndex = currentChordIndex;
+        let tempChordIndex = current.chordIndex;
 
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
@@ -42,76 +52,76 @@ namespace state {
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
 
-        events.tonicChange.publish({ noteSpec: currentNoteSpec });
-        events.modeChange.publish({ mode: currentMode });
+        events.tonicChange.publish({ noteSpec: current.noteSpec });
+        events.modeChange.publish({ mode: current.mode });
         events.chordChange.publish({ chordIndex: tempChordIndex });
-        events.chordIntervalChange.publish( { chordIntervals: currentChordIntervals });
+        events.chordIntervalChange.publish( { chordIntervals: current.chordIntervals });
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
-        currentNoteSpec = tonicChangedEvent.noteSpec;
-        currentChordIndex = -1;
+        current.noteSpec = tonicChangedEvent.noteSpec;
+        current.chordIndex = -1;
         updateScale();
     }
 
     function modeChanged(modeChangedEvent: events.ModeChangedEvent): void {
-        currentMode = modeChangedEvent.mode;
-        currentChordIndex = -1;
+        current.mode = modeChangedEvent.mode;
+        current.chordIndex = -1;
         updateScale();
     }
 
     function chordChanged(chordChangedEvent: events.ChordChangeEvent): void {
-        if(chordChangedEvent.chordIndex === currentChordIndex) {
-            currentChordIndex = -1
+        if(chordChangedEvent.chordIndex === current.chordIndex) {
+            current.chordIndex = -1
         }
         else {
-            currentChordIndex = chordChangedEvent.chordIndex;
+            current.chordIndex = chordChangedEvent.chordIndex;
         }
-        currentToggledIndexes = 0;
+        current.toggledIndexes = 0;
         updateScale();
     }
 
     function toggle(toggleEvent: events.ToggleEvent): void {
-        currentToggledIndexes = currentToggledIndexes ^ 2**toggleEvent.index;
+        current.toggledIndexes = current.toggledIndexes ^ 2**toggleEvent.index;
         updateScale();
     }
 
     function chordIntervalChanged(chordIntervalChangedEvent: events.ChordIntervalChangeEvent): void {
-        currentChordIntervals = chordIntervalChangedEvent.chordIntervals;
-        currentToggledIndexes = 0;
+        current.chordIntervals = chordIntervalChangedEvent.chordIntervals;
+        current.toggledIndexes = 0;
         updateScale();
     }
 
     function scaleFamilyChanged(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent): void {
-        currentScaleFamily = scaleFamilyChangedEvent.scaleFamily;
-        currentChordIndex = -1
+        current.scaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        current.chordIndex = -1
         updateScale();
     }
 
     function midiNote(midiNoteEvent: events.MidiNoteEvent): void {
-        currentMidiToggledIndexes = midiNoteEvent.toggledIndexes;
+        current.midiToggledIndexes = midiNoteEvent.toggledIndexes;
         updateScale();
     }
 
     function updateScale(): void {
         let nodes = music.generateScaleShim(
-            currentNoteSpec, 
-            currentMode, 
-            currentChordIndex, 
-            currentChordIntervals, 
-            currentToggledIndexes,
-            currentMidiToggledIndexes,
-            currentScaleFamily);
+            current.noteSpec, 
+            current.mode, 
+            current.chordIndex, 
+            current.chordIntervals, 
+            current.toggledIndexes,
+            current.midiToggledIndexes,
+            current.scaleFamily);
 
         // update togges, because a chord may have been generated.
-        currentToggledIndexes = nodes
+        current.toggledIndexes = nodes
             .filter(x => x.toggle)
             .map(x => x.scaleNote.note.index)
             .reduce((a, b) => a + 2**b, 0);
 
         events.scaleChange.publish({
             nodes: nodes,
-            mode: currentMode
+            mode: current.mode
         });
     }
 }
