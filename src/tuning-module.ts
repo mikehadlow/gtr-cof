@@ -63,7 +63,6 @@ namespace tuning {
 
         for(let i:number =0; i < tuning.length; i++) {
             let noteChar = tuning.charAt(i);
-            console.log(noteChar);
             if("ABCDEFG".indexOf(noteChar) >= 0) {
                 tokens[tokenIndex] = noteChar;
                 tokenIndex++;

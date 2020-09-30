@@ -92,6 +92,7 @@ var events;
     function genericName(type) {
         return type.constructor.toString();
     }
+    events.stateChange = new Bus("stateChange");
     events.scaleChange = new Bus("scaleChange");
     events.tonicChange = new Bus("tonicChange");
     events.modeChange = new Bus("modeChange");
@@ -115,46 +116,32 @@ var events;
 var cookies;
 (function (cookies) {
     function init() {
-        events.scaleChange.subscribe(bakeCookie);
+        events.stateChange.subscribe(bakeCookie2);
     }
     cookies.init = init;
-    function bakeCookie(scaleChange) {
-        let cookieExpiryDays = 30;
-        let expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
-        let expires = "expires=" + expiryDate.toUTCString();
-        let tonicNode = scaleChange.nodes[0];
-        document.cookie = "gtr-cof-state="
-            + tonicNode.scaleNote.note.index + "|"
-            + tonicNode.scaleNote.note.natural.index + "|"
-            + scaleChange.mode.index + "|"
-            + (scaleChange.nodes.some(x => x.isChordRoot)
-                ? scaleChange.nodes.filter(x => x.isChordRoot)[0].scaleNote.note.index
-                : -1) + ""
-            + ";" + expires;
+    function bakeCookie2(stateChange) {
+        let json = JSON.stringify(stateChange.state);
+        document.cookie = "gtr-cof-state-v2=" + json + ";";
     }
-    function readCookie() {
-        let result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
+    function readCookie2() {
+        let result = document.cookie.match(new RegExp("gtr-cof-state-v2" + '=([^;]+)'));
         if (result != null) {
-            let items = result[1].split("|");
-            if (items.length == 4) {
-                return {
-                    hasCookie: true,
-                    index: Number(items[0]),
-                    naturalIndex: Number(items[1]),
-                    modeIndex: Number(items[2]),
-                    chordIndex: Number(items[3])
-                };
-            }
+            let state = JSON.parse(result[1]);
+            let scaleFamily = music.scaleFamily.find(x => x.index == state.scaleFamily.index);
+            let newState = {
+                noteSpec: state.noteSpec,
+                chordIndex: state.chordIndex,
+                chordIntervals: state.chordIntervals,
+                toggledIndexes: state.toggledIndexes,
+                scaleFamily: scaleFamily,
+                mode: scaleFamily.modes.find(x => x.index == state.mode.index),
+                midiToggledIndexes: state.midiToggledIndexes
+            };
+            return newState;
         }
-        return {
-            hasCookie: false,
-            index: 0,
-            naturalIndex: 0,
-            modeIndex: 0,
-            chordIndex: -1
-        };
+        return null;
     }
-    cookies.readCookie = readCookie;
+    cookies.readCookie2 = readCookie2;
 })(cookies || (cookies = {}));
 var music;
 (function (music) {
@@ -222,11 +209,11 @@ var music;
         { name: 'Altered scale', index: 11 },
     ];
     music.scaleFamily = [
-        { name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
-        { name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
-        { name: "jazz minor", intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
-        { name: "whole tone", intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0 }], defaultModeIndex: 0 },
-        { name: "diminished", intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0 }], defaultModeIndex: 0 }
+        { index: 0, name: "diatonic", intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
+        { index: 1, name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
+        { index: 2, name: "jazz minor", intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
+        { index: 3, name: "whole tone", intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0 }], defaultModeIndex: 0 },
+        { index: 4, name: "diminished", intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0 }], defaultModeIndex: 0 }
     ];
     // root diatonic scale is major
     music.diatonic = new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
@@ -518,24 +505,18 @@ var state;
     };
     function init() {
         try {
-            let cookieData = cookies.readCookie();
-            if (cookieData.hasCookie) {
-                let cookieModes = current.scaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
-                if (cookieModes.length > 0) {
-                    current.mode = cookieModes[0];
-                }
-                current.chordIndex = cookieData.chordIndex;
-                current.noteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
+            let cookieState = cookies.readCookie2();
+            if (cookieState !== null) {
+                current = cookieState;
             }
         }
         catch (e) {
             // ignore the invalid cookie:
-            current.mode = current.scaleFamily.modes[1];
-            current.chordIndex = -1;
-            current.noteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
+        events.scaleFamilyChange.publish({ scaleFamily: current.scaleFamily });
+        events.modeChange.publish({ mode: current.mode });
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
@@ -544,9 +525,8 @@ var state;
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
         events.tonicChange.publish({ noteSpec: current.noteSpec });
-        events.modeChange.publish({ mode: current.mode });
-        events.chordChange.publish({ chordIndex: tempChordIndex });
         events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
+        events.chordChange.publish({ chordIndex: tempChordIndex });
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
@@ -597,6 +577,12 @@ var state;
         events.scaleChange.publish({
             nodes: nodes,
             mode: current.mode
+        });
+        publishStateChange();
+    }
+    function publishStateChange() {
+        events.stateChange.publish({
+            state: current
         });
     }
 })(state || (state = {}));
@@ -1247,7 +1233,6 @@ var tuning;
         let lastWasChar = false;
         for (let i = 0; i < tuning.length; i++) {
             let noteChar = tuning.charAt(i);
-            console.log(noteChar);
             if ("ABCDEFG".indexOf(noteChar) >= 0) {
                 tokens[tokenIndex] = noteChar;
                 tokenIndex++;

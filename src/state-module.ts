@@ -23,26 +23,20 @@ namespace state {
 
     export function init() {
         try{
-            let cookieData = cookies.readCookie();
-
-            if(cookieData.hasCookie) {
-                let cookieModes = current.scaleFamily.modes.filter((x) => x.index == cookieData.modeIndex);
-                if(cookieModes.length > 0) {
-                    current.mode = cookieModes[0];
-                }
-                current.chordIndex = cookieData.chordIndex;
-                current.noteSpec = music.createNoteSpec(cookieData.naturalIndex, cookieData.index);
+            let cookieState = cookies.readCookie2();
+            if(cookieState !== null) {
+                current = cookieState;
             }
         }
         catch(e) {
             // ignore the invalid cookie:
-            current.mode = current.scaleFamily.modes[1];
-            current.chordIndex = -1;
-            current.noteSpec = music.createNoteSpec(3, 3); // C natural is default
         }
 
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
+
+        events.scaleFamilyChange.publish({ scaleFamily: current.scaleFamily });
+        events.modeChange.publish({ mode: current.mode });
 
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
@@ -53,9 +47,8 @@ namespace state {
         events.midiNote.subscribe(midiNote);
 
         events.tonicChange.publish({ noteSpec: current.noteSpec });
-        events.modeChange.publish({ mode: current.mode });
-        events.chordChange.publish({ chordIndex: tempChordIndex });
         events.chordIntervalChange.publish( { chordIntervals: current.chordIntervals });
+        events.chordChange.publish({ chordIndex: tempChordIndex });
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
@@ -122,6 +115,14 @@ namespace state {
         events.scaleChange.publish({
             nodes: nodes,
             mode: current.mode
+        });
+
+        publishStateChange();
+    }
+
+    function publishStateChange(): void {
+        events.stateChange.publish({
+            state: current
         });
     }
 }

@@ -33,6 +33,12 @@ namespace events {
         return type.constructor.toString();
     }
 
+    export let stateChange: Bus<StateChangedEvent> = new Bus<StateChangedEvent>("stateChange");
+
+    export interface StateChangedEvent {
+        readonly state: state.State;
+    }
+
     export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>("scaleChange");
 
     export interface ScaleChangedEvent {

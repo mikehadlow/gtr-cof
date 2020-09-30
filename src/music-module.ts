@@ -40,6 +40,7 @@ namespace music {
     ]);
 
     export interface ScaleFamily {
+        readonly index: number;
         readonly name: string;
         readonly intervals: mod.Mod<boolean>;
         readonly modes: Mode[];
@@ -81,11 +82,11 @@ namespace music {
     ];
 
     export let scaleFamily: ScaleFamily[] = [
-        { name: "diatonic",       intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
-        { name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
-        { name: "jazz minor",     intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
-        { name: "whole tone",     intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0}], defaultModeIndex: 0 },
-        { name: "diminished",     intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0}], defaultModeIndex: 0 }
+        { index: 0, name: "diatonic",       intervals: new mod.Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
+        { index: 1, name: "harmonic minor", intervals: new mod.Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
+        { index: 2, name: "jazz minor",     intervals: new mod.Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
+        { index: 3, name: "whole tone",     intervals: new mod.Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0}], defaultModeIndex: 0 },
+        { index: 4, name: "diminished",     intervals: new mod.Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0}], defaultModeIndex: 0 }
     ];
 
     // root diatonic scale is major

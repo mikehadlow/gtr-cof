@@ -1,53 +1,33 @@
 namespace cookies {
 
     export function init(): void {
-        events.scaleChange.subscribe(bakeCookie);
+        events.stateChange.subscribe(bakeCookie2);
     }
 
-    function bakeCookie(scaleChange: events.ScaleChangedEvent): void {
-        let cookieExpiryDays = 30;
-        let expiryDate = new Date(Date.now() + (cookieExpiryDays * 24 * 60 * 60 * 1000));
-        let expires = "expires=" + expiryDate.toUTCString();
-        let tonicNode = scaleChange.nodes[0];
-        document.cookie = "gtr-cof-state=" 
-            + tonicNode.scaleNote.note.index + "|" 
-            + tonicNode.scaleNote.note.natural.index + "|" 
-            + scaleChange.mode.index + "|" 
-            + (scaleChange.nodes.some(x => x.isChordRoot) 
-                ? scaleChange.nodes.filter(x => x.isChordRoot)[0].scaleNote.note.index 
-                : -1) + "" 
-            + ";" + expires;
+    function bakeCookie2(stateChange: events.StateChangedEvent): void {
+        let json = JSON.stringify(stateChange.state);
+        document.cookie = "gtr-cof-state-v2=" + json + ";";
     }
 
-    export function readCookie(): CookieData {
-        let result = document.cookie.match(new RegExp("gtr-cof-state" + '=([^;]+)'));
+    export function readCookie2(): state.State {
+        let result = document.cookie.match(new RegExp("gtr-cof-state-v2" + '=([^;]+)'));
         if(result != null)
         {
-            let items = result[1].split("|");
-            if(items.length == 4) {
-                return {
-                    hasCookie: true,
-                    index: Number(items[0]),
-                    naturalIndex: Number(items[1]),
-                    modeIndex: Number(items[2]),
-                    chordIndex: Number(items[3])
-                };
-            }
-        }
-        return {
-            hasCookie: false,
-            index: 0,
-            naturalIndex: 0,
-            modeIndex: 0,
-            chordIndex: -1
-        };
-    }
+            let state: state.State = JSON.parse(result[1]);
+            let scaleFamily: music.ScaleFamily = music.scaleFamily.find(x => x.index == state.scaleFamily.index);
 
-    export interface CookieData {
-        readonly hasCookie: boolean;
-        readonly index: number;
-        readonly naturalIndex: number;
-        readonly modeIndex: number;
-        readonly chordIndex: number;
+            let newState: state.State = {
+                noteSpec: state.noteSpec,
+                chordIndex: state.chordIndex,
+                chordIntervals: state.chordIntervals,
+                toggledIndexes: state.toggledIndexes,
+                scaleFamily: scaleFamily,
+                mode: scaleFamily.modes.find(x => x.index == state.mode.index),
+                midiToggledIndexes: state.midiToggledIndexes
+            };
+            return newState;
+        }
+
+        return null;
     }
 }
