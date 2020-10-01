@@ -49,11 +49,16 @@ namespace modes {
             .text((x) => x.name)
             .attr("class", "mode-text");
 
-        events.modeChange.publish({ mode: scaleFamily.modes.filter(x => x.index == scaleFamily.defaultModeIndex)[0] })
+        let defaultMode = scaleFamily.modes.find(x => x.index == scaleFamily.defaultModeIndex);
+        highlightActiveMode(defaultMode);
     }
 
     function update(modeChange: events.ModeChangedEvent): void {
-        let modes: Array<music.Mode> = [modeChange.mode];
+        highlightActiveMode(modeChange.mode);
+    }
+
+    function highlightActiveMode(mode: music.Mode): void {
+        let modes: Array<music.Mode> = [mode];
         buttons
             .data(modes, index)
             .attr("class", "mode-button mode-button-selected")

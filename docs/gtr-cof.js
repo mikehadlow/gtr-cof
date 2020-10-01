@@ -115,29 +115,20 @@ var events;
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
+    let cookieName = "gtr-cof-state-v3";
     function init() {
         events.stateChange.subscribe(bakeCookie2);
     }
     cookies.init = init;
     function bakeCookie2(stateChange) {
         let json = JSON.stringify(stateChange.state);
-        document.cookie = "gtr-cof-state-v2=" + json + ";";
+        document.cookie = cookieName + "=" + json + ";";
     }
     function readCookie2() {
-        let result = document.cookie.match(new RegExp("gtr-cof-state-v2" + '=([^;]+)'));
+        let result = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
         if (result != null) {
             let state = JSON.parse(result[1]);
-            let scaleFamily = music.scaleFamily.find(x => x.index == state.scaleFamily.index);
-            let newState = {
-                noteSpec: state.noteSpec,
-                chordIndex: state.chordIndex,
-                chordIntervals: state.chordIntervals,
-                toggledIndexes: state.toggledIndexes,
-                scaleFamily: scaleFamily,
-                mode: scaleFamily.modes.find(x => x.index == state.mode.index),
-                midiToggledIndexes: state.midiToggledIndexes
-            };
-            return newState;
+            return state;
         }
         return null;
     }
@@ -499,8 +490,8 @@ var state;
         chordIndex: -1,
         chordIntervals: [0, 2, 4],
         toggledIndexes: 0,
-        scaleFamily: music.scaleFamily[0],
-        mode: music.scaleFamily[0].modes[1],
+        scaleFamilyIndex: 0,
+        modeIndex: 0,
         midiToggledIndexes: 0,
     };
     function init() {
@@ -515,8 +506,16 @@ var state;
         }
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
-        events.scaleFamilyChange.publish({ scaleFamily: current.scaleFamily });
-        events.modeChange.publish({ mode: current.mode });
+        let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+        if (!scaleFamily) {
+            throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+        }
+        let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+        if (!mode) {
+            throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+        }
+        events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
+        events.modeChange.publish({ mode: mode });
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
@@ -535,7 +534,7 @@ var state;
         updateScale();
     }
     function modeChanged(modeChangedEvent) {
-        current.mode = modeChangedEvent.mode;
+        current.modeIndex = modeChangedEvent.mode.index;
         current.chordIndex = -1;
         updateScale();
     }
@@ -559,7 +558,8 @@ var state;
         updateScale();
     }
     function scaleFamilyChanged(scaleFamilyChangedEvent) {
-        current.scaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        current.scaleFamilyIndex = scaleFamilyChangedEvent.scaleFamily.index;
+        current.modeIndex = scaleFamilyChangedEvent.scaleFamily.defaultModeIndex;
         current.chordIndex = -1;
         updateScale();
     }
@@ -568,7 +568,15 @@ var state;
         updateScale();
     }
     function updateScale() {
-        let nodes = music.generateScaleShim(current.noteSpec, current.mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, current.scaleFamily);
+        let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+        if (!scaleFamily) {
+            throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+        }
+        let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+        if (!mode) {
+            throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+        }
+        let nodes = music.generateScaleShim(current.noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily);
         // update togges, because a chord may have been generated.
         current.toggledIndexes = nodes
             .filter(x => x.toggle)
@@ -576,7 +584,7 @@ var state;
             .reduce((a, b) => a + Math.pow(2, b), 0);
         events.scaleChange.publish({
             nodes: nodes,
-            mode: current.mode
+            mode: mode
         });
         publishStateChange();
     }
@@ -947,10 +955,14 @@ var modes;
             .attr("y", 17)
             .text((x) => x.name)
             .attr("class", "mode-text");
-        events.modeChange.publish({ mode: scaleFamily.modes.filter(x => x.index == scaleFamily.defaultModeIndex)[0] });
+        let defaultMode = scaleFamily.modes.find(x => x.index == scaleFamily.defaultModeIndex);
+        highlightActiveMode(defaultMode);
     }
     function update(modeChange) {
-        let modes = [modeChange.mode];
+        highlightActiveMode(modeChange.mode);
+    }
+    function highlightActiveMode(mode) {
+        let modes = [mode];
         buttons
             .data(modes, index)
             .attr("class", "mode-button mode-button-selected")

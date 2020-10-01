@@ -5,8 +5,8 @@ namespace state {
         chordIndex: number;
         chordIntervals: number[];
         toggledIndexes: number;
-        scaleFamily: music.ScaleFamily;
-        mode: music.Mode;
+        scaleFamilyIndex: number;
+        modeIndex: number;
         midiToggledIndexes: number;
     }
 
@@ -16,8 +16,8 @@ namespace state {
         chordIndex: -1, // no chord
         chordIntervals: [0, 2, 4], // standard triad
         toggledIndexes: 0, // index bitflag
-        scaleFamily: music.scaleFamily[0], // diatornic
-        mode: music.scaleFamily[0].modes[1], // major
+        scaleFamilyIndex: 0, // diatornic
+        modeIndex: 0, // major
         midiToggledIndexes: 0,
     }
 
@@ -35,8 +35,17 @@ namespace state {
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
 
-        events.scaleFamilyChange.publish({ scaleFamily: current.scaleFamily });
-        events.modeChange.publish({ mode: current.mode });
+        let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+        if(!scaleFamily) {
+            throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+        }
+        let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+        if(!mode) {
+            throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+        }
+
+        events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
+        events.modeChange.publish({ mode: mode });
 
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
@@ -58,7 +67,7 @@ namespace state {
     }
 
     function modeChanged(modeChangedEvent: events.ModeChangedEvent): void {
-        current.mode = modeChangedEvent.mode;
+        current.modeIndex = modeChangedEvent.mode.index;
         current.chordIndex = -1;
         updateScale();
     }
@@ -86,7 +95,8 @@ namespace state {
     }
 
     function scaleFamilyChanged(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent): void {
-        current.scaleFamily = scaleFamilyChangedEvent.scaleFamily;
+        current.scaleFamilyIndex = scaleFamilyChangedEvent.scaleFamily.index;
+        current.modeIndex = scaleFamilyChangedEvent.scaleFamily.defaultModeIndex;
         current.chordIndex = -1
         updateScale();
     }
@@ -97,14 +107,24 @@ namespace state {
     }
 
     function updateScale(): void {
+
+        let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+        if(!scaleFamily) {
+            throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+        }
+        let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+        if(!mode) {
+            throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+        }
+
         let nodes = music.generateScaleShim(
             current.noteSpec, 
-            current.mode, 
+            mode, 
             current.chordIndex, 
             current.chordIntervals, 
             current.toggledIndexes,
             current.midiToggledIndexes,
-            current.scaleFamily);
+            scaleFamily);
 
         // update togges, because a chord may have been generated.
         current.toggledIndexes = nodes
@@ -114,7 +134,7 @@ namespace state {
 
         events.scaleChange.publish({
             nodes: nodes,
-            mode: current.mode
+            mode: mode
         });
 
         publishStateChange();
