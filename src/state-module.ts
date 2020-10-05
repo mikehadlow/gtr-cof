@@ -8,6 +8,10 @@ namespace state {
         scaleFamilyIndex: number;
         modeIndex: number;
         midiToggledIndexes: number;
+        isLeftHanded: boolean;
+        isNutFlipped: boolean;
+        fretboardLabelType: events.FretboardLabelType;
+        circleIsCNoon: boolean;
     }
 
     // default initial state
@@ -19,6 +23,10 @@ namespace state {
         scaleFamilyIndex: 0, // diatornic
         modeIndex: 0, // major
         midiToggledIndexes: 0,
+        isLeftHanded: false,
+        isNutFlipped: false,
+        fretboardLabelType: events.FretboardLabelType.NoteName,
+        circleIsCNoon: true,
     }
 
     export function init() {
@@ -58,6 +66,16 @@ namespace state {
         events.tonicChange.publish({ noteSpec: current.noteSpec });
         events.chordIntervalChange.publish( { chordIntervals: current.chordIntervals });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+
+        events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
+        events.flipNutChange.publish( { isNutFlipped: current.isNutFlipped });
+        events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType })
+        events.setCToNoon.publish({ isC: current.circleIsCNoon });
+
+        events.leftHandedChange.subscribe(leftHandedChange);
+        events.flipNutChange.subscribe(flipNutChange);
+        events.fretboardLabelChange.subscribe(fretboardLabelChange)
+        events.setCToNoon.subscribe(setCToNoon);
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
@@ -104,6 +122,26 @@ namespace state {
     function midiNote(midiNoteEvent: events.MidiNoteEvent): void {
         current.midiToggledIndexes = midiNoteEvent.toggledIndexes;
         updateScale();
+    }
+
+    function leftHandedChange(leftHandedChangeEvent: events.LeftHandedFretboardEvent): void {
+        current.isLeftHanded = leftHandedChangeEvent.isLeftHanded;
+        publishStateChange();
+    }
+
+    function flipNutChange(flipNutChangeEvent: events.FlipNutEvent): void {
+        current.isNutFlipped = flipNutChangeEvent.isNutFlipped;
+        publishStateChange();
+    }
+
+    function fretboardLabelChange(fretboardLabelChangeEvent: events.FretboardLabelChangeEvent): void {
+        current.fretboardLabelType = fretboardLabelChangeEvent.labelType;
+        publishStateChange();
+    }
+
+    function setCToNoon(setCToNoonEvent: events.SetCToNoonEvent): void {
+        current.circleIsCNoon = setCToNoonEvent.isC;
+        publishStateChange();
     }
 
     function updateScale(): void {

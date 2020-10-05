@@ -493,6 +493,10 @@ var state;
         scaleFamilyIndex: 0,
         modeIndex: 0,
         midiToggledIndexes: 0,
+        isLeftHanded: false,
+        isNutFlipped: false,
+        fretboardLabelType: events.FretboardLabelType.NoteName,
+        circleIsCNoon: true,
     };
     function init() {
         try {
@@ -526,6 +530,14 @@ var state;
         events.tonicChange.publish({ noteSpec: current.noteSpec });
         events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+        events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
+        events.flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
+        events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType });
+        events.setCToNoon.publish({ isC: current.circleIsCNoon });
+        events.leftHandedChange.subscribe(leftHandedChange);
+        events.flipNutChange.subscribe(flipNutChange);
+        events.fretboardLabelChange.subscribe(fretboardLabelChange);
+        events.setCToNoon.subscribe(setCToNoon);
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
@@ -566,6 +578,22 @@ var state;
     function midiNote(midiNoteEvent) {
         current.midiToggledIndexes = midiNoteEvent.toggledIndexes;
         updateScale();
+    }
+    function leftHandedChange(leftHandedChangeEvent) {
+        current.isLeftHanded = leftHandedChangeEvent.isLeftHanded;
+        publishStateChange();
+    }
+    function flipNutChange(flipNutChangeEvent) {
+        current.isNutFlipped = flipNutChangeEvent.isNutFlipped;
+        publishStateChange();
+    }
+    function fretboardLabelChange(fretboardLabelChangeEvent) {
+        current.fretboardLabelType = fretboardLabelChangeEvent.labelType;
+        publishStateChange();
+    }
+    function setCToNoon(setCToNoonEvent) {
+        current.circleIsCNoon = setCToNoonEvent.isC;
+        publishStateChange();
     }
     function updateScale() {
         let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
