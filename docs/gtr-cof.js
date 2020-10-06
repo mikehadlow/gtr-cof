@@ -1320,6 +1320,26 @@ var tuning;
 })(tuning || (tuning = {}));
 var settings;
 (function (settings) {
+    function init() {
+        events.leftHandedChange.subscribe(e => {
+            let checkbox = document.getElementById("left-handed-checkbox");
+            checkbox.checked = e.isLeftHanded;
+        });
+        events.flipNutChange.subscribe(e => {
+            let checkbox = document.getElementById("flip-nut-checkbox");
+            checkbox.checked = e.isNutFlipped;
+        });
+        events.setCToNoon.subscribe(e => {
+            let checkbox = document.getElementById("set-c-to-noon-checkbox");
+            checkbox.checked = e.isC;
+        });
+        events.fretboardLabelChange.subscribe(e => {
+            let selected = "fb-note-text" + String(e.labelType);
+            let radio = document.getElementById(selected);
+            radio.checked = true;
+        });
+    }
+    settings.init = init;
     function onLeftHandedClick(e) {
         events.leftHandedChange.publish({ isLeftHanded: e.checked });
     }
@@ -1328,14 +1348,14 @@ var settings;
         events.flipNutChange.publish({ isNutFlipped: e.checked });
     }
     settings.onFlipNut = onFlipNut;
-    function onFbNoteTextClick(e) {
-        events.fretboardLabelChange.publish({ labelType: parseInt(e.value) });
-    }
-    settings.onFbNoteTextClick = onFbNoteTextClick;
     function onSetCToNoon(e) {
         events.setCToNoon.publish({ isC: e.checked });
     }
     settings.onSetCToNoon = onSetCToNoon;
+    function onFbNoteTextClick(e) {
+        events.fretboardLabelChange.publish({ labelType: parseInt(e.value) });
+    }
+    settings.onFbNoteTextClick = onFbNoteTextClick;
 })(settings || (settings = {}));
 var scaleFamily;
 (function (scaleFamily_1) {
@@ -1409,6 +1429,7 @@ let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circ
 gtr.init();
 tuning.init();
 scaleFamily.init();
+settings.init();
 state.init();
 cookies.init();
 //# sourceMappingURL=gtr-cof.js.map
