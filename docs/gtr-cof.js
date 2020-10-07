@@ -1024,7 +1024,7 @@ var gtr;
         return stringNote.index + "_" + stringNote.octave;
     }
     function init() {
-        events.tuningChange.subscribe(updateFretboard);
+        events.tuningChange.subscribe(e => updateFretboard(e.tuning));
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.flipNutChange.subscribe(handleFlipNutChanged);
@@ -1241,7 +1241,7 @@ var tuning;
         [12, -1],
         [12, 1]
     ];
-    let tunings = [
+    let tuningInfos = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
@@ -1266,6 +1266,7 @@ var tuning;
         { tuning: "GDAE", dots: violaDots, description: "Violin" },
         { tuning: "CGDA", dots: violaDots, description: "Viola" },
     ];
+    tuning_1.tunings = [];
     function parseTuning(tuning) {
         let tokens = [];
         let result = [];
@@ -1297,24 +1298,32 @@ var tuning;
     }
     tuning_1.parseTuning = parseTuning;
     function init() {
+        let index = 0;
+        for (let info of tuningInfos) {
+            let tuning = {
+                index: index,
+                tuning: info.tuning,
+                dots: info.dots,
+                description: info.description,
+                notes: parseTuning(info.tuning)
+            };
+            tuning_1.tunings.push(tuning);
+            index++;
+        }
         d3.select("#tuning-dropdown")
             .selectAll("div")
-            .data(tunings)
+            .data(tuning_1.tunings)
             .enter()
             .append("div")
             .attr("class", "dropdown-content-item")
             .on("click", x => raiseTuningChangedEvent(x))
             .text(x => x.tuning + "   " + x.description);
-        raiseTuningChangedEvent(tunings[0]);
+        raiseTuningChangedEvent(tuning_1.tunings[0]);
     }
     tuning_1.init = init;
-    function raiseTuningChangedEvent(info) {
-        let notes = parseTuning(info.tuning);
+    function raiseTuningChangedEvent(tuning) {
         events.tuningChange.publish({
-            tuning: info.tuning,
-            dots: info.dots,
-            description: info.description,
-            notes: notes
+            tuning: tuning
         });
     }
 })(tuning || (tuning = {}));

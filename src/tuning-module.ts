@@ -26,7 +26,15 @@ namespace tuning {
         readonly description: string;
     }
 
-    let tunings: Array<TuningInfo> = [
+    export interface Tuning {
+        readonly index: number;
+        readonly tuning: string;
+        readonly dots: Array<[number, number]>;
+        readonly description: string;
+        readonly notes: Array<number>;
+    }
+
+    let tuningInfos: Array<TuningInfo> = [
         { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
         { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
         { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
@@ -53,6 +61,8 @@ namespace tuning {
         { tuning: "GDAE", dots: violaDots, description: "Violin" },
         { tuning: "CGDA", dots: violaDots, description: "Viola" },
     ]
+
+    export let tunings: Array<Tuning> = [];
 
     export function parseTuning(tuning: string) : Array<number> {
         let tokens: Array<string> = [];
@@ -89,6 +99,20 @@ namespace tuning {
     }
 
     export function init() {
+
+        let index: number = 0;
+        for(let info of tuningInfos) {
+            let tuning: Tuning = {
+                index: index,
+                tuning: info.tuning,
+                dots: info.dots,
+                description: info.description,
+                notes: parseTuning(info.tuning)
+            };
+            tunings.push(tuning);
+            index++;
+        }
+
         d3.select("#tuning-dropdown")
             .selectAll("div")
             .data(tunings)
@@ -101,14 +125,9 @@ namespace tuning {
         raiseTuningChangedEvent(tunings[0]);
     }
 
-    function raiseTuningChangedEvent(info: TuningInfo): void{
-        let notes = parseTuning(info.tuning);
-
+    function raiseTuningChangedEvent(tuning: Tuning): void{
         events.tuningChange.publish({
-            tuning: info.tuning,
-            dots: info.dots,
-            description: info.description,
-            notes: notes
+            tuning: tuning
         });
     }
 }

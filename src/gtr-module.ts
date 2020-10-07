@@ -1,7 +1,7 @@
 
 namespace gtr {
 
-    let currentTuning: events.TuningChangedEvent;
+    let currentTuning: tuning.Tuning;
     let currentState: events.ScaleChangedEvent;
     let notes: d3.Selection<StringNote>;
     let noteLabels: d3.Selection<StringNote>;
@@ -22,7 +22,7 @@ namespace gtr {
     }
 
     export function init() {
-        events.tuningChange.subscribe(updateFretboard);
+        events.tuningChange.subscribe(e => updateFretboard(e.tuning));
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.flipNutChange.subscribe(handleFlipNutChanged);
@@ -88,7 +88,7 @@ namespace gtr {
         }
     }
 
-    function updateFretboard(tuningInfo: events.TuningChangedEvent): void {
+    function updateFretboard(tuningInfo: tuning.Tuning): void {
 
         currentTuning = tuningInfo;
         let fretData: Array<number> = getFretData(numberOfFrets);
