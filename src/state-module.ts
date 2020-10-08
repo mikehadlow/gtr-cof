@@ -12,6 +12,7 @@ namespace state {
         isNutFlipped: boolean;
         fretboardLabelType: events.FretboardLabelType;
         circleIsCNoon: boolean;
+        tuningIndex: number;
     }
 
     // default initial state
@@ -27,6 +28,7 @@ namespace state {
         isNutFlipped: false,
         fretboardLabelType: events.FretboardLabelType.NoteName,
         circleIsCNoon: true,
+        tuningIndex: 0,
     }
 
     export function init() {
@@ -52,9 +54,11 @@ namespace state {
             throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
         }
 
+        // publish scale and mode
         events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
         events.modeChange.publish({ mode: mode });
 
+        // subscriptions
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
@@ -63,19 +67,24 @@ namespace state {
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
 
+        // publish tonic and chord
         events.tonicChange.publish({ noteSpec: current.noteSpec });
         events.chordIntervalChange.publish( { chordIntervals: current.chordIntervals });
         events.chordChange.publish({ chordIndex: tempChordIndex });
 
+        // publish settings
         events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
         events.flipNutChange.publish( { isNutFlipped: current.isNutFlipped });
         events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType })
         events.setCToNoon.publish({ isC: current.circleIsCNoon });
+        events.tuningChange.publish({ tuning: tuning.tunings.find(x => x.index == current.tuningIndex )});
 
+        // subscribe to settings changes
         events.leftHandedChange.subscribe(leftHandedChange);
         events.flipNutChange.subscribe(flipNutChange);
         events.fretboardLabelChange.subscribe(fretboardLabelChange)
         events.setCToNoon.subscribe(setCToNoon);
+        events.tuningChange.subscribe(tuningChange);
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
@@ -124,6 +133,8 @@ namespace state {
         updateScale();
     }
 
+    // setttings event handlers
+
     function leftHandedChange(leftHandedChangeEvent: events.LeftHandedFretboardEvent): void {
         current.isLeftHanded = leftHandedChangeEvent.isLeftHanded;
         publishStateChange();
@@ -141,6 +152,11 @@ namespace state {
 
     function setCToNoon(setCToNoonEvent: events.SetCToNoonEvent): void {
         current.circleIsCNoon = setCToNoonEvent.isC;
+        publishStateChange();
+    }
+
+    function tuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
+        current.tuningIndex = tuningChangedEvent.tuning.index;
         publishStateChange();
     }
 

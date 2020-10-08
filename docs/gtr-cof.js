@@ -497,6 +497,7 @@ var state;
         isNutFlipped: false,
         fretboardLabelType: events.FretboardLabelType.NoteName,
         circleIsCNoon: true,
+        tuningIndex: 0,
     };
     function init() {
         try {
@@ -518,8 +519,10 @@ var state;
         if (!mode) {
             throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
         }
+        // publish scale and mode
         events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
         events.modeChange.publish({ mode: mode });
+        // subscriptions
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
         events.chordChange.subscribe(chordChanged);
@@ -527,17 +530,22 @@ var state;
         events.chordIntervalChange.subscribe(chordIntervalChanged);
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
+        // publish tonic and chord
         events.tonicChange.publish({ noteSpec: current.noteSpec });
         events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+        // publish settings
         events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
         events.flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
         events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType });
         events.setCToNoon.publish({ isC: current.circleIsCNoon });
+        events.tuningChange.publish({ tuning: tuning.tunings.find(x => x.index == current.tuningIndex) });
+        // subscribe to settings changes
         events.leftHandedChange.subscribe(leftHandedChange);
         events.flipNutChange.subscribe(flipNutChange);
         events.fretboardLabelChange.subscribe(fretboardLabelChange);
         events.setCToNoon.subscribe(setCToNoon);
+        events.tuningChange.subscribe(tuningChange);
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
@@ -579,6 +587,7 @@ var state;
         current.midiToggledIndexes = midiNoteEvent.toggledIndexes;
         updateScale();
     }
+    // setttings event handlers
     function leftHandedChange(leftHandedChangeEvent) {
         current.isLeftHanded = leftHandedChangeEvent.isLeftHanded;
         publishStateChange();
@@ -593,6 +602,10 @@ var state;
     }
     function setCToNoon(setCToNoonEvent) {
         current.circleIsCNoon = setCToNoonEvent.isC;
+        publishStateChange();
+    }
+    function tuningChange(tuningChangedEvent) {
+        current.tuningIndex = tuningChangedEvent.tuning.index;
         publishStateChange();
     }
     function updateScale() {
