@@ -539,7 +539,7 @@ var state;
         events.flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
         events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType });
         events.setCToNoon.publish({ isC: current.circleIsCNoon });
-        events.tuningChange.publish({ tuning: tuning.tunings.find(x => x.index == current.tuningIndex) });
+        events.tuningChange.publish({ index: current.tuningIndex });
         // subscribe to settings changes
         events.leftHandedChange.subscribe(leftHandedChange);
         events.flipNutChange.subscribe(flipNutChange);
@@ -605,7 +605,7 @@ var state;
         publishStateChange();
     }
     function tuningChange(tuningChangedEvent) {
-        current.tuningIndex = tuningChangedEvent.tuning.index;
+        current.tuningIndex = tuningChangedEvent.index;
         publishStateChange();
     }
     function updateScale() {
@@ -1037,13 +1037,17 @@ var gtr;
         return stringNote.index + "_" + stringNote.octave;
     }
     function init() {
-        events.tuningChange.subscribe(e => updateFretboard(e.tuning));
+        events.tuningChange.subscribe(handleTuningChange);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.flipNutChange.subscribe(handleFlipNutChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
     }
     gtr_1.init = init;
+    function handleTuningChange(tuningChangedEvent) {
+        let newTuning = tuning.tunings.find(x => x.index == tuningChangedEvent.index);
+        updateFretboard(newTuning);
+    }
     function handleLeftHandedChanged(lhEvent) {
         isLeftHanded = lhEvent.isLeftHanded;
         if (currentTuning != null) {
@@ -1336,7 +1340,7 @@ var tuning;
     tuning_1.init = init;
     function raiseTuningChangedEvent(tuning) {
         events.tuningChange.publish({
-            tuning: tuning
+            index: tuning.index
         });
     }
 })(tuning || (tuning = {}));

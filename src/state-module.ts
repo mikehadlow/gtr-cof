@@ -77,7 +77,7 @@ namespace state {
         events.flipNutChange.publish( { isNutFlipped: current.isNutFlipped });
         events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType })
         events.setCToNoon.publish({ isC: current.circleIsCNoon });
-        events.tuningChange.publish({ tuning: tuning.tunings.find(x => x.index == current.tuningIndex )});
+        events.tuningChange.publish({ index: current.tuningIndex });
 
         // subscribe to settings changes
         events.leftHandedChange.subscribe(leftHandedChange);
@@ -156,7 +156,7 @@ namespace state {
     }
 
     function tuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
-        current.tuningIndex = tuningChangedEvent.tuning.index;
+        current.tuningIndex = tuningChangedEvent.index;
         publishStateChange();
     }
 

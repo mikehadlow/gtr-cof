@@ -22,11 +22,16 @@ namespace gtr {
     }
 
     export function init() {
-        events.tuningChange.subscribe(e => updateFretboard(e.tuning));
+        events.tuningChange.subscribe(handleTuningChange);
         events.scaleChange.subscribe(update);
         events.leftHandedChange.subscribe(handleLeftHandedChanged);
         events.flipNutChange.subscribe(handleFlipNutChanged);
         events.fretboardLabelChange.subscribe(handleLabelChange);
+    }
+
+    function handleTuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
+        let newTuning = tuning.tunings.find(x => x.index == tuningChangedEvent.index);
+        updateFretboard(newTuning);
     }
 
     function handleLeftHandedChanged(lhEvent: events.LeftHandedFretboardEvent) {

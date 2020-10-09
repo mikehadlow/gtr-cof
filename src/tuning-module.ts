@@ -127,7 +127,7 @@ namespace tuning {
 
     function raiseTuningChangedEvent(tuning: Tuning): void{
         events.tuningChange.publish({
-            tuning: tuning
+            index: tuning.index
         });
     }
 }

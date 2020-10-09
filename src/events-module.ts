@@ -73,7 +73,7 @@ namespace events {
     export let tuningChange: Bus<TuningChangedEvent> = new Bus<TuningChangedEvent>("tuningChange");
 
     export interface TuningChangedEvent {
-        readonly tuning: tuning.Tuning;
+        readonly index: number;
     }
 
     export let leftHandedChange: Bus<LeftHandedFretboardEvent> = new Bus<LeftHandedFretboardEvent>("leftHandedChange");
