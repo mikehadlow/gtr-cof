@@ -511,6 +511,7 @@ var state;
         }
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
+        let tempToggledIndexes = current.toggledIndexes;
         let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
         if (!scaleFamily) {
             throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
@@ -522,6 +523,7 @@ var state;
         // publish scale and mode
         events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
         events.modeChange.publish({ mode: mode });
+        events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
         // subscriptions
         events.tonicChange.subscribe(tonicChanged);
         events.modeChange.subscribe(modeChanged);
@@ -532,8 +534,10 @@ var state;
         events.midiNote.subscribe(midiNote);
         // publish tonic and chord
         events.tonicChange.publish({ noteSpec: current.noteSpec });
-        events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
         events.chordChange.publish({ chordIndex: tempChordIndex });
+        // restore toggles
+        current.toggledIndexes = tempToggledIndexes;
+        updateScale();
         // publish settings
         events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
         events.flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
