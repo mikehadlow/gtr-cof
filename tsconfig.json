@@ -22,6 +22,7 @@
         "src/settings-module.ts",
         "src/scale-family-module.ts",
         "src/midi-module.ts",
+        "src/permalink-module.ts",
         "src/gtr-cof.ts"
     ]
 }

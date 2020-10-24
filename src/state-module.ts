@@ -1,7 +1,8 @@
 namespace state {
 
     export interface State {
-        noteSpec: music.NoteSpec;
+        index: number;
+        naturalIndex: number;
         chordIndex: number;
         chordIntervals: number[];
         toggledIndexes: number;
@@ -16,8 +17,9 @@ namespace state {
     }
 
     // default initial state
-    let current: State = {
-        noteSpec: music.createNoteSpec(3, 3), // C natural is default
+    export const defaultState: State = {
+        index: 3, // C
+        naturalIndex: 3, // C
         chordIndex: -1, // no chord
         chordIntervals: [0, 2, 4], // standard triad
         toggledIndexes: 0, // index bitflag
@@ -31,7 +33,24 @@ namespace state {
         tuningIndex: 0,
     }
 
+    let current: State = {
+        index: defaultState.index,
+        naturalIndex: defaultState.naturalIndex,
+        chordIndex: defaultState.chordIndex,
+        chordIntervals: defaultState.chordIntervals,
+        toggledIndexes: defaultState.toggledIndexes,
+        scaleFamilyIndex: defaultState.scaleFamilyIndex,
+        modeIndex: defaultState.modeIndex,
+        midiToggledIndexes: defaultState.midiToggledIndexes,
+        isLeftHanded: defaultState.isLeftHanded,
+        isNutFlipped: defaultState.isNutFlipped,
+        fretboardLabelType: defaultState.fretboardLabelType,
+        circleIsCNoon: defaultState.circleIsCNoon,
+        tuningIndex: defaultState.tuningIndex,
+    };
+
     export function init() {
+
         try{
             let cookieState = cookies.readCookie2();
             if(cookieState !== null) {
@@ -41,6 +60,9 @@ namespace state {
         catch(e) {
             // ignore the invalid cookie:
         }
+
+        // update current state based on querystring.
+        current = permalink.getState(current);        
 
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
@@ -70,7 +92,7 @@ namespace state {
         events.midiNote.subscribe(midiNote);
 
         // publish tonic and chord
-        events.tonicChange.publish({ noteSpec: current.noteSpec });
+        events.tonicChange.publish({ noteSpec: music.createNoteSpec(current.naturalIndex, current.index) });
         events.chordChange.publish({ chordIndex: tempChordIndex });
         // restore toggles
         current.toggledIndexes = tempToggledIndexes;
@@ -92,7 +114,8 @@ namespace state {
     }
 
     function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
-        current.noteSpec = tonicChangedEvent.noteSpec;
+        current.index = tonicChangedEvent.noteSpec.index;
+        current.naturalIndex = tonicChangedEvent.noteSpec.natural.index;
         current.chordIndex = -1;
         updateScale();
     }
@@ -174,9 +197,10 @@ namespace state {
         if(!mode) {
             throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
         }
+        let noteSpec = music.createNoteSpec(current.index, current.naturalIndex);
 
         let nodes = music.generateScaleShim(
-            current.noteSpec, 
+            noteSpec, 
             mode, 
             current.chordIndex, 
             current.chordIntervals, 

@@ -9,5 +9,6 @@ gtr.init();
 tuning.init();
 scaleFamily.init();
 settings.init();
+permalink.init();
 state.init();
 cookies.init();

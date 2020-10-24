@@ -1,6 +1,6 @@
 namespace cookies {
 
-    let cookieName = "gtr-cof-state-v3";
+    let cookieName = "gtr-cof-state-v4";
 
     export function init(): void {
         events.stateChange.subscribe(bakeCookie2);

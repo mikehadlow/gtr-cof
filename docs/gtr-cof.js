@@ -115,7 +115,7 @@ var events;
 })(events || (events = {}));
 var cookies;
 (function (cookies) {
-    let cookieName = "gtr-cof-state-v3";
+    let cookieName = "gtr-cof-state-v4";
     function init() {
         events.stateChange.subscribe(bakeCookie2);
     }
@@ -485,8 +485,9 @@ var music;
 var state;
 (function (state) {
     // default initial state
-    let current = {
-        noteSpec: music.createNoteSpec(3, 3),
+    state.defaultState = {
+        index: 3,
+        naturalIndex: 3,
         chordIndex: -1,
         chordIntervals: [0, 2, 4],
         toggledIndexes: 0,
@@ -499,6 +500,21 @@ var state;
         circleIsCNoon: true,
         tuningIndex: 0,
     };
+    let current = {
+        index: state.defaultState.index,
+        naturalIndex: state.defaultState.naturalIndex,
+        chordIndex: state.defaultState.chordIndex,
+        chordIntervals: state.defaultState.chordIntervals,
+        toggledIndexes: state.defaultState.toggledIndexes,
+        scaleFamilyIndex: state.defaultState.scaleFamilyIndex,
+        modeIndex: state.defaultState.modeIndex,
+        midiToggledIndexes: state.defaultState.midiToggledIndexes,
+        isLeftHanded: state.defaultState.isLeftHanded,
+        isNutFlipped: state.defaultState.isNutFlipped,
+        fretboardLabelType: state.defaultState.fretboardLabelType,
+        circleIsCNoon: state.defaultState.circleIsCNoon,
+        tuningIndex: state.defaultState.tuningIndex,
+    };
     function init() {
         try {
             let cookieState = cookies.readCookie2();
@@ -509,6 +525,8 @@ var state;
         catch (e) {
             // ignore the invalid cookie:
         }
+        // update current state based on querystring.
+        current = permalink.getState(current);
         // lets remember this while we reset everything.
         let tempChordIndex = current.chordIndex;
         let tempToggledIndexes = current.toggledIndexes;
@@ -533,7 +551,7 @@ var state;
         events.scaleFamilyChange.subscribe(scaleFamilyChanged);
         events.midiNote.subscribe(midiNote);
         // publish tonic and chord
-        events.tonicChange.publish({ noteSpec: current.noteSpec });
+        events.tonicChange.publish({ noteSpec: music.createNoteSpec(current.naturalIndex, current.index) });
         events.chordChange.publish({ chordIndex: tempChordIndex });
         // restore toggles
         current.toggledIndexes = tempToggledIndexes;
@@ -553,7 +571,8 @@ var state;
     }
     state.init = init;
     function tonicChanged(tonicChangedEvent) {
-        current.noteSpec = tonicChangedEvent.noteSpec;
+        current.index = tonicChangedEvent.noteSpec.index;
+        current.naturalIndex = tonicChangedEvent.noteSpec.natural.index;
         current.chordIndex = -1;
         updateScale();
     }
@@ -621,7 +640,8 @@ var state;
         if (!mode) {
             throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
         }
-        let nodes = music.generateScaleShim(current.noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily);
+        let noteSpec = music.createNoteSpec(current.index, current.naturalIndex);
+        let nodes = music.generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily);
         // update togges, because a chord may have been generated.
         current.toggledIndexes = nodes
             .filter(x => x.toggle)
@@ -1450,6 +1470,75 @@ var midiControl;
         }
     }
 })(midiControl || (midiControl = {}));
+var permalink;
+(function (permalink_1) {
+    let currentState = null;
+    function init() {
+        events.stateChange.subscribe(x => currentState = x.state);
+    }
+    permalink_1.init = init;
+    function populatePermalinkText() {
+        let permalink = generatePermalink();
+        let inputbox = document.getElementById("permalink-text");
+        inputbox.value = permalink;
+        inputbox.focus;
+        inputbox.select;
+        inputbox.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+    }
+    permalink_1.populatePermalinkText = populatePermalinkText;
+    // create querystring from state
+    function generatePermalink() {
+        if (currentState === null) {
+            throw "No stateChange event published before querystring requested";
+        }
+        let params = new URLSearchParams();
+        // only copy state that's different from default
+        Object.keys(currentState).forEach(key => {
+            if (currentState[key] !== state.defaultState[key]) {
+                params.append(key, currentState[key]);
+            }
+        });
+        return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
+    }
+    permalink_1.generatePermalink = generatePermalink;
+    // update state from querystring
+    function getState(existingState) {
+        let queryString = location.search;
+        let params = new URLSearchParams(queryString);
+        console.log(queryString);
+        Object.keys(existingState).forEach(x => {
+            let value = params.get(x);
+            if (value == null)
+                return;
+            switch (typeof existingState[x]) {
+                case 'boolean':
+                    existingState[x] = (value === "true");
+                    break;
+                case 'number':
+                    existingState[x] = parseInt(value);
+                    break;
+                case 'object':
+                    existingState[x] = JSON.parse("[" + value + "]");
+                    break;
+                case 'string':
+                    existingState[x] = value;
+                    break;
+            }
+            console.log(`${x} -> ${value}, ${typeof existingState[x]}, ${existingState[x]}`);
+        });
+        Object.keys(existingState).forEach(x => {
+            console.log(`${x}, ${existingState[x]}`);
+        });
+        return existingState;
+    }
+    permalink_1.getState = getState;
+    // test function
+    function getCurrentState() {
+        let newState = getState(currentState);
+    }
+    permalink_1.getCurrentState = getCurrentState;
+})(permalink || (permalink = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 tonics.init();
 modes.init(music.scaleFamily[0]);
@@ -1460,6 +1549,7 @@ gtr.init();
 tuning.init();
 scaleFamily.init();
 settings.init();
+permalink.init();
 state.init();
 cookies.init();
 //# sourceMappingURL=gtr-cof.js.map
