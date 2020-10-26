@@ -1,4 +1,4 @@
-name: learn-github-actions
+name: build
 on: [push]
 jobs:
   check-bats-version:
