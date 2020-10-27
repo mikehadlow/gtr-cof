@@ -1,0 +1,180 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 12pt;
+    margin: 0px;
+}
+
+text {
+    pointer-events: none;
+}
+
+div {
+    margin: 0px;
+    padding: 0px;
+}
+
+.header {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+.menu {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    cursor: default;
+}
+
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown:hover {
+    background-color: red;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    color: black;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    text-align: left;
+    z-index: 1;
+}
+
+.with-padding {
+    padding: 12px 16px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: default;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content-item:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.content {
+    padding: 10px 10px 10px 10px;
+}
+
+/* Circle of Fifths */
+.note-segment {
+    fill: lightgrey;
+    stroke: none;
+}
+.note-segment-tonic {
+    fill: yellow;
+    stroke: black;
+    stroke-width: 3px;
+}
+.note-segment-scale {
+    fill: white;
+    stroke: black;
+    stroke-width: 3px;
+}
+.note-segment-text {
+    font-size: 35px;
+    text-anchor: middle;
+    fill: black;
+}
+.degree-segment {
+    fill: none;
+    stroke: none;
+}
+.degree-segment-selected {
+    fill: white;
+    stroke: black;
+    stroke-width: 2px;
+}
+.degree-segment-text {
+    font-size: 20px;
+    text-anchor: middle;
+    fill: black;
+}
+.chord-segment {
+    fill: none;
+    stroke: none;
+}
+.chord-segment-dim {
+    fill: lightcoral;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-minor {
+    fill: lightblue;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-major {
+    fill: lightgreen;
+    stroke: black;
+    stroke-width: 2px;
+}
+.chord-segment-note {
+    fill: none;
+    stroke: none;
+}
+.interval-note-selected {
+    stroke: black;
+    stroke-width: 2px;
+}
+.interval-segment {
+    fill: white;
+    stroke: none;
+}
+.interval-note {
+    fill: none;
+    stroke: none;
+}
+/* Modes */
+.mode-button {
+    fill: white;
+    stroke: black;
+}
+.mode-button-selected {
+    fill: yellow;
+}
+.mode-text {
+    font-size: 15;
+    text-anchor: left;
+    fill: black;
+}
+
+/* Tonics */
+.tonic-button {
+    fill: white;
+    stroke: black;
+}
+.tonic-button-grey {
+    fill: grey;
+}
+.tonic-button-selected {
+    fill: yellow;
+}
+.tonic-text {
+    font-size: 15;
+    text-anchor: left;
+    fill: black;
+}

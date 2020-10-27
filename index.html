@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Guitar Dashboard</title>
+  <meta name="description" content="An interactive music theory dashboard for guitarists including a circle of fifths." />
+  <link href="gtr-cof.css" rel="stylesheet">
+  <link rel="shortcut icon" href="favicon.ico?r=31241" />
+</head>
+
+<body>
+  <div class="header">
+    <div class="menu"><span class="title">Guitar Dashboard</span></div>
+    <div class="dropdown">
+      <div class="menu">Info</div>
+      <div class="dropdown-content with-padding">
+        <p>
+          An interactive music theory dashboard, including a <a href="https://en.wikipedia.org/wiki/Circle_of_fifths">circle of fifths</a>          for guitarists.
+        </p>
+        <p>
+          Follow <a href="https://twitter.com/mikehadlow">@mikehadlow</a> on Twitter for news and updates.
+        </p>
+        <p>Watch the video:</p>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/JPcEvxoWTJM" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+        </iframe>
+        <p>Read the blog post, <a href="http://mikehadlow.blogspot.com/2018/09/what-i-learned-creating-guitar.html">What I learnt creating guitar dashboard</a>.</p>
+        <p>
+          By <a href="http://mikehadlow.com/">Mike Hadlow</a>. Open source on <a href="https://github.com/mikehadlow/gtr-cof">Github</a>.
+        </p>
+      </div>
+    </div>
+    <div class="dropdown">
+      <div class="menu">Scale</div>
+      <div id="scale-dropdown" class="dropdown-content">
+      </div>
+    </div>
+    <div class="dropdown">
+      <div class="menu">Tunings</div>
+      <div id="tuning-dropdown" class="dropdown-content">
+      </div>
+    </div>
+    <div class="dropdown">
+      <div class="menu">Settings</div>
+      <div id="settings-dropdown" class="dropdown-content">
+        <div class="with-padding">
+          <input type="checkbox" id="left-handed-checkbox" name="left_handed" onclick="settings.onLeftHandedClick(this)" >
+          <label for="left_handed">Left Handed Fretboard</label><br />
+          <input type="checkbox" id="flip-nut-checkbox" name="flip_nut" onclick="settings.onFlipNut(this)" >
+          <label for="flip_nut">Flip Nut</label><br />
+          <input type="checkbox" id="set-c-to-noon-checkbox" name="set_c_to_noon" onclick="settings.onSetCToNoon(this)" checked >
+          <label for="set_c_to_noon">Set C To Noon</label>
+        </div>
+        <div class="with-padding">
+          <fieldset>
+            <label for="fb-note-text">Fretboard note labels:</label><br/>
+            <input type="radio" name="fb-note-text" id="fb-note-text0" onclick="settings.onFbNoteTextClick(this)" value="0" /> None <br/>
+            <input type="radio" name="fb-note-text" id="fb-note-text1" onclick="settings.onFbNoteTextClick(this)" value="1" checked /> Note names <br/>
+            <input type="radio" name="fb-note-text" id="fb-note-text2" onclick="settings.onFbNoteTextClick(this)" value="2" /> Intervals 
+          </fieldset>
+        </div>
+      </div>
+    </div>
+    <div class="dropdown">
+      <div class="menu">Permalink</div>
+      <div id="permalink-dropdown" class="dropdown-content">
+        <div class="with-padding">
+          <input type="button" id="permalink-button" value="Generate Permalink" onclick="permalink.populatePermalinkText()" />
+          <br />
+          <br />
+          <input type="input" id="permalink-text" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <svg id="chromatic" width="500" height="500"></svg>
+    <svg id="modes" width="160" height="500"></svg>
+    <svg id="cof" width="500" height="500" ></svg>
+    <svg id="gtr" width="1160" height="300" ></svg>
+  </div>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="gtr-cof.js"></script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-99669395-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+</body>
+</html>
