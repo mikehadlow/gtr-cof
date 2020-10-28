@@ -8,6 +8,8 @@ jobs:
       - uses: actions/setup-node@v1
       - run: npm install
       - run: tsc --build tsconfig.json
+      - run: mkdir docs/src
+      - run: cp src/*.ts docs/src
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
