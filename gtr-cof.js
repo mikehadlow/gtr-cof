@@ -1506,7 +1506,6 @@ var permalink;
     function getState(existingState) {
         let queryString = location.search;
         let params = new URLSearchParams(queryString);
-        console.log(queryString);
         Object.keys(existingState).forEach(x => {
             let value = params.get(x);
             if (value == null)
@@ -1526,9 +1525,6 @@ var permalink;
                     break;
             }
             console.log(`${x} -> ${value}, ${typeof existingState[x]}, ${existingState[x]}`);
-        });
-        Object.keys(existingState).forEach(x => {
-            console.log(`${x}, ${existingState[x]}`);
         });
         return existingState;
     }
