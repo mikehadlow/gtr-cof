@@ -640,7 +640,7 @@ var state;
         if (!mode) {
             throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
         }
-        let noteSpec = music.createNoteSpec(current.index, current.naturalIndex);
+        let noteSpec = music.createNoteSpec(current.naturalIndex, current.index);
         let nodes = music.generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily);
         // update togges, because a chord may have been generated.
         current.toggledIndexes = nodes
