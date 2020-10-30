@@ -10,7 +10,7 @@ jobs:
       - run: tsc --build tsconfig.json
       - run: mkdir docs/src
       - run: cp src/*.ts docs/src
-      - run: echo "Run number=$GITHUB_RUN_NUMBER, Actor=$GITHUB_ACTOR, Sha=$GITHUB_SHA" > docs/version
+      - run: echo "Run number=$GITHUB_RUN_NUMBER, Actor=$GITHUB_ACTOR, Sha=$GITHUB_SHA" > docs/version.txt
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
