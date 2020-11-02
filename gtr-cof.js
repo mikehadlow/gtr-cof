@@ -257,11 +257,11 @@ var music;
         { name: "E♯", index: 8 },
         { name: "E♭", index: 6 },
         { name: "F", index: 8 },
-        { name: "F♯", index: 7 },
-        { name: "F♭", index: 9 },
+        { name: "F♯", index: 9 },
+        { name: "F♭", index: 7 },
         { name: "G", index: 10 },
-        { name: "G♯", index: 9 },
-        { name: "G♭", index: 11 },
+        { name: "G♯", index: 11 },
+        { name: "G♭", index: 9 },
     ];
     let noteLabels = [
         { offset: 0, label: '' },
