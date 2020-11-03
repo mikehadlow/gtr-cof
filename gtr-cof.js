@@ -424,7 +424,6 @@ var music;
                 let roman = romanNumeral[scaleNote.noteNumber];
                 let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamily);
                 let diminished = "";
-                let seventh = "";
                 let type = ChordType.Minor;
                 // does it have a diminished 5th?
                 if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
@@ -436,16 +435,8 @@ var music;
                     roman = roman.toLocaleUpperCase();
                     type = ChordType.Major;
                 }
-                // does it have a natural 7th?
-                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Min)) {
-                    seventh = "7";
-                }
-                // does it have a major 7th?
-                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 6 && x.chordInterval.type === IntervalType.Maj)) {
-                    seventh = "^7";
-                }
                 return {
-                    romanNumeral: roman + diminished + seventh,
+                    romanNumeral: roman + diminished,
                     type: type
                 };
             }
