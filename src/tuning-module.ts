@@ -53,6 +53,7 @@ namespace tuning {
         { tuning: "EADGC", dots: guitarDots, description: "Bass 5 Strings Standard High" },
         { tuning: "BEADG", dots: guitarDots, description: "Bass 5 Strings Standard Low" },
         { tuning: "BEADGC", dots: guitarDots, description: "Bass 6 Strings Standard" },
+        { tuning: "BEADGCF", dots: guitarDots, description: "Bass 7 Strings Standard" },
 
         { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
         { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho"},
