@@ -283,6 +283,7 @@ var music;
         ChordType[ChordType["Major"] = 0] = "Major";
         ChordType[ChordType["Minor"] = 1] = "Minor";
         ChordType[ChordType["Diminished"] = 2] = "Diminished";
+        ChordType[ChordType["Augmented"] = 3] = "Augmented";
     })(ChordType = music.ChordType || (music.ChordType = {}));
     ;
     ;
@@ -430,8 +431,13 @@ var music;
                     diminished = "°";
                     type = ChordType.Diminished;
                 }
+                // does it have an augmented 5th?
+                else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Aug)) {
+                    diminished = "+";
+                    type = ChordType.Augmented;
+                }
                 // does it have a major 3rd?
-                if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
+                else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
                     roman = roman.toLocaleUpperCase();
                     type = ChordType.Major;
                 }
@@ -807,6 +813,8 @@ var cof;
     function getChordSegmentClass(chord) {
         if (chord.type === music.ChordType.Diminished)
             return "chord-segment-dim";
+        if (chord.type === music.ChordType.Augmented)
+            return "chord-segment-aug";
         if (chord.type === music.ChordType.Minor)
             return "chord-segment-minor";
         if (chord.type === music.ChordType.Major)

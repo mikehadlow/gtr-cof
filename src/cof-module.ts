@@ -195,6 +195,7 @@ namespace cof {
 
     function getChordSegmentClass(chord: music.Chord): string {
         if (chord.type === music.ChordType.Diminished) return "chord-segment-dim";
+        if (chord.type === music.ChordType.Augmented) return "chord-segment-aug";
         if (chord.type === music.ChordType.Minor) return "chord-segment-minor";
         if (chord.type === music.ChordType.Major) return "chord-segment-major";
         throw "Unexpected ChordType";
