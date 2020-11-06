@@ -207,7 +207,7 @@ namespace music {
         };
     }
 
-    export enum ChordType { Major, Minor, Diminished };
+    export enum ChordType { Major, Minor, Diminished, Augmented };
 
     export interface Chord {
         readonly romanNumeral: string;
@@ -406,8 +406,13 @@ namespace music {
                     diminished = "°";
                     type = ChordType.Diminished;
                 }
+                // does it have an augmented 5th?
+                else if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Aug)) {
+                    diminished = "+";
+                    type = ChordType.Augmented;
+                }
                 // does it have a major 3rd?
-                if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
+                else if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
                     roman = roman.toLocaleUpperCase();
                     type = ChordType.Major;
                 }

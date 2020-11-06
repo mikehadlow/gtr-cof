@@ -122,6 +122,11 @@ div {
     stroke: black;
     stroke-width: 2px;
 }
+.chord-segment-aug {
+    fill: lightsalmon;
+    stroke: black;
+    stroke-width: 2px;
+}
 .chord-segment-minor {
     fill: lightblue;
     stroke: black;
