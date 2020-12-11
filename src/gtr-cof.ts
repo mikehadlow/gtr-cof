@@ -1,5 +1,6 @@
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
 
+menu.init();
 tonics.init();
 modes.init(music.scaleFamily[0]);
 chordInterval.init();
