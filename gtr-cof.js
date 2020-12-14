@@ -1,3 +1,39 @@
+var menu;
+(function (menu) {
+    function init() {
+        let menuItems = document.getElementsByClassName("menu");
+        for (let menuItem of menuItems) {
+            console.log(menuItem);
+            menuItem.addEventListener("click", onMenuClick);
+        }
+        // close open menu when document is clicked outside
+        document.addEventListener("mouseup", (event) => {
+            let targetElement = event.target;
+            if (targetElement.closest(".dropdown-content") === null && targetElement.closest(".menu") === null) {
+                let contentElements = document.getElementsByClassName("dropdown-content");
+                for (let contentElement of contentElements) {
+                    if (contentElement.classList.contains("dropdown-content-visible")) {
+                        contentElement.classList.remove("dropdown-content-visible");
+                    }
+                }
+            }
+        });
+    }
+    menu.init = init;
+    function onMenuClick(event) {
+        let menuElement = event.target;
+        let currentContentElement = menuElement.parentElement.querySelector(".dropdown-content");
+        let contentElements = document.getElementsByClassName("dropdown-content");
+        for (let contentElement of contentElements) {
+            if (contentElement === currentContentElement) {
+                currentContentElement.classList.toggle("dropdown-content-visible");
+            }
+            else {
+                contentElement.classList.remove("dropdown-content-visible");
+            }
+        }
+    }
+})(menu || (menu = {}));
 var mod;
 (function (mod) {
     class Mod {
@@ -1536,6 +1572,7 @@ var permalink;
     permalink_1.getCurrentState = getCurrentState;
 })(permalink || (permalink = {}));
 ///<reference path="../node_modules/@types/d3/index.d.ts" />
+menu.init();
 tonics.init();
 modes.init(music.scaleFamily[0]);
 chordInterval.init();
