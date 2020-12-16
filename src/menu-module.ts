@@ -3,7 +3,6 @@ namespace menu {
 
         let menuItems = document.getElementsByClassName("menu");
         for(let menuItem of menuItems) {
-            console.log(menuItem);
             menuItem.addEventListener("click", onMenuClick)
         }
 

@@ -3,7 +3,6 @@ var menu;
     function init() {
         let menuItems = document.getElementsByClassName("menu");
         for (let menuItem of menuItems) {
-            console.log(menuItem);
             menuItem.addEventListener("click", onMenuClick);
         }
         // close open menu when document is clicked outside
