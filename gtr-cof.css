@@ -20,9 +20,18 @@ div {
     background-color: #333;
 }
 
+footer {
+    margin: 0;
+    padding: 0px 16px;
+    overflow: hidden;
+    color: white;
+    background-color: #333;
+}
+
 .title {
     font-weight: bold;
     font-size: 14pt;
+    margin: 0pt;
 }
 
 .menu {
