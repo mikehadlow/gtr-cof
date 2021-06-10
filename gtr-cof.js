@@ -1329,6 +1329,8 @@ var tuning;
         { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G" },
         { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert" },
         { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)" },
+        { tuning: "BEADF♯B", dots: guitarDots, description: "Baritone B" },
+        { tuning: "ADGCEA", dots: guitarDots, description: "Baritone A" },
         { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
         { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
         { tuning: "EADGC", dots: guitarDots, description: "Bass 5 Strings Standard High" },
