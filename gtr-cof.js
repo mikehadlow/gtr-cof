@@ -518,13 +518,13 @@ var state;
 (function (state) {
     // default initial state
     state.defaultState = {
-        index: 3,
-        naturalIndex: 3,
-        chordIndex: -1,
-        chordIntervals: [0, 2, 4],
-        toggledIndexes: 0,
-        scaleFamilyIndex: 0,
-        modeIndex: 0,
+        index: 3, // C
+        naturalIndex: 3, // C
+        chordIndex: -1, // no chord
+        chordIntervals: [0, 2, 4], // standard triad
+        toggledIndexes: 0, // index bitflag
+        scaleFamilyIndex: 0, // diatornic
+        modeIndex: 0, // major
         midiToggledIndexes: 0,
         isLeftHanded: false,
         isNutFlipped: false,
@@ -1299,7 +1299,7 @@ var gtr;
 var tuning;
 (function (tuning_1) {
     let guitarDots = [
-        [3, 0],
+        [3, 0], // [fret, position]
         [5, 0],
         [7, 0],
         [9, 0],
@@ -1309,10 +1309,10 @@ var tuning;
     ];
     // Viola/violin for beginners.
     let violaDots = [
-        [2, 0],
-        [4, 0],
-        [5, 0],
-        [7, 0],
+        [2, 0], // 1st finger
+        [4, 0], // 2nd finger
+        [5, 0], // 3rd finger
+        [7, 0], // 4th finger
         [12, -1],
         [12, 1]
     ];
