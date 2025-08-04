@@ -5,7 +5,8 @@
   "scripts": {
     "lite": "lite-server --baseDir=\"docs\" --port 10001",
     "start": "npm run lite",
-    "dev": "concurrently --raw --kill-others 'npm start' 'tsc -w'"
+    "dev": "concurrently --raw --kill-others 'npm start' 'tsc -w'",
+    "build": "tsc"
   },
   "author": "Mike Hadlow",
   "license": "MIT",
