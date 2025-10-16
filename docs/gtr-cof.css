@@ -192,3 +192,44 @@ footer {
     text-anchor: left;
     fill: black;
 }
+
+/* Tuning Modal Styles */
+#tuning-modal-close:hover,
+#tuning-modal-close:focus {
+    color: #000;
+}
+
+.tuning-option {
+    padding: 12px 16px;
+    margin: 8px 0;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.tuning-option:hover {
+    background-color: #f5f5f5;
+    border-color: #999;
+}
+
+.tuning-option.selected {
+    background-color: #e6f2ff;
+    border-color: #0066cc;
+    font-weight: bold;
+}
+
+.tuning-clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.tuning-clickable:hover {
+    color: #0066cc;
+}
+
+.tuning-display {
+    fill: #0066cc;
+}

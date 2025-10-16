@@ -117,15 +117,14 @@ namespace tuning {
             index++;
         }
 
-        d3.select("#tuning-dropdown")
-            .selectAll("div")
-            .data(tunings)
-            .enter()
-            .append("div")
-            .attr("class", "dropdown-content-item")
-            .on("click", x => raiseTuningChangedEvent(x))
-            .text(x => x.tuning + "   " + x.description);
-        
+        // Delay modal initialization until DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTuningModal);
+        } else {
+            // DOM is already ready
+            initTuningModal();
+        }
+        // Set initial tuning
         raiseTuningChangedEvent(tunings[0]);
     }
 
@@ -133,5 +132,58 @@ namespace tuning {
         events.tuningChange.publish({
             index: tuning.index
         });
+    }
+
+    let currentTuningIndex: number = 0;
+
+    function initTuningModal(): void {
+        d3.select("#tuning-options-container")
+            .selectAll("div")
+            .data(tunings)
+            .enter()
+            .append("div")
+            .attr("class", (d, i) => "tuning-option" + (i === 0 ? " selected" : ""))
+            .on("click", (x, i) => {
+                selectTuning(i);
+                hideModal();
+            })
+            .text(x => x.tuning + "   " + x.description);
+
+        d3.select("#tuning-modal-close").on("click", hideModal);
+        
+        // Click outside to close
+        d3.select("#tuning-modal").on("click", function() {
+            const event = d3.event as MouseEvent;
+                if (event.target === this) {
+                    hideModal();
+                }
+        });
+
+        // Escape key to close
+        d3.select(document).on("keydown.tuningmodal", function() {
+            const event = d3.event as KeyboardEvent;
+            if (event.key === "Escape") {
+                hideModal();
+            }
+        });
+    }
+
+    function hideModal(): void {
+        d3.select("#tuning-modal").style("display", "none");
+    }
+
+    function selectTuning(index: number): void {
+        currentTuningIndex = index;
+        
+        d3.selectAll(".tuning-option")
+            .classed("selected", (d, i) => i === index);
+
+        // Trigger tuning change
+        raiseTuningChangedEvent(tunings[index]);
+    }
+
+    export function showTuningModal(): void {
+        const modal = d3.select("#tuning-modal");
+        modal.style("display", "block");
     }
 }
