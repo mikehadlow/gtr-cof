@@ -109,9 +109,15 @@ namespace gtr {
         let tuningGroup = svg.append("g")
             .attr("class", "tuning-label-group");
 
+        tuningGroup.append("text")
+            .attr("class", "mode-text")
+            .attr("x", 30)
+            .attr("y", 11)
+            .text("Tuning: ")
+
         let tuningLabel = tuningGroup.append("text")
             .attr("class", "mode-text tuning-display")
-            .attr("x", 30)
+            .attr("x", 80)
             .attr("y", 11)
             .style("text-decoration", "underline")
             .style("text-decoration-style", "dotted")
