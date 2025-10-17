@@ -101,14 +101,46 @@ namespace gtr {
 
         d3.selectAll("#gtr > *").remove();
         let svg = d3.select("#gtr");
-        svg.append("text")
+        let tuningText = tuningInfo.tuning + " "
+            + tuningInfo.description
+            + (isLeftHanded ? ", Left Handed" : "")
+            + (isNutFlipped ? ", Nut Flipped" : "");
+
+        let tuningGroup = svg.append("g")
+            .attr("class", "tuning-label-group");
+
+        tuningGroup.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
             .attr("y", 11)
-            .text(tuningInfo.tuning + " "
-                + tuningInfo.description
-                + (isLeftHanded ? ", Left Handed" : "")
-                + (isNutFlipped ? ", Nut Flipped" : ""));
+            .text("Tuning: ")
+
+        let tuningLabel = tuningGroup.append("text")
+            .attr("class", "mode-text tuning-display")
+            .attr("x", 80)
+            .attr("y", 11)
+            .style("text-decoration", "underline")
+            .style("text-decoration-style", "dotted")
+            .style("cursor", "pointer")
+            .text(tuningText);
+
+        // Get the actual bounding box of the text
+        let bbox = (<SVGTextElement>tuningLabel.node()).getBBox();
+
+        // Add invisible rectangle for better click target, sized to actual text
+        tuningGroup.insert("rect", "text")  // Insert before text so text is on top
+            .attr("x", bbox.x - 2)
+            .attr("y", bbox.y - 2)
+            .attr("width", bbox.width + 4)
+            .attr("height", bbox.height + 4)
+            .attr("fill", "transparent")
+            .style("cursor", "pointer");
+
+        // Add click handler to the group
+        tuningGroup.on("click", function() {
+            tuning.showTuningModal();
+        });
+
         let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = <SVGGElement>gtr.node();
 
