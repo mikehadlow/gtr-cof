@@ -1,126 +1,119 @@
-namespace events {
-    export class Bus<T> {
-        private listeners: Array<(x:T)=>void> = [];
-        private name: string;
+import { State, FretboardLabelType } from './types';
+import * as music from './music-module';
 
-        // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
-        constructor(name: string) {
-            this.name = name;
+export { FretboardLabelType } from './types';
+
+export class Bus<T> {
+    private listeners: Array<(x:T)=>void> = [];
+    private name: string;
+
+    // name should be the name of the exported variable in 'events' that the bus instance is assigned to.
+    constructor(name: string) {
+        this.name = name;
+    }
+
+    public subscribe(listener: (x:T)=>void): void {
+        this.listeners.push(listener);
+    }
+
+    // first call should be passed index = -1
+    public resubscribe(listener: (x:T)=>void, index: number): number {
+        if(index === -1) {
+            return this.listeners.push(listener) - 1;
         }
+        this.listeners[index] = listener;
+        return index;
+    }
 
-        public subscribe(listener: (x:T)=>void): void {
-            this.listeners.push(listener);
-        }
-
-        // first call should be passed index = -1
-        public resubscribe(listener: (x:T)=>void, index: number): number {
-            if(index === -1) {
-                return this.listeners.push(listener) - 1;
-            }
-            this.listeners[index] = listener;
-            return index;
-        }
-
-        public publish(event: T): void {
-            //console.log("Published event: '" + this.name + "'")
-            for (let listener of this.listeners) {
-                listener(event);
-            }
+    public publish(event: T): void {
+        //console.log("Published event: '" + this.name + "'")
+        for (let listener of this.listeners) {
+            listener(event);
         }
     }
+}
 
-    function genericName<U>(type: { new(): U; }): string {
-        return type.constructor.toString();
-    }
+export let stateChange: Bus<StateChangedEvent> = new Bus<StateChangedEvent>("stateChange");
 
-    export let stateChange: Bus<StateChangedEvent> = new Bus<StateChangedEvent>("stateChange");
+export interface StateChangedEvent {
+    readonly state: State;
+}
 
-    export interface StateChangedEvent {
-        readonly state: state.State;
-    }
+export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>("scaleChange");
 
-    export let scaleChange: Bus<ScaleChangedEvent> = new Bus<ScaleChangedEvent>("scaleChange");
+export interface ScaleChangedEvent {
+    readonly nodes: music.Node[];
+    readonly mode: music.Mode;
+}
 
-    export interface ScaleChangedEvent {
-        readonly nodes: music.Node[];
-        readonly mode: music.Mode;
-    }
+export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>("tonicChange");
 
-    export let tonicChange: Bus<TonicChangedEvent> = new Bus<TonicChangedEvent>("tonicChange");
+export interface TonicChangedEvent {
+    readonly noteSpec: music.NoteSpec;
+}
 
-    export interface TonicChangedEvent {
-        readonly noteSpec: music.NoteSpec;
-    }
+export let modeChange: Bus<ModeChangedEvent> = new Bus<ModeChangedEvent>("modeChange");
 
-    export let modeChange: Bus<ModeChangedEvent> = new Bus<ModeChangedEvent>("modeChange");
+export interface ModeChangedEvent {
+    readonly mode: music.Mode;
+}
 
-    export interface ModeChangedEvent {
-        readonly mode: music.Mode;
-    }
+export let chordChange: Bus<ChordChangeEvent> = new Bus<ChordChangeEvent>("chordChange");
 
-    export let chordChange: Bus<ChordChangeEvent> = new Bus<ChordChangeEvent>("chordChange");
+export interface ChordChangeEvent {
+    readonly chordIndex: number;
+}
 
-    export interface ChordChangeEvent {
-        readonly chordIndex: number;
-    }
+export let toggle: Bus<ToggleEvent> = new Bus<ToggleEvent>("toggle");
 
-    export let toggle: Bus<ToggleEvent> = new Bus<ToggleEvent>("toggle");
+export interface ToggleEvent {
+    readonly index: number;
+}
 
-    export interface ToggleEvent {
-        readonly index: number;
-    }
+export let tuningChange: Bus<TuningChangedEvent> = new Bus<TuningChangedEvent>("tuningChange");
 
-    export let tuningChange: Bus<TuningChangedEvent> = new Bus<TuningChangedEvent>("tuningChange");
+export interface TuningChangedEvent {
+    readonly index: number;
+}
 
-    export interface TuningChangedEvent {
-        readonly index: number;
-    }
+export let leftHandedChange: Bus<LeftHandedFretboardEvent> = new Bus<LeftHandedFretboardEvent>("leftHandedChange");
 
-    export let leftHandedChange: Bus<LeftHandedFretboardEvent> = new Bus<LeftHandedFretboardEvent>("leftHandedChange");
+export interface LeftHandedFretboardEvent {
+    readonly isLeftHanded: boolean;
+}
 
-    export interface LeftHandedFretboardEvent {
-        readonly isLeftHanded: boolean;
-    }
+export let flipNutChange: Bus<FlipNutEvent> = new Bus<FlipNutEvent>("flipNutChange");
 
-    export let flipNutChange: Bus<FlipNutEvent> = new Bus<FlipNutEvent>("flipNutChange");
+export interface FlipNutEvent {
+    readonly isNutFlipped: boolean;
+}
 
-    export interface FlipNutEvent {
-        readonly isNutFlipped: boolean;
-    }
+export let fretboardLabelChange: Bus<FretboardLabelChangeEvent> = new Bus<FretboardLabelChangeEvent>("fretboardLabelChange");
 
-    export let fretboardLabelChange: Bus<FretboardLabelChangeEvent> = new Bus<FretboardLabelChangeEvent>("fretboardLabelChange");
+export interface FretboardLabelChangeEvent {
+    readonly labelType: FretboardLabelType;
+}
 
-    export interface FretboardLabelChangeEvent {
-        readonly labelType: FretboardLabelType;
-    }
+export let chordIntervalChange: Bus<ChordIntervalChangeEvent> = new Bus<ChordIntervalChangeEvent>("chordIntervalChange");
 
-    export enum FretboardLabelType {
-        None,
-        NoteName,
-        Interval
-    }
+export interface ChordIntervalChangeEvent {
+    readonly chordIntervals: number[];
+}
 
-    export let chordIntervalChange: Bus<ChordIntervalChangeEvent> = new Bus<ChordIntervalChangeEvent>("chordIntervalChange");
+export let scaleFamilyChange: Bus<ScaleFamilyChangeEvent> = new Bus<ScaleFamilyChangeEvent>("scaleFamilyChange");
 
-    export interface ChordIntervalChangeEvent {
-        readonly chordIntervals: number[];
-    }
+export interface ScaleFamilyChangeEvent {
+    readonly scaleFamily: music.ScaleFamily;
+}
 
-    export let scaleFamilyChange: Bus<ScaleFamilyChangeEvent> = new Bus<ScaleFamilyChangeEvent>("scaleFamilyChange");
+export let midiNote: Bus<MidiNoteEvent> = new Bus<MidiNoteEvent>("midiNoteEvent");
 
-    export interface ScaleFamilyChangeEvent {
-        readonly scaleFamily: music.ScaleFamily;
-    }
+export interface MidiNoteEvent {
+    readonly toggledIndexes: number;
+}
 
-    export let midiNote: Bus<MidiNoteEvent> = new Bus<MidiNoteEvent>("midiNoteEvent");
+export let setCToNoon: Bus<SetCToNoonEvent> = new Bus<SetCToNoonEvent>("setCToNoonEvent");
 
-    export interface MidiNoteEvent {
-        readonly toggledIndexes: number;
-    }
-
-    export let setCToNoon: Bus<SetCToNoonEvent> = new Bus<SetCToNoonEvent>("setCToNoonEvent");
-
-    export interface SetCToNoonEvent {
-        readonly isC: boolean;
-    }
+export interface SetCToNoonEvent {
+    readonly isC: boolean;
 }

@@ -1,72 +1,76 @@
-namespace permalink {
+import * as events from './events-module';
+import { State } from './types';
+import { defaultState } from './state-module';
 
-    let currentState: state.State = null;
+let currentState: State | null = null;
 
-    export function init(): void {
-        events.stateChange.subscribe(x => currentState = x.state);
+export function init(): void {
+    events.stateChange.subscribe(x => currentState = x.state);
+}
+
+export function populatePermalinkText(): void {
+    let permalink = generatePermalink();
+    let inputbox = document.getElementById("permalink-text") as HTMLInputElement
+    inputbox.value = permalink;
+    inputbox.focus;
+    inputbox.select;
+    inputbox.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+}
+
+// create querystring from state
+export function generatePermalink(): string {
+    if(currentState === null) {
+        throw "No stateChange event published before querystring requested";
     }
 
-    export function populatePermalinkText(): void {
-        let permalink = generatePermalink();
-        let inputbox = document.getElementById("permalink-text") as HTMLInputElement
-        inputbox.value = permalink;
-        inputbox.focus;
-        inputbox.select;
-        inputbox.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-    }
+    let params = new URLSearchParams();
 
-    // create querystring from state
-    export function generatePermalink(): string {
-        if(currentState === null) {
-            throw "No stateChange event published before querystring requested";
+    // only copy state that's different from default
+    Object.keys(currentState).forEach(key => {
+        if((currentState as any)[key] !== (defaultState as any)[key]) {
+            params.append(key, (currentState as any)[key]);
+        }
+    });
+
+    return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
+}
+
+// update state from querystring
+export function getState(existingState: State): State {
+
+    let queryString = location.search;
+    let params = new URLSearchParams(queryString);
+    let mutableState: any = existingState;
+
+    Object.keys(existingState).forEach(x => {
+        let value = params.get(x);
+        if(value == null) return;
+
+        switch (typeof mutableState[x]) {
+            case 'boolean':
+                mutableState[x] = (value === "true");
+                break;
+            case 'number':
+                mutableState[x] = parseInt(value);
+                break;
+            case 'object':
+                mutableState[x] = JSON.parse("[" + value + "]");
+                break;
+            case 'string':
+                mutableState[x] = value;
+                break;
         }
 
-        let params = new URLSearchParams();
+        console.log(`${x} -> ${value}, ${typeof mutableState[x]}, ${mutableState[x]}`);
+    });
 
-        // only copy state that's different from default
-        Object.keys(currentState).forEach(key => {
-            if(currentState[key] !== state.defaultState[key]) {
-                params.append(key, currentState[key]);
-            }
-        });
+    return mutableState;
+}
 
-        return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
-    }
-
-    // update state from querystring
-    export function getState(existingState: state.State): state.State {
-
-        let queryString = location.search;
-        let params = new URLSearchParams(queryString);
-
-        Object.keys(existingState).forEach(x => {
-            let value = params.get(x);
-            if(value == null) return;
-
-            switch (typeof existingState[x]) {
-                case 'boolean':
-                    existingState[x] = (value === "true");
-                    break;
-                case 'number':
-                    existingState[x] = parseInt(value);
-                    break;
-                case 'object':
-                    existingState[x] = JSON.parse("[" + value + "]");
-                    break;
-                case 'string':
-                    existingState[x] = value;
-                    break;
-            }
-
-            console.log(`${x} -> ${value}, ${typeof existingState[x]}, ${existingState[x]}`);
-        });
-
-        return existingState;
-    }
-
-    // test function
-    export function getCurrentState(): void {
-        let newState = getState(currentState);
+// test function
+export function getCurrentState(): void {
+    if (currentState) {
+        getState(currentState);
     }
 }

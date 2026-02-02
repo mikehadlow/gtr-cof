@@ -1,29 +1,14 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "none",
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "outDir": "dist",
+        "declaration": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
         "sourceMap": true,
-        "outDir": "docs",
-        "outFile": "docs/gtr-cof.js",
-        "types": []
+        "types": ["d3", "webmidi"]
     },
-    "files": [
-        "src/menu-module.ts",
-        "src/mod-module.ts",
-        "src/events-module.ts",
-        "src/cookie-module.ts",
-        "src/music-module.ts",
-        "src/state-module.ts",
-        "src/cof-module.ts",
-        "src/tonics-module.ts",
-        "src/chord-interval-module.ts",
-        "src/modes-module.ts",
-        "src/gtr-module.ts",
-        "src/tuning-module.ts",
-        "src/settings-module.ts",
-        "src/scale-family-module.ts",
-        "src/midi-module.ts",
-        "src/permalink-module.ts",
-        "src/gtr-cof.ts"
-    ]
+    "include": ["src/**/*.ts"]
 }
