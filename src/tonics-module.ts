@@ -4,7 +4,7 @@ import * as music from './music-module';
 
 let buttons: d3.Selection<ButtonData>;
 
-interface ButtonData {
+type ButtonData = {
     readonly noteSpec: music.NoteSpec;
 };
 

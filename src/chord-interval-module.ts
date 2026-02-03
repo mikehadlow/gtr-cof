@@ -15,7 +15,7 @@ export function init(): void {
         .attr("transform", "translate(0, 240)");
 
     let gs = intervals.selectAll("g")
-        .data([0,1,2,3,4,5,6], function (i) { return i.toString(); })
+        .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
         .enter()
         .append("g")
         .attr("transform", function (d, i) { return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)"; });
@@ -39,15 +39,15 @@ export function init(): void {
     events.chordIntervalChange.subscribe(update);
 }
 
-function onClick(x:number) {
-    let updatedToggle = toggle ^ (2**x);
-    let chordIntervals = [0,1,2,3,4,5,6].filter(x => (2**x & updatedToggle) === 2**x);
+function onClick(x: number) {
+    let updatedToggle = toggle ^ (2 ** x);
+    let chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (2 ** x & updatedToggle) === 2 ** x);
     events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
 }
 
 export function update(event: events.ChordIntervalChangeEvent): void {
     toggle = 0;
-    event.chordIntervals.forEach(x => toggle = toggle + 2**x);
+    event.chordIntervals.forEach(x => toggle = toggle + 2 ** x);
     buttons
         .data(event.chordIntervals, function (m) { return m.toString(); })
         .attr("class", "mode-button mode-button-selected")
@@ -55,7 +55,7 @@ export function update(event: events.ChordIntervalChangeEvent): void {
         .attr("class", "mode-button");
 }
 
-interface button {
+type Button = {
     readonly id: number,
     selected: boolean
 }

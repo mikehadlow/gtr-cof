@@ -22,13 +22,13 @@ let violaDots: Array<[number, number]> = [
     [12, 1]
 ];
 
-interface TuningInfo {
+type TuningInfo = {
     readonly tuning: string;
     readonly dots: Array<[number, number]>;
     readonly description: string;
 }
 
-export interface Tuning {
+export type Tuning = {
     readonly index: number;
     readonly tuning: string;
     readonly dots: Array<[number, number]>;
@@ -61,7 +61,7 @@ let tuningInfos: Array<TuningInfo> = [
     { tuning: "BEADGCF", dots: guitarDots, description: "Bass 7 Strings Standard" },
 
     { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
-    { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho"},
+    { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho" },
     { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
     { tuning: "CGDA", dots: violaDots, description: "Cello" },
     { tuning: "GDAE", dots: violaDots, description: "Violin" },
@@ -70,22 +70,22 @@ let tuningInfos: Array<TuningInfo> = [
 
 export let tunings: Array<Tuning> = [];
 
-export function parseTuning(tuning: string) : Array<number> {
+export function parseTuning(tuning: string): Array<number> {
     let tokens: Array<string> = [];
     let result: Array<number> = [];
 
     let tokenIndex = 0;
     let lastWasChar = false;
 
-    for(let i:number =0; i < tuning.length; i++) {
+    for (let i: number = 0; i < tuning.length; i++) {
         let noteChar = tuning.charAt(i);
-        if("ABCDEFG".indexOf(noteChar) >= 0) {
+        if ("ABCDEFG".indexOf(noteChar) >= 0) {
             tokens[tokenIndex] = noteChar;
             tokenIndex++;
             lastWasChar = true;
         }
-        else if("♯♭".indexOf(noteChar) >= 0 && lastWasChar) {
-            tokens[tokenIndex-1] = tokens[tokenIndex-1] + noteChar;
+        else if ("♯♭".indexOf(noteChar) >= 0 && lastWasChar) {
+            tokens[tokenIndex - 1] = tokens[tokenIndex - 1] + noteChar;
             lastWasChar = false;
         }
         else {
@@ -93,9 +93,9 @@ export function parseTuning(tuning: string) : Array<number> {
         }
     }
 
-    for(let token of tokens){
+    for (let token of tokens) {
         let noteName = music.noteNames.filter(x => x.name === token);
-        if(noteName.length != 1) {
+        if (noteName.length != 1) {
             throw "Invalid token";
         }
         result.push(noteName[0].index);
@@ -107,7 +107,7 @@ export function parseTuning(tuning: string) : Array<number> {
 export function init() {
 
     let index: number = 0;
-    for(let info of tuningInfos) {
+    for (let info of tuningInfos) {
         let tuning: Tuning = {
             index: index,
             tuning: info.tuning,
@@ -131,7 +131,7 @@ export function init() {
     raiseTuningChangedEvent(tunings[0]);
 }
 
-function raiseTuningChangedEvent(tuning: Tuning): void{
+function raiseTuningChangedEvent(tuning: Tuning): void {
     events.tuningChange.publish({
         index: tuning.index
     });

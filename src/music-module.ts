@@ -8,14 +8,14 @@ export enum IntervalType {
     Dim
 };
 
-export let intervalName: {[key: string]: string} = {};
+export let intervalName: { [key: string]: string } = {};
 intervalName[IntervalType.Nat] = "";
 intervalName[IntervalType.Maj] = "M";
 intervalName[IntervalType.Min] = "m";
 intervalName[IntervalType.Aug] = "A";
 intervalName[IntervalType.Dim] = "d";
 
-export interface Interval {
+export type Interval = {
     readonly ord: number;
     readonly type: IntervalType;
     readonly colour: number;
@@ -38,7 +38,7 @@ export let intervals: Mod<Interval[]> = new Mod([
     [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
 ]);
 
-export interface ScaleFamily {
+export type ScaleFamily = {
     readonly index: number;
     readonly name: string;
     readonly intervals: Mod<boolean>;
@@ -81,18 +81,18 @@ let jazzMinorModes: Mode[] = [
 ];
 
 export let scaleFamily: ScaleFamily[] = [
-    { index: 0, name: "diatonic",       intervals: new Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
+    { index: 0, name: "diatonic", intervals: new Mod([true, false, true, false, true, true, false, true, false, true, false, true]), modes: diatonicModes, defaultModeIndex: 0 },
     { index: 1, name: "harmonic minor", intervals: new Mod([true, false, true, false, true, true, false, false, true, true, false, true]), modes: harmonicMinorModes, defaultModeIndex: 9 },
-    { index: 2, name: "jazz minor",     intervals: new Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
-    { index: 3, name: "whole tone",     intervals: new Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0}], defaultModeIndex: 0 },
-    { index: 4, name: "diminished",     intervals: new Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0}], defaultModeIndex: 0 }
+    { index: 2, name: "jazz minor", intervals: new Mod([true, false, true, true, false, true, false, true, false, true, false, true]), modes: jazzMinorModes, defaultModeIndex: 0 },
+    { index: 3, name: "whole tone", intervals: new Mod([true, false, true, false, true, false, true, false, true, false, true, false]), modes: [{ name: 'Whole Tone', index: 0 }], defaultModeIndex: 0 },
+    { index: 4, name: "diminished", intervals: new Mod([true, false, true, true, false, true, true, false, true, true, false, true]), modes: [{ name: 'Diminished', index: 0 }], defaultModeIndex: 0 }
 ];
 
 // root diatonic scale is major
 export let diatonic: Mod<boolean> = new Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
-export let indexList: Mod<number> = new Mod([0,1,2,3,4,5,6,7,8,9,10,11]);
+export let indexList: Mod<number> = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
 
-export interface NoteSpec {
+export type NoteSpec = {
     readonly natural: Natural;
     readonly index: number;
     readonly offset: number;
@@ -101,12 +101,12 @@ export interface NoteSpec {
 
 export function createNoteSpec(naturalIndex: number, index: number): NoteSpec {
     let natural = naturals.filter(x => x.index === naturalIndex)[0];
-    if(! naturals.some(x => x.index === naturalIndex)) {
+    if (!naturals.some(x => x.index === naturalIndex)) {
         throw "naturalIndex is not valid: " + naturalIndex;
     }
 
     let offset = diff(12, naturalIndex, index);
-    if(Math.abs(offset) > 2) {
+    if (Math.abs(offset) > 2) {
         throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
     }
 
@@ -120,7 +120,7 @@ export function createNoteSpec(naturalIndex: number, index: number): NoteSpec {
     };
 }
 
-export interface Natural {
+export type Natural = {
     id: number, // order of the number in the natural set.
     index: number, // number against the fixed chromatic series
     label: string // the natural name, e.g: 'A'
@@ -141,7 +141,7 @@ export let naturals: Natural[] = [
 
 let naturalList = new Mod(naturals);
 
-interface NoteName {
+type NoteName = {
     readonly name: string;
     readonly index: number;
 }
@@ -176,7 +176,7 @@ export let noteNames: NoteName[] = [
     { name: "G♭", index: 9 },
 ];
 
-interface NoteLabel {
+type NoteLabel = {
     readonly offset: number;
     readonly label: string;
 }
@@ -189,17 +189,17 @@ let noteLabels: Array<NoteLabel> = [
     { offset: -2, label: '♭♭' },
 ];
 
-export interface Mode {
+export type Mode = {
     readonly name: string;
     readonly index: number;
 };
 
-export interface ScaleSpec {
+export type ScaleSpec = {
     noteSpec: NoteSpec;
     mode: Mode;
 }
 
-export function createScaleSpec(index:number, naturalIndex:number, modeIndex:number): ScaleSpec {
+export function createScaleSpec(index: number, naturalIndex: number, modeIndex: number): ScaleSpec {
     return {
         noteSpec: createNoteSpec(naturalIndex, index),
         mode: scaleFamily[0].modes[modeIndex]
@@ -208,12 +208,12 @@ export function createScaleSpec(index:number, naturalIndex:number, modeIndex:num
 
 export enum ChordType { Major, Minor, Diminished, Augmented };
 
-export interface Chord {
+export type Chord = {
     readonly romanNumeral: string;
     readonly type: ChordType;
 }
 
-export interface ScaleNote {
+export type ScaleNote = {
     readonly note: NoteSpec;
     readonly interval: Interval;
     readonly intervalName: string;
@@ -222,7 +222,7 @@ export interface ScaleNote {
     chord?: Chord;
 };
 
-export interface Node {
+export type Node = {
     readonly scaleNote: ScaleNote;
     readonly chordInterval: Interval;
     readonly intervalName: string;
@@ -274,7 +274,7 @@ export function generateScaleShim(
 
     let scale = generateScale(noteSpec, mode, scaleFamilyArg);
     zip(scale, generateChordNumbers(scale, mode, scaleFamilyArg.intervals)).forEach(x => x[0].chord = x[1]);
-    if(chordIndex === -1) {
+    if (chordIndex === -1) {
         return generateNodes(scale, mode, scale[0].note.index, chordIntervals, toggledIndexes, toggledMidiNotes, scaleFamilyArg.intervals);
     }
     else {
@@ -294,15 +294,15 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
         let index = item[0];
         let isScaleNote = item[1][0];
 
-        let noteNumber:number;
-        let natural:Natural;
-        let activeInterval:Interval;
+        let noteNumber: number;
+        let natural: Natural;
+        let activeInterval: Interval;
 
-        if(isScaleNote &&  isSevenNoteScale) {
+        if (isScaleNote && isSevenNoteScale) {
             noteNumber = item[1][1];
             natural = naturalList.itemAt(noteNumber);
             activeInterval = item[2].filter(x => x.ord == noteNumber)[0];
-            if(activeInterval == null) {
+            if (activeInterval == null) {
                 activeInterval = item[2][0];
             }
         }
@@ -331,7 +331,7 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
 // chord selections.
 export function generateNodes(
     scaleNotes: ScaleNote[],
-    mode:Mode,
+    mode: Mode,
     chordIndex: number,
     chordIntervals: number[],
     toggledIndexes: number,
@@ -354,7 +354,7 @@ export function generateNodes(
         let activeInterval = scaleNote.isScaleNote
             ? chordIntervalCandidates.filter(x => x.ord === scaleCounter[1])[0]
             : chordIntervalCandidates[0];
-        if(activeInterval == null) {
+        if (activeInterval == null) {
             activeInterval = chordIntervalCandidates[0];
         }
 
@@ -373,18 +373,18 @@ export function generateNodes(
             intervalName: getIntervalName(activeInterval),
             isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
             toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals),
-            midiToggle: (toggledMidiNotes & (2**scaleNote.note.index)) != 0
+            midiToggle: (toggledMidiNotes & (2 ** scaleNote.note.index)) != 0
         };
     });
 }
 
-function buildScaleCounter(diatonic: boolean[], startAt:number = 0): [boolean, number][] {
+function buildScaleCounter(diatonic: boolean[], startAt: number = 0): [boolean, number][] {
     let noteCount = diatonic.filter(x => x).length;
-    let i=(noteCount - startAt) % noteCount;
+    let i = (noteCount - startAt) % noteCount;
     return diatonic.map(isNote => {
-        if(isNote) {
+        if (isNote) {
             let value = <[boolean, number]>[true, i];
-            i = (i+1) % noteCount;
+            i = (i + 1) % noteCount;
             return value;
         }
         return <[boolean, number]>[false, 0];
@@ -395,23 +395,23 @@ let romanNumeral: Array<string> = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'vi
 
 export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleFamilyIntervals: Mod<boolean>): Chord[] {
     return scaleNotes.map((scaleNote, i) => {
-        if(scaleNote.isScaleNote) {
+        if (scaleNote.isScaleNote) {
             let roman = romanNumeral[scaleNote.noteNumber];
             let nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamilyIntervals);
             let diminished = "";
             let type: ChordType = ChordType.Minor;
             // does it have a diminished 5th?
-            if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
+            if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
                 diminished = "°";
                 type = ChordType.Diminished;
             }
             // does it have an augmented 5th?
-            else if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Aug)) {
+            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Aug)) {
                 diminished = "+";
                 type = ChordType.Augmented;
             }
             // does it have a major 3rd?
-            else if(nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
+            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
                 roman = roman.toLocaleUpperCase();
                 type = ChordType.Major;
             }
@@ -435,10 +435,10 @@ export function calculateToggle(
     toggledIndexes: number,
     chordIntervals: number[]
 ): boolean {
-    if(toggledIndexes === 0) {
+    if (toggledIndexes === 0) {
         return chordSelected && scaleNote.isScaleNote && chordIntervals.some(x => activeInterval.ord === x);
     }
-    return (toggledIndexes & (2**scaleNote.note.index)) != 0;
+    return (toggledIndexes & (2 ** scaleNote.note.index)) != 0;
 }
 
 export function fifths(): Array<number> {
