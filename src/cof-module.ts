@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as events from './events-module';
 import * as music from './music-module';
 
-interface NoteCircleState {
+type NoteCircleState = {
     noteSegments: d3.Selection<Segment>;
     noteText: d3.Selection<Segment>;
     intervalSegments: d3.Selection<Segment>;
@@ -32,7 +32,7 @@ export class NoteCircle {
         });
     }
 
-    draw (svg: d3.Selection<any>, noteIndexes: number[], label: string) : NoteCircleState {
+    draw(svg: d3.Selection<any>, noteIndexes: number[], label: string): NoteCircleState {
         let pad = 50;
 
         let chordRadius = 240;
@@ -149,12 +149,12 @@ export class NoteCircle {
 
     update(scaleChnaged: events.ScaleChangedEvent, state: NoteCircleState): void {
         let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
-                startAngle: 0,
-                endAngle: 0,
-                scaleNote: {},
-                index: node.scaleNote.note.index,
-                node: node
-            });
+            startAngle: 0,
+            endAngle: 0,
+            scaleNote: {},
+            index: node.scaleNote.note.index,
+            node: node
+        });
 
         state.noteSegments
             .data(data, this.indexer)
@@ -225,7 +225,7 @@ function handleNoteClick(segment: Segment, i: number): void {
 }
 
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec): music.NoteSpec {
-    if(Math.abs(noteSpec.offset) > 1) {
+    if (Math.abs(noteSpec.offset) > 1) {
         let naturalId = noteSpec.natural.id;
         let newNaturalId = (noteSpec.offset > 0)
             ? naturalId + 1 % 7
@@ -246,13 +246,13 @@ function handleIntervalClick(segment: Segment, i: number): void {
 
 function rotate(array: number[], offset: number): number[] {
     let newArray: number[] = [];
-    for(let item of array) {
+    for (let item of array) {
         newArray.push((item + offset) % 12);
     }
     return newArray;
 }
 
-interface Segment {
+type Segment = {
     readonly startAngle: number;
     readonly endAngle: number;
     readonly index: number;

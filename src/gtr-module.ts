@@ -38,14 +38,13 @@ function handleTuningChange(tuningChangedEvent: events.TuningChangedEvent): void
 
 function handleLeftHandedChanged(lhEvent: events.LeftHandedFretboardEvent) {
     isLeftHanded = lhEvent.isLeftHanded;
-    if(currentTuning != null) {
+    if (currentTuning != null) {
         updateFretboard(currentTuning);
     }
 }
 
-function setHandedness()
-{
-    if(isLeftHanded) {
+function setHandedness() {
+    if (isLeftHanded) {
         fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
         fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
         noteLabels
@@ -62,7 +61,7 @@ function setHandedness()
 
 function handleFlipNutChanged(fnEvent: events.FlipNutEvent) {
     isNutFlipped = fnEvent.isNutFlipped;
-    if(currentTuning != null) {
+    if (currentTuning != null) {
         updateFretboard(currentTuning);
     }
 }
@@ -72,8 +71,7 @@ function handleLabelChange(lcEvent: events.FretboardLabelChangeEvent) {
     setLabels();
 }
 
-function setLabels()
-{
+function setLabels() {
     function setNoteName(note: StringNote): string {
         return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
     }
@@ -177,7 +175,7 @@ function updateFretboard(tuningInfo: tuning.Tuning): void {
 
     setHandedness();
 
-    if(currentState != null) {
+    if (currentState != null) {
         update(currentState);
     }
 }
@@ -199,15 +197,15 @@ function update(stateChange: events.ScaleChangedEvent): void {
     let stroke = function (d: StringNote): string {
         return d.node.midiToggle ? "OrangeRed"
             : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
-            : hasToggledNotes ? "none"
-            : d.node.scaleNote.isScaleNote ? "grey" : "none";
+                : hasToggledNotes ? "none"
+                    : d.node.scaleNote.isScaleNote ? "grey" : "none";
     };
 
     let strokeWidth = function (d: StringNote): number {
         return d.node.midiToggle ? 10
             : d.node.toggle ? 4
-            : d.node.scaleNote.isScaleNote ? 2
-            : 0;
+                : d.node.scaleNote.isScaleNote ? 2
+                    : 0;
     };
 
     let data = repeatTo(stateChange.nodes, numberOfFrets);
@@ -247,7 +245,7 @@ function getFretData(numberOfFrets: number): Array<number> {
 
 function repeatTo(nodes: music.Node[], count: number): StringNote[] {
     let stringNotes: StringNote[] = [];
-    for(let i=0; i <= Math.floor(count / 12); i++) {
+    for (let i = 0; i <= Math.floor(count / 12); i++) {
         stringNotes = stringNotes.concat(nodes.map(x => <StringNote>{
             octave: i,
             index: x.scaleNote.note.index,
@@ -257,7 +255,7 @@ function repeatTo(nodes: music.Node[], count: number): StringNote[] {
     return stringNotes;
 }
 
-interface StringNote {
+type StringNote = {
     readonly octave: number;
     readonly index: number;
     readonly node: music.Node;

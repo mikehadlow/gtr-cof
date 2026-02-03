@@ -1,10 +1,10 @@
 export enum FretboardLabelType {
     None,
     NoteName,
-    Interval
+    Interval,
 }
 
-export interface State {
+export type State = {
     index: number;
     naturalIndex: number;
     chordIndex: number;
@@ -18,4 +18,4 @@ export interface State {
     fretboardLabelType: FretboardLabelType;
     circleIsCNoon: boolean;
     tuningIndex: number;
-}
+};
