@@ -10,11 +10,13 @@ Guitar Dashboard is an interactive music theory visualization tool for guitarist
 
 ## Build Commands
 
+Guitar Dashboard uses Bun for build, development, and testing.
+
 ```bash
-npm install          # Install dependencies
-npm run build        # Compile TypeScript (tsc)
-npm run dev          # Development mode: watch + local server at http://localhost:10001
-npm start            # Run local server only
+bun install          # Install dependencies
+bun run build        # Bundle to JS
+bun run start        # Development mode: local server at http://localhost:3000
+bun run typecheck    # Run tsc with --noEmit
 ```
 
 The build outputs a single bundled file at `docs/gtr-cof.js`. CI/CD via GitHub Actions deploys to the `publish` branch on push to `master`.
@@ -22,7 +24,7 @@ The build outputs a single bundled file at `docs/gtr-cof.js`. CI/CD via GitHub A
 ## Architecture
 
 ### Module System
-TypeScript namespaces compiled in dependency order (defined in `tsconfig.json`). All source files are in `/src/`. The compiled output goes to `/docs/` which is served by GitHub Pages.
+Uses ES modules
 
 ### Event-Driven Communication
 Modules communicate via a custom pub/sub event bus in `events-module.ts`. Key events:
@@ -49,7 +51,6 @@ User Interaction → Event Bus → State Update → D3 Re-render → Cookie/URL 
 
 ## Important Notes
 
-- Module compilation order in `tsconfig.json` matters - dependencies must come first
 - Edit only `.ts` files in `/src/`, never edit generated `.js` files
 - Uses D3.js v3 (not current v7) - API differs significantly
 - No test framework is configured
