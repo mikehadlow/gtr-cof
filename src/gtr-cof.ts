@@ -1,5 +1,4 @@
-import './d3-global.d.ts';
-
+import * as d3 from 'd3';
 import * as menu from './menu-module';
 import * as tonics from './tonics-module';
 import * as modes from './modes-module';
