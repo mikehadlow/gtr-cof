@@ -7,8 +7,7 @@
         "declaration": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "sourceMap": true,
-        "types": ["d3", "webmidi"]
+        "sourceMap": true
     },
     "include": ["src/**/*.ts"]
 }
