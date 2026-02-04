@@ -11,7 +11,7 @@ let numberOfFrets = 16;
 let fretboardElement: SVGGElement;
 let isLeftHanded: boolean = false;
 let isNutFlipped: boolean = false;
-let fretboardLabelType: events.FretboardLabelType = events.FretboardLabelType.NoteName;
+let fretboardLabelType: events.FretboardLabelType = "NoteName";
 
 let stringGap = 40;
 let fretGap = 70;
@@ -81,15 +81,17 @@ function setLabels() {
     }
 
     switch (fretboardLabelType) {
-        case events.FretboardLabelType.None:
+        case "None":
             noteLabels.text("");
             break;
-        case events.FretboardLabelType.NoteName:
+        case "NoteName":
             noteLabels.text(setNoteName)
             break;
-        case events.FretboardLabelType.Interval:
+        case "Interval":
             noteLabels.text(setInterval);
             break;
+        default:
+            throw new Error(`Unexpected label type: ${fretboardLabelType}`)
     }
 }
 

@@ -1,19 +1,13 @@
 import { Mod, zip, diff } from './mod-module';
 
-export enum IntervalType {
-    Nat,
-    Maj,
-    Min,
-    Aug,
-    Dim
+export let intervalName = {
+    Nat: "",
+    Maj: "M",
+    Min: "m",
+    Aug: "A",
+    Dim: "d",
 };
-
-export let intervalName: { [key: string]: string } = {};
-intervalName[IntervalType.Nat] = "";
-intervalName[IntervalType.Maj] = "M";
-intervalName[IntervalType.Min] = "m";
-intervalName[IntervalType.Aug] = "A";
-intervalName[IntervalType.Dim] = "d";
+export type IntervalType = keyof typeof intervalName;
 
 export type Interval = {
     readonly ord: number;
@@ -24,18 +18,18 @@ export type Interval = {
 export let getIntervalName: (x: Interval) => string = interval => intervalName[interval.type] + (interval.ord + 1);
 
 export let intervals: Mod<Interval[]> = new Mod([
-    [{ ord: 0, type: IntervalType.Nat, colour: 0xf44b42 }, { ord: 1, type: IntervalType.Dim, colour: 0xf44b42 }],
-    [{ ord: 1, type: IntervalType.Min, colour: 0xf48942 }, { ord: 0, type: IntervalType.Aug, colour: 0xf48942 }],
-    [{ ord: 1, type: IntervalType.Maj, colour: 0xf4bf42 }, { ord: 2, type: IntervalType.Dim, colour: 0xf4bf42 }],
-    [{ ord: 2, type: IntervalType.Min, colour: 0xf4ee42 }, { ord: 1, type: IntervalType.Aug, colour: 0xf4ee42 }],
-    [{ ord: 2, type: IntervalType.Maj, colour: 0x8cf442 }, { ord: 3, type: IntervalType.Dim, colour: 0x8cf442 }],
-    [{ ord: 3, type: IntervalType.Nat, colour: 0x42f4bf }, { ord: 2, type: IntervalType.Aug, colour: 0x42f4bf }],
-    [{ ord: 4, type: IntervalType.Dim, colour: 0x42d4f4 }, { ord: 3, type: IntervalType.Aug, colour: 0x42d4f4 }],
-    [{ ord: 4, type: IntervalType.Nat, colour: 0x429ef4 }, { ord: 5, type: IntervalType.Dim, colour: 0x429ef4 }],
-    [{ ord: 5, type: IntervalType.Min, colour: 0xe542f4 }, { ord: 4, type: IntervalType.Aug, colour: 0xe542f4 }],
-    [{ ord: 5, type: IntervalType.Maj, colour: 0xf44289 }, { ord: 6, type: IntervalType.Dim, colour: 0xf44289 }],
-    [{ ord: 6, type: IntervalType.Min, colour: 0xff8282 }, { ord: 5, type: IntervalType.Aug, colour: 0xff8282 }],
-    [{ ord: 6, type: IntervalType.Maj, colour: 0xff82fc }, { ord: 0, type: IntervalType.Dim, colour: 0xff82fc }],
+    [{ ord: 0, type: "Nat", colour: 0xf44b42 }, { ord: 1, type: "Dim", colour: 0xf44b42 }],
+    [{ ord: 1, type: "Min", colour: 0xf48942 }, { ord: 0, type: "Aug", colour: 0xf48942 }],
+    [{ ord: 1, type: "Maj", colour: 0xf4bf42 }, { ord: 2, type: "Dim", colour: 0xf4bf42 }],
+    [{ ord: 2, type: "Min", colour: 0xf4ee42 }, { ord: 1, type: "Aug", colour: 0xf4ee42 }],
+    [{ ord: 2, type: "Maj", colour: 0x8cf442 }, { ord: 3, type: "Dim", colour: 0x8cf442 }],
+    [{ ord: 3, type: "Nat", colour: 0x42f4bf }, { ord: 2, type: "Aug", colour: 0x42f4bf }],
+    [{ ord: 4, type: "Dim", colour: 0x42d4f4 }, { ord: 3, type: "Aug", colour: 0x42d4f4 }],
+    [{ ord: 4, type: "Nat", colour: 0x429ef4 }, { ord: 5, type: "Dim", colour: 0x429ef4 }],
+    [{ ord: 5, type: "Min", colour: 0xe542f4 }, { ord: 4, type: "Aug", colour: 0xe542f4 }],
+    [{ ord: 5, type: "Maj", colour: 0xf44289 }, { ord: 6, type: "Dim", colour: 0xf44289 }],
+    [{ ord: 6, type: "Min", colour: 0xff8282 }, { ord: 5, type: "Aug", colour: 0xff8282 }],
+    [{ ord: 6, type: "Maj", colour: 0xff82fc }, { ord: 0, type: "Dim", colour: 0xff82fc }],
 ]);
 
 export type ScaleFamily = {
@@ -245,7 +239,7 @@ export let nullNode: Node = {
         },
         interval: {
             ord: 0,
-            type: 0,
+            type: "Nat",
             colour: 0
         },
         intervalName: "",
@@ -254,7 +248,7 @@ export let nullNode: Node = {
     },
     chordInterval: {
         ord: 0,
-        type: 0,
+        type: "Nat",
         colour: 0
     },
     intervalName: "",
@@ -371,7 +365,7 @@ export function generateNodes(
             scaleNote: scaleNote,
             chordInterval: activeInterval,
             intervalName: getIntervalName(activeInterval),
-            isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === 0,
+            isChordRoot: chordSelected && activeInterval.ord === 0 && activeInterval.type === "Nat",
             toggle: calculateToggle(activeInterval, scaleNote, chordSelected, toggledIndexes, chordIntervals),
             midiToggle: (toggledMidiNotes & (2 ** scaleNote.note.index)) != 0
         };
@@ -401,17 +395,17 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
             let diminished = "";
             let type: ChordType = ChordType.Minor;
             // does it have a diminished 5th?
-            if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Dim)) {
+            if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === "Dim")) {
                 diminished = "°";
                 type = ChordType.Diminished;
             }
             // does it have an augmented 5th?
-            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === IntervalType.Aug)) {
+            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === "Aug")) {
                 diminished = "+";
                 type = ChordType.Augmented;
             }
             // does it have a major 3rd?
-            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === IntervalType.Maj)) {
+            else if (nodes.some(x => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === "Maj")) {
                 roman = roman.toLocaleUpperCase();
                 type = ChordType.Major;
             }
