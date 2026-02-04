@@ -15,7 +15,7 @@ export function init(): void {
         checkbox.checked = e.isC;
     });
     events.fretboardLabelChange.subscribe(e => {
-        let selected = "fb-note-text" + String(e.labelType);
+        let selected = "fb-note-text-" + String(e.labelType);
         let radio = <HTMLInputElement>document.getElementById(selected);
         radio.checked = true;
     });
