@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "gtr-cof",
   "scripts": {
-    "start": "bunx serve ./docs",
-    "build": "bun build ./src/gtr-cof.ts --outfile ./docs/gtr-cof.js --target=browser",
+    "start": "bun run build && bunx serve ./docs",
+    "build": "bun run typecheck && bun build ./src/gtr-cof.ts --outfile ./docs/gtr-cof.js --target=browser",
     "typecheck": "tsc --noEmit"
   },
   "author": "Mike Hadlow",
