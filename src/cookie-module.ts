@@ -1,5 +1,5 @@
 import * as events from './events-module';
-import { State } from './types';
+import { State, StateSchema } from './types';
 
 let cookieName = "gtr-cof-state-v4";
 
@@ -15,9 +15,12 @@ function bakeCookie2(stateChange: events.StateChangedEvent): void {
 export function readCookie2(): State | null {
     let result = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
     if (result != null) {
-        let state: State = JSON.parse(result[1]);
-        console.log(JSON.stringify(state, null, 2));
-        return state;
+        let parsed = StateSchema.safeParse(JSON.parse(result[1]));
+        if (!parsed.success) {
+            console.log("Invalid cookie state:", parsed.error.message);
+            return null;
+        }
+        return parsed.data;
     }
 
     return null;

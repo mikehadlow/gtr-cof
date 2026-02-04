@@ -1,17 +1,22 @@
-export type FretboardLabelType = "None" | "NoteName" | "Interval";
+import { z } from "zod";
 
-export type State = {
-    index: number;
-    naturalIndex: number;
-    chordIndex: number;
-    chordIntervals: number[];
-    toggledIndexes: number;
-    scaleFamilyIndex: number;
-    modeIndex: number;
-    midiToggledIndexes: number;
-    isLeftHanded: boolean;
-    isNutFlipped: boolean;
-    fretboardLabelType: FretboardLabelType;
-    circleIsCNoon: boolean;
-    tuningIndex: number;
-};
+export const FretboardLabelTypeSchema = z.enum(["None", "NoteName", "Interval"]);
+export type FretboardLabelType = z.infer<typeof FretboardLabelTypeSchema>;
+
+export const StateSchema = z.object({
+    index: z.number(),
+    naturalIndex: z.number(),
+    chordIndex: z.number(),
+    chordIntervals: z.array(z.number()),
+    toggledIndexes: z.number(),
+    scaleFamilyIndex: z.number(),
+    modeIndex: z.number(),
+    midiToggledIndexes: z.number(),
+    isLeftHanded: z.boolean(),
+    isNutFlipped: z.boolean(),
+    fretboardLabelType: FretboardLabelTypeSchema,
+    circleIsCNoon: z.boolean(),
+    tuningIndex: z.number(),
+});
+
+export type State = z.infer<typeof StateSchema>;
