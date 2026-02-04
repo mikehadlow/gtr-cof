@@ -1,5 +1,6 @@
 body {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family:
+        "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
     font-size: 12pt;
     margin: 0px;
 }
@@ -57,7 +58,7 @@ footer {
     background-color: #f9f9f9;
     color: black;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     text-align: left;
     z-index: 1;
 }
@@ -85,7 +86,9 @@ footer {
 }
 
 .content {
-    padding: 10px 10px 10px 10px;
+    padding: 10px;
+    max-width: 1320px;
+    margin: 0 auto;
 }
 
 /* Circle of Fifths */
