@@ -18,7 +18,7 @@ export const defaultState: State = {
     midiToggledIndexes: 0,
     isLeftHanded: false,
     isNutFlipped: false,
-    fretboardLabelType: FretboardLabelType.NoteName,
+    fretboardLabelType: "NoteName",
     circleIsCNoon: true,
     tuningIndex: 0,
 }
@@ -41,13 +41,13 @@ let current: State = {
 
 export function init() {
 
-    try{
+    try {
         let cookieState = cookies.readCookie2();
-        if(cookieState !== null) {
+        if (cookieState !== null) {
             current = cookieState;
         }
     }
-    catch(e) {
+    catch (e) {
         // ignore the invalid cookie:
     }
 
@@ -59,18 +59,18 @@ export function init() {
     let tempToggledIndexes = current.toggledIndexes;
 
     let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
-    if(!scaleFamily) {
+    if (!scaleFamily) {
         throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
     }
     let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
-    if(!mode) {
+    if (!mode) {
         throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
     }
 
     // publish scale and mode
     events.scaleFamilyChange.publish({ scaleFamily: scaleFamily });
     events.modeChange.publish({ mode: mode });
-    events.chordIntervalChange.publish( { chordIntervals: current.chordIntervals });
+    events.chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
 
     // subscriptions
     events.tonicChange.subscribe(tonicChanged);
@@ -90,7 +90,7 @@ export function init() {
 
     // publish settings
     events.leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
-    events.flipNutChange.publish( { isNutFlipped: current.isNutFlipped });
+    events.flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
     events.fretboardLabelChange.publish({ labelType: current.fretboardLabelType })
     events.setCToNoon.publish({ isC: current.circleIsCNoon });
     events.tuningChange.publish({ index: current.tuningIndex });
@@ -117,7 +117,7 @@ function modeChanged(modeChangedEvent: events.ModeChangedEvent): void {
 }
 
 function chordChanged(chordChangedEvent: events.ChordChangeEvent): void {
-    if(chordChangedEvent.chordIndex === current.chordIndex) {
+    if (chordChangedEvent.chordIndex === current.chordIndex) {
         current.chordIndex = -1
     }
     else {
@@ -128,7 +128,7 @@ function chordChanged(chordChangedEvent: events.ChordChangeEvent): void {
 }
 
 function toggle(toggleEvent: events.ToggleEvent): void {
-    current.toggledIndexes = current.toggledIndexes ^ 2**toggleEvent.index;
+    current.toggledIndexes = current.toggledIndexes ^ 2 ** toggleEvent.index;
     updateScale();
 }
 
@@ -180,11 +180,11 @@ function tuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
 function updateScale(): void {
 
     let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
-    if(!scaleFamily) {
+    if (!scaleFamily) {
         throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
     }
     let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
-    if(!mode) {
+    if (!mode) {
         throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
     }
     let noteSpec = music.createNoteSpec(current.naturalIndex, current.index);
@@ -202,7 +202,7 @@ function updateScale(): void {
     current.toggledIndexes = nodes
         .filter(x => x.toggle)
         .map(x => x.scaleNote.note.index)
-        .reduce((a, b) => a + 2**b, 0);
+        .reduce((a, b) => a + 2 ** b, 0);
 
     events.scaleChange.publish({
         nodes: nodes,

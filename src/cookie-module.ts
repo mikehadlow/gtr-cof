@@ -14,9 +14,9 @@ function bakeCookie2(stateChange: events.StateChangedEvent): void {
 
 export function readCookie2(): State | null {
     let result = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
-    if(result != null)
-    {
+    if (result != null) {
         let state: State = JSON.parse(result[1]);
+        console.log(JSON.stringify(state, null, 2));
         return state;
     }
 

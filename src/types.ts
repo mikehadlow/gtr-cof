@@ -1,8 +1,4 @@
-export enum FretboardLabelType {
-    None,
-    NoteName,
-    Interval,
-}
+export type FretboardLabelType = "None" | "NoteName" | "Interval";
 
 export type State = {
     index: number;
