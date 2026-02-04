@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "gtr-cof",
+      "dependencies": {
+        "zod": "^4.3.6",
+      },
       "devDependencies": {
         "@types/d3": "^3.0.0",
         "@types/webmidi": "^2.0.2",
@@ -20,5 +23,7 @@
     "d3": ["d3@3.5.17", "", {}, "sha1-vEZ0gAQ3iyGjYMn8fPUjF5B2L7g="],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "zod": ["zod@4.3.6", "", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
   }
 }

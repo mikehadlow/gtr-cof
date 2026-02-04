@@ -14,5 +14,8 @@
     "@types/webmidi": "^2.0.2",
     "d3": "^3.0.0",
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
   }
 }
