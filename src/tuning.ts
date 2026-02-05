@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 
-let guitarDots: Array<[number, number]> = [
+const guitarDots: Array<[number, number]> = [
     [3, 0], // [fret, position]
     [5, 0],
     [7, 0],
@@ -13,7 +13,7 @@ let guitarDots: Array<[number, number]> = [
 ];
 
 // Viola/violin for beginners.
-let violaDots: Array<[number, number]> = [
+const violaDots: Array<[number, number]> = [
     [2, 0],   // 1st finger
     [4, 0],   // 2nd finger
     [5, 0],   // 3rd finger
@@ -36,7 +36,7 @@ export type Tuning = {
     readonly notes: Array<number>;
 }
 
-let tuningInfos: Array<TuningInfo> = [
+const tuningInfos: Array<TuningInfo> = [
     { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
     { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
     { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
@@ -68,17 +68,17 @@ let tuningInfos: Array<TuningInfo> = [
     { tuning: "CGDA", dots: violaDots, description: "Viola" },
 ]
 
-export let tunings: Array<Tuning> = [];
+export const tunings: Array<Tuning> = [];
 
 export function parseTuning(tuning: string): Array<number> {
-    let tokens: Array<string> = [];
-    let result: Array<number> = [];
+    const tokens: Array<string> = [];
+    const result: Array<number> = [];
 
     let tokenIndex = 0;
     let lastWasChar = false;
 
     for (let i: number = 0; i < tuning.length; i++) {
-        let noteChar = tuning.charAt(i);
+        const noteChar = tuning.charAt(i);
         if ("ABCDEFG".indexOf(noteChar) >= 0) {
             tokens[tokenIndex] = noteChar;
             tokenIndex++;
@@ -93,8 +93,8 @@ export function parseTuning(tuning: string): Array<number> {
         }
     }
 
-    for (let token of tokens) {
-        let noteName = music.noteNames.filter(x => x.name === token);
+    for (const token of tokens) {
+        const noteName = music.noteNames.filter(x => x.name === token);
         if (noteName.length != 1) {
             throw "Invalid token";
         }
@@ -107,8 +107,8 @@ export function parseTuning(tuning: string): Array<number> {
 export function init() {
 
     let index: number = 0;
-    for (let info of tuningInfos) {
-        let tuning: Tuning = {
+    for (const info of tuningInfos) {
+        const tuning: Tuning = {
             index: index,
             tuning: info.tuning,
             dots: info.dots,

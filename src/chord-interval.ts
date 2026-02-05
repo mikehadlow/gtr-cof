@@ -6,15 +6,15 @@ let toggle: number = 0;
 
 export function init(): void {
 
-    let radius = 10;
-    let pad = 2;
+    const radius = 10;
+    const pad = 2;
 
-    let svg = d3.select("#modes");
-    let intervals = svg
+    const svg = d3.select("#modes");
+    const intervals = svg
         .append("g")
         .attr("transform", "translate(0, 240)");
 
-    let gs = intervals.selectAll("g")
+    const gs = intervals.selectAll("g")
         .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
         .enter()
         .append("g")
@@ -40,8 +40,8 @@ export function init(): void {
 }
 
 function onClick(x: number) {
-    let updatedToggle = toggle ^ (2 ** x);
-    let chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (2 ** x & updatedToggle) === 2 ** x);
+    const updatedToggle = toggle ^ (2 ** x);
+    const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (2 ** x & updatedToggle) === 2 ** x);
     events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
 }
 

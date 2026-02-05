@@ -1,16 +1,16 @@
 export function init(): void {
 
-    let menuItems = document.getElementsByClassName("menu");
-    for (let menuItem of menuItems) {
+    const menuItems = document.getElementsByClassName("menu");
+    for (const menuItem of menuItems) {
         menuItem.addEventListener("click", onMenuClick)
     }
 
     // close open menu when document is clicked outside
     document.addEventListener("mouseup", (event: MouseEvent) => {
-        let targetElement = <Element>event.target;
+        const targetElement = <Element>event.target;
         if (targetElement.closest(".dropdown-content") === null && targetElement.closest(".menu") === null) {
-            let contentElements = document.getElementsByClassName("dropdown-content");
-            for (let contentElement of contentElements) {
+            const contentElements = document.getElementsByClassName("dropdown-content");
+            for (const contentElement of contentElements) {
                 if (contentElement.classList.contains("dropdown-content-visible")) {
                     contentElement.classList.remove("dropdown-content-visible");
                 }
@@ -20,11 +20,11 @@ export function init(): void {
 }
 
 function onMenuClick(event: Event): void {
-    let menuElement = <Element>event.target;
-    let currentContentElement = menuElement.parentElement!.querySelector(".dropdown-content")
+    const menuElement = <Element>event.target;
+    const currentContentElement = menuElement.parentElement!.querySelector(".dropdown-content")
 
-    let contentElements = document.getElementsByClassName("dropdown-content");
-    for (let contentElement of contentElements) {
+    const contentElements = document.getElementsByClassName("dropdown-content");
+    for (const contentElement of contentElements) {
         if (contentElement === currentContentElement) {
             currentContentElement!.classList.toggle("dropdown-content-visible");
         }

@@ -2,22 +2,23 @@ import * as d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 import * as tuning from './tuning';
+import type { FretboardLabelType } from './types';
 
 let currentTuning: tuning.Tuning;
 let currentState: events.ScaleChangedEvent;
 let notes: d3.Selection<StringNote>;
 let noteLabels: d3.Selection<StringNote>;
-let numberOfFrets = 16;
+const numberOfFrets = 16;
 let fretboardElement: SVGGElement;
 let isLeftHanded: boolean = false;
 let isNutFlipped: boolean = false;
-let fretboardLabelType: events.FretboardLabelType = "NoteName";
+let fretboardLabelType: FretboardLabelType = "NoteName";
 
-let stringGap = 40;
-let fretGap = 70;
-let fretWidth = 5;
-let noteRadius = 15;
-let pad = 20;
+const stringGap = 40;
+const fretGap = 70;
+const fretWidth = 5;
+const noteRadius = 15;
+const pad = 20;
 
 function indexer(stringNote: StringNote): string {
     return stringNote.index + "_" + stringNote.octave;
@@ -32,7 +33,7 @@ export function init() {
 }
 
 function handleTuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
-    let newTuning = tuning.tunings.find(x => x.index == tuningChangedEvent.index);
+    const newTuning = tuning.tunings.find(x => x.index == tuningChangedEvent.index);
     updateFretboard(newTuning!);
 }
 
@@ -98,11 +99,11 @@ function setLabels() {
 function updateFretboard(tuningInfo: tuning.Tuning): void {
 
     currentTuning = tuningInfo;
-    let fretData: Array<number> = getFretData(numberOfFrets);
-    let dots: Array<[number, number]> = tuningInfo.dots;
+    const fretData: Array<number> = getFretData(numberOfFrets);
+    const dots: Array<[number, number]> = tuningInfo.dots;
 
     d3.selectAll("#gtr > *").remove();
-    let svg = d3.select("#gtr");
+    const svg = d3.select("#gtr");
     svg.append("text")
         .attr("class", "mode-text")
         .attr("x", 30)
@@ -111,7 +112,7 @@ function updateFretboard(tuningInfo: tuning.Tuning): void {
             + tuningInfo.description
             + (isLeftHanded ? ", Left Handed" : "")
             + (isNutFlipped ? ", Nut Flipped" : ""));
-    let gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
+    const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
     fretboardElement = <SVGGElement>gtr.node();
 
     // frets
@@ -138,7 +139,7 @@ function updateFretboard(tuningInfo: tuning.Tuning): void {
         .attr("fill", "lightgrey")
         .attr("stroke", "none");
 
-    let strings = gtr.append("g").selectAll("g")
+    const strings = gtr.append("g").selectAll("g")
         .data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => i + "")
         .enter()
         .append("g")
@@ -184,9 +185,9 @@ function updateFretboard(tuningInfo: tuning.Tuning): void {
 
 function update(stateChange: events.ScaleChangedEvent): void {
 
-    let hasToggledNotes = stateChange.nodes.some(x => x.toggle);
+    const hasToggledNotes = stateChange.nodes.some(x => x.toggle);
 
-    let fill = function (d: StringNote): string {
+    const fill = function (d: StringNote): string {
         return d.node.toggle
             ? "white"
             : d.node.scaleNote.isScaleNote
@@ -196,21 +197,21 @@ function update(stateChange: events.ScaleChangedEvent): void {
                 : "rgba(255, 255, 255, 0.01)";
     };
 
-    let stroke = function (d: StringNote): string {
+    const stroke = function (d: StringNote): string {
         return d.node.midiToggle ? "OrangeRed"
             : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16)
                 : hasToggledNotes ? "none"
                     : d.node.scaleNote.isScaleNote ? "grey" : "none";
     };
 
-    let strokeWidth = function (d: StringNote): number {
+    const strokeWidth = function (d: StringNote): number {
         return d.node.midiToggle ? 10
             : d.node.toggle ? 4
                 : d.node.scaleNote.isScaleNote ? 2
                     : 0;
     };
 
-    let data = repeatTo(stateChange.nodes, numberOfFrets);
+    const data = repeatTo(stateChange.nodes, numberOfFrets);
 
     notes
         .data(data, indexer)
@@ -224,7 +225,7 @@ function update(stateChange: events.ScaleChangedEvent): void {
 }
 
 function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
-    let items: Array<StringNote> = [];
+    const items: Array<StringNote> = [];
 
     for (let i = 0; i < numberOfNotes; i++) {
         items.push({
@@ -238,7 +239,7 @@ function allNotesFrom(index: number, numberOfNotes: number): Array<StringNote> {
 }
 
 function getFretData(numberOfFrets: number): Array<number> {
-    let data: Array<number> = [];
+    const data: Array<number> = [];
     for (let i = 0; i < numberOfFrets; i++) {
         data.push(i);
     }

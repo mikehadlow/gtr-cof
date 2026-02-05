@@ -2,9 +2,7 @@ import * as events from './events';
 import * as music from './music';
 import * as cookies from './cookie';
 import * as permalink from './permalink';
-import { State, FretboardLabelType } from './types';
-
-export { State, FretboardLabelType } from './types';
+import { State } from './types';
 
 // default initial state
 export const defaultState: State = {
@@ -42,7 +40,7 @@ let current: State = {
 export function init() {
 
     try {
-        let cookieState = cookies.readCookie2();
+        const cookieState = cookies.readCookie2();
         if (cookieState !== null) {
             current = cookieState;
         }
@@ -55,14 +53,14 @@ export function init() {
     current = permalink.getState(current);
 
     // lets remember this while we reset everything.
-    let tempChordIndex = current.chordIndex;
-    let tempToggledIndexes = current.toggledIndexes;
+    const tempChordIndex = current.chordIndex;
+    const tempToggledIndexes = current.toggledIndexes;
 
-    let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+    const scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
     if (!scaleFamily) {
         throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
     }
-    let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+    const mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
     if (!mode) {
         throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
     }
@@ -179,17 +177,17 @@ function tuningChange(tuningChangedEvent: events.TuningChangedEvent): void {
 
 function updateScale(): void {
 
-    let scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
+    const scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
     if (!scaleFamily) {
         throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
     }
-    let mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
+    const mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
     if (!mode) {
         throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
     }
-    let noteSpec = music.createNoteSpec(current.naturalIndex, current.index);
+    const noteSpec = music.createNoteSpec(current.naturalIndex, current.index);
 
-    let nodes = music.generateScaleShim(
+    const nodes = music.generateScaleShim(
         noteSpec,
         mode,
         current.chordIndex,

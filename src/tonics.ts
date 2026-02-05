@@ -9,8 +9,8 @@ type ButtonData = {
 };
 
 function bg(natural: music.Natural): Array<ButtonData> {
-    let flatIndex = natural.index == 0 ? 11 : natural.index - 1;
-    let sharpIndex = (natural.index + 1) % 12;
+    const flatIndex = natural.index == 0 ? 11 : natural.index - 1;
+    const sharpIndex = (natural.index + 1) % 12;
     return [
         { noteSpec: music.createNoteSpec(natural.index, flatIndex) },
         { noteSpec: music.createNoteSpec(natural.index, natural.index) },
@@ -19,13 +19,13 @@ function bg(natural: music.Natural): Array<ButtonData> {
 }
 
 export function init(): void {
-    let pad = 5;
-    let buttonHeight = 25;
-    let svg = d3.select("#modes");
+    const pad = 5;
+    const buttonHeight = 25;
+    const svg = d3.select("#modes");
 
-    let tonics = svg.append("g");
+    const tonics = svg.append("g");
 
-    let gs = tonics.selectAll("g")
+    const gs = tonics.selectAll("g")
         .data(music.naturals)
         .enter()
         .append("g")
@@ -57,7 +57,7 @@ export function init(): void {
 }
 
 function listener(tonicChanged: events.TonicChangedEvent): void {
-    let ds: Array<ButtonData> = [{
+    const ds: Array<ButtonData> = [{
         noteSpec: tonicChanged.noteSpec
     }];
     buttons

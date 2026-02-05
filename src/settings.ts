@@ -3,20 +3,20 @@ import { FretboardLabelType } from './types';
 
 export function init(): void {
     events.leftHandedChange.subscribe(e => {
-        let checkbox = <HTMLInputElement>document.getElementById("left-handed-checkbox")
+        const checkbox = <HTMLInputElement>document.getElementById("left-handed-checkbox")
         checkbox.checked = e.isLeftHanded;
     });
     events.flipNutChange.subscribe(e => {
-        let checkbox = <HTMLInputElement>document.getElementById("flip-nut-checkbox")
+        const checkbox = <HTMLInputElement>document.getElementById("flip-nut-checkbox")
         checkbox.checked = e.isNutFlipped;
     });
     events.setCToNoon.subscribe(e => {
-        let checkbox = <HTMLInputElement>document.getElementById("set-c-to-noon-checkbox")
+        const checkbox = <HTMLInputElement>document.getElementById("set-c-to-noon-checkbox")
         checkbox.checked = e.isC;
     });
     events.fretboardLabelChange.subscribe(e => {
-        let selected = "fb-note-text-" + String(e.labelType);
-        let radio = <HTMLInputElement>document.getElementById(selected);
+        const selected = "fb-note-text-" + String(e.labelType);
+        const radio = <HTMLInputElement>document.getElementById(selected);
         radio.checked = true;
     });
 }
