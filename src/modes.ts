@@ -6,7 +6,7 @@ let buttons: d3.Selection<music.Mode>;
 let modes: d3.Selection<any>;
 
 export function init(scaleFamily: music.ScaleFamily): void {
-    let svg = d3.select("#modes");
+    const svg = d3.select("#modes");
     modes = svg
         .append("g")
         .attr("transform", "translate(0, 280)");
@@ -18,11 +18,11 @@ export function init(scaleFamily: music.ScaleFamily): void {
 }
 
 function drawButtons(scaleFamily: music.ScaleFamily): void {
-    let pad = 5;
-    let buttonHeight = 25;
+    const pad = 5;
+    const buttonHeight = 25;
 
     modes.selectAll("g").remove();
-    let gs = modes.selectAll("g").data(scaleFamily.modes, index);
+    const gs = modes.selectAll("g").data(scaleFamily.modes, index);
 
     gs
         .exit()
@@ -50,7 +50,7 @@ function drawButtons(scaleFamily: music.ScaleFamily): void {
         .text((x) => x.name)
         .attr("class", "mode-text");
 
-    let defaultMode = scaleFamily.modes.find(x => x.index == scaleFamily.defaultModeIndex);
+    const defaultMode = scaleFamily.modes.find(x => x.index == scaleFamily.defaultModeIndex);
     highlightActiveMode(defaultMode!);
 }
 
@@ -59,7 +59,7 @@ function update(modeChange: events.ModeChangedEvent): void {
 }
 
 function highlightActiveMode(mode: music.Mode): void {
-    let modes: Array<music.Mode> = [mode];
+    const modes: Array<music.Mode> = [mode];
     buttons
         .data(modes, index)
         .attr("class", "mode-button mode-button-selected")

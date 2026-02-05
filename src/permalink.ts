@@ -9,8 +9,8 @@ export function init(): void {
 }
 
 export function populatePermalinkText(): void {
-    let permalink = generatePermalink();
-    let inputbox = document.getElementById("permalink-text") as HTMLInputElement
+    const permalink = generatePermalink();
+    const inputbox = document.getElementById("permalink-text") as HTMLInputElement
     inputbox.value = permalink;
     inputbox.focus;
     inputbox.select;
@@ -24,7 +24,7 @@ export function generatePermalink(): string {
         throw "No stateChange event published before querystring requested";
     }
 
-    let params = new URLSearchParams();
+    const params = new URLSearchParams();
 
     // only copy state that's different from default
     Object.keys(currentState).forEach(key => {
@@ -39,12 +39,12 @@ export function generatePermalink(): string {
 // update state from querystring
 export function getState(existingState: State): State {
 
-    let queryString = location.search;
-    let params = new URLSearchParams(queryString);
-    let mutableState: any = existingState;
+    const queryString = location.search;
+    const params = new URLSearchParams(queryString);
+    const mutableState: any = existingState;
 
     Object.keys(existingState).forEach(x => {
-        let value = params.get(x);
+        const value = params.get(x);
         if(value == null) return;
 
         switch (typeof mutableState[x]) {

@@ -24,7 +24,7 @@ export class NoteCircle {
             this.update(scaleChnaged, state);
 
             setCToNoonSubscriptionIndex = events.setCToNoon.resubscribe(setCToNoonEvent => {
-                let offset = setCToNoonEvent.isC ? 3 : 0;
+                const offset = setCToNoonEvent.isC ? 3 : 0;
                 svg.selectAll("*").remove();
                 state = this.draw(svg, rotate(noteIndexes, offset), label);
                 this.update(scaleChnaged, state);
@@ -33,14 +33,14 @@ export class NoteCircle {
     }
 
     draw(svg: d3.Selection<any>, noteIndexes: number[], label: string): NoteCircleState {
-        let pad = 50;
+        const pad = 50;
 
-        let chordRadius = 240;
-        let noteRadius = 200;
-        let degreeRadius = 135;
-        let innerRadius = 90;
+        const chordRadius = 240;
+        const noteRadius = 200;
+        const degreeRadius = 135;
+        const innerRadius = 90;
 
-        let cof = svg
+        const cof = svg
             .append("g")
             .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
 
@@ -50,21 +50,21 @@ export class NoteCircle {
             .attr("y", 0)
             .text(label)
 
-        let segments = generateSegments(noteIndexes);
+        const segments = generateSegments(noteIndexes);
 
-        let noteArc = d3.svg.arc<Segment>()
+        const noteArc = d3.svg.arc<Segment>()
             .innerRadius(degreeRadius)
             .outerRadius(noteRadius);
 
-        let degreeArc = d3.svg.arc<Segment>()
+        const degreeArc = d3.svg.arc<Segment>()
             .innerRadius(innerRadius)
             .outerRadius(degreeRadius);
 
-        let chordArc = d3.svg.arc<Segment>()
+        const chordArc = d3.svg.arc<Segment>()
             .innerRadius(noteRadius)
             .outerRadius(chordRadius);
 
-        let noteSegments = cof.append("g").selectAll("path")
+        const noteSegments = cof.append("g").selectAll("path")
             .data(segments, this.indexer)
             .enter()
             .append("path")
@@ -72,7 +72,7 @@ export class NoteCircle {
             .attr("class", "note-segment")
             .on("click", handleNoteClick);
 
-        let noteText = cof.append("g").selectAll("text")
+        const noteText = cof.append("g").selectAll("text")
             .data(segments)
             .enter()
             .append("text")
@@ -81,7 +81,7 @@ export class NoteCircle {
             .text("")
             .attr("class", "note-segment-text");
 
-        let intervalSegments = cof.append("g").selectAll("path")
+        const intervalSegments = cof.append("g").selectAll("path")
             .data(segments, this.indexer)
             .enter()
             .append("path")
@@ -89,7 +89,7 @@ export class NoteCircle {
             .attr("class", "interval-segment")
             .on("click", handleIntervalClick);
 
-        let intervalNotes = cof.append("g").selectAll("circle")
+        const intervalNotes = cof.append("g").selectAll("circle")
             .data(segments, this.indexer)
             .enter()
             .append("circle")
@@ -99,7 +99,7 @@ export class NoteCircle {
             .attr("cy", function (x) { return degreeArc.centroid(x)[1]; })
             .attr("class", "interval-note")
 
-        let intervalText = cof.append("g").selectAll("text")
+        const intervalText = cof.append("g").selectAll("text")
             .data(segments, this.indexer)
             .enter()
             .append("text")
@@ -108,7 +108,7 @@ export class NoteCircle {
             .text("")
             .attr("class", "degree-segment-text");
 
-        let chordSegments = cof.append("g").selectAll("path")
+        const chordSegments = cof.append("g").selectAll("path")
             .data(segments, this.indexer)
             .enter()
             .append("path")
@@ -116,7 +116,7 @@ export class NoteCircle {
             .attr("class", "chord-segment")
             .on("click", handleChordClick);
 
-        let chordNotes = cof.append("g").selectAll("circle")
+        const chordNotes = cof.append("g").selectAll("circle")
             .data(segments, this.indexer)
             .enter()
             .append("circle")
@@ -126,7 +126,7 @@ export class NoteCircle {
             .attr("cy", function (x) { return chordArc.centroid(x)[1]; })
             .attr("class", "chord-segment-note");
 
-        let chordText = cof.append("g").selectAll("text")
+        const chordText = cof.append("g").selectAll("text")
             .data(segments, this.indexer)
             .enter()
             .append("text")
@@ -148,7 +148,7 @@ export class NoteCircle {
     }
 
     update(scaleChnaged: events.ScaleChangedEvent, state: NoteCircleState): void {
-        let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
+        const data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
             startAngle: 0,
             endAngle: 0,
             scaleNote: {},
@@ -203,11 +203,11 @@ function getChordSegmentClass(chord: music.Chord): string {
 }
 
 function generateSegments(fifths: number[]): Segment[] {
-    let count = fifths.length;
-    let items: Array<Segment> = [];
-    let angle = (Math.PI * (2 / count));
+    const count = fifths.length;
+    const items: Array<Segment> = [];
+    const angle = (Math.PI * (2 / count));
     for (let i: number = 0; i < count; i++) {
-        let itemAngle = (angle * i) - (angle / 2);
+        const itemAngle = (angle * i) - (angle / 2);
         items.push({
             startAngle: itemAngle,
             endAngle: itemAngle + angle,
@@ -226,11 +226,11 @@ function handleNoteClick(segment: Segment, i: number): void {
 
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec): music.NoteSpec {
     if (Math.abs(noteSpec.offset) > 1) {
-        let naturalId = noteSpec.natural.id;
-        let newNaturalId = (noteSpec.offset > 0)
+        const naturalId = noteSpec.natural.id;
+        const newNaturalId = (noteSpec.offset > 0)
             ? naturalId + 1 % 7
             : naturalId == 0 ? 6 : naturalId - 1;
-        let newNatural = music.naturals.filter(x => x.id === newNaturalId)[0];
+        const newNatural = music.naturals.filter(x => x.id === newNaturalId)[0];
         return music.createNoteSpec(newNatural.index, noteSpec.index)
     }
     return noteSpec;
@@ -245,8 +245,8 @@ function handleIntervalClick(segment: Segment, i: number): void {
 }
 
 function rotate(array: number[], offset: number): number[] {
-    let newArray: number[] = [];
-    for (let item of array) {
+    const newArray: number[] = [];
+    for (const item of array) {
         newArray.push((item + offset) % 12);
     }
     return newArray;

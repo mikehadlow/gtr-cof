@@ -18,7 +18,7 @@ export class Mod<T> {
     }
 
     toArray(): T[] {
-        let newArray: T[] = [];
+        const newArray: T[] = [];
         for(let i=0; i<this.size; i++) {
             newArray.push(this.items[(i + this.start) % this.size]);
         }
@@ -26,12 +26,12 @@ export class Mod<T> {
     }
 
     merge<U>(items: U[]): [T, U][] {
-        let theseItems: T[] = this.toArray();
+        const theseItems: T[] = this.toArray();
         return zip(theseItems, items);
     }
 
     merge3<U, V>(items2: U[], items3: V[]): [T, U, V][] {
-        let theseItems: T[] = this.toArray();
+        const theseItems: T[] = this.toArray();
         return zip3(theseItems, items2, items3);
     }
 }
@@ -51,11 +51,11 @@ export function zip3<A, B, C>(a:A[], b:B[], c:C[]): [A,B,C][] {
 }
 
 export function diff(size: number, a: number, b: number) : number {
-    let ax = a % size;
-    let bx = b % size;
+    const ax = a % size;
+    const bx = b % size;
     if(ax == bx) return 0;
 
-    let d1 = bx - ax;
+    const d1 = bx - ax;
     let d2 = 0;
 
     if(d1 > 0) {
