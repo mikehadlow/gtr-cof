@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { Mod, zip, zip3, diff } from './mod-module';
+import { Mod, zip, zip3, diff } from './mod';
 
 describe('Mod class', () => {
     describe('constructor', () => {

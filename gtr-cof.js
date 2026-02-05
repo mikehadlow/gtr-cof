@@ -10422,7 +10422,7 @@ var require_d3 = __commonJS((exports, module) => {
 // src/gtr-cof.ts
 var d38 = __toESM(require_d3(), 1);
 
-// src/menu-module.ts
+// src/menu.ts
 function init() {
   let menuItems = document.getElementsByClassName("menu");
   for (let menuItem of menuItems) {
@@ -10453,7 +10453,7 @@ function onMenuClick(event) {
   }
 }
 
-// src/tonics-module.ts
+// src/tonics.ts
 var d3 = __toESM(require_d3(), 1);
 
 // node_modules/zod/v4/classic/external.js
@@ -24006,7 +24006,7 @@ var StateSchema = exports_external.object({
   tuningIndex: exports_external.number()
 });
 
-// src/events-module.ts
+// src/events.ts
 class Bus {
   listeners = [];
   name;
@@ -24044,7 +24044,7 @@ var scaleFamilyChange = new Bus("scaleFamilyChange");
 var midiNote = new Bus("midiNoteEvent");
 var setCToNoon = new Bus("setCToNoonEvent");
 
-// src/mod-module.ts
+// src/mod.ts
 class Mod {
   size = 0;
   items;
@@ -24102,7 +24102,7 @@ function diff(size, a, b) {
   return Math.abs(d1) > Math.abs(d2) ? d2 : d1;
 }
 
-// src/music-module.ts
+// src/music.ts
 var intervalName = {
   Nat: "",
   Maj: "M",
@@ -24383,7 +24383,7 @@ function chromatic() {
   return indexes;
 }
 
-// src/tonics-module.ts
+// src/tonics.ts
 var buttons;
 function bg(natural) {
   let flatIndex = natural.index == 0 ? 11 : natural.index - 1;
@@ -24423,7 +24423,7 @@ function isSameNoteAsNatural(noteSpec) {
   return naturals.some((x) => x.index === noteSpec.index && x.index != noteSpec.natural.index);
 }
 
-// src/modes-module.ts
+// src/modes.ts
 var d32 = __toESM(require_d3(), 1);
 var buttons2;
 var modes;
@@ -24460,7 +24460,7 @@ function index(mode) {
   return mode.index.toString();
 }
 
-// src/chord-interval-module.ts
+// src/chord-interval.ts
 var d33 = __toESM(require_d3(), 1);
 var buttons3;
 var toggle2 = 0;
@@ -24493,7 +24493,7 @@ function update2(event) {
   }).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
 }
 
-// src/cof-module.ts
+// src/cof.ts
 var d34 = __toESM(require_d3(), 1);
 class NoteCircle {
   indexer = (x) => x.index + "";
@@ -24633,10 +24633,10 @@ function rotate(array2, offset) {
   return newArray;
 }
 
-// src/gtr-module.ts
+// src/gtr.ts
 var d36 = __toESM(require_d3(), 1);
 
-// src/tuning-module.ts
+// src/tuning.ts
 var d35 = __toESM(require_d3(), 1);
 var guitarDots = [
   [3, 0],
@@ -24733,7 +24733,7 @@ function raiseTuningChangedEvent(tuning) {
   });
 }
 
-// src/gtr-module.ts
+// src/gtr.ts
 var currentTuning;
 var currentState;
 var notes;
@@ -24893,7 +24893,7 @@ function repeatTo(nodes, count) {
   return stringNotes;
 }
 
-// src/scale-family-module.ts
+// src/scale-family.ts
 var d37 = __toESM(require_d3(), 1);
 function init7() {
   d37.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", (x) => raiseScaleFamilyChangedEvent(x)).text((x) => x.name);
@@ -24904,9 +24904,9 @@ function raiseScaleFamilyChangedEvent(scaleFamily2) {
   });
 }
 
-// src/settings-module.ts
-var exports_settings_module = {};
-__export(exports_settings_module, {
+// src/settings.ts
+var exports_settings = {};
+__export(exports_settings, {
   onSetCToNoon: () => onSetCToNoon,
   onLeftHandedClick: () => onLeftHandedClick,
   onFlipNut: () => onFlipNut,
@@ -24945,9 +24945,9 @@ function onFbNoteTextClick(e) {
   fretboardLabelChange.publish({ labelType: e.value });
 }
 
-// src/permalink-module.ts
-var exports_permalink_module = {};
-__export(exports_permalink_module, {
+// src/permalink.ts
+var exports_permalink = {};
+__export(exports_permalink, {
   populatePermalinkText: () => populatePermalinkText,
   init: () => init11,
   getState: () => getState,
@@ -24955,7 +24955,7 @@ __export(exports_permalink_module, {
   generatePermalink: () => generatePermalink
 });
 
-// src/cookie-module.ts
+// src/cookie.ts
 var cookieName = "gtr-cof-state-v4";
 function init9() {
   stateChange.subscribe(bakeCookie2);
@@ -24977,7 +24977,7 @@ function readCookie2() {
   return null;
 }
 
-// src/state-module.ts
+// src/state.ts
 var defaultState = {
   index: 3,
   naturalIndex: 3,
@@ -25134,7 +25134,7 @@ function publishStateChange() {
   });
 }
 
-// src/permalink-module.ts
+// src/permalink.ts
 var currentState2 = null;
 function init11() {
   stateChange.subscribe((x) => currentState2 = x.state);
@@ -25193,8 +25193,8 @@ function getCurrentState() {
 }
 
 // src/gtr-cof.ts
-window.settings = exports_settings_module;
-window.permalink = exports_permalink_module;
+window.settings = exports_settings;
+window.permalink = exports_permalink;
 init();
 init2();
 init3(scaleFamily[0]);
@@ -25209,5 +25209,5 @@ init11();
 init10();
 init9();
 
-//# debugId=3F86F62545BB830464756E2164756E21
+//# debugId=CE2421AACF135DBD64756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

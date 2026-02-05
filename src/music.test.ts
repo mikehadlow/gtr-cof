@@ -10,7 +10,7 @@ import {
     scaleFamily,
     naturals,
     ChordType,
-} from './music-module';
+} from './music';
 
 describe('createNoteSpec', () => {
     test('creates note spec for natural note A', () => {

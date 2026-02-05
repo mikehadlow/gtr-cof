@@ -1,5 +1,5 @@
 import { State, FretboardLabelType } from './types';
-import * as music from './music-module';
+import * as music from './music';
 
 export { FretboardLabelType } from './types';
 

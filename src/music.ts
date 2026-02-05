@@ -1,4 +1,4 @@
-import { Mod, zip, diff } from './mod-module';
+import { Mod, zip, diff } from './mod';
 
 export let intervalName = {
     Nat: "",

@@ -1,4 +1,4 @@
-import * as events from './events-module';
+import * as events from './events';
 
 // bit flag for on/off MIDI notes
 let currentToggledIndexes: number = 0;
