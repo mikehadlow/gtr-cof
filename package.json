@@ -5,11 +5,13 @@
   "scripts": {
     "start": "bun run build && bunx serve ./docs",
     "build": "bun run typecheck && bun build ./src/gtr-cof.ts --outfile ./docs/gtr-cof.js --target=browser --sourcemap=linked && mv ./src/gtr-cof.js ./src/gtr-cof.js.map ./docs/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "author": "Mike Hadlow",
   "license": "MIT",
   "devDependencies": {
+    "@types/bun": "^1.3.8",
     "@types/d3": "^3.0.0",
     "@types/webmidi": "^2.0.2",
     "d3": "^3.0.0",
