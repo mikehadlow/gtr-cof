@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 import * as tuning from './tuning';
+import type { FretboardLabelType } from './types';
 
 let currentTuning: tuning.Tuning;
 let currentState: events.ScaleChangedEvent;
@@ -11,7 +12,7 @@ let numberOfFrets = 16;
 let fretboardElement: SVGGElement;
 let isLeftHanded: boolean = false;
 let isNutFlipped: boolean = false;
-let fretboardLabelType: events.FretboardLabelType = "NoteName";
+let fretboardLabelType: FretboardLabelType = "NoteName";
 
 let stringGap = 40;
 let fretGap = 70;

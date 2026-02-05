@@ -1,7 +1,5 @@
-import { State, FretboardLabelType } from './types';
+import type { State, FretboardLabelType } from './types';
 import * as music from './music';
-
-export { FretboardLabelType } from './types';
 
 export class Bus<T> {
     private listeners: Array<(x: T) => void> = [];
