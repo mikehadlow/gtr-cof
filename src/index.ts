@@ -23,17 +23,20 @@ declare global {
 window.settings = settings;
 window.permalink = permalink;
 
-// Initialize modules
-menu.init();
-tonics.init();
-modes.init(music.scaleFamily[0]);
-chordInterval.init();
-new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
-new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-gtr.init();
-tuning.init();
-scaleFamily.init();
-settings.init();
-permalink.init();
-state.init();
-cookies.init();
+const main = () => {
+    menu.init();
+    tonics.init();
+    modes.init(music.scaleFamily[0]);
+    chordInterval.init();
+    new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
+    new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
+    gtr.init();
+    tuning.init();
+    scaleFamily.init();
+    settings.init();
+    permalink.init();
+    state.init();
+    cookies.init();
+};
+
+main();

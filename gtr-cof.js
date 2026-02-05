@@ -10419,7 +10419,7 @@ var require_d3 = __commonJS((exports, module) => {
   })();
 });
 
-// src/gtr-cof.ts
+// src/index.ts
 var d38 = __toESM(require_d3(), 1);
 
 // src/menu.ts
@@ -25192,22 +25192,25 @@ function getCurrentState() {
   }
 }
 
-// src/gtr-cof.ts
+// src/index.ts
 window.settings = exports_settings;
 window.permalink = exports_permalink;
-init();
-init2();
-init3(scaleFamily[0]);
-init4();
-new NoteCircle(d38.select("#chromatic"), chromatic(), "Chromatic");
-new NoteCircle(d38.select("#cof"), fifths(), "Circle of Fifths");
-init6();
-init5();
-init7();
-init8();
-init11();
-init10();
-init9();
+var main = () => {
+  init();
+  init2();
+  init3(scaleFamily[0]);
+  init4();
+  new NoteCircle(d38.select("#chromatic"), chromatic(), "Chromatic");
+  new NoteCircle(d38.select("#cof"), fifths(), "Circle of Fifths");
+  init6();
+  init5();
+  init7();
+  init8();
+  init11();
+  init10();
+  init9();
+};
+main();
 
-//# debugId=CE2421AACF135DBD64756E2164756E21
+//# debugId=F34B50533959F31764756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
