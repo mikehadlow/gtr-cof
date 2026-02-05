@@ -4,7 +4,7 @@
   "description": "gtr-cof",
   "scripts": {
     "start": "bun run build && bunx serve ./docs",
-    "build": "bun run typecheck && bun build ./src/gtr-cof.ts --outfile ./docs/gtr-cof.js --target=browser --sourcemap=linked && mv ./src/gtr-cof.js ./src/gtr-cof.js.map ./docs/",
+    "build": "bun run typecheck && bun build ./src/index.ts --outfile ./docs/gtr-cof.js --target=browser --sourcemap=linked && mv ./src/gtr-cof.js ./src/gtr-cof.js.map ./docs/",
     "typecheck": "tsc --noEmit",
     "test": "bun test"
   },
