@@ -8,6 +8,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun run build
+      - run: bun test
       - run: mkdir docs/src
       - run: cp src/*.ts docs/src
       - run: echo "Run number=$GITHUB_RUN_NUMBER, Actor=$GITHUB_ACTOR, Sha=$GITHUB_SHA" > docs/version.txt
