@@ -1,17 +1,17 @@
 import * as d3 from 'd3';
-import * as menu from './menu-module';
-import * as tonics from './tonics-module';
-import * as modes from './modes-module';
-import * as chordInterval from './chord-interval-module';
-import * as cof from './cof-module';
-import * as gtr from './gtr-module';
-import * as tuning from './tuning-module';
-import * as scaleFamily from './scale-family-module';
-import * as settings from './settings-module';
-import * as permalink from './permalink-module';
-import * as state from './state-module';
-import * as cookies from './cookie-module';
-import * as music from './music-module';
+import * as menu from './menu';
+import * as tonics from './tonics';
+import * as modes from './modes';
+import * as chordInterval from './chord-interval';
+import * as cof from './cof';
+import * as gtr from './gtr';
+import * as tuning from './tuning';
+import * as scaleFamily from './scale-family';
+import * as settings from './settings';
+import * as permalink from './permalink';
+import * as state from './state';
+import * as cookies from './cookie';
+import * as music from './music';
 
 // Expose modules for HTML onclick handlers
 declare global {

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as events from './events-module';
+import * as events from './events';
 
 let buttons: d3.Selection<number>;
 let toggle: number = 0;

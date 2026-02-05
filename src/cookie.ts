@@ -1,4 +1,4 @@
-import * as events from './events-module';
+import * as events from './events';
 import { State, StateSchema } from './types';
 
 let cookieName = "gtr-cof-state-v4";

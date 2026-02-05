@@ -1,4 +1,4 @@
-import * as events from './events-module';
+import * as events from './events';
 import { FretboardLabelType } from './types';
 
 export function init(): void {

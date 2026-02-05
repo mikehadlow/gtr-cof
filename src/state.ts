@@ -1,7 +1,7 @@
-import * as events from './events-module';
-import * as music from './music-module';
-import * as cookies from './cookie-module';
-import * as permalink from './permalink-module';
+import * as events from './events';
+import * as music from './music';
+import * as cookies from './cookie';
+import * as permalink from './permalink';
 import { State, FretboardLabelType } from './types';
 
 export { State, FretboardLabelType } from './types';

@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import * as events from './events-module';
-import * as music from './music-module';
+import * as events from './events';
+import * as music from './music';
 
 let buttons: d3.Selection<ButtonData>;
 

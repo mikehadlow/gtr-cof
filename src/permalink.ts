@@ -1,6 +1,6 @@
-import * as events from './events-module';
+import * as events from './events';
 import { State } from './types';
-import { defaultState } from './state-module';
+import { defaultState } from './state';
 
 let currentState: State | null = null;
 
