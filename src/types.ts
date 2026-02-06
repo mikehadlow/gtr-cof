@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+// Elm inspired architectural types
+
+type Init<TModel> = () => TModel;
+
+type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
+
+type View<TModel, TMsg, TSvg> = (model: TModel, raise: (msg: TMsg) => void) => TSvg;
+
+// State
+
 export const FretboardLabelTypeSchema = z.enum(["None", "NoteName", "Interval"]);
 export type FretboardLabelType = z.infer<typeof FretboardLabelTypeSchema>;
 
