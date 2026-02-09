@@ -25052,6 +25052,7 @@ function init10() {
   tuningChange.subscribe(tuningChange2);
 }
 function tonicChanged(tonicChangedEvent) {
+  console.log(`TonicChangedEvent: ${JSON.stringify(tonicChangedEvent, null, 2)}`);
   current.index = tonicChangedEvent.noteSpec.index;
   current.naturalIndex = tonicChangedEvent.noteSpec.natural.index;
   current.chordIndex = -1;
@@ -25212,5 +25213,5 @@ var main = () => {
 };
 main();
 
-//# debugId=3E342ED93D3830B764756E2164756E21
+//# debugId=840EF25D8E0F0F4564756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
