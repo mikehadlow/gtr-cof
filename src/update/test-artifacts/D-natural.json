@@ -1,0 +1,449 @@
+{
+  "music": {
+    "nodes": [
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 3,
+              "index": 5,
+              "label": "D"
+            },
+            "index": 5,
+            "offset": 0,
+            "label": "D"
+          },
+          "interval": {
+            "ord": 0,
+            "type": "Nat",
+            "colour": 16010050
+          },
+          "intervalName": "1",
+          "isScaleNote": true,
+          "noteNumber": 0,
+          "chord": {
+            "romanNumeral": "I",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 0,
+          "type": "Nat",
+          "colour": 16010050
+        },
+        "intervalName": "1",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 4,
+              "index": 7,
+              "label": "E"
+            },
+            "index": 6,
+            "offset": -1,
+            "label": "E♭"
+          },
+          "interval": {
+            "ord": 1,
+            "type": "Min",
+            "colour": 16025922
+          },
+          "intervalName": "m2",
+          "isScaleNote": false,
+          "noteNumber": 1,
+          "chord": {
+            "romanNumeral": "",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 1,
+          "type": "Min",
+          "colour": 16025922
+        },
+        "intervalName": "m2",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 4,
+              "index": 7,
+              "label": "E"
+            },
+            "index": 7,
+            "offset": 0,
+            "label": "E"
+          },
+          "interval": {
+            "ord": 1,
+            "type": "Maj",
+            "colour": 16039746
+          },
+          "intervalName": "M2",
+          "isScaleNote": true,
+          "noteNumber": 1,
+          "chord": {
+            "romanNumeral": "ii",
+            "type": 1
+          }
+        },
+        "chordInterval": {
+          "ord": 1,
+          "type": "Maj",
+          "colour": 16039746
+        },
+        "intervalName": "M2",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 5,
+              "index": 8,
+              "label": "F"
+            },
+            "index": 8,
+            "offset": 0,
+            "label": "F"
+          },
+          "interval": {
+            "ord": 2,
+            "type": "Min",
+            "colour": 16051778
+          },
+          "intervalName": "m3",
+          "isScaleNote": false,
+          "noteNumber": 2,
+          "chord": {
+            "romanNumeral": "",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 2,
+          "type": "Min",
+          "colour": 16051778
+        },
+        "intervalName": "m3",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 5,
+              "index": 8,
+              "label": "F"
+            },
+            "index": 9,
+            "offset": 1,
+            "label": "F♯"
+          },
+          "interval": {
+            "ord": 2,
+            "type": "Maj",
+            "colour": 9237570
+          },
+          "intervalName": "M3",
+          "isScaleNote": true,
+          "noteNumber": 2,
+          "chord": {
+            "romanNumeral": "iii",
+            "type": 1
+          }
+        },
+        "chordInterval": {
+          "ord": 2,
+          "type": "Maj",
+          "colour": 9237570
+        },
+        "intervalName": "M3",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 6,
+              "index": 10,
+              "label": "G"
+            },
+            "index": 10,
+            "offset": 0,
+            "label": "G"
+          },
+          "interval": {
+            "ord": 3,
+            "type": "Nat",
+            "colour": 4388031
+          },
+          "intervalName": "4",
+          "isScaleNote": true,
+          "noteNumber": 3,
+          "chord": {
+            "romanNumeral": "IV",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 3,
+          "type": "Nat",
+          "colour": 4388031
+        },
+        "intervalName": "4",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 0,
+              "index": 0,
+              "label": "A"
+            },
+            "index": 11,
+            "offset": -1,
+            "label": "A♭"
+          },
+          "interval": {
+            "ord": 4,
+            "type": "Dim",
+            "colour": 4379892
+          },
+          "intervalName": "d5",
+          "isScaleNote": false,
+          "noteNumber": 4,
+          "chord": {
+            "romanNumeral": "",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 4,
+          "type": "Dim",
+          "colour": 4379892
+        },
+        "intervalName": "d5",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 0,
+              "index": 0,
+              "label": "A"
+            },
+            "index": 0,
+            "offset": 0,
+            "label": "A"
+          },
+          "interval": {
+            "ord": 4,
+            "type": "Nat",
+            "colour": 4366068
+          },
+          "intervalName": "5",
+          "isScaleNote": true,
+          "noteNumber": 4,
+          "chord": {
+            "romanNumeral": "V",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 4,
+          "type": "Nat",
+          "colour": 4366068
+        },
+        "intervalName": "5",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 1,
+              "index": 2,
+              "label": "B"
+            },
+            "index": 1,
+            "offset": -1,
+            "label": "B♭"
+          },
+          "interval": {
+            "ord": 5,
+            "type": "Min",
+            "colour": 15024884
+          },
+          "intervalName": "m6",
+          "isScaleNote": false,
+          "noteNumber": 5,
+          "chord": {
+            "romanNumeral": "",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 5,
+          "type": "Min",
+          "colour": 15024884
+        },
+        "intervalName": "m6",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 1,
+              "index": 2,
+              "label": "B"
+            },
+            "index": 2,
+            "offset": 0,
+            "label": "B"
+          },
+          "interval": {
+            "ord": 5,
+            "type": "Maj",
+            "colour": 16007817
+          },
+          "intervalName": "M6",
+          "isScaleNote": true,
+          "noteNumber": 5,
+          "chord": {
+            "romanNumeral": "vi",
+            "type": 1
+          }
+        },
+        "chordInterval": {
+          "ord": 5,
+          "type": "Maj",
+          "colour": 16007817
+        },
+        "intervalName": "M6",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 2,
+              "index": 3,
+              "label": "C"
+            },
+            "index": 3,
+            "offset": 0,
+            "label": "C"
+          },
+          "interval": {
+            "ord": 6,
+            "type": "Min",
+            "colour": 16745090
+          },
+          "intervalName": "m7",
+          "isScaleNote": false,
+          "noteNumber": 6,
+          "chord": {
+            "romanNumeral": "",
+            "type": 0
+          }
+        },
+        "chordInterval": {
+          "ord": 6,
+          "type": "Min",
+          "colour": 16745090
+        },
+        "intervalName": "m7",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      },
+      {
+        "scaleNote": {
+          "note": {
+            "natural": {
+              "id": 2,
+              "index": 3,
+              "label": "C"
+            },
+            "index": 4,
+            "offset": 1,
+            "label": "C♯"
+          },
+          "interval": {
+            "ord": 6,
+            "type": "Maj",
+            "colour": 16745212
+          },
+          "intervalName": "M7",
+          "isScaleNote": true,
+          "noteNumber": 6,
+          "chord": {
+            "romanNumeral": "vii°",
+            "type": 2
+          }
+        },
+        "chordInterval": {
+          "ord": 6,
+          "type": "Maj",
+          "colour": 16745212
+        },
+        "intervalName": "M7",
+        "isChordRoot": false,
+        "toggle": false,
+        "midiToggle": false
+      }
+    ],
+    "mode": {
+      "name": "Major / Ionian",
+      "index": 0
+    }
+  },
+  "state": {
+    "index": 5,
+    "naturalIndex": 5,
+    "chordIndex": -1,
+    "chordIntervals": [
+      0,
+      2,
+      4
+    ],
+    "toggledIndexes": 0,
+    "scaleFamilyIndex": 0,
+    "modeIndex": 0,
+    "midiToggledIndexes": 0,
+    "isLeftHanded": false,
+    "isNutFlipped": false,
+    "fretboardLabelType": "NoteName",
+    "circleIsCNoon": true,
+    "tuningIndex": 0
+  }
+}
