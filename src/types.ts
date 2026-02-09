@@ -2,11 +2,11 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
-type Init<TModel> = () => TModel;
+export type Init<TModel> = () => TModel;
 
-type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
+export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
-type View<TModel, TMsg, TSvg> = (model: TModel, raise: (msg: TMsg) => void) => TSvg;
+export type View<TModel, TMsg, TSvg> = (model: TModel, raise: (msg: TMsg) => void) => TSvg;
 
 // State
 
