@@ -47,7 +47,7 @@ for (const nat of music.naturals) {
     variants.push({ natural: nat, offset: 1,  suffix: "sharp" });
 }
 
-const outDir = join(import.meta.dir, "test-artifacts");
+const outDir = join(import.meta.dir, "test-artifacts", "tonic-changed");
 mkdirSync(outDir, { recursive: true });
 
 for (const v of variants) {

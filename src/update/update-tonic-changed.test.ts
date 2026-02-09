@@ -42,7 +42,7 @@ const suffixes = [
     { offset: 1,  suffix: "sharp" },
 ] as const;
 
-const artifactsDir = join(import.meta.dir, "test-artifacts");
+const artifactsDir = join(import.meta.dir, "test-artifacts", "tonic-changed");
 
 describe("update-tonic-changed", () => {
     for (const nat of music.naturals) {
