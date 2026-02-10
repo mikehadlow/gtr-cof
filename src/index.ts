@@ -12,6 +12,7 @@ import * as permalink from './permalink';
 import * as state from './state';
 import * as cookies from './cookie';
 import * as music from './music';
+import * as wakelock from './wakelock';
 
 // Expose modules for HTML onclick handlers
 declare global {
@@ -37,6 +38,7 @@ const main = () => {
     permalink.init();
     state.init();
     cookies.init();
+    wakelock.init();
 };
 
 main();
