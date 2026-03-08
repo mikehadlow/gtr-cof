@@ -3,25 +3,43 @@ var __getProtoOf = Object.getPrototypeOf;
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+function __accessProp(key) {
+  return this[key];
+}
+var __toESMCache_node;
+var __toESMCache_esm;
 var __toESM = (mod, isNodeMode, target) => {
+  var canCache = mod != null && typeof mod === "object";
+  if (canCache) {
+    var cache = isNodeMode ? __toESMCache_node ??= new WeakMap : __toESMCache_esm ??= new WeakMap;
+    var cached = cache.get(mod);
+    if (cached)
+      return cached;
+  }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
   for (let key of __getOwnPropNames(mod))
     if (!__hasOwnProp.call(to, key))
       __defProp(to, key, {
-        get: () => mod[key],
+        get: __accessProp.bind(mod, key),
         enumerable: true
       });
+  if (canCache)
+    cache.set(mod, to);
   return to;
 };
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __returnValue = (v) => v;
+function __exportSetter(name, newValue) {
+  this[name] = __returnValue.bind(null, newValue);
+}
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, {
       get: all[name],
       enumerable: true,
       configurable: true,
-      set: (newValue) => all[name] = () => newValue
+      set: __exportSetter.bind(all, name)
     });
 };
 
@@ -25193,6 +25211,25 @@ function getCurrentState() {
   }
 }
 
+// src/wakelock.ts
+var lock;
+function init12() {
+  if (!("wakeLock" in navigator)) {
+    return;
+  }
+  tryAcquireWakeLock();
+  document.addEventListener("visibilitychange", async () => {
+    if (lock !== null && document.visibilityState === "visible") {
+      tryAcquireWakeLock();
+    }
+  });
+}
+function tryAcquireWakeLock() {
+  try {
+    navigator.wakeLock.request("screen").then((lock2) => lock2 = lock2);
+  } catch (e) {}
+}
+
 // src/index.ts
 window.settings = exports_settings;
 window.permalink = exports_permalink;
@@ -25210,8 +25247,9 @@ var main = () => {
   init11();
   init10();
   init9();
+  init12();
 };
 main();
 
-//# debugId=840EF25D8E0F0F4564756E2164756E21
+//# debugId=2F29F59D30770C9264756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
