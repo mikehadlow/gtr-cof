@@ -1,6 +1,10 @@
 import { type Update as UpdateModel } from "../types";
 import { type Model } from "../model";
+import { updateScale } from ".";
 
 export const Update: UpdateModel<Model, { id: "ChordIntervalChange", chordIntervals: number[] }> = (model, msg) => {
-    return model;
+    const current = model.state;
+    current.chordIntervals = msg.chordIntervals;
+    current.toggledIndexes = 0;
+    return updateScale(current);
 }
