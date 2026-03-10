@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
 import { Update } from "./update-chord-interval-change";
-import { updateScale } from ".";
+import { updateScale } from "./updateScale";
 import { defaultState } from "./test-default-state";
 
 describe("update-chord-interval-change", () => {

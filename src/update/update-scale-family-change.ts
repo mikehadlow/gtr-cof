@@ -1,7 +1,7 @@
 import { type Update as UpdateModel } from "../types";
 import { type Model } from "../model";
 import * as music from '../music';
-import { updateScale } from ".";
+import { updateScale } from "./updateScale";
 
 export const Update: UpdateModel<Model, { id: "ScaleFamilyChange", scaleFamily: music.ScaleFamily }> = (model, msg) => {
     const current = model.state;

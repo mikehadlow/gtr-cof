@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
 import { Update } from "./update-set-c-to-noon";
-import { updateScale } from ".";
+import { updateScale } from "./updateScale";
 import { defaultState } from "./test-default-state";
 
 describe("update-set-c-to-noon", () => {

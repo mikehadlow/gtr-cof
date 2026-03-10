@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
 import { Update } from "./update-left-handed-fretboard";
-import { updateScale } from ".";
+import { updateScale } from "./updateScale";
 import { defaultState } from "./test-default-state";
 
 describe("update-left-handed-fretboard", () => {

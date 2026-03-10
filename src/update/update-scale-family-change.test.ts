@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
 import { Update } from "./update-scale-family-change";
-import { updateScale } from ".";
+import { updateScale } from "./updateScale";
 import { defaultState } from "./test-default-state";
 import * as music from "../music";
 
