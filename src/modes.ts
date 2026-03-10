@@ -2,6 +2,59 @@ import * as d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
+
+export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    if (ctx.init) {
+        const svg = d3.select("#modes");
+        modes = svg
+            .append("g")
+            .attr("transform", "translate(0, 280)");
+    }
+
+    const scaleFamily = music.scaleFamily[model.state.scaleFamilyIndex];
+    const activeMode = scaleFamily.modes.find(x => x.index === model.state.modeIndex);
+    if (!activeMode) {
+        throw new Error("Invalid mode index");
+    }
+
+    const pad = 5;
+    const buttonHeight = 25;
+
+    modes.selectAll("g").remove();
+    const gs = modes.selectAll("g").data(scaleFamily.modes, index);
+
+    gs
+        .exit()
+        .remove();
+
+    gs
+        .enter()
+        .append("g")
+        .attr("transform", (d, i) => "translate(0, " + (i * (buttonHeight + pad) + pad) + ")");
+
+    buttons = gs
+        .append("rect")
+        .attr("x", pad)
+        .attr("y", 0)
+        .attr("strokeWidth", 2)
+        .attr("width", 150)
+        .attr("height", 25)
+        .attr("class", "mode-button")
+        .on("click", (d) => raise({ id: "ModeChanged", mode: d }));
+
+    gs
+        .append("text")
+        .attr("x", pad + 10)
+        .attr("y", 17)
+        .text((x) => x.name)
+        .attr("class", "mode-text");
+
+    highlightActiveMode(activeMode);
+}
+
 let buttons: d3.Selection<music.Mode>;
 let modes: d3.Selection<any>;
 

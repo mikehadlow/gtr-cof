@@ -2,6 +2,57 @@ import * as d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
+
+export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    if (ctx.init) {
+        const pad = 5;
+        const buttonHeight = 25;
+        const svg = d3.select("#modes");
+
+        const tonics = svg.append("g");
+
+        const gs = tonics.selectAll("g")
+            .data(music.naturals)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
+            .selectAll("g")
+            .data(d => bg(d), indexer)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(" + (i * 55) + ", 0)"; });
+
+        buttons = gs
+            .append("rect")
+            .attr("x", pad)
+            .attr("y", 0)
+            .attr("strokeWidth", 2)
+            .attr("width", 40)
+            .attr("height", 25)
+            .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button")
+            .on("click", d => raise({ id: "TonicChanged", noteSpec: d.noteSpec }));
+
+        gs
+            .append("text")
+            .attr("x", pad + 10)
+            .attr("y", 17)
+            .text(function (x) { return x.noteSpec.label; })
+            .attr("class", "tonic-text");
+    }
+
+    const ds: Array<ButtonData> = [{
+        noteSpec: music.createNoteSpec(model.state.naturalIndex, model.state.index)
+    }];
+    buttons
+        .data(ds, indexer)
+        .attr("class", "tonic-button tonic-button-selected")
+        .exit()
+        .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
+}
+
 let buttons: d3.Selection<ButtonData>;
 
 type ButtonData = {

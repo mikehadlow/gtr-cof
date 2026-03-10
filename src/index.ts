@@ -25,10 +25,10 @@ window.settings = settings;
 window.permalink = permalink;
 
 const main = () => {
-    menu.init();
-    tonics.init();
-    modes.init(music.scaleFamily[0]);
-    chordInterval.init();
+    menu.init(); // Elmed
+    tonics.init(); // Elmed
+    modes.init(music.scaleFamily[0]); // Elmed
+    chordInterval.init(); // Elmed
     new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
     new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
     gtr.init();

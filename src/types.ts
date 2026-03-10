@@ -6,7 +6,11 @@ export type Init<TModel> = () => TModel;
 
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
-export type View<TModel, TMsg, TSvg> = (model: TModel, raise: (msg: TMsg) => void) => TSvg;
+export type ViewContext = {
+    readonly init: boolean;
+}
+
+export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: (msg: TMsg) => void) => TSvg;
 
 // State
 

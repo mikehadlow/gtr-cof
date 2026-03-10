@@ -1,3 +1,13 @@
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
+
+export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    if (ctx.init) {
+        init();
+    }
+}
+
 export function init(): void {
 
     const menuItems = document.getElementsByClassName("menu");
