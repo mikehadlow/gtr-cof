@@ -30,3 +30,5 @@ export const StateSchema = z.object({
 });
 
 export type State = z.infer<typeof StateSchema>;
+
+export type Svg = void;
