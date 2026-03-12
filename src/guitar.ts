@@ -49,8 +49,8 @@ export const create = (): View<Model, Msg, Svg> => {
     // return view function
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         if (ctx.init || fretboardStateHasChanged(model)) {
-            drawFretboard(tuning.tunings[model.state.tuningIndex], raise);
             setFretboardState(model);
+            drawFretboard(tuning.tunings[model.state.tuningIndex], raise);
         }
         update(model.music);
     }

@@ -39,7 +39,7 @@ const main = () => {
     new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths"); // Elmed
     gtr.init(); // Elmed
     tuning.init(); // Elmed
-    scaleFamily.init();
+    scaleFamily.init(); // Elmed
     settings.init();
     permalink.init();
     state.init();
