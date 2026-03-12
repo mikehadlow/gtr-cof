@@ -37,8 +37,8 @@ const main = () => {
     chordInterval.init(); // Elmed
     new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic"); // Elmed
     new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths"); // Elmed
-    gtr.init();
-    tuning.init();
+    gtr.init(); // Elmed
+    tuning.init(); // Elmed
     scaleFamily.init();
     settings.init();
     permalink.init();
