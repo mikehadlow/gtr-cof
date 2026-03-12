@@ -9,6 +9,7 @@ import { view as modesView } from "../modes";
 import { view as chordIntervalView } from "../chord-interval"
 import { view as tuningView } from "../tuning";
 import { view as scaleFamilyView } from "../scale-family";
+import { view as storageView } from "../storage";
 import { view as settingsView } from "../settings";
 import { create as createCircle } from "../circle";
 import { create as createGuitar } from "../guitar";
@@ -28,7 +29,8 @@ export const createViews = (): View<Model, Msg, Svg> => {
         cofView,
         guitarView,
         scaleFamilyView,
-        settingsView
+        settingsView,
+        storageView
     ];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {

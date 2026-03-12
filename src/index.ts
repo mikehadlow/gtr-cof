@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import d3 from "d3";
 import * as menu from "./menu";
 import * as tonics from "./tonics";
 import * as modes from "./modes";
@@ -12,13 +12,14 @@ import * as permalink from "./permalink";
 import * as state from "./state";
 import * as cookies from "./cookie";
 import * as music from "./music";
-import * as wakelock from "./wakelock";
+import { setWakeLock } from "./wakelock";
 import { type State } from "./types";
 import { type Model } from "./model";
 import { updateScale } from "./update/updateScale";
 import { createViews } from "./view";
 import { type Msg } from "./message";
 import { update } from "./update";
+import { getStateFromLocalStorage } from "./storage";
 
 // Expose modules for HTML onclick handlers
 declare global {
@@ -30,6 +31,11 @@ declare global {
 window.settings = settings;
 window.permalink = permalink;
 
+const initModel = (): Model => {
+    const state: State = getStateFromLocalStorage();
+    return updateScale(state);
+};
+
 const main = () => {
     menu.init(); // Elmed
     tonics.init(); // Elmed
@@ -40,36 +46,24 @@ const main = () => {
     gtr.init(); // Elmed
     tuning.init(); // Elmed
     scaleFamily.init(); // Elmed
-    settings.init();
+    settings.init(); // Elmed
     permalink.init();
-    state.init();
-    cookies.init();
-    wakelock.init();
+    state.init(); // Not needed
+    cookies.init(); // Elmed
+    setWakeLock(); // Elmed
 };
 
 const main2 = () => {
-    const state: State = {
-        index: 3, // C
-        naturalIndex: 3, // C
-        chordIndex: -1, // no chord
-        chordIntervals: [0, 2, 4], // standard triad
-        toggledIndexes: 0, // index bitflag
-        scaleFamilyIndex: 0, // diatornic
-        modeIndex: 0, // major
-        midiToggledIndexes: 0,
-        isLeftHanded: false,
-        isNutFlipped: false,
-        fretboardLabelType: "NoteName",
-        circleIsCNoon: true,
-        tuningIndex: 0,
-    }
-    let model: Model = updateScale(state);
+    let model: Model = initModel();
+
     const view = createViews();
     const raise = (msg: Msg): void => {
         model = update(model, msg)
         view(model, { init: false }, raise);
     }
+
     view(model, { init: true }, raise);
+    setWakeLock();
 };
 
 main2();

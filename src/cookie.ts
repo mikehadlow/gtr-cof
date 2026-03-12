@@ -3,6 +3,7 @@ import { State, StateSchema } from './types';
 
 const cookieName = "gtr-cof-state-v4";
 
+// TODO: remove this file
 export function init(): void {
     events.stateChange.subscribe(bakeCookie2);
 }
