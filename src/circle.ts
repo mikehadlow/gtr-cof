@@ -48,6 +48,27 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
     const degreeRadius = 135;
     const innerRadius = 90;
 
+    function handleNoteClick(segment: Segment, i: number): void {
+        raise({
+            id: "TonicChanged",
+            noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
+        });
+    }
+
+    function handleChordClick(segment: Segment, i: number): void {
+        raise({
+            id: "ChordChanged",
+            chordIndex: segment.node.scaleNote.note.index
+        });
+    }
+
+    function handleIntervalClick(segment: Segment, i: number): void {
+        raise({
+            id: "Toggle",
+            index: segment.node.scaleNote.note.index
+        });
+    }
+
     const cof = svg
         .append("g")
         .attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
@@ -78,7 +99,7 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
         .append("path")
         .attr("d", noteArc)
         .attr("class", "note-segment")
-        .on("click", (s, i) => handleNoteClick(s, i, raise));
+        .on("click", handleNoteClick);
 
     const noteText = cof.append("g").selectAll("text")
         .data(segments)
@@ -95,7 +116,7 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
         .append("path")
         .attr("d", degreeArc)
         .attr("class", "interval-segment")
-        .on("click", (s, i) => handleIntervalClick(s, i, raise));
+        .on("click", handleIntervalClick);
 
     const intervalNotes = cof.append("g").selectAll("circle")
         .data(segments, indexer)
@@ -122,7 +143,7 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
         .append("path")
         .attr("d", chordArc)
         .attr("class", "chord-segment")
-        .on("click", (s, i) => handleChordClick(s, i, raise));
+        .on("click", handleChordClick);
 
     const chordNotes = cof.append("g").selectAll("circle")
         .data(segments, indexer)
@@ -225,13 +246,6 @@ function generateSegments(fifths: number[]): Segment[] {
     return items;
 }
 
-function handleNoteClick(segment: Segment, i: number, raise: (msg: Msg) => void): void {
-    raise({
-        id: "TonicChanged",
-        noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
-    });
-}
-
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec): music.NoteSpec {
     if (Math.abs(noteSpec.offset) > 1) {
         const naturalId = noteSpec.natural.id;
@@ -242,20 +256,6 @@ function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec)
         return music.createNoteSpec(newNatural.index, noteSpec.index)
     }
     return noteSpec;
-}
-
-function handleChordClick(segment: Segment, i: number, raise: (msg: Msg) => void): void {
-    raise({
-        id: "ChordChanged",
-        chordIndex: segment.node.scaleNote.note.index
-    });
-}
-
-function handleIntervalClick(segment: Segment, i: number, raise: (msg: Msg) => void): void {
-    raise({
-        id: "Toggle",
-        index: segment.node.scaleNote.note.index
-    });
 }
 
 function rotate(array: number[], offset: number): number[] {
