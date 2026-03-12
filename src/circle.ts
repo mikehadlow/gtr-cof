@@ -48,26 +48,28 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
     const degreeRadius = 135;
     const innerRadius = 90;
 
-    function handleNoteClick(segment: Segment, i: number): void {
+    const handleNoteClick = (segment: Segment, i: number): void => {
         raise({
             id: "TonicChanged",
             noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
         });
     }
 
-    function handleChordClick(segment: Segment, i: number): void {
+    const handleChordClick = (segment: Segment, i: number): void => {
         raise({
             id: "ChordChanged",
             chordIndex: segment.node.scaleNote.note.index
         });
     }
 
-    function handleIntervalClick(segment: Segment, i: number): void {
+    const handleIntervalClick = (segment: Segment, i: number): void => {
         raise({
             id: "Toggle",
             index: segment.node.scaleNote.note.index
         });
     }
+
+    svg.selectAll("*").remove();
 
     const cof = svg
         .append("g")
