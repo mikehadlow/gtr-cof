@@ -50,7 +50,7 @@ export function init() {
     }
 
     // update current state based on querystring.
-    current = permalink.getState(current);
+    current = permalink.updateStateFromQuerystring(current);
 
     // lets remember this while we reset everything.
     const tempChordIndex = current.chordIndex;

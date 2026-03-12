@@ -11,6 +11,7 @@ import { view as tuningView } from "../tuning";
 import { view as scaleFamilyView } from "../scale-family";
 import { view as storageView } from "../storage";
 import { view as settingsView } from "../settings";
+import { view as permalinkView } from "../permalink";
 import { create as createCircle } from "../circle";
 import { create as createGuitar } from "../guitar";
 
@@ -30,7 +31,8 @@ export const createViews = (): View<Model, Msg, Svg> => {
         guitarView,
         scaleFamilyView,
         settingsView,
-        storageView
+        storageView,
+        permalinkView
     ];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {

@@ -20,6 +20,7 @@ import { createViews } from "./view";
 import { type Msg } from "./message";
 import { update } from "./update";
 import { getStateFromLocalStorage } from "./storage";
+import { updateStateFromQuerystring } from "./permalink";
 
 // Expose modules for HTML onclick handlers
 declare global {
@@ -32,7 +33,7 @@ window.settings = settings;
 window.permalink = permalink;
 
 const initModel = (): Model => {
-    const state: State = getStateFromLocalStorage();
+    const state: State = updateStateFromQuerystring(getStateFromLocalStorage());
     return updateScale(state);
 };
 

@@ -1,9 +1,17 @@
 import * as events from './events';
 import { State } from './types';
 import { defaultState } from './state';
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
 
 let currentState: State | null = null;
 
+export const view: View<Model, Msg, Svg> = ({ state }: Model, _ctx: ViewContext, _raise: (msg: Msg) => void): Svg => {
+    currentState = state;
+}
+
+// TODO: remove
 export function init(): void {
     events.stateChange.subscribe(x => currentState = x.state);
 }
@@ -12,15 +20,12 @@ export function populatePermalinkText(): void {
     const permalink = generatePermalink();
     const inputbox = document.getElementById("permalink-text") as HTMLInputElement
     inputbox.value = permalink;
-    inputbox.focus;
-    inputbox.select;
-    inputbox.setSelectionRange(0, 99999);
-    document.execCommand("copy");
+    navigator.clipboard.writeText(permalink);
 }
 
 // create querystring from state
 export function generatePermalink(): string {
-    if(currentState === null) {
+    if (currentState === null) {
         throw "No stateChange event published before querystring requested";
     }
 
@@ -28,7 +33,7 @@ export function generatePermalink(): string {
 
     // only copy state that's different from default
     Object.keys(currentState).forEach(key => {
-        if((currentState as any)[key] !== (defaultState as any)[key]) {
+        if ((currentState as any)[key] !== (defaultState as any)[key]) {
             params.append(key, (currentState as any)[key]);
         }
     });
@@ -37,7 +42,7 @@ export function generatePermalink(): string {
 }
 
 // update state from querystring
-export function getState(existingState: State): State {
+export function updateStateFromQuerystring(existingState: State): State {
 
     const queryString = location.search;
     const params = new URLSearchParams(queryString);
@@ -45,7 +50,7 @@ export function getState(existingState: State): State {
 
     Object.keys(existingState).forEach(x => {
         const value = params.get(x);
-        if(value == null) return;
+        if (value == null) return;
 
         switch (typeof mutableState[x]) {
             case 'boolean':
@@ -71,6 +76,6 @@ export function getState(existingState: State): State {
 // test function
 export function getCurrentState(): void {
     if (currentState) {
-        getState(currentState);
+        updateStateFromQuerystring(currentState);
     }
 }
