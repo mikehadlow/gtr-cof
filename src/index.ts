@@ -16,7 +16,7 @@ import * as wakelock from "./wakelock";
 import { type State } from "./types";
 import { type Model } from "./model";
 import { updateScale } from "./update/updateScale";
-import { view } from "./view";
+import { createViews } from "./view";
 import { type Msg } from "./message";
 import { update } from "./update";
 
@@ -64,6 +64,7 @@ const main2 = () => {
         tuningIndex: 0,
     }
     let model: Model = updateScale(state);
+    const view = createViews();
     const raise = (msg: Msg): void => {
         model = update(model, msg)
         view(model, { init: false }, raise);
