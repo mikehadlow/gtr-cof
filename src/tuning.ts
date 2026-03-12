@@ -68,7 +68,7 @@ const tuningInfos: Array<TuningInfo> = [
     { tuning: "CGDA", dots: violaDots, description: "Viola" },
 ]
 
-export const tunings: Array<Tuning> = [];
+export const tunings: Array<Tuning> = buildTunings();
 
 export function parseTuning(tuning: string): Array<number> {
     const tokens: Array<string> = [];
@@ -104,8 +104,8 @@ export function parseTuning(tuning: string): Array<number> {
     return result;
 }
 
-export function init() {
-
+function buildTunings(): Tuning[] {
+    const tunings: Tuning[] = [];
     let index: number = 0;
     for (const info of tuningInfos) {
         const tuning: Tuning = {
@@ -118,6 +118,10 @@ export function init() {
         tunings.push(tuning);
         index++;
     }
+    return tunings;
+}
+
+export function init() {
 
     d3.select("#tuning-dropdown")
         .selectAll("div")

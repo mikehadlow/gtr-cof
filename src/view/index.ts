@@ -8,10 +8,13 @@ import { view as tonicsView } from "../tonics";
 import { view as modesView } from "../modes";
 import { view as chordIntervalView } from "../chord-interval"
 import { create as createCircle } from "../circle";
+import { create as createGuitar } from "../guitar";
 
 export const createViews = (): View<Model, Msg, Svg> => {
     const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
     const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
+    const guitarView = createGuitar();
+
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         menuView(model, ctx, raise);
         tonicsView(model, ctx, raise);
@@ -19,5 +22,6 @@ export const createViews = (): View<Model, Msg, Svg> => {
         chordIntervalView(model, ctx, raise);
         chromaticView(model, ctx, raise);
         cofView(model, ctx, raise);
+        guitarView(model, ctx, raise);
     };
 }
