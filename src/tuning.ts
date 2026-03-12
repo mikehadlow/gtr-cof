@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
-import * as events from './events';
 import * as music from './music';
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
 
 const guitarDots: Array<[number, number]> = [
     [3, 0], // [fret, position]
@@ -121,22 +123,26 @@ function buildTunings(): Tuning[] {
     return tunings;
 }
 
+// TODO: START to remove
 export function init() {
-
-    d3.select("#tuning-dropdown")
-        .selectAll("div")
-        .data(tunings)
-        .enter()
-        .append("div")
-        .attr("class", "dropdown-content-item")
-        .on("click", x => raiseTuningChangedEvent(x))
-        .text(x => x.tuning + "   " + x.description);
-
-    raiseTuningChangedEvent(tunings[0]);
 }
+// END
 
-function raiseTuningChangedEvent(tuning: Tuning): void {
-    events.tuningChange.publish({
-        index: tuning.index
-    });
+export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    const raiseTuningChangedEvent = (tuning: Tuning): void => {
+        raise({
+            id: "TuningChanged",
+            index: tuning.index
+        });
+    }
+    if (ctx.init) {
+        d3.select("#tuning-dropdown")
+            .selectAll("div")
+            .data(tunings)
+            .enter()
+            .append("div")
+            .attr("class", "dropdown-content-item")
+            .on("click", raiseTuningChangedEvent)
+            .text(x => x.tuning + "   " + x.description);
+    }
 }
