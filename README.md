@@ -6,7 +6,7 @@ The aim is to provide a graphical representation of music theory elements (scale
 
 ## Getting started with the codebase
 
-Guitar dashboard is a static website with a single HTML page and a client-side TypeScript application that implements a music theory algorithm that renders SVG.
+Guitar dashboard is a static website with a single HTML page and a client-side TypeScript application that implements a music theory algorithm and renders SVG.
 
 Guitar dashboard uses [Bun](https://bun.com/).
 

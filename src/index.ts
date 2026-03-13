@@ -27,8 +27,8 @@ const initModel = (): Model => {
 
 const main = () => {
     let model: Model = initModel();
-
     const view = createViews();
+
     const raise = (msg: Msg): void => {
         model = update(model, msg)
         view(model, { init: false }, raise);
