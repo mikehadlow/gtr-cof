@@ -1,8 +1,8 @@
 import { State } from './types';
-import { defaultState } from './state';
 import { View, ViewContext, Svg } from "./types";
 import { Model } from "./model";
 import { Msg } from "./message";
+import { defaultState } from './defaultState';
 
 let currentState: State | null = null;
 

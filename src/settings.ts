@@ -1,4 +1,3 @@
-import * as events from './events';
 import { FretboardLabelType } from './types';
 import { View, ViewContext, Svg } from "./types";
 import { Model } from "./model";

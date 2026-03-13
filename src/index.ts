@@ -1,6 +1,5 @@
 import * as settings from "./settings";
 import * as permalink from "./permalink";
-import * as state from "./state";
 import { setWakeLock } from "./wakelock";
 import { type State } from "./types";
 import { type Model } from "./model";

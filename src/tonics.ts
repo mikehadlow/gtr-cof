@@ -1,5 +1,4 @@
 import d3 from 'd3';
-import * as events from './events';
 import * as music from './music';
 
 import { View, ViewContext, Svg } from "./types";
