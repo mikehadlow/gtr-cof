@@ -86,7 +86,6 @@
                             type="checkbox"
                             id="left-handed-checkbox"
                             name="left_handed"
-                            onclick="settings.onLeftHandedClick(this)"
                         />
                         <label for="left-handed-checkbox"
                             >Left Handed Fretboard</label
@@ -95,14 +94,12 @@
                             type="checkbox"
                             id="flip-nut-checkbox"
                             name="flip_nut"
-                            onclick="settings.onFlipNut(this)"
                         />
                         <label for="flip-nut-checkbox">Flip Nut</label><br />
                         <input
                             type="checkbox"
                             id="set-c-to-noon-checkbox"
                             name="set_c_to_noon"
-                            onclick="settings.onSetCToNoon(this)"
                             checked
                         />
                         <label for="set-c-to-noon-checkbox"
@@ -116,7 +113,6 @@
                                 type="radio"
                                 name="fb-note-text"
                                 id="fb-note-text-None"
-                                onclick="settings.onFbNoteTextClick(this)"
                                 value="None"
                             />
                             None <br />
@@ -124,16 +120,13 @@
                                 type="radio"
                                 name="fb-note-text"
                                 id="fb-note-text-NoteName"
-                                onclick="settings.onFbNoteTextClick(this)"
                                 value="NoteName"
-                                checked
                             />
                             Note names <br />
                             <input
                                 type="radio"
                                 name="fb-note-text"
                                 id="fb-note-text-Interval"
-                                onclick="settings.onFbNoteTextClick(this)"
                                 value="Interval"
                             />
                             Intervals
