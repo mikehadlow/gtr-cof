@@ -2,11 +2,15 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
-export type Init<TModel> = () => TModel;
+type Init<TModel> = () => TModel;
 
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
-export type View<TModel, TMsg, TSvg> = (model: TModel, raise: (msg: TMsg) => void) => TSvg;
+export type ViewContext = {
+    readonly init: boolean;
+}
+
+export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: (msg: TMsg) => void) => TSvg;
 
 // State
 
@@ -30,3 +34,5 @@ export const StateSchema = z.object({
 });
 
 export type State = z.infer<typeof StateSchema>;
+
+export type Svg = void;

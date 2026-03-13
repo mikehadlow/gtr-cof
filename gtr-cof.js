@@ -1502,7 +1502,7 @@ var require_d3 = __commonJS((exports, module) => {
       return i;
     };
     d3.behavior.zoom = function() {
-      var view = {
+      var view4 = {
         x: 0,
         y: 0,
         k: 1
@@ -1521,20 +1521,20 @@ var require_d3 = __commonJS((exports, module) => {
       }
       zoom.event = function(g) {
         g.each(function() {
-          var dispatch = event.of(this, arguments), view1 = view;
+          var dispatch = event.of(this, arguments), view1 = view4;
           if (d3_transitionInheritId) {
             d3.select(this).transition().each("start.zoom", function() {
-              view = this.__chart__ || {
+              view4 = this.__chart__ || {
                 x: 0,
                 y: 0,
                 k: 1
               };
               zoomstarted(dispatch);
             }).tween("zoom:zoom", function() {
-              var dx = size[0], dy = size[1], cx = center0 ? center0[0] : dx / 2, cy = center0 ? center0[1] : dy / 2, i = d3.interpolateZoom([(cx - view.x) / view.k, (cy - view.y) / view.k, dx / view.k], [(cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k]);
+              var dx = size[0], dy = size[1], cx = center0 ? center0[0] : dx / 2, cy = center0 ? center0[1] : dy / 2, i = d3.interpolateZoom([(cx - view4.x) / view4.k, (cy - view4.y) / view4.k, dx / view4.k], [(cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k]);
               return function(t) {
                 var l = i(t), k = dx / l[2];
-                this.__chart__ = view = {
+                this.__chart__ = view4 = {
                   x: cx - l[0] * k,
                   y: cy - l[1] * k,
                   k
@@ -1547,7 +1547,7 @@ var require_d3 = __commonJS((exports, module) => {
               zoomended(dispatch);
             });
           } else {
-            this.__chart__ = view;
+            this.__chart__ = view4;
             zoomstarted(dispatch);
             zoomed(dispatch);
             zoomended(dispatch);
@@ -1556,21 +1556,21 @@ var require_d3 = __commonJS((exports, module) => {
       };
       zoom.translate = function(_) {
         if (!arguments.length)
-          return [view.x, view.y];
-        view = {
+          return [view4.x, view4.y];
+        view4 = {
           x: +_[0],
           y: +_[1],
-          k: view.k
+          k: view4.k
         };
         rescale();
         return zoom;
       };
       zoom.scale = function(_) {
         if (!arguments.length)
-          return view.k;
-        view = {
-          x: view.x,
-          y: view.y,
+          return view4.k;
+        view4 = {
+          x: view4.x,
+          y: view4.y,
           k: null
         };
         scaleTo(+_);
@@ -1606,7 +1606,7 @@ var require_d3 = __commonJS((exports, module) => {
           return x1;
         x1 = z;
         x0 = z.copy();
-        view = {
+        view4 = {
           x: 0,
           y: 0,
           k: 1
@@ -1618,7 +1618,7 @@ var require_d3 = __commonJS((exports, module) => {
           return y1;
         y1 = z;
         y0 = z.copy();
-        view = {
+        view4 = {
           x: 0,
           y: 0,
           k: 1
@@ -1626,24 +1626,24 @@ var require_d3 = __commonJS((exports, module) => {
         return zoom;
       };
       function location2(p) {
-        return [(p[0] - view.x) / view.k, (p[1] - view.y) / view.k];
+        return [(p[0] - view4.x) / view4.k, (p[1] - view4.y) / view4.k];
       }
       function point(l) {
-        return [l[0] * view.k + view.x, l[1] * view.k + view.y];
+        return [l[0] * view4.k + view4.x, l[1] * view4.k + view4.y];
       }
       function scaleTo(s) {
-        view.k = Math.max(scaleExtent[0], Math.min(scaleExtent[1], s));
+        view4.k = Math.max(scaleExtent[0], Math.min(scaleExtent[1], s));
       }
       function translateTo(p, l) {
         l = point(l);
-        view.x += p[0] - l[0];
-        view.y += p[1] - l[1];
+        view4.x += p[0] - l[0];
+        view4.y += p[1] - l[1];
       }
       function zoomTo(that, p, l, k) {
         that.__chart__ = {
-          x: view.x,
-          y: view.y,
-          k: view.k
+          x: view4.x,
+          y: view4.y,
+          k: view4.k
         };
         scaleTo(Math.pow(2, k));
         translateTo(center0 = p, l);
@@ -1655,11 +1655,11 @@ var require_d3 = __commonJS((exports, module) => {
       function rescale() {
         if (x1)
           x1.domain(x0.range().map(function(x) {
-            return (x - view.x) / view.k;
+            return (x - view4.x) / view4.k;
           }).map(x0.invert));
         if (y1)
           y1.domain(y0.range().map(function(y) {
-            return (y - view.y) / view.k;
+            return (y - view4.y) / view4.k;
           }).map(y0.invert));
       }
       function zoomstarted(dispatch) {
@@ -1672,8 +1672,8 @@ var require_d3 = __commonJS((exports, module) => {
         rescale();
         dispatch({
           type: "zoom",
-          scale: view.k,
-          translate: [view.x, view.y]
+          scale: view4.k,
+          translate: [view4.x, view4.y]
         });
       }
       function zoomended(dispatch) {
@@ -1704,7 +1704,7 @@ var require_d3 = __commonJS((exports, module) => {
         subject.on(mousedown, null).on(touchstart, started);
         function relocate() {
           var touches = d3.touches(that);
-          scale0 = view.k;
+          scale0 = view4.k;
           touches.forEach(function(t) {
             if (t.identifier in locations0)
               locations0[t.identifier] = location2(t);
@@ -1723,7 +1723,7 @@ var require_d3 = __commonJS((exports, module) => {
           if (touches.length === 1) {
             if (now - touchtime < 500) {
               var p = touches[0];
-              zoomTo(that, p, locations0[p.identifier], Math.floor(Math.log(view.k) / Math.LN2) + 1);
+              zoomTo(that, p, locations0[p.identifier], Math.floor(Math.log(view4.k) / Math.LN2) + 1);
               d3_eventPreventDefault();
             }
             touchtime = now;
@@ -1780,12 +1780,12 @@ var require_d3 = __commonJS((exports, module) => {
           zoomended(dispatch);
         }, 50);
         d3_eventPreventDefault();
-        scaleTo(Math.pow(2, d3_behavior_zoomDelta() * 0.002) * view.k);
+        scaleTo(Math.pow(2, d3_behavior_zoomDelta() * 0.002) * view4.k);
         translateTo(center0, translate0);
         zoomed(dispatch);
       }
       function dblclicked() {
-        var p = d3.mouse(this), k = Math.log(view.k) / Math.LN2;
+        var p = d3.mouse(this), k = Math.log(view4.k) / Math.LN2;
         zoomTo(this, p, location2(p), d3.event.shiftKey ? Math.ceil(k) - 1 : Math.floor(k) + 1);
       }
       return d3.rebind(zoom, event, "on");
@@ -9464,15 +9464,15 @@ var require_d3 = __commonJS((exports, module) => {
     var d3_selection_interrupt = d3_selection_interruptNS(d3_transitionNamespace());
     function d3_selection_interruptNS(ns) {
       return function() {
-        var lock, activeId, active;
-        if ((lock = this[ns]) && (active = lock[activeId = lock.active])) {
+        var lock2, activeId, active;
+        if ((lock2 = this[ns]) && (active = lock2[activeId = lock2.active])) {
           active.timer.c = null;
           active.timer.t = NaN;
-          if (--lock.count)
-            delete lock[activeId];
+          if (--lock2.count)
+            delete lock2[activeId];
           else
             delete this[ns];
-          lock.active += 0.5;
+          lock2.active += 0.5;
           active.event && active.event.interrupt.call(this, this.__data__, active.index);
         }
       };
@@ -9737,10 +9737,10 @@ var require_d3 = __commonJS((exports, module) => {
       return name == null ? "__transition__" : "__transition_" + name + "__";
     }
     function d3_transitionNode(node, i, ns, id, inherit) {
-      var lock = node[ns] || (node[ns] = {
+      var lock2 = node[ns] || (node[ns] = {
         active: 0,
         count: 0
-      }), transition = lock[id], time, timer, duration, ease, tweens;
+      }), transition = lock2[id], time, timer, duration, ease, tweens;
       function schedule(elapsed) {
         var delay = transition.delay;
         timer.t = delay + time;
@@ -9749,21 +9749,21 @@ var require_d3 = __commonJS((exports, module) => {
         timer.c = start;
       }
       function start(elapsed) {
-        var activeId = lock.active, active = lock[activeId];
+        var activeId = lock2.active, active = lock2[activeId];
         if (active) {
           active.timer.c = null;
           active.timer.t = NaN;
-          --lock.count;
-          delete lock[activeId];
+          --lock2.count;
+          delete lock2[activeId];
           active.event && active.event.interrupt.call(node, node.__data__, active.index);
         }
-        for (var cancelId in lock) {
+        for (var cancelId in lock2) {
           if (+cancelId < id) {
-            var cancel = lock[cancelId];
+            var cancel = lock2[cancelId];
             cancel.timer.c = null;
             cancel.timer.t = NaN;
-            --lock.count;
-            delete lock[cancelId];
+            --lock2.count;
+            delete lock2[cancelId];
           }
         }
         timer.c = tick;
@@ -9774,7 +9774,7 @@ var require_d3 = __commonJS((exports, module) => {
           }
           return 1;
         }, 0, time);
-        lock.active = id;
+        lock2.active = id;
         transition.event && transition.event.start.call(node, node.__data__, i);
         tweens = [];
         transition.tween.forEach(function(key, value) {
@@ -9792,8 +9792,8 @@ var require_d3 = __commonJS((exports, module) => {
         }
         if (t >= 1) {
           transition.event && transition.event.end.call(node, node.__data__, i);
-          if (--lock.count)
-            delete lock[id];
+          if (--lock2.count)
+            delete lock2[id];
           else
             delete node[ns];
           return 1;
@@ -9802,7 +9802,7 @@ var require_d3 = __commonJS((exports, module) => {
       if (!transition) {
         time = inherit.time;
         timer = d3_timer(schedule, 0, time);
-        transition = lock[id] = {
+        transition = lock2[id] = {
           tween: new d3_Map,
           time,
           timer,
@@ -9812,7 +9812,7 @@ var require_d3 = __commonJS((exports, module) => {
           index: i
         };
         inherit = null;
-        ++lock.count;
+        ++lock2.count;
       }
     }
     d3.svg.axis = function() {
@@ -10437,80 +10437,144 @@ var require_d3 = __commonJS((exports, module) => {
   })();
 });
 
-// src/index.ts
-var d38 = __toESM(require_d3(), 1);
-
-// src/menu.ts
-function init() {
-  const menuItems = document.getElementsByClassName("menu");
-  for (const menuItem of menuItems) {
-    menuItem.addEventListener("click", onMenuClick);
+// src/settings.ts
+var exports_settings = {};
+__export(exports_settings, {
+  view: () => view,
+  onSetCToNoon: () => onSetCToNoon,
+  onLeftHandedClick: () => onLeftHandedClick,
+  onFlipNut: () => onFlipNut,
+  onFbNoteTextClick: () => onFbNoteTextClick
+});
+var _raise = null;
+var view = ({ state }, ctx, raise) => {
+  const setCheckbox = (id, checked) => {
+    const checkbox = document.getElementById(id);
+    checkbox.checked = checked;
+  };
+  if (ctx.init) {
+    setCheckbox("left-handed-checkbox", state.isLeftHanded);
+    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+    const selected = "fb-note-text-" + state.fretboardLabelType;
+    const radio = document.getElementById(selected);
+    radio.checked = true;
+    _raise = raise;
   }
-  document.addEventListener("mouseup", (event) => {
-    const targetElement = event.target;
-    if (targetElement.closest(".dropdown-content") === null && targetElement.closest(".menu") === null) {
-      const contentElements = document.getElementsByClassName("dropdown-content");
-      for (const contentElement of contentElements) {
-        if (contentElement.classList.contains("dropdown-content-visible")) {
-          contentElement.classList.remove("dropdown-content-visible");
-        }
-      }
+};
+function onLeftHandedClick(e) {
+  if (_raise) {
+    _raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
+  }
+}
+function onFlipNut(e) {
+  if (_raise) {
+    _raise({ id: "FlipNut", isNutFlipped: e.checked });
+  }
+}
+function onSetCToNoon(e) {
+  if (_raise) {
+    _raise({ id: "SetCToNoon", isC: e.checked });
+  }
+}
+function onFbNoteTextClick(e) {
+  if (_raise) {
+    _raise({ id: "FretboardLabelChange", labelType: e.value });
+  }
+}
+
+// src/permalink.ts
+var exports_permalink = {};
+__export(exports_permalink, {
+  view: () => view2,
+  updateStateFromQuerystring: () => updateStateFromQuerystring,
+  populatePermalinkText: () => populatePermalinkText
+});
+
+// src/defaultState.ts
+var defaultState = {
+  index: 3,
+  naturalIndex: 3,
+  chordIndex: -1,
+  chordIntervals: [0, 2, 4],
+  toggledIndexes: 0,
+  scaleFamilyIndex: 0,
+  modeIndex: 0,
+  midiToggledIndexes: 0,
+  isLeftHanded: false,
+  isNutFlipped: false,
+  fretboardLabelType: "NoteName",
+  circleIsCNoon: true,
+  tuningIndex: 0
+};
+
+// src/permalink.ts
+var currentState = null;
+var view2 = ({ state }, _ctx, _raise2) => {
+  currentState = state;
+};
+function populatePermalinkText() {
+  const permalink = generatePermalink();
+  const inputbox = document.getElementById("permalink-text");
+  inputbox.value = permalink;
+  navigator.clipboard.writeText(permalink);
+}
+function generatePermalink() {
+  if (currentState === null) {
+    throw "No stateChange event published before querystring requested";
+  }
+  const params = new URLSearchParams;
+  Object.keys(currentState).forEach((key) => {
+    if (currentState[key] !== defaultState[key]) {
+      params.append(key, currentState[key]);
+    }
+  });
+  return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
+}
+function updateStateFromQuerystring(existingState) {
+  const queryString = location.search;
+  const params = new URLSearchParams(queryString);
+  const mutableState = existingState;
+  Object.keys(existingState).forEach((x) => {
+    const value = params.get(x);
+    if (value == null)
+      return;
+    switch (typeof mutableState[x]) {
+      case "boolean":
+        mutableState[x] = value === "true";
+        break;
+      case "number":
+        mutableState[x] = parseInt(value);
+        break;
+      case "object":
+        mutableState[x] = JSON.parse("[" + value + "]");
+        break;
+      case "string":
+        mutableState[x] = value;
+        break;
+    }
+  });
+  return mutableState;
+}
+
+// src/wakelock.ts
+var lock;
+function setWakeLock() {
+  if (!("wakeLock" in navigator)) {
+    return;
+  }
+  tryAcquireWakeLock();
+  document.addEventListener("visibilitychange", async () => {
+    if (lock !== null && document.visibilityState === "visible") {
+      tryAcquireWakeLock();
     }
   });
 }
-function onMenuClick(event) {
-  const menuElement = event.target;
-  const currentContentElement = menuElement.parentElement.querySelector(".dropdown-content");
-  const contentElements = document.getElementsByClassName("dropdown-content");
-  for (const contentElement of contentElements) {
-    if (contentElement === currentContentElement) {
-      currentContentElement.classList.toggle("dropdown-content-visible");
-    } else {
-      contentElement.classList.remove("dropdown-content-visible");
-    }
-  }
+function tryAcquireWakeLock() {
+  try {
+    navigator.wakeLock.request("screen").then((lock2) => lock2 = lock2);
+  } catch (e) {}
 }
-
-// src/tonics.ts
-var d3 = __toESM(require_d3(), 1);
-
-// src/events.ts
-class Bus {
-  listeners = [];
-  name;
-  constructor(name) {
-    this.name = name;
-  }
-  subscribe(listener) {
-    this.listeners.push(listener);
-  }
-  resubscribe(listener, index) {
-    if (index === -1) {
-      return this.listeners.push(listener) - 1;
-    }
-    this.listeners[index] = listener;
-    return index;
-  }
-  publish(event) {
-    for (const listener of this.listeners) {
-      listener(event);
-    }
-  }
-}
-var stateChange = new Bus("stateChange");
-var scaleChange = new Bus("scaleChange");
-var tonicChange = new Bus("tonicChange");
-var modeChange = new Bus("modeChange");
-var chordChange = new Bus("chordChange");
-var toggle = new Bus("toggle");
-var tuningChange = new Bus("tuningChange");
-var leftHandedChange = new Bus("leftHandedChange");
-var flipNutChange = new Bus("flipNutChange");
-var fretboardLabelChange = new Bus("fretboardLabelChange");
-var chordIntervalChange = new Bus("chordIntervalChange");
-var scaleFamilyChange = new Bus("scaleFamilyChange");
-var midiNote = new Bus("midiNoteEvent");
-var setCToNoon = new Bus("setCToNoonEvent");
 
 // src/mod.ts
 class Mod {
@@ -10851,7 +10915,87 @@ function chromatic() {
   return indexes;
 }
 
+// src/update/updateScale.ts
+var updateScale = (current) => {
+  const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
+  if (!scaleFamily2) {
+    throw "scaleFamily is " + scaleFamily2 + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+  }
+  const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
+  if (!mode) {
+    throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+  }
+  const noteSpec = createNoteSpec(current.naturalIndex, current.index);
+  const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily2);
+  current.toggledIndexes = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
+  return {
+    music: {
+      nodes,
+      mode
+    },
+    state: current
+  };
+};
+
+// src/menu.ts
+var view3 = (_, ctx, raise) => {
+  if (ctx.init) {
+    init();
+  }
+};
+function init() {
+  const menuItems = document.getElementsByClassName("menu");
+  for (const menuItem of menuItems) {
+    menuItem.addEventListener("click", onMenuClick);
+  }
+  document.addEventListener("mouseup", (event) => {
+    const targetElement = event.target;
+    if (targetElement.closest(".dropdown-content") === null && targetElement.closest(".menu") === null) {
+      const contentElements = document.getElementsByClassName("dropdown-content");
+      for (const contentElement of contentElements) {
+        if (contentElement.classList.contains("dropdown-content-visible")) {
+          contentElement.classList.remove("dropdown-content-visible");
+        }
+      }
+    }
+  });
+}
+function onMenuClick(event) {
+  const menuElement = event.target;
+  const currentContentElement = menuElement.parentElement.querySelector(".dropdown-content");
+  const contentElements = document.getElementsByClassName("dropdown-content");
+  for (const contentElement of contentElements) {
+    if (contentElement === currentContentElement) {
+      currentContentElement.classList.toggle("dropdown-content-visible");
+    } else {
+      contentElement.classList.remove("dropdown-content-visible");
+    }
+  }
+}
+
 // src/tonics.ts
+var import_d3 = __toESM(require_d3(), 1);
+var view4 = (model, ctx, raise) => {
+  if (ctx.init) {
+    const pad = 5;
+    const buttonHeight = 25;
+    const svg = import_d3.default.select("#modes");
+    const tonics = svg.append("g");
+    const gs = tonics.selectAll("g").data(naturals).enter().append("g").attr("transform", function(d, i) {
+      return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")";
+    }).selectAll("g").data((d) => bg(d), indexer).enter().append("g").attr("transform", function(d, i) {
+      return "translate(" + i * 55 + ", 0)";
+    });
+    buttons = gs.append("rect").attr("x", pad).attr("y", 0).attr("strokeWidth", 2).attr("width", 40).attr("height", 25).attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button").on("click", (d) => raise({ id: "TonicChanged", noteSpec: d.noteSpec }));
+    gs.append("text").attr("x", pad + 10).attr("y", 17).text(function(x) {
+      return x.noteSpec.label;
+    }).attr("class", "tonic-text");
+  }
+  const ds = [{
+    noteSpec: createNoteSpec(model.state.naturalIndex, model.state.index)
+  }];
+  buttons.data(ds, indexer).attr("class", "tonic-button tonic-button-selected").exit().attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
+};
 var buttons;
 function bg(natural) {
   const flatIndex = natural.index == 0 ? 11 : natural.index - 1;
@@ -10862,28 +11006,6 @@ function bg(natural) {
     { noteSpec: createNoteSpec(natural.index, sharpIndex) }
   ];
 }
-function init2() {
-  const pad = 5;
-  const buttonHeight = 25;
-  const svg = d3.select("#modes");
-  const tonics = svg.append("g");
-  const gs = tonics.selectAll("g").data(naturals).enter().append("g").attr("transform", function(d, i) {
-    return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")";
-  }).selectAll("g").data((d) => bg(d), indexer).enter().append("g").attr("transform", function(d, i) {
-    return "translate(" + i * 55 + ", 0)";
-  });
-  buttons = gs.append("rect").attr("x", pad).attr("y", 0).attr("strokeWidth", 2).attr("width", 40).attr("height", 25).attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button").on("click", (d) => tonicChange.publish({ noteSpec: d.noteSpec }));
-  gs.append("text").attr("x", pad + 10).attr("y", 17).text(function(x) {
-    return x.noteSpec.label;
-  }).attr("class", "tonic-text");
-  tonicChange.subscribe(listener);
-}
-function listener(tonicChanged) {
-  const ds = [{
-    noteSpec: tonicChanged.noteSpec
-  }];
-  buttons.data(ds, indexer).attr("class", "tonic-button tonic-button-selected").exit().attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
-}
 function indexer(d) {
   return d.noteSpec.label;
 }
@@ -10892,220 +11014,71 @@ function isSameNoteAsNatural(noteSpec) {
 }
 
 // src/modes.ts
-var d32 = __toESM(require_d3(), 1);
-var buttons2;
-var modes;
-function init3(scaleFamily2) {
-  const svg = d32.select("#modes");
-  modes = svg.append("g").attr("transform", "translate(0, 280)");
-  drawButtons(scaleFamily2);
-  modeChange.subscribe(update);
-  scaleFamilyChange.subscribe(handleScaleFamilyChangedEvent);
-}
-function drawButtons(scaleFamily2) {
+var import_d32 = __toESM(require_d3(), 1);
+var view5 = (model, ctx, raise) => {
+  if (ctx.init) {
+    const svg = import_d32.default.select("#modes");
+    modes = svg.append("g").attr("transform", "translate(0, 280)");
+  }
+  const scaleFamily2 = scaleFamily[model.state.scaleFamilyIndex];
+  const activeMode = scaleFamily2.modes.find((x) => x.index === model.state.modeIndex);
+  if (!activeMode) {
+    throw new Error("Invalid mode index");
+  }
   const pad = 5;
   const buttonHeight = 25;
   modes.selectAll("g").remove();
   const gs = modes.selectAll("g").data(scaleFamily2.modes, index);
   gs.exit().remove();
   gs.enter().append("g").attr("transform", (d, i) => "translate(0, " + (i * (buttonHeight + pad) + pad) + ")");
-  buttons2 = gs.append("rect").attr("x", pad).attr("y", 0).attr("strokeWidth", 2).attr("width", 150).attr("height", 25).attr("class", "mode-button").on("click", (d) => modeChange.publish({ mode: d }));
+  buttons2 = gs.append("rect").attr("x", pad).attr("y", 0).attr("strokeWidth", 2).attr("width", 150).attr("height", 25).attr("class", "mode-button").on("click", (d) => raise({ id: "ModeChanged", mode: d }));
   gs.append("text").attr("x", pad + 10).attr("y", 17).text((x) => x.name).attr("class", "mode-text");
-  const defaultMode = scaleFamily2.modes.find((x) => x.index == scaleFamily2.defaultModeIndex);
-  highlightActiveMode(defaultMode);
-}
-function update(modeChange2) {
-  highlightActiveMode(modeChange2.mode);
-}
+  highlightActiveMode(activeMode);
+};
+var buttons2;
+var modes;
 function highlightActiveMode(mode) {
   const modes2 = [mode];
   buttons2.data(modes2, index).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
-}
-function handleScaleFamilyChangedEvent(scaleFamilyChangedEvent) {
-  drawButtons(scaleFamilyChangedEvent.scaleFamily);
 }
 function index(mode) {
   return mode.index.toString();
 }
 
 // src/chord-interval.ts
-var d33 = __toESM(require_d3(), 1);
+var import_d33 = __toESM(require_d3(), 1);
 var buttons3;
-var toggle2 = 0;
-function init4() {
-  const radius = 10;
-  const pad = 2;
-  const svg = d33.select("#modes");
-  const intervals2 = svg.append("g").attr("transform", "translate(0, 240)");
-  const gs = intervals2.selectAll("g").data([0, 1, 2, 3, 4, 5, 6], function(i) {
-    return i.toString();
-  }).enter().append("g").attr("transform", function(d, i) {
-    return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)";
-  });
-  buttons3 = gs.append("circle").attr("cx", radius).attr("cy", radius).attr("r", radius).attr("strokeWidth", 2).attr("class", "mode-button").on("click", onClick);
-  gs.append("text").attr("x", radius).attr("y", radius + 5).attr("text-anchor", "middle").text(function(x) {
-    return x + 1;
-  });
-  chordIntervalChange.subscribe(update2);
-}
-function onClick(x) {
-  const updatedToggle = toggle2 ^ 2 ** x;
-  const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter((x2) => (2 ** x2 & updatedToggle) === 2 ** x2);
-  chordIntervalChange.publish({ chordIntervals });
-}
-function update2(event) {
-  toggle2 = 0;
-  event.chordIntervals.forEach((x) => toggle2 = toggle2 + 2 ** x);
-  buttons3.data(event.chordIntervals, function(m) {
+var toggle = 0;
+var view6 = (model, ctx, raise) => {
+  const onClick = (x) => {
+    const updatedToggle = toggle ^ 2 ** x;
+    const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter((x2) => (2 ** x2 & updatedToggle) === 2 ** x2);
+    raise({ id: "ChordIntervalChange", chordIntervals });
+  };
+  if (ctx.init) {
+    const radius = 10;
+    const pad = 2;
+    const svg = import_d33.default.select("#modes");
+    const intervals2 = svg.append("g").attr("transform", "translate(0, 240)");
+    const gs = intervals2.selectAll("g").data([0, 1, 2, 3, 4, 5, 6], function(i) {
+      return i.toString();
+    }).enter().append("g").attr("transform", function(d, i) {
+      return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)";
+    });
+    buttons3 = gs.append("circle").attr("cx", radius).attr("cy", radius).attr("r", radius).attr("strokeWidth", 2).attr("class", "mode-button").on("click", onClick);
+    gs.append("text").attr("x", radius).attr("y", radius + 5).attr("text-anchor", "middle").text(function(x) {
+      return x + 1;
+    });
+  }
+  toggle = 0;
+  model.state.chordIntervals.forEach((x) => toggle = toggle + 2 ** x);
+  buttons3.data(model.state.chordIntervals, function(m) {
     return m.toString();
   }).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
-}
-
-// src/cof.ts
-var d34 = __toESM(require_d3(), 1);
-class NoteCircle {
-  indexer = (x) => x.index + "";
-  constructor(svg2, noteIndexes, label) {
-    let state = this.draw(svg2, rotate(noteIndexes, 3), label);
-    let setCToNoonSubscriptionIndex = -1;
-    scaleChange.subscribe((scaleChnaged) => {
-      this.update(scaleChnaged, state);
-      setCToNoonSubscriptionIndex = setCToNoon.resubscribe((setCToNoonEvent) => {
-        const offset = setCToNoonEvent.isC ? 3 : 0;
-        svg2.selectAll("*").remove();
-        state = this.draw(svg2, rotate(noteIndexes, offset), label);
-        this.update(scaleChnaged, state);
-      }, setCToNoonSubscriptionIndex);
-    });
-  }
-  draw(svg2, noteIndexes, label) {
-    const pad = 50;
-    const chordRadius = 240;
-    const noteRadius = 200;
-    const degreeRadius = 135;
-    const innerRadius = 90;
-    const cof = svg2.append("g").attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
-    cof.append("text").attr("text-anchor", "middle").attr("x", 0).attr("y", 0).text(label);
-    const segments = generateSegments(noteIndexes);
-    const noteArc = d34.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
-    const degreeArc = d34.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
-    const chordArc = d34.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
-    const noteSegments = cof.append("g").selectAll("path").data(segments, this.indexer).enter().append("path").attr("d", noteArc).attr("class", "note-segment").on("click", handleNoteClick);
-    const noteText = cof.append("g").selectAll("text").data(segments).enter().append("text").attr("x", function(x) {
-      return noteArc.centroid(x)[0];
-    }).attr("y", function(x) {
-      return noteArc.centroid(x)[1] + 11;
-    }).text("").attr("class", "note-segment-text");
-    const intervalSegments = cof.append("g").selectAll("path").data(segments, this.indexer).enter().append("path").attr("d", degreeArc).attr("class", "interval-segment").on("click", handleIntervalClick);
-    const intervalNotes = cof.append("g").selectAll("circle").data(segments, this.indexer).enter().append("circle").style("pointer-events", "none").attr("r", 25).attr("cx", function(x) {
-      return degreeArc.centroid(x)[0];
-    }).attr("cy", function(x) {
-      return degreeArc.centroid(x)[1];
-    }).attr("class", "interval-note");
-    const intervalText = cof.append("g").selectAll("text").data(segments, this.indexer).enter().append("text").attr("x", function(x) {
-      return degreeArc.centroid(x)[0];
-    }).attr("y", function(x) {
-      return degreeArc.centroid(x)[1] + 8;
-    }).text("").attr("class", "degree-segment-text");
-    const chordSegments = cof.append("g").selectAll("path").data(segments, this.indexer).enter().append("path").attr("d", chordArc).attr("class", "chord-segment").on("click", handleChordClick);
-    const chordNotes = cof.append("g").selectAll("circle").data(segments, this.indexer).enter().append("circle").style("pointer-events", "none").attr("r", 28).attr("cx", function(x) {
-      return chordArc.centroid(x)[0];
-    }).attr("cy", function(x) {
-      return chordArc.centroid(x)[1];
-    }).attr("class", "chord-segment-note");
-    const chordText = cof.append("g").selectAll("text").data(segments, this.indexer).enter().append("text").attr("x", function(x) {
-      return chordArc.centroid(x)[0];
-    }).attr("y", function(x) {
-      return chordArc.centroid(x)[1] + 8;
-    }).text("").attr("class", "degree-segment-text");
-    return {
-      noteSegments,
-      noteText,
-      intervalSegments,
-      intervalNotes,
-      intervalText,
-      chordSegments,
-      chordNotes,
-      chordText
-    };
-  }
-  update(scaleChnaged, state) {
-    const data = scaleChnaged.nodes.map((node) => ({
-      startAngle: 0,
-      endAngle: 0,
-      scaleNote: {},
-      index: node.scaleNote.note.index,
-      node
-    }));
-    state.noteSegments.data(data, this.indexer).attr("class", (d, i) => "note-segment " + (d.node.scaleNote.isScaleNote ? i === 0 ? "note-segment-tonic" : "note-segment-scale" : ""));
-    state.noteText.data(data, this.indexer).text((d) => d.node.scaleNote.note.label);
-    state.intervalSegments.data(data, this.indexer).attr("class", (d) => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
-    state.intervalText.data(data, this.indexer).text((d) => d.node.intervalName);
-    state.intervalNotes.data(data, this.indexer).attr("class", (d) => d.node.toggle ? "interval-note-selected" : "interval-note").style("fill", (d) => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none").style("stroke-width", (d) => d.node.midiToggle ? "20px" : "2px").style("stroke", (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
-    state.chordText.data(data, this.indexer).text((d) => d.node.scaleNote.chord.romanNumeral + "");
-    state.chordSegments.data(data, this.indexer).attr("class", (d) => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
-    state.chordNotes.data(data, this.indexer).attr("class", (d) => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
-  }
-}
-function getChordSegmentClass(chord) {
-  if (chord.type === 2 /* Diminished */)
-    return "chord-segment-dim";
-  if (chord.type === 3 /* Augmented */)
-    return "chord-segment-aug";
-  if (chord.type === 1 /* Minor */)
-    return "chord-segment-minor";
-  if (chord.type === 0 /* Major */)
-    return "chord-segment-major";
-  throw "Unexpected ChordType";
-}
-function generateSegments(fifths2) {
-  const count = fifths2.length;
-  const items = [];
-  const angle = Math.PI * (2 / count);
-  for (let i = 0;i < count; i++) {
-    const itemAngle = angle * i - angle / 2;
-    items.push({
-      startAngle: itemAngle,
-      endAngle: itemAngle + angle,
-      index: fifths2[i],
-      node: nullNode
-    });
-  }
-  return items;
-}
-function handleNoteClick(segment, i) {
-  tonicChange.publish({
-    noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
-  });
-}
-function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
-  if (Math.abs(noteSpec.offset) > 1) {
-    const naturalId = noteSpec.natural.id;
-    const newNaturalId = noteSpec.offset > 0 ? naturalId + 1 % 7 : naturalId == 0 ? 6 : naturalId - 1;
-    const newNatural = naturals.filter((x) => x.id === newNaturalId)[0];
-    return createNoteSpec(newNatural.index, noteSpec.index);
-  }
-  return noteSpec;
-}
-function handleChordClick(segment, i) {
-  chordChange.publish({ chordIndex: segment.node.scaleNote.note.index });
-}
-function handleIntervalClick(segment, i) {
-  toggle.publish({ index: segment.node.scaleNote.note.index });
-}
-function rotate(array, offset) {
-  const newArray = [];
-  for (const item of array) {
-    newArray.push((item + offset) % 12);
-  }
-  return newArray;
-}
-
-// src/gtr.ts
-var d36 = __toESM(require_d3(), 1);
+};
 
 // src/tuning.ts
-var d35 = __toESM(require_d3(), 1);
+var d34 = __toESM(require_d3(), 1);
 var guitarDots = [
   [3, 0],
   [5, 0],
@@ -11151,7 +11124,7 @@ var tuningInfos = [
   { tuning: "GDAE", dots: violaDots, description: "Violin" },
   { tuning: "CGDA", dots: violaDots, description: "Viola" }
 ];
-var tunings = [];
+var tunings = buildTunings();
 function parseTuning(tuning) {
   const tokens = [];
   const result = [];
@@ -11179,7 +11152,8 @@ function parseTuning(tuning) {
   }
   return result;
 }
-function init5() {
+function buildTunings() {
+  const tunings2 = [];
   let index2 = 0;
   for (const info of tuningInfos) {
     const tuning = {
@@ -11189,239 +11163,36 @@ function init5() {
       description: info.description,
       notes: parseTuning(info.tuning)
     };
-    tunings.push(tuning);
+    tunings2.push(tuning);
     index2++;
   }
-  d35.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", (x) => raiseTuningChangedEvent(x)).text((x) => x.tuning + "   " + x.description);
-  raiseTuningChangedEvent(tunings[0]);
+  return tunings2;
 }
-function raiseTuningChangedEvent(tuning) {
-  tuningChange.publish({
-    index: tuning.index
-  });
-}
-
-// src/gtr.ts
-var currentTuning;
-var currentState;
-var notes;
-var noteLabels2;
-var numberOfFrets = 16;
-var fretboardElement;
-var isLeftHanded = false;
-var isNutFlipped = false;
-var fretboardLabelType = "NoteName";
-var stringGap = 40;
-var fretGap = 70;
-var fretWidth = 5;
-var noteRadius = 15;
-var pad = 20;
-function indexer2(stringNote) {
-  return stringNote.index + "_" + stringNote.octave;
-}
-function init6() {
-  tuningChange.subscribe(handleTuningChange);
-  scaleChange.subscribe(update3);
-  leftHandedChange.subscribe(handleLeftHandedChanged);
-  flipNutChange.subscribe(handleFlipNutChanged);
-  fretboardLabelChange.subscribe(handleLabelChange);
-}
-function handleTuningChange(tuningChangedEvent) {
-  const newTuning = tunings.find((x) => x.index == tuningChangedEvent.index);
-  updateFretboard(newTuning);
-}
-function handleLeftHandedChanged(lhEvent) {
-  isLeftHanded = lhEvent.isLeftHanded;
-  if (currentTuning != null) {
-    updateFretboard(currentTuning);
-  }
-}
-function setHandedness() {
-  if (isLeftHanded) {
-    fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
-    fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
-    noteLabels2.attr("transform", (d, i) => "translate(0, 0) scale(-1, 1)").attr("x", (d, i) => -(i * fretGap + pad + 30));
-  } else {
-    fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
-    fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
-    noteLabels2.attr("transform", (d, i) => "translate(0, 0) scale(1, 1)").attr("x", (d, i) => i * fretGap + pad + 30);
-  }
-}
-function handleFlipNutChanged(fnEvent) {
-  isNutFlipped = fnEvent.isNutFlipped;
-  if (currentTuning != null) {
-    updateFretboard(currentTuning);
-  }
-}
-function handleLabelChange(lcEvent) {
-  fretboardLabelType = lcEvent.labelType;
-  setLabels();
-}
-function setLabels() {
-  function setNoteName(note) {
-    return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
-  }
-  function setInterval(note) {
-    return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.intervalName : "";
-  }
-  switch (fretboardLabelType) {
-    case "None":
-      noteLabels2.text("");
-      break;
-    case "NoteName":
-      noteLabels2.text(setNoteName);
-      break;
-    case "Interval":
-      noteLabels2.text(setInterval);
-      break;
-    default:
-      throw new Error(`Unexpected label type: ${fretboardLabelType}`);
-  }
-}
-function updateFretboard(tuningInfo) {
-  currentTuning = tuningInfo;
-  const fretData = getFretData(numberOfFrets);
-  const dots = tuningInfo.dots;
-  d36.selectAll("#gtr > *").remove();
-  const svg2 = d36.select("#gtr");
-  svg2.append("text").attr("class", "mode-text").attr("x", 30).attr("y", 11).text(tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : ""));
-  const gtr = svg2.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
-  fretboardElement = gtr.node();
-  gtr.append("g").selectAll("rect").data(fretData).enter().append("rect").attr("x", function(d, i) {
-    return (i + 1) * fretGap + pad - fretWidth;
-  }).attr("y", pad + stringGap / 2 - fretWidth).attr("width", fretWidth).attr("height", stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2).attr("fill", function(d, i) {
-    return i === 0 ? "black" : "none";
-  }).attr("stroke", "grey").attr("stroke-width", 1);
-  gtr.append("g").selectAll("circle").data(dots).enter().append("circle").attr("r", 10).attr("cx", function(d) {
-    return d[0] * fretGap + pad + 30 + d[1] * 10;
-  }).attr("cy", function(d) {
-    return tuningInfo.notes.length * stringGap + pad + 15;
-  }).attr("fill", "lightgrey").attr("stroke", "none");
-  const strings = gtr.append("g").selectAll("g").data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => i + "").enter().append("g").attr("transform", function(d, i) {
-    return "translate(0, " + (i * stringGap + pad) + ")";
-  });
-  strings.append("line").attr("x1", pad + fretGap).attr("y1", stringGap / 2).attr("x2", pad + fretGap * numberOfFrets + 20).attr("y2", stringGap / 2).attr("stroke", "black").attr("stroke-width", 2);
-  notes = strings.selectAll("circle").data(function(d) {
-    return allNotesFrom(d, numberOfFrets);
-  }, indexer2).enter().append("circle").attr("r", noteRadius).attr("cy", stringGap / 2).attr("cx", function(d, i) {
-    return i * fretGap + pad + 30;
-  }).on("click", (d) => toggle.publish({ index: d.index }));
-  noteLabels2 = strings.selectAll("text").data(function(d) {
-    return allNotesFrom(d, numberOfFrets);
-  }, indexer2).enter().append("text").attr("transform", "translate(0, 0) scale(1, 1)").attr("text-anchor", "middle").attr("x", (d, i) => i * fretGap + pad + 30).attr("y", stringGap / 2 + 5).text("");
-  setHandedness();
-  if (currentState != null) {
-    update3(currentState);
-  }
-}
-function update3(stateChange2) {
-  const hasToggledNotes = stateChange2.nodes.some((x) => x.toggle);
-  const fill = function(d) {
-    return d.node.toggle ? "white" : d.node.scaleNote.isScaleNote ? d.node.scaleNote.noteNumber === 0 ? hasToggledNotes ? "white" : "yellow" : "white" : "rgba(255, 255, 255, 0.01)";
-  };
-  const stroke = function(d) {
-    return d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : hasToggledNotes ? "none" : d.node.scaleNote.isScaleNote ? "grey" : "none";
-  };
-  const strokeWidth = function(d) {
-    return d.node.midiToggle ? 10 : d.node.toggle ? 4 : d.node.scaleNote.isScaleNote ? 2 : 0;
-  };
-  const data = repeatTo(stateChange2.nodes, numberOfFrets);
-  notes.data(data, indexer2).attr("fill", fill).attr("stroke", stroke).attr("stroke-width", strokeWidth);
-  noteLabels2.data(data, indexer2);
-  setLabels();
-  currentState = stateChange2;
-}
-function allNotesFrom(index2, numberOfNotes) {
-  const items = [];
-  for (let i = 0;i < numberOfNotes; i++) {
-    items.push({
-      octave: Math.floor((i + 1) / 12),
-      index: (i + index2) % 12,
-      node: nullNode
+var view7 = (_, ctx, raise) => {
+  const raiseTuningChangedEvent = (tuning) => {
+    raise({
+      id: "TuningChanged",
+      index: tuning.index
     });
+  };
+  if (ctx.init) {
+    d34.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseTuningChangedEvent).text((x) => x.tuning + "   " + x.description);
   }
-  return items;
-}
-function getFretData(numberOfFrets2) {
-  const data = [];
-  for (let i = 0;i < numberOfFrets2; i++) {
-    data.push(i);
-  }
-  return data;
-}
-function repeatTo(nodes, count) {
-  let stringNotes = [];
-  for (let i = 0;i <= Math.floor(count / 12); i++) {
-    stringNotes = stringNotes.concat(nodes.map((x) => ({
-      octave: i,
-      index: x.scaleNote.note.index,
-      node: x
-    })));
-  }
-  return stringNotes;
-}
+};
 
 // src/scale-family.ts
-var d37 = __toESM(require_d3(), 1);
-function init7() {
-  d37.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", (x) => raiseScaleFamilyChangedEvent(x)).text((x) => x.name);
-}
-function raiseScaleFamilyChangedEvent(scaleFamily2) {
-  scaleFamilyChange.publish({
-    scaleFamily: scaleFamily2
-  });
-}
-
-// src/settings.ts
-var exports_settings = {};
-__export(exports_settings, {
-  onSetCToNoon: () => onSetCToNoon,
-  onLeftHandedClick: () => onLeftHandedClick,
-  onFlipNut: () => onFlipNut,
-  onFbNoteTextClick: () => onFbNoteTextClick,
-  init: () => init8
-});
-function init8() {
-  leftHandedChange.subscribe((e) => {
-    const checkbox = document.getElementById("left-handed-checkbox");
-    checkbox.checked = e.isLeftHanded;
-  });
-  flipNutChange.subscribe((e) => {
-    const checkbox = document.getElementById("flip-nut-checkbox");
-    checkbox.checked = e.isNutFlipped;
-  });
-  setCToNoon.subscribe((e) => {
-    const checkbox = document.getElementById("set-c-to-noon-checkbox");
-    checkbox.checked = e.isC;
-  });
-  fretboardLabelChange.subscribe((e) => {
-    const selected = "fb-note-text-" + String(e.labelType);
-    const radio = document.getElementById(selected);
-    radio.checked = true;
-  });
-}
-function onLeftHandedClick(e) {
-  leftHandedChange.publish({ isLeftHanded: e.checked });
-}
-function onFlipNut(e) {
-  flipNutChange.publish({ isNutFlipped: e.checked });
-}
-function onSetCToNoon(e) {
-  setCToNoon.publish({ isC: e.checked });
-}
-function onFbNoteTextClick(e) {
-  fretboardLabelChange.publish({ labelType: e.value });
-}
-
-// src/permalink.ts
-var exports_permalink = {};
-__export(exports_permalink, {
-  populatePermalinkText: () => populatePermalinkText,
-  init: () => init11,
-  getState: () => getState,
-  getCurrentState: () => getCurrentState,
-  generatePermalink: () => generatePermalink
-});
+var import_d34 = __toESM(require_d3(), 1);
+var view8 = (_, ctx, raise) => {
+  function raiseScaleFamilyChangedEvent(scaleFamily2) {
+    raise({
+      id: "ScaleFamilyChange",
+      scaleFamily: scaleFamily2
+    });
+  }
+  if (ctx.init) {
+    import_d34.default.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseScaleFamilyChangedEvent).text((x) => x.name);
+  }
+};
 
 // node_modules/zod/v4/classic/external.js
 var exports_external = {};
@@ -11947,7 +11718,7 @@ var NEVER = Object.freeze({
   status: "aborted"
 });
 function $constructor(name, initializer, params) {
-  function init9(inst, def) {
+  function init2(inst, def) {
     if (!inst._zod) {
       Object.defineProperty(inst, "_zod", {
         value: {
@@ -11980,14 +11751,14 @@ function $constructor(name, initializer, params) {
   function _(def) {
     var _a;
     const inst = params?.Parent ? new Definition : this;
-    init9(inst, def);
+    init2(inst, def);
     (_a = inst._zod).deferred ?? (_a.deferred = []);
     for (const fn of inst._zod.deferred) {
       fn();
     }
     return inst;
   }
-  Object.defineProperty(_, "init", { value: init9 });
+  Object.defineProperty(_, "init", { value: init2 });
   Object.defineProperty(_, Symbol.hasInstance, {
     value: (inst) => {
       if (params?.Parent && inst instanceof params.Parent)
@@ -24973,283 +24744,478 @@ var StateSchema = exports_external.object({
   tuningIndex: exports_external.number()
 });
 
-// src/cookie.ts
-var cookieName = "gtr-cof-state-v4";
-function init9() {
-  stateChange.subscribe(bakeCookie2);
-}
-function bakeCookie2(stateChange2) {
-  const json2 = JSON.stringify(stateChange2.state);
-  document.cookie = cookieName + "=" + json2 + ";";
-}
-function readCookie2() {
-  const result = document.cookie.match(new RegExp(cookieName + "=([^;]+)"));
-  if (result != null) {
-    const parsed = StateSchema.safeParse(JSON.parse(result[1]));
-    if (!parsed.success) {
-      console.log("Invalid cookie state:", parsed.error.message);
-      return null;
-    }
-    return parsed.data;
+// src/storage.ts
+var STORAGE_KEY = "app_state";
+var view9 = ({ state }, _ctx, _raise2) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+};
+var getStateFromLocalStorage = () => {
+  const stateString = localStorage.getItem(STORAGE_KEY);
+  if (!stateString) {
+    return defaultState;
   }
-  return null;
+  const parsed = StateSchema.safeParse(JSON.parse(stateString));
+  if (!parsed.success) {
+    console.log("Invalid cookie state:", parsed.error.message);
+    return defaultState;
+  }
+  return parsed.data;
+};
+
+// src/circle.ts
+var import_d35 = __toESM(require_d3(), 1);
+var create = (svgId, noteIndexes, label) => {
+  const svg = import_d35.default.select(svgId);
+  let state;
+  let isCNoon = true;
+  return (model, ctx, raise) => {
+    if (ctx.init || isCNoon !== model.state.circleIsCNoon) {
+      const offset = model.state.circleIsCNoon ? 3 : 0;
+      state = draw(svg, rotate(noteIndexes, offset), label, raise);
+      isCNoon = model.state.circleIsCNoon;
+    }
+    update(model.music, state);
+  };
+};
+var indexer2 = (x) => x.index.toString();
+function draw(svg, noteIndexes, label, raise) {
+  const pad = 50;
+  const chordRadius = 240;
+  const noteRadius = 200;
+  const degreeRadius = 135;
+  const innerRadius = 90;
+  const handleNoteClick = (segment, i) => {
+    raise({
+      id: "TonicChanged",
+      noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
+    });
+  };
+  const handleChordClick = (segment, i) => {
+    raise({
+      id: "ChordChanged",
+      chordIndex: segment.node.scaleNote.note.index
+    });
+  };
+  const handleIntervalClick = (segment, i) => {
+    raise({
+      id: "Toggle",
+      index: segment.node.scaleNote.note.index
+    });
+  };
+  svg.selectAll("*").remove();
+  const cof = svg.append("g").attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
+  cof.append("text").attr("text-anchor", "middle").attr("x", 0).attr("y", 0).text(label);
+  const segments = generateSegments(noteIndexes);
+  const noteArc = import_d35.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
+  const degreeArc = import_d35.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
+  const chordArc = import_d35.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
+  const noteSegments = cof.append("g").selectAll("path").data(segments, indexer2).enter().append("path").attr("d", noteArc).attr("class", "note-segment").on("click", handleNoteClick);
+  const noteText = cof.append("g").selectAll("text").data(segments).enter().append("text").attr("x", function(x) {
+    return noteArc.centroid(x)[0];
+  }).attr("y", function(x) {
+    return noteArc.centroid(x)[1] + 11;
+  }).text("").attr("class", "note-segment-text");
+  const intervalSegments = cof.append("g").selectAll("path").data(segments, indexer2).enter().append("path").attr("d", degreeArc).attr("class", "interval-segment").on("click", handleIntervalClick);
+  const intervalNotes = cof.append("g").selectAll("circle").data(segments, indexer2).enter().append("circle").style("pointer-events", "none").attr("r", 25).attr("cx", function(x) {
+    return degreeArc.centroid(x)[0];
+  }).attr("cy", function(x) {
+    return degreeArc.centroid(x)[1];
+  }).attr("class", "interval-note");
+  const intervalText = cof.append("g").selectAll("text").data(segments, indexer2).enter().append("text").attr("x", function(x) {
+    return degreeArc.centroid(x)[0];
+  }).attr("y", function(x) {
+    return degreeArc.centroid(x)[1] + 8;
+  }).text("").attr("class", "degree-segment-text");
+  const chordSegments = cof.append("g").selectAll("path").data(segments, indexer2).enter().append("path").attr("d", chordArc).attr("class", "chord-segment").on("click", handleChordClick);
+  const chordNotes = cof.append("g").selectAll("circle").data(segments, indexer2).enter().append("circle").style("pointer-events", "none").attr("r", 28).attr("cx", function(x) {
+    return chordArc.centroid(x)[0];
+  }).attr("cy", function(x) {
+    return chordArc.centroid(x)[1];
+  }).attr("class", "chord-segment-note");
+  const chordText = cof.append("g").selectAll("text").data(segments, indexer2).enter().append("text").attr("x", function(x) {
+    return chordArc.centroid(x)[0];
+  }).attr("y", function(x) {
+    return chordArc.centroid(x)[1] + 8;
+  }).text("").attr("class", "degree-segment-text");
+  return {
+    noteSegments,
+    noteText,
+    intervalSegments,
+    intervalNotes,
+    intervalText,
+    chordSegments,
+    chordNotes,
+    chordText
+  };
+}
+function update(scaleChnaged, state) {
+  const data = scaleChnaged.nodes.map((node) => ({
+    startAngle: 0,
+    endAngle: 0,
+    scaleNote: {},
+    index: node.scaleNote.note.index,
+    node
+  }));
+  state.noteSegments.data(data, indexer2).attr("class", (d, i) => "note-segment " + (d.node.scaleNote.isScaleNote ? i === 0 ? "note-segment-tonic" : "note-segment-scale" : ""));
+  state.noteText.data(data, indexer2).text((d) => d.node.scaleNote.note.label);
+  state.intervalSegments.data(data, indexer2).attr("class", (d) => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
+  state.intervalText.data(data, indexer2).text((d) => d.node.intervalName);
+  state.intervalNotes.data(data, indexer2).attr("class", (d) => d.node.toggle ? "interval-note-selected" : "interval-note").style("fill", (d) => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none").style("stroke-width", (d) => d.node.midiToggle ? "20px" : "2px").style("stroke", (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
+  state.chordText.data(data, indexer2).text((d) => d.node.scaleNote.chord.romanNumeral + "");
+  state.chordSegments.data(data, indexer2).attr("class", (d) => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
+  state.chordNotes.data(data, indexer2).attr("class", (d) => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
+}
+function getChordSegmentClass(chord) {
+  if (chord.type === 2 /* Diminished */)
+    return "chord-segment-dim";
+  if (chord.type === 3 /* Augmented */)
+    return "chord-segment-aug";
+  if (chord.type === 1 /* Minor */)
+    return "chord-segment-minor";
+  if (chord.type === 0 /* Major */)
+    return "chord-segment-major";
+  throw "Unexpected ChordType";
+}
+function generateSegments(fifths2) {
+  const count = fifths2.length;
+  const items = [];
+  const angle = Math.PI * (2 / count);
+  for (let i = 0;i < count; i++) {
+    const itemAngle = angle * i - angle / 2;
+    items.push({
+      startAngle: itemAngle,
+      endAngle: itemAngle + angle,
+      index: fifths2[i],
+      node: nullNode
+    });
+  }
+  return items;
+}
+function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
+  if (Math.abs(noteSpec.offset) > 1) {
+    const naturalId = noteSpec.natural.id;
+    const newNaturalId = noteSpec.offset > 0 ? naturalId + 1 % 7 : naturalId == 0 ? 6 : naturalId - 1;
+    const newNatural = naturals.filter((x) => x.id === newNaturalId)[0];
+    return createNoteSpec(newNatural.index, noteSpec.index);
+  }
+  return noteSpec;
+}
+function rotate(array2, offset) {
+  const newArray = [];
+  for (const item of array2) {
+    newArray.push((item + offset) % 12);
+  }
+  return newArray;
 }
 
-// src/state.ts
-var defaultState = {
-  index: 3,
-  naturalIndex: 3,
-  chordIndex: -1,
-  chordIntervals: [0, 2, 4],
-  toggledIndexes: 0,
-  scaleFamilyIndex: 0,
-  modeIndex: 0,
-  midiToggledIndexes: 0,
-  isLeftHanded: false,
-  isNutFlipped: false,
-  fretboardLabelType: "NoteName",
-  circleIsCNoon: true,
-  tuningIndex: 0
-};
-var current = {
-  index: defaultState.index,
-  naturalIndex: defaultState.naturalIndex,
-  chordIndex: defaultState.chordIndex,
-  chordIntervals: defaultState.chordIntervals,
-  toggledIndexes: defaultState.toggledIndexes,
-  scaleFamilyIndex: defaultState.scaleFamilyIndex,
-  modeIndex: defaultState.modeIndex,
-  midiToggledIndexes: defaultState.midiToggledIndexes,
-  isLeftHanded: defaultState.isLeftHanded,
-  isNutFlipped: defaultState.isNutFlipped,
-  fretboardLabelType: defaultState.fretboardLabelType,
-  circleIsCNoon: defaultState.circleIsCNoon,
-  tuningIndex: defaultState.tuningIndex
-};
-function init10() {
-  try {
-    const cookieState = readCookie2();
-    if (cookieState !== null) {
-      current = cookieState;
+// src/guitar.ts
+var import_d36 = __toESM(require_d3(), 1);
+var stringGap = 40;
+var fretGap = 70;
+var fretWidth = 5;
+var noteRadius = 15;
+var pad = 20;
+var numberOfFrets = 16;
+var indexer3 = (stringNote) => stringNote.index + "_" + stringNote.octave;
+var create2 = () => {
+  let tuningIndex = 0;
+  let isLeftHanded = false;
+  let isNutFlipped = false;
+  let fretboardLabelType = "NoteName";
+  let notes;
+  let noteLabels2;
+  let fretboardElement;
+  const fretboardStateHasChanged = (model) => tuningIndex !== model.state.tuningIndex || isLeftHanded !== model.state.isLeftHanded || isNutFlipped !== model.state.isNutFlipped || fretboardLabelType !== model.state.fretboardLabelType;
+  const setFretboardState = (model) => {
+    tuningIndex = model.state.tuningIndex;
+    isLeftHanded = model.state.isLeftHanded;
+    isNutFlipped = model.state.isNutFlipped;
+    fretboardLabelType = model.state.fretboardLabelType;
+  };
+  return (model, ctx, raise) => {
+    if (ctx.init || fretboardStateHasChanged(model)) {
+      setFretboardState(model);
+      drawFretboard(tunings[model.state.tuningIndex], raise);
     }
-  } catch (e) {}
-  current = getState(current);
-  const tempChordIndex = current.chordIndex;
-  const tempToggledIndexes = current.toggledIndexes;
-  const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
-  if (!scaleFamily2) {
-    throw "scaleFamily is " + scaleFamily2 + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+    update2(model.music);
+  };
+  function drawFretboard(tuningInfo, raise) {
+    const fretData = getFretData(numberOfFrets);
+    const dots = tuningInfo.dots;
+    import_d36.default.selectAll("#gtr > *").remove();
+    const svg = import_d36.default.select("#gtr");
+    svg.append("text").attr("class", "mode-text").attr("x", 30).attr("y", 11).text(tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : ""));
+    const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
+    fretboardElement = gtr.node();
+    gtr.append("g").selectAll("rect").data(fretData).enter().append("rect").attr("x", function(d, i) {
+      return (i + 1) * fretGap + pad - fretWidth;
+    }).attr("y", pad + stringGap / 2 - fretWidth).attr("width", fretWidth).attr("height", stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2).attr("fill", function(d, i) {
+      return i === 0 ? "black" : "none";
+    }).attr("stroke", "grey").attr("stroke-width", 1);
+    gtr.append("g").selectAll("circle").data(dots).enter().append("circle").attr("r", 10).attr("cx", function(d) {
+      return d[0] * fretGap + pad + 30 + d[1] * 10;
+    }).attr("cy", function(d) {
+      return tuningInfo.notes.length * stringGap + pad + 15;
+    }).attr("fill", "lightgrey").attr("stroke", "none");
+    const strings = gtr.append("g").selectAll("g").data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => i + "").enter().append("g").attr("transform", function(d, i) {
+      return "translate(0, " + (i * stringGap + pad) + ")";
+    });
+    strings.append("line").attr("x1", pad + fretGap).attr("y1", stringGap / 2).attr("x2", pad + fretGap * numberOfFrets + 20).attr("y2", stringGap / 2).attr("stroke", "black").attr("stroke-width", 2);
+    notes = strings.selectAll("circle").data(function(d) {
+      return allNotesFrom(d, numberOfFrets);
+    }, indexer3).enter().append("circle").attr("r", noteRadius).attr("cy", stringGap / 2).attr("cx", function(d, i) {
+      return i * fretGap + pad + 30;
+    }).on("click", (d) => raise({ id: "Toggle", index: d.index }));
+    noteLabels2 = strings.selectAll("text").data(function(d) {
+      return allNotesFrom(d, numberOfFrets);
+    }, indexer3).enter().append("text").attr("transform", "translate(0, 0) scale(1, 1)").attr("text-anchor", "middle").attr("x", (d, i) => i * fretGap + pad + 30).attr("y", stringGap / 2 + 5).text("");
+    setHandedness();
   }
-  const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
-  if (!mode) {
-    throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+  function update2(music) {
+    const hasToggledNotes = music.nodes.some((x) => x.toggle);
+    const fill = function(d) {
+      return d.node.toggle ? "white" : d.node.scaleNote.isScaleNote ? d.node.scaleNote.noteNumber === 0 ? hasToggledNotes ? "white" : "yellow" : "white" : "rgba(255, 255, 255, 0.01)";
+    };
+    const stroke = function(d) {
+      return d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : hasToggledNotes ? "none" : d.node.scaleNote.isScaleNote ? "grey" : "none";
+    };
+    const strokeWidth = function(d) {
+      return d.node.midiToggle ? 10 : d.node.toggle ? 4 : d.node.scaleNote.isScaleNote ? 2 : 0;
+    };
+    const data = repeatTo(music.nodes, numberOfFrets);
+    notes.data(data, indexer3).attr("fill", fill).attr("stroke", stroke).attr("stroke-width", strokeWidth);
+    noteLabels2.data(data, indexer3);
+    setLabels();
   }
-  scaleFamilyChange.publish({ scaleFamily: scaleFamily2 });
-  modeChange.publish({ mode });
-  chordIntervalChange.publish({ chordIntervals: current.chordIntervals });
-  tonicChange.subscribe(tonicChanged);
-  modeChange.subscribe(modeChanged);
-  chordChange.subscribe(chordChanged);
-  toggle.subscribe(toggle3);
-  chordIntervalChange.subscribe(chordIntervalChanged);
-  scaleFamilyChange.subscribe(scaleFamilyChanged);
-  midiNote.subscribe(midiNote2);
-  tonicChange.publish({ noteSpec: createNoteSpec(current.naturalIndex, current.index) });
-  chordChange.publish({ chordIndex: tempChordIndex });
-  current.toggledIndexes = tempToggledIndexes;
-  updateScale();
-  leftHandedChange.publish({ isLeftHanded: current.isLeftHanded });
-  flipNutChange.publish({ isNutFlipped: current.isNutFlipped });
-  fretboardLabelChange.publish({ labelType: current.fretboardLabelType });
-  setCToNoon.publish({ isC: current.circleIsCNoon });
-  tuningChange.publish({ index: current.tuningIndex });
-  leftHandedChange.subscribe(leftHandedChange2);
-  flipNutChange.subscribe(flipNutChange2);
-  fretboardLabelChange.subscribe(fretboardLabelChange2);
-  setCToNoon.subscribe(setCToNoon2);
-  tuningChange.subscribe(tuningChange2);
-}
-function tonicChanged(tonicChangedEvent) {
-  console.log(`TonicChangedEvent: ${JSON.stringify(tonicChangedEvent, null, 2)}`);
-  current.index = tonicChangedEvent.noteSpec.index;
-  current.naturalIndex = tonicChangedEvent.noteSpec.natural.index;
+  function allNotesFrom(index2, numberOfNotes) {
+    const items = [];
+    for (let i = 0;i < numberOfNotes; i++) {
+      items.push({
+        octave: Math.floor((i + 1) / 12),
+        index: (i + index2) % 12,
+        node: nullNode
+      });
+    }
+    return items;
+  }
+  function getFretData(numberOfFrets2) {
+    const data = [];
+    for (let i = 0;i < numberOfFrets2; i++) {
+      data.push(i);
+    }
+    return data;
+  }
+  function repeatTo(nodes, count) {
+    let stringNotes = [];
+    for (let i = 0;i <= Math.floor(count / 12); i++) {
+      stringNotes = stringNotes.concat(nodes.map((x) => ({
+        octave: i,
+        index: x.scaleNote.note.index,
+        node: x
+      })));
+    }
+    return stringNotes;
+  }
+  function setHandedness() {
+    if (isLeftHanded) {
+      fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
+      fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
+      noteLabels2.attr("transform", (d, i) => "translate(0, 0) scale(-1, 1)").attr("x", (d, i) => -(i * fretGap + pad + 30));
+    } else {
+      fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
+      fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
+      noteLabels2.attr("transform", (d, i) => "translate(0, 0) scale(1, 1)").attr("x", (d, i) => i * fretGap + pad + 30);
+    }
+  }
+  function setLabels() {
+    function setNoteName(note) {
+      return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
+    }
+    function setInterval(note) {
+      return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.intervalName : "";
+    }
+    switch (fretboardLabelType) {
+      case "None":
+        noteLabels2.text("");
+        break;
+      case "NoteName":
+        noteLabels2.text(setNoteName);
+        break;
+      case "Interval":
+        noteLabels2.text(setInterval);
+        break;
+      default:
+        throw new Error(`Unexpected label type: ${fretboardLabelType}`);
+    }
+  }
+};
+
+// src/view/index.ts
+var createViews = () => {
+  const chromaticView = create("#chromatic", chromatic(), "Chromatic");
+  const cofView = create("#cof", fifths(), "Circle of Fifths");
+  const guitarView = create2();
+  const views = [
+    view3,
+    view4,
+    view5,
+    view6,
+    view7,
+    chromaticView,
+    cofView,
+    guitarView,
+    view8,
+    view,
+    view9,
+    view2
+  ];
+  return (model, ctx, raise) => {
+    for (const view10 of views) {
+      view10(model, ctx, raise);
+    }
+  };
+};
+
+// src/update/update-tonic-changed.ts
+var Update = (model, msg) => {
+  const current = model.state;
+  current.index = msg.noteSpec.index;
+  current.naturalIndex = msg.noteSpec.natural.index;
   current.chordIndex = -1;
-  updateScale();
-}
-function modeChanged(modeChangedEvent) {
-  current.modeIndex = modeChangedEvent.mode.index;
+  return updateScale(current);
+};
+
+// src/update/update-mode-changed.ts
+var Update2 = (model, msg) => {
+  const current = model.state;
+  current.modeIndex = msg.mode.index;
   current.chordIndex = -1;
-  updateScale();
-}
-function chordChanged(chordChangedEvent) {
-  if (chordChangedEvent.chordIndex === current.chordIndex) {
+  return updateScale(current);
+};
+
+// src/update/update-chord-changed.ts
+var Update3 = (model, msg) => {
+  const current = model.state;
+  if (msg.chordIndex === current.chordIndex) {
     current.chordIndex = -1;
   } else {
-    current.chordIndex = chordChangedEvent.chordIndex;
+    current.chordIndex = msg.chordIndex;
   }
   current.toggledIndexes = 0;
-  updateScale();
-}
-function toggle3(toggleEvent) {
-  current.toggledIndexes = current.toggledIndexes ^ 2 ** toggleEvent.index;
-  updateScale();
-}
-function chordIntervalChanged(chordIntervalChangedEvent) {
-  current.chordIntervals = chordIntervalChangedEvent.chordIntervals;
+  return updateScale(current);
+};
+
+// src/update/update-toggle.ts
+var Update4 = (model, msg) => {
+  const current = model.state;
+  current.toggledIndexes = current.toggledIndexes ^ 2 ** msg.index;
+  return updateScale(current);
+};
+
+// src/update/update-chord-interval-change.ts
+var Update5 = (model, msg) => {
+  const current = model.state;
+  current.chordIntervals = msg.chordIntervals;
   current.toggledIndexes = 0;
-  updateScale();
-}
-function scaleFamilyChanged(scaleFamilyChangedEvent) {
-  current.scaleFamilyIndex = scaleFamilyChangedEvent.scaleFamily.index;
-  current.modeIndex = scaleFamilyChangedEvent.scaleFamily.defaultModeIndex;
+  return updateScale(current);
+};
+
+// src/update/update-scale-family-change.ts
+var Update6 = (model, msg) => {
+  const current = model.state;
+  current.scaleFamilyIndex = msg.scaleFamily.index;
+  current.modeIndex = msg.scaleFamily.defaultModeIndex;
   current.chordIndex = -1;
-  updateScale();
-}
-function midiNote2(midiNoteEvent) {
-  current.midiToggledIndexes = midiNoteEvent.toggledIndexes;
-  updateScale();
-}
-function leftHandedChange2(leftHandedChangeEvent) {
-  current.isLeftHanded = leftHandedChangeEvent.isLeftHanded;
-  publishStateChange();
-}
-function flipNutChange2(flipNutChangeEvent) {
-  current.isNutFlipped = flipNutChangeEvent.isNutFlipped;
-  publishStateChange();
-}
-function fretboardLabelChange2(fretboardLabelChangeEvent) {
-  current.fretboardLabelType = fretboardLabelChangeEvent.labelType;
-  publishStateChange();
-}
-function setCToNoon2(setCToNoonEvent) {
-  current.circleIsCNoon = setCToNoonEvent.isC;
-  publishStateChange();
-}
-function tuningChange2(tuningChangedEvent) {
-  current.tuningIndex = tuningChangedEvent.index;
-  publishStateChange();
-}
-function updateScale() {
-  const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
-  if (!scaleFamily2) {
-    throw "scaleFamily is " + scaleFamily2 + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
-  }
-  const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
-  if (!mode) {
-    throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
-  }
-  const noteSpec = createNoteSpec(current.naturalIndex, current.index);
-  const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily2);
-  current.toggledIndexes = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
-  scaleChange.publish({
-    nodes,
-    mode
-  });
-  publishStateChange();
-}
-function publishStateChange() {
-  stateChange.publish({
-    state: current
-  });
-}
+  return updateScale(current);
+};
 
-// src/permalink.ts
-var currentState2 = null;
-function init11() {
-  stateChange.subscribe((x) => currentState2 = x.state);
-}
-function populatePermalinkText() {
-  const permalink = generatePermalink();
-  const inputbox = document.getElementById("permalink-text");
-  inputbox.value = permalink;
-  inputbox.focus;
-  inputbox.select;
-  inputbox.setSelectionRange(0, 99999);
-  document.execCommand("copy");
-}
-function generatePermalink() {
-  if (currentState2 === null) {
-    throw "No stateChange event published before querystring requested";
-  }
-  const params = new URLSearchParams;
-  Object.keys(currentState2).forEach((key) => {
-    if (currentState2[key] !== defaultState[key]) {
-      params.append(key, currentState2[key]);
-    }
-  });
-  return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
-}
-function getState(existingState) {
-  const queryString = location.search;
-  const params = new URLSearchParams(queryString);
-  const mutableState = existingState;
-  Object.keys(existingState).forEach((x) => {
-    const value = params.get(x);
-    if (value == null)
-      return;
-    switch (typeof mutableState[x]) {
-      case "boolean":
-        mutableState[x] = value === "true";
-        break;
-      case "number":
-        mutableState[x] = parseInt(value);
-        break;
-      case "object":
-        mutableState[x] = JSON.parse("[" + value + "]");
-        break;
-      case "string":
-        mutableState[x] = value;
-        break;
-    }
-    console.log(`${x} -> ${value}, ${typeof mutableState[x]}, ${mutableState[x]}`);
-  });
-  return mutableState;
-}
-function getCurrentState() {
-  if (currentState2) {
-    getState(currentState2);
-  }
-}
+// src/update/update-tuning-changed.ts
+var Update7 = (model, msg) => {
+  model.state.tuningIndex = msg.index;
+  return model;
+};
 
-// src/wakelock.ts
-var lock;
-function init12() {
-  if (!("wakeLock" in navigator)) {
-    return;
+// src/update/update-left-handed-fretboard.ts
+var Update8 = (model, msg) => {
+  model.state.isLeftHanded = msg.isLeftHanded;
+  return model;
+};
+
+// src/update/update-flip-nut.ts
+var Update9 = (model, msg) => {
+  model.state.isNutFlipped = msg.isNutFlipped;
+  return model;
+};
+
+// src/update/update-fretboard-label-change.ts
+var Update10 = (model, msg) => {
+  model.state.fretboardLabelType = msg.labelType;
+  return model;
+};
+
+// src/update/update-midi-note.ts
+var Update11 = (model, msg) => {
+  model.state.midiToggledIndexes = msg.toggledIndexes;
+  return updateScale(model.state);
+};
+
+// src/update/update-set-c-to-noon.ts
+var Update12 = (model, msg) => {
+  model.state.circleIsCNoon = msg.isC;
+  return model;
+};
+
+// src/update/index.ts
+var update2 = (model, msg) => {
+  switch (msg.id) {
+    case "TonicChanged":
+      return Update(model, msg);
+    case "ModeChanged":
+      return Update2(model, msg);
+    case "ChordChanged":
+      return Update3(model, msg);
+    case "Toggle":
+      return Update4(model, msg);
+    case "ChordIntervalChange":
+      return Update5(model, msg);
+    case "ScaleFamilyChange":
+      return Update6(model, msg);
+    case "TuningChanged":
+      return Update7(model, msg);
+    case "LeftHandedFretboard":
+      return Update8(model, msg);
+    case "FlipNut":
+      return Update9(model, msg);
+    case "FretboardLabelChange":
+      return Update10(model, msg);
+    case "MidiNote":
+      return Update11(model, msg);
+    case "SetCToNoon":
+      return Update12(model, msg);
+    default:
+      const _exhaustiveCheck = msg;
+      return _exhaustiveCheck;
   }
-  tryAcquireWakeLock();
-  document.addEventListener("visibilitychange", async () => {
-    if (lock !== null && document.visibilityState === "visible") {
-      tryAcquireWakeLock();
-    }
-  });
-}
-function tryAcquireWakeLock() {
-  try {
-    navigator.wakeLock.request("screen").then((lock2) => lock2 = lock2);
-  } catch (e) {}
-}
+};
 
 // src/index.ts
 window.settings = exports_settings;
 window.permalink = exports_permalink;
+var initModel = () => {
+  const state = updateStateFromQuerystring(getStateFromLocalStorage());
+  return updateScale(state);
+};
 var main = () => {
-  init();
-  init2();
-  init3(scaleFamily[0]);
-  init4();
-  new NoteCircle(d38.select("#chromatic"), chromatic(), "Chromatic");
-  new NoteCircle(d38.select("#cof"), fifths(), "Circle of Fifths");
-  init6();
-  init5();
-  init7();
-  init8();
-  init11();
-  init10();
-  init9();
-  init12();
+  let model = initModel();
+  const view10 = createViews();
+  const raise = (msg) => {
+    model = update2(model, msg);
+    view10(model, { init: false }, raise);
+  };
+  view10(model, { init: true }, raise);
+  setWakeLock();
 };
 main();
 
-//# debugId=2F29F59D30770C9264756E2164756E21
+//# debugId=10835B7E9A16BF8564756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
-import * as events from './events';
 import * as music from './music';
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
 
 const guitarDots: Array<[number, number]> = [
     [3, 0], // [fret, position]
@@ -68,9 +70,9 @@ const tuningInfos: Array<TuningInfo> = [
     { tuning: "CGDA", dots: violaDots, description: "Viola" },
 ]
 
-export const tunings: Array<Tuning> = [];
+export const tunings: Array<Tuning> = buildTunings();
 
-export function parseTuning(tuning: string): Array<number> {
+function parseTuning(tuning: string): Array<number> {
     const tokens: Array<string> = [];
     const result: Array<number> = [];
 
@@ -104,8 +106,8 @@ export function parseTuning(tuning: string): Array<number> {
     return result;
 }
 
-export function init() {
-
+function buildTunings(): Tuning[] {
+    const tunings: Tuning[] = [];
     let index: number = 0;
     for (const info of tuningInfos) {
         const tuning: Tuning = {
@@ -118,21 +120,24 @@ export function init() {
         tunings.push(tuning);
         index++;
     }
-
-    d3.select("#tuning-dropdown")
-        .selectAll("div")
-        .data(tunings)
-        .enter()
-        .append("div")
-        .attr("class", "dropdown-content-item")
-        .on("click", x => raiseTuningChangedEvent(x))
-        .text(x => x.tuning + "   " + x.description);
-
-    raiseTuningChangedEvent(tunings[0]);
+    return tunings;
 }
 
-function raiseTuningChangedEvent(tuning: Tuning): void {
-    events.tuningChange.publish({
-        index: tuning.index
-    });
+export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    const raiseTuningChangedEvent = (tuning: Tuning): void => {
+        raise({
+            id: "TuningChanged",
+            index: tuning.index
+        });
+    }
+    if (ctx.init) {
+        d3.select("#tuning-dropdown")
+            .selectAll("div")
+            .data(tunings)
+            .enter()
+            .append("div")
+            .attr("class", "dropdown-content-item")
+            .on("click", raiseTuningChangedEvent)
+            .text(x => x.tuning + "   " + x.description);
+    }
 }

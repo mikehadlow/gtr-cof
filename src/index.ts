@@ -1,18 +1,14 @@
-import * as d3 from 'd3';
-import * as menu from './menu';
-import * as tonics from './tonics';
-import * as modes from './modes';
-import * as chordInterval from './chord-interval';
-import * as cof from './cof';
-import * as gtr from './gtr';
-import * as tuning from './tuning';
-import * as scaleFamily from './scale-family';
-import * as settings from './settings';
-import * as permalink from './permalink';
-import * as state from './state';
-import * as cookies from './cookie';
-import * as music from './music';
-import * as wakelock from './wakelock';
+import * as settings from "./settings";
+import * as permalink from "./permalink";
+import { setWakeLock } from "./wakelock";
+import { type State } from "./types";
+import { type Model } from "./model";
+import { updateScale } from "./update/updateScale";
+import { createViews } from "./view";
+import { type Msg } from "./message";
+import { update } from "./update";
+import { getStateFromLocalStorage } from "./storage";
+import { updateStateFromQuerystring } from "./permalink";
 
 // Expose modules for HTML onclick handlers
 declare global {
@@ -24,21 +20,22 @@ declare global {
 window.settings = settings;
 window.permalink = permalink;
 
+const initModel = (): Model => {
+    const state: State = updateStateFromQuerystring(getStateFromLocalStorage());
+    return updateScale(state);
+};
+
 const main = () => {
-    menu.init();
-    tonics.init();
-    modes.init(music.scaleFamily[0]);
-    chordInterval.init();
-    new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
-    new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
-    gtr.init();
-    tuning.init();
-    scaleFamily.init();
-    settings.init();
-    permalink.init();
-    state.init();
-    cookies.init();
-    wakelock.init();
+    let model: Model = initModel();
+
+    const view = createViews();
+    const raise = (msg: Msg): void => {
+        model = update(model, msg)
+        view(model, { init: false }, raise);
+    }
+
+    view(model, { init: true }, raise);
+    setWakeLock();
 };
 
 main();

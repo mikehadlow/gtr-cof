@@ -1,61 +1,56 @@
-import * as d3 from 'd3';
-import * as events from './events';
+import d3 from 'd3';
+
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
 
 let buttons: d3.Selection<number>;
 let toggle: number = 0;
 
-export function init(): void {
+export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    const onClick = (x: number) => {
+        const updatedToggle = toggle ^ (2 ** x);
+        const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (2 ** x & updatedToggle) === 2 ** x);
+        raise({ id: "ChordIntervalChange", chordIntervals: chordIntervals });
+    };
 
-    const radius = 10;
-    const pad = 2;
+    if (ctx.init) {
+        const radius = 10;
+        const pad = 2;
 
-    const svg = d3.select("#modes");
-    const intervals = svg
-        .append("g")
-        .attr("transform", "translate(0, 240)");
+        const svg = d3.select("#modes");
+        const intervals = svg
+            .append("g")
+            .attr("transform", "translate(0, 240)");
 
-    const gs = intervals.selectAll("g")
-        .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
-        .enter()
-        .append("g")
-        .attr("transform", function (d, i) { return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)"; });
+        const gs = intervals.selectAll("g")
+            .data([0, 1, 2, 3, 4, 5, 6], function (i) { return i.toString(); })
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) { return "translate(" + (i * (radius * 2 + pad) + pad) + ", 0)"; });
 
-    buttons = gs
-        .append("circle")
-        .attr("cx", radius)
-        .attr("cy", radius)
-        .attr("r", radius)
-        .attr("strokeWidth", 2)
-        .attr("class", "mode-button")
-        .on("click", onClick);
+        buttons = gs
+            .append("circle")
+            .attr("cx", radius)
+            .attr("cy", radius)
+            .attr("r", radius)
+            .attr("strokeWidth", 2)
+            .attr("class", "mode-button")
+            .on("click", onClick);
 
-    gs
-        .append("text")
-        .attr("x", radius)
-        .attr("y", radius + 5)
-        .attr("text-anchor", "middle")
-        .text(function (x) { return x + 1; });
+        gs
+            .append("text")
+            .attr("x", radius)
+            .attr("y", radius + 5)
+            .attr("text-anchor", "middle")
+            .text(function (x) { return x + 1; });
+    }
 
-    events.chordIntervalChange.subscribe(update);
-}
-
-function onClick(x: number) {
-    const updatedToggle = toggle ^ (2 ** x);
-    const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter(x => (2 ** x & updatedToggle) === 2 ** x);
-    events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
-}
-
-export function update(event: events.ChordIntervalChangeEvent): void {
     toggle = 0;
-    event.chordIntervals.forEach(x => toggle = toggle + 2 ** x);
+    model.state.chordIntervals.forEach(x => toggle = toggle + 2 ** x);
     buttons
-        .data(event.chordIntervals, function (m) { return m.toString(); })
+        .data(model.state.chordIntervals, function (m) { return m.toString(); })
         .attr("class", "mode-button mode-button-selected")
         .exit()
         .attr("class", "mode-button");
-}
-
-type Button = {
-    readonly id: number,
-    selected: boolean
 }

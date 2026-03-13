@@ -1,23 +1,24 @@
-import * as d3 from 'd3';
-import * as events from './events';
+import d3 from 'd3';
 import * as music from './music';
 
-let buttons: d3.Selection<music.Mode>;
-let modes: d3.Selection<any>;
+import { View, ViewContext, Svg } from "./types";
+import { Model } from "./model";
+import { Msg } from "./message";
 
-export function init(scaleFamily: music.ScaleFamily): void {
-    const svg = d3.select("#modes");
-    modes = svg
-        .append("g")
-        .attr("transform", "translate(0, 280)");
+export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    if (ctx.init) {
+        const svg = d3.select("#modes");
+        modes = svg
+            .append("g")
+            .attr("transform", "translate(0, 280)");
+    }
 
-    drawButtons(scaleFamily);
+    const scaleFamily = music.scaleFamily[model.state.scaleFamilyIndex];
+    const activeMode = scaleFamily.modes.find(x => x.index === model.state.modeIndex);
+    if (!activeMode) {
+        throw new Error("Invalid mode index");
+    }
 
-    events.modeChange.subscribe(update);
-    events.scaleFamilyChange.subscribe(handleScaleFamilyChangedEvent);
-}
-
-function drawButtons(scaleFamily: music.ScaleFamily): void {
     const pad = 5;
     const buttonHeight = 25;
 
@@ -41,7 +42,7 @@ function drawButtons(scaleFamily: music.ScaleFamily): void {
         .attr("width", 150)
         .attr("height", 25)
         .attr("class", "mode-button")
-        .on("click", (d) => events.modeChange.publish({ mode: d }));
+        .on("click", (d) => raise({ id: "ModeChanged", mode: d }));
 
     gs
         .append("text")
@@ -50,13 +51,11 @@ function drawButtons(scaleFamily: music.ScaleFamily): void {
         .text((x) => x.name)
         .attr("class", "mode-text");
 
-    const defaultMode = scaleFamily.modes.find(x => x.index == scaleFamily.defaultModeIndex);
-    highlightActiveMode(defaultMode!);
+    highlightActiveMode(activeMode);
 }
 
-function update(modeChange: events.ModeChangedEvent): void {
-    highlightActiveMode(modeChange.mode);
-}
+let buttons: d3.Selection<music.Mode>;
+let modes: d3.Selection<any>;
 
 function highlightActiveMode(mode: music.Mode): void {
     const modes: Array<music.Mode> = [mode];
@@ -65,10 +64,6 @@ function highlightActiveMode(mode: music.Mode): void {
         .attr("class", "mode-button mode-button-selected")
         .exit()
         .attr("class", "mode-button")
-}
-
-function handleScaleFamilyChangedEvent(scaleFamilyChangedEvent: events.ScaleFamilyChangeEvent) {
-    drawButtons(scaleFamilyChangedEvent.scaleFamily);
 }
 
 function index(mode: music.Mode): string {

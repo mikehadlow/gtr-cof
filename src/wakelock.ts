@@ -1,6 +1,6 @@
 let lock!: WakeLockSentinel;
 
-export function init(): void {
+export function setWakeLock(): void {
     if (!('wakeLock' in navigator)) {
         return
     }
