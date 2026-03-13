@@ -44,25 +44,31 @@ export function updateStateFromQuerystring(existingState: State): State {
     const params = new URLSearchParams(queryString);
     const mutableState: any = existingState;
 
-    Object.keys(existingState).forEach(x => {
-        const value = params.get(x);
-        if (value == null) return;
+    try {
+        Object.keys(existingState).forEach(x => {
+            const value = params.get(x);
+            if (value == null) return;
 
-        switch (typeof mutableState[x]) {
-            case 'boolean':
-                mutableState[x] = (value === "true");
-                break;
-            case 'number':
-                mutableState[x] = parseInt(value);
-                break;
-            case 'object':
-                mutableState[x] = JSON.parse("[" + value + "]");
-                break;
-            case 'string':
-                mutableState[x] = value;
-                break;
-        }
-    });
+            switch (typeof mutableState[x]) {
+                case 'boolean':
+                    mutableState[x] = (value === "true");
+                    break;
+                case 'number':
+                    mutableState[x] = parseInt(value, 10);
+                    break;
+                case 'object':
+                    mutableState[x] = JSON.parse("[" + value + "]");
+                    break;
+                case 'string':
+                    mutableState[x] = value;
+                    break;
+            }
+        });
+    }
+    catch (e) {
+        console.log(`Error reading query string: ${e}`);
+        return existingState;
+    }
 
     return mutableState;
 }

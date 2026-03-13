@@ -6,11 +6,11 @@ import { State } from "../types";
 export const updateScale = (current: State): Model => {
     const scaleFamily = music.scaleFamily.find(x => x.index == current.scaleFamilyIndex);
     if (!scaleFamily) {
-        throw "scaleFamily is " + scaleFamily + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+        throw new Error("Invalid scaleFamilyIndex, current.scaleFamilyIndex = " + current.scaleFamilyIndex);
     }
     const mode = scaleFamily.modes.find(x => x.index == current.modeIndex);
     if (!mode) {
-        throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+        throw new Error("Invalid modeIndex, current.modeIndex = " + current.modeIndex);
     }
     const noteSpec = music.createNoteSpec(current.naturalIndex, current.index);
 

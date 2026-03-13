@@ -16,6 +16,8 @@ export function setWakeLock(): void {
 
 function tryAcquireWakeLock(): void {
     try {
-        navigator.wakeLock.request("screen").then(lock => lock = lock);
-    } catch (e) { }
+        navigator.wakeLock.request("screen").then(l => lock = l);
+    } catch (e) {
+        console.log("Could not aquire wake lock")
+    }
 }

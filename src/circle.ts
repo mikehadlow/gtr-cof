@@ -207,7 +207,7 @@ function update(scaleChnaged: Model["music"], state: NoteCircleState): void {
     state.intervalNotes
         .data(data, indexer)
         .attr("class", d => d.node.toggle ? "interval-note-selected" : "interval-note")
-        .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none")
+        .style("fill", d => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16).padStart(6, '0') : "none")
         .style("stroke-width", d => d.node.midiToggle ? "20px" : "2px")
         .style("stroke", d => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
 
@@ -229,7 +229,7 @@ function getChordSegmentClass(chord: music.Chord): string {
     if (chord.type === music.ChordType.Augmented) return "chord-segment-aug";
     if (chord.type === music.ChordType.Minor) return "chord-segment-minor";
     if (chord.type === music.ChordType.Major) return "chord-segment-major";
-    throw "Unexpected ChordType";
+    throw new Error("Unexpected ChordType");
 }
 
 function generateSegments(fifths: number[]): Segment[] {
@@ -252,7 +252,7 @@ function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec)
     if (Math.abs(noteSpec.offset) > 1) {
         const naturalId = noteSpec.natural.id;
         const newNaturalId = (noteSpec.offset > 0)
-            ? naturalId + 1 % 7
+            ? (naturalId + 1) % 7
             : naturalId == 0 ? 6 : naturalId - 1;
         const newNatural = music.naturals.filter(x => x.id === newNaturalId)[0];
         return music.createNoteSpec(newNatural.index, noteSpec.index)
