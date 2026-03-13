@@ -102,7 +102,6 @@ export function init() {
 }
 
 function tonicChanged(tonicChangedEvent: events.TonicChangedEvent): void {
-    console.log(`TonicChangedEvent: ${JSON.stringify(tonicChangedEvent, null, 2)}`)
     current.index = tonicChangedEvent.noteSpec.index;
     current.naturalIndex = tonicChangedEvent.noteSpec.natural.index;
     current.chordIndex = -1;

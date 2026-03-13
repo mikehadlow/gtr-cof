@@ -24,7 +24,6 @@ export class Bus<T> {
     }
 
     public publish(event: T): void {
-        //console.log("Published event: '" + this.name + "'")
         for (const listener of this.listeners) {
             listener(event);
         }

@@ -28,7 +28,6 @@ export function init(): void {
 }
 
 export function onLeftHandedClick(e: HTMLInputElement) {
-    console.log(`Event handler: is left handed: ${e.checked}`)
     if (_raise) {
         _raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked })
     }

@@ -66,8 +66,6 @@ export function updateStateFromQuerystring(existingState: State): State {
                 mutableState[x] = value;
                 break;
         }
-
-        console.log(`${x} -> ${value}, ${typeof mutableState[x]}, ${mutableState[x]}`);
     });
 
     return mutableState;
