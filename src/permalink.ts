@@ -1,4 +1,3 @@
-import * as events from './events';
 import { State } from './types';
 import { defaultState } from './state';
 import { View, ViewContext, Svg } from "./types";
@@ -11,11 +10,8 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, _ctx: ViewContext,
     currentState = state;
 }
 
-// TODO: remove
-export function init(): void {
-    events.stateChange.subscribe(x => currentState = x.state);
-}
-
+// referenced in HTML
+/** @public */
 export function populatePermalinkText(): void {
     const permalink = generatePermalink();
     const inputbox = document.getElementById("permalink-text") as HTMLInputElement
@@ -24,7 +20,7 @@ export function populatePermalinkText(): void {
 }
 
 // create querystring from state
-export function generatePermalink(): string {
+function generatePermalink(): string {
     if (currentState === null) {
         throw "No stateChange event published before querystring requested";
     }
@@ -69,11 +65,4 @@ export function updateStateFromQuerystring(existingState: State): State {
     });
 
     return mutableState;
-}
-
-// test function
-export function getCurrentState(): void {
-    if (currentState) {
-        updateStateFromQuerystring(currentState);
-    }
 }

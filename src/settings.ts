@@ -23,28 +23,32 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, 
     }
 }
 
-// TODO: remove
-export function init(): void {
-}
-
+// referenced in HTML
+/** @public */
 export function onLeftHandedClick(e: HTMLInputElement) {
     if (_raise) {
         _raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked })
     }
 }
 
+// referenced in HTML
+/** @public */
 export function onFlipNut(e: HTMLInputElement) {
     if (_raise) {
         _raise({ id: "FlipNut", isNutFlipped: e.checked })
     }
 }
 
+// referenced in HTML
+/** @public */
 export function onSetCToNoon(e: HTMLInputElement) {
     if (_raise) {
         _raise({ id: "SetCToNoon", isC: e.checked })
     }
 }
 
+// referenced in HTML
+/** @public */
 export function onFbNoteTextClick(e: HTMLInputElement) {
     if (_raise) {
         _raise({ id: "FretboardLabelChange", labelType: e.value as FretboardLabelType })

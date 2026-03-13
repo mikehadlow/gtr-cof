@@ -123,11 +123,6 @@ function buildTunings(): Tuning[] {
     return tunings;
 }
 
-// TODO: START to remove
-export function init() {
-}
-// END
-
 export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     const raiseTuningChangedEvent = (tuning: Tuning): void => {
         raise({

@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import d3 from 'd3';
 import * as events from './events';
 import * as music from './music';
 
@@ -67,55 +67,6 @@ function bg(natural: music.Natural): Array<ButtonData> {
         { noteSpec: music.createNoteSpec(natural.index, natural.index) },
         { noteSpec: music.createNoteSpec(natural.index, sharpIndex) }
     ];
-}
-
-export function init(): void {
-    const pad = 5;
-    const buttonHeight = 25;
-    const svg = d3.select("#modes");
-
-    const tonics = svg.append("g");
-
-    const gs = tonics.selectAll("g")
-        .data(music.naturals)
-        .enter()
-        .append("g")
-        .attr("transform", function (d, i) { return "translate(0, " + (i * (buttonHeight + pad) + pad) + ")"; })
-        .selectAll("g")
-        .data(d => bg(d), indexer)
-        .enter()
-        .append("g")
-        .attr("transform", function (d, i) { return "translate(" + (i * 55) + ", 0)"; });
-
-    buttons = gs
-        .append("rect")
-        .attr("x", pad)
-        .attr("y", 0)
-        .attr("strokeWidth", 2)
-        .attr("width", 40)
-        .attr("height", 25)
-        .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button")
-        .on("click", d => events.tonicChange.publish({ noteSpec: d.noteSpec }));
-
-    gs
-        .append("text")
-        .attr("x", pad + 10)
-        .attr("y", 17)
-        .text(function (x) { return x.noteSpec.label; })
-        .attr("class", "tonic-text");
-
-    events.tonicChange.subscribe(listener);
-}
-
-function listener(tonicChanged: events.TonicChangedEvent): void {
-    const ds: Array<ButtonData> = [{
-        noteSpec: tonicChanged.noteSpec
-    }];
-    buttons
-        .data(ds, indexer)
-        .attr("class", "tonic-button tonic-button-selected")
-        .exit()
-        .attr("class", d => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
 }
 
 function indexer(d: ButtonData): string {

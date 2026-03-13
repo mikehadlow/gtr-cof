@@ -22,7 +22,3 @@ export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (
             .text(x => x.name);
     }
 }
-
-// TODO: remove
-export function init() {
-}

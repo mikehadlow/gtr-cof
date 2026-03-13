@@ -8,7 +8,7 @@ export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (
     }
 }
 
-export function init(): void {
+function init(): void {
 
     const menuItems = document.getElementsByClassName("menu");
     for (const menuItem of menuItems) {

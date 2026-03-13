@@ -1,6 +1,5 @@
 import * as events from './events';
 import * as music from './music';
-import * as cookies from './cookie';
 import * as permalink from './permalink';
 import { State } from './types';
 
@@ -38,16 +37,6 @@ let current: State = {
 };
 
 export function init() {
-
-    try {
-        const cookieState = cookies.readCookie2();
-        if (cookieState !== null) {
-            current = cookieState;
-        }
-    }
-    catch (e) {
-        // ignore the invalid cookie:
-    }
 
     // update current state based on querystring.
     current = permalink.updateStateFromQuerystring(current);
