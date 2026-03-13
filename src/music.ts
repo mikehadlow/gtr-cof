@@ -1,13 +1,13 @@
 import { Mod, zip, diff } from './mod';
 
-export const intervalName = {
+const intervalName = {
     Nat: "",
     Maj: "M",
     Min: "m",
     Aug: "A",
     Dim: "d",
 };
-export type IntervalType = keyof typeof intervalName;
+type IntervalType = keyof typeof intervalName;
 
 export type Interval = {
     readonly ord: number;
@@ -17,7 +17,7 @@ export type Interval = {
 
 export const getIntervalName: (x: Interval) => string = interval => intervalName[interval.type] + (interval.ord + 1);
 
-export const intervals: Mod<Interval[]> = new Mod([
+const intervals: Mod<Interval[]> = new Mod([
     [{ ord: 0, type: "Nat", colour: 0xf44b42 }, { ord: 1, type: "Dim", colour: 0xf44b42 }],
     [{ ord: 1, type: "Min", colour: 0xf48942 }, { ord: 0, type: "Aug", colour: 0xf48942 }],
     [{ ord: 1, type: "Maj", colour: 0xf4bf42 }, { ord: 2, type: "Dim", colour: 0xf4bf42 }],
@@ -83,8 +83,8 @@ export const scaleFamily: ScaleFamily[] = [
 ];
 
 // root diatonic scale is major
-export const diatonic: Mod<boolean> = new Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
-export const indexList: Mod<number> = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+const diatonic: Mod<boolean> = new Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
+const indexList: Mod<number> = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
 
 export type NoteSpec = {
     readonly natural: Natural;
@@ -188,12 +188,12 @@ export type Mode = {
     readonly index: number;
 };
 
-export type ScaleSpec = {
+type ScaleSpec = {
     noteSpec: NoteSpec;
     mode: Mode;
 }
 
-export function createScaleSpec(index: number, naturalIndex: number, modeIndex: number): ScaleSpec {
+function createScaleSpec(index: number, naturalIndex: number, modeIndex: number): ScaleSpec {
     return {
         noteSpec: createNoteSpec(naturalIndex, index),
         mode: scaleFamily[0].modes[modeIndex]
@@ -323,7 +323,7 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
 
 // generateNodes creates an 'outer' sliding interval ring that can change with
 // chord selections.
-export function generateNodes(
+function generateNodes(
     scaleNotes: ScaleNote[],
     mode: Mode,
     chordIndex: number,
@@ -422,7 +422,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
     });
 }
 
-export function calculateToggle(
+function calculateToggle(
     activeInterval: Interval,
     scaleNote: ScaleNote,
     chordSelected: boolean,

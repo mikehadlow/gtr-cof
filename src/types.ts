@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
-export type Init<TModel> = () => TModel;
+type Init<TModel> = () => TModel;
 
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 

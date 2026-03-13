@@ -97,7 +97,7 @@ function onClick(x: number) {
     events.chordIntervalChange.publish({ chordIntervals: chordIntervals });
 }
 
-export function update(event: events.ChordIntervalChangeEvent): void {
+function update(event: events.ChordIntervalChangeEvent): void {
     toggle = 0;
     event.chordIntervals.forEach(x => toggle = toggle + 2 ** x);
     buttons

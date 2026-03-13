@@ -72,7 +72,7 @@ const tuningInfos: Array<TuningInfo> = [
 
 export const tunings: Array<Tuning> = buildTunings();
 
-export function parseTuning(tuning: string): Array<number> {
+function parseTuning(tuning: string): Array<number> {
     const tokens: Array<string> = [];
     const result: Array<number> = [];
 
