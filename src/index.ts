@@ -1,5 +1,4 @@
 import * as settings from "./settings";
-import * as permalink from "./permalink";
 import { setWakeLock } from "./wakelock";
 import { type State } from "./types";
 import { type Model } from "./model";
@@ -14,11 +13,9 @@ import { updateStateFromQuerystring } from "./permalink";
 declare global {
     interface Window {
         settings: typeof settings;
-        permalink: typeof permalink;
     }
 }
 window.settings = settings;
-window.permalink = permalink;
 
 const initModel = (): Model => {
     const state: State = updateStateFromQuerystring(getStateFromLocalStorage());
