@@ -31,8 +31,7 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, 
         setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
 
         const selected = "fb-note-text-" + state.fretboardLabelType;
-        const radio = <HTMLInputElement>document.getElementById(selected);
-        radio.checked = true;
+        setCheckbox(selected, true);
 
         setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
         setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);

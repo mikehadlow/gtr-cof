@@ -24,12 +24,13 @@ function populatePermalinkText(state: State): void {
 // create querystring from state
 function generatePermalink(state: State): string {
     const params = new URLSearchParams();
-    // only copy state that's different from default
-    Object.keys(state).forEach((key) => {
-        if ((state as any)[key] !== (defaultState as any)[key]) {
-            params.append(key, (state as any)[key]);
+    const keys = Object.keys(state) as Array<keyof State>;
+    for (const key of keys) {
+        // only copy state that's different from default
+        if (state[key] !== defaultState[key]) {
+            params.append(key, state[key].toString());
         }
-    });
+    }
     const queryString = params.size === 0 ? "" : `?${params.toString()}`;
     return `${location.protocol}//${location.host}${location.pathname}${queryString}`;
 }
@@ -38,28 +39,29 @@ function generatePermalink(state: State): string {
 export function updateStateFromQuerystring(existingState: State): State {
     const queryString = location.search;
     const params = new URLSearchParams(queryString);
-    const mutableState: any = existingState;
+    const mutableState = { ...existingState };
+    const keys = Object.keys(existingState) as Array<keyof State>;
 
     try {
-        Object.keys(existingState).forEach(x => {
+        for (const x of keys) {
             const value = params.get(x);
-            if (value == null) return;
+            if (value == null) continue;
 
             switch (typeof mutableState[x]) {
                 case 'boolean':
-                    mutableState[x] = (value === "true");
+                    (mutableState[x] as boolean) = (value === "true");
                     break;
                 case 'number':
-                    mutableState[x] = parseInt(value, 10);
+                    (mutableState[x] as number) = parseInt(value, 10);
                     break;
                 case 'object':
-                    mutableState[x] = JSON.parse("[" + value + "]");
+                    (mutableState[x] as object) = JSON.parse("[" + value + "]");
                     break;
                 case 'string':
-                    mutableState[x] = value;
+                    (mutableState[x] as string) = value;
                     break;
             }
-        });
+        }
     }
     catch (e) {
         console.log(`Error reading query string: ${e}`);
