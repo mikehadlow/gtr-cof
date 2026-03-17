@@ -178,8 +178,8 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
     };
 }
 
-function update(scaleChnaged: Model["music"], state: NoteCircleState): void {
-    const data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
+function update(scaleChanged: Model["music"], state: NoteCircleState): void {
+    const data: Segment[] = scaleChanged.nodes.map(node => <Segment>{
         startAngle: 0,
         endAngle: 0,
         scaleNote: {},

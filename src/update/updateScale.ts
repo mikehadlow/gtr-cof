@@ -19,12 +19,12 @@ export const updateScale = (current: State): Model => {
         mode,
         current.chordIndex,
         current.chordIntervals,
-        current.toggledIndexes,
-        current.midiToggledIndexes,
+        current.toggledNotesBitmask,
+        current.midiToggledNotesBitmask,
         scaleFamily);
 
-    // update togges, because a chord may have been generated.
-    current.toggledIndexes = nodes
+    // update toggles, because a chord may have been generated.
+    current.toggledNotesBitmask = nodes
         .filter(x => x.toggle)
         .map(x => x.scaleNote.note.index)
         .reduce((a, b) => a + 2 ** b, 0);

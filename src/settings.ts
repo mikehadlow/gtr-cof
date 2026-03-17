@@ -15,7 +15,10 @@ const FB_NT_INT_ID = "fb-note-text-Interval";
 
 export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     const setCheckbox = (id: string, checked: boolean): void => {
-        const checkbox = <HTMLInputElement>document.getElementById(id)
+        const checkbox = document.getElementById(id) as HTMLInputElement | null;
+        if (checkbox === null) {
+            throw new Error(`checkbox with id '${id}' not found.`);
+        }
         checkbox.checked = checked;
     }
     const setClickHandler = (id: string, handler: (e: HTMLInputElement, raise: Raise) => void) => {

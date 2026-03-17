@@ -2,8 +2,6 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
-type Init<TModel> = () => TModel;
-
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
 export type ViewContext = {
@@ -22,10 +20,10 @@ export const StateSchema = z.object({
     naturalIndex: z.number(),
     chordIndex: z.number(),
     chordIntervals: z.array(z.number()),
-    toggledIndexes: z.number(),
+    toggledNotesBitmask: z.number(),
     scaleFamilyIndex: z.number(),
     modeIndex: z.number(),
-    midiToggledIndexes: z.number(),
+    midiToggledNotesBitmask: z.number(),
     isLeftHanded: z.boolean(),
     isNutFlipped: z.boolean(),
     fretboardLabelType: FretboardLabelTypeSchema,

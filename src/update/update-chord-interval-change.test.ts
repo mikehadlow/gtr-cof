@@ -11,8 +11,8 @@ describe("update-chord-interval-change", () => {
     });
 
     test("clears toggledIndexes", () => {
-        const model = updateScale({ ...defaultState, toggledIndexes: 2 ** 0 | 2 ** 4 });
+        const model = updateScale({ ...defaultState, toggledNotesBitmask: 2 ** 0 | 2 ** 4 });
         const result = Update(model, { id: "ChordIntervalChange", chordIntervals: [0, 2, 4] });
-        expect(result.state.toggledIndexes).toBe(0);
+        expect(result.state.toggledNotesBitmask).toBe(0);
     });
 });

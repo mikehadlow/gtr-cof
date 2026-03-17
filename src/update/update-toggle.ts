@@ -4,6 +4,6 @@ import { updateScale } from "./updateScale";
 
 export const Update: UpdateModel<Model, { id: "Toggle", index: number }> = (model, msg) => {
     const current = model.state;
-    current.toggledIndexes = current.toggledIndexes ^ 2 ** msg.index;
+    current.toggledNotesBitmask = current.toggledNotesBitmask ^ 2 ** msg.index;
     return updateScale(current);
 }

@@ -12,10 +12,10 @@ function makeInputModel(chordIndex: number): Model {
         naturalIndex: 3,
         chordIndex,
         chordIntervals: [0, 2, 4],
-        toggledIndexes: 0,
+        toggledNotesBitmask: 0,
         scaleFamilyIndex: 0, // diatonic
         modeIndex: 0,
-        midiToggledIndexes: 0,
+        midiToggledNotesBitmask: 0,
         isLeftHanded: false,
         isNutFlipped: false,
         fretboardLabelType: "NoteName",
@@ -28,7 +28,7 @@ function makeInputModel(chordIndex: number): Model {
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
         noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledIndexes, state.midiToggledIndexes, scaleFamily
+        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
     );
 
     return {

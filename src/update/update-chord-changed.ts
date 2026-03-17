@@ -12,6 +12,6 @@ export const Update: UpdateModel<Model, { id: "ChordChanged", chordIndex: number
         current.chordIndex = msg.chordIndex;
     }
     // un-toggle any previously selected notes
-    current.toggledIndexes = 0;
+    current.toggledNotesBitmask = 0;
     return updateScale(current);
 }

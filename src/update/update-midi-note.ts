@@ -3,6 +3,6 @@ import { type Model } from "../model";
 import { updateScale } from "./updateScale";
 
 export const Update: UpdateModel<Model, { id: "MidiNote", toggledIndexes: number }> = (model, msg) => {
-    model.state.midiToggledIndexes = msg.toggledIndexes;
+    model.state.midiToggledNotesBitmask = msg.toggledIndexes;
     return updateScale(model.state);
 }

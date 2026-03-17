@@ -5,6 +5,6 @@ import { updateScale } from "./updateScale";
 export const Update: UpdateModel<Model, { id: "ChordIntervalChange", chordIntervals: number[] }> = (model, msg) => {
     const current = model.state;
     current.chordIntervals = msg.chordIntervals;
-    current.toggledIndexes = 0;
+    current.toggledNotesBitmask = 0;
     return updateScale(current);
 }

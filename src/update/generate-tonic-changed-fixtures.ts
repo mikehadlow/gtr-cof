@@ -12,10 +12,10 @@ function makeInputModel(): Model {
         naturalIndex: 3,
         chordIndex: -1,
         chordIntervals: [0, 2, 4],
-        toggledIndexes: 0,
+        toggledNotesBitmask: 0,
         scaleFamilyIndex: 0, // diatonic
         modeIndex: 0,
-        midiToggledIndexes: 0,
+        midiToggledNotesBitmask: 0,
         isLeftHanded: false,
         isNutFlipped: false,
         fretboardLabelType: "NoteName",
@@ -30,7 +30,7 @@ function makeInputModel(): Model {
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
         noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledIndexes, state.midiToggledIndexes, scaleFamily
+        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
     );
 
     return {
@@ -43,8 +43,8 @@ function makeInputModel(): Model {
 const variants: { natural: music.Natural; offset: number; suffix: string }[] = [];
 for (const nat of music.naturals) {
     variants.push({ natural: nat, offset: -1, suffix: "flat" });
-    variants.push({ natural: nat, offset: 0,  suffix: "natural" });
-    variants.push({ natural: nat, offset: 1,  suffix: "sharp" });
+    variants.push({ natural: nat, offset: 0, suffix: "natural" });
+    variants.push({ natural: nat, offset: 1, suffix: "sharp" });
 }
 
 const outDir = join(import.meta.dir, "test-artifacts", "tonic-changed");

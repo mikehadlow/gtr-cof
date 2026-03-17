@@ -22,7 +22,7 @@ export const getStateFromLocalStorage = (): State => {
     }
     const parsed = StateSchema.safeParse(JSON.parse(stateString));
     if (!parsed.success) {
-        console.log("Invalid cookie state:", parsed.error.message);
+        console.log("Invalid storage state:", parsed.error.message);
         return { ...defaultState };
     }
     return parsed.data;
