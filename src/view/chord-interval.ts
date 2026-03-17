@@ -1,8 +1,8 @@
 import d3 from 'd3';
 
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
+import { View, ViewContext, Svg } from "../types";
+import { Model } from "../model";
+import { Msg } from "../message";
 
 let buttons: d3.Selection<number>;
 let toggle: number = 0;

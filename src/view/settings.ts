@@ -1,7 +1,7 @@
-import { FretboardLabelType } from './types';
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
+import { FretboardLabelType } from '../types';
+import { View, ViewContext, Svg } from "../types";
+import { Model } from "../model";
+import { Msg } from "../message";
 
 type Raise = (msg: Msg) => void;
 

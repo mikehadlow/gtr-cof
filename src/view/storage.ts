@@ -1,8 +1,8 @@
-import { State, StateSchema } from './types';
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
-import { defaultState } from './defaultState';
+import { State, StateSchema } from '../types';
+import { View, ViewContext, Svg } from "../types";
+import { Model } from "../model";
+import { Msg } from "../message";
+import { defaultState } from '../defaultState';
 
 const STORAGE_KEY = "app_state";
 

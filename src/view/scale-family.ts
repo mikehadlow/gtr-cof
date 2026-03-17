@@ -1,8 +1,8 @@
 import d3 from 'd3';
-import * as music from './music';
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
+import * as music from '../music';
+import { View, ViewContext, Svg } from "../types";
+import { Model } from "../model";
+import { Msg } from "../message";
 
 export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     function raiseScaleFamilyChangedEvent(scaleFamily: music.ScaleFamily): void {

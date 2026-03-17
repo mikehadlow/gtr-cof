@@ -1,9 +1,9 @@
 import d3 from 'd3';
-import * as music from './music';
+import * as music from '../music';
 
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
+import type { View, ViewContext, Svg } from "../types";
+import type { Model } from "../model";
+import type { Msg } from "../message";
 
 export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     if (ctx.init) {

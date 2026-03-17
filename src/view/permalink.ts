@@ -1,8 +1,8 @@
-import { State } from './types';
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
-import { defaultState } from './defaultState';
+import type { State } from '../types';
+import type { View, ViewContext, Svg } from "../types";
+import type { Model } from "../model";
+import type { Msg } from "../message";
+import { defaultState } from '../defaultState';
 
 const PERMALINK_BUTTON_ID = "permalink-button";
 const PERMALINK_TEXT_ID = "permalink-text";

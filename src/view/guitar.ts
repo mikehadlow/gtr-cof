@@ -1,11 +1,9 @@
 import d3 from 'd3';
-import * as music from './music';
+import * as music from '../music';
 import * as tuning from './tuning';
-import type { FretboardLabelType } from './types';
-
-import { View, ViewContext, Svg } from "./types";
-import { Model } from "./model";
-import { Msg } from "./message";
+import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
+import type { Model } from "../model";
+import type { Msg } from "../message";
 
 type StringNote = {
     readonly octave: number;

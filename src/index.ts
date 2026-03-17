@@ -5,8 +5,8 @@ import { updateScale } from "./update/updateScale";
 import { createViews } from "./view";
 import { type Msg } from "./message";
 import { update } from "./update";
-import { getStateFromLocalStorage } from "./storage";
-import { updateStateFromQuerystring } from "./permalink";
+import { getStateFromLocalStorage } from "./view/storage";
+import { updateStateFromQuerystring } from "./view/permalink";
 
 const initModel = (): Model => {
     const state: State = updateStateFromQuerystring(getStateFromLocalStorage());
