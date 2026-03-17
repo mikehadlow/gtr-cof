@@ -13,13 +13,13 @@ export class Mod<T> {
         this.start = start % this.size;
     }
 
-    itemAt(index: number) : T {
+    itemAt(index: number): T {
         return this.items[(this.start + index) % this.size];
     }
 
     toArray(): T[] {
         const newArray: T[] = [];
-        for(let i=0; i<this.size; i++) {
+        for (let i = 0; i < this.size; i++) {
             newArray.push(this.items[(i + this.start) % this.size]);
         }
         return newArray;
@@ -36,29 +36,29 @@ export class Mod<T> {
     }
 }
 
-export function zip<A, B>(a:A[], b:B[]): [A,B][] {
-    if(a.length != b.length) {
-        throw "Cannot merge arrays of different lengths";
+export function zip<A, B>(a: A[], b: B[]): [A, B][] {
+    if (a.length != b.length) {
+        throw new Error("Cannot merge arrays of different lengths");
     }
-    return a.map((x, i) => <[A,B]>[x, b[i]]);
+    return a.map((x, i) => <[A, B]>[x, b[i]]);
 }
 
-export function zip3<A, B, C>(a:A[], b:B[], c:C[]): [A,B,C][] {
-    if(a.length != b.length || a.length != c.length) {
-        throw "Cannot merge arrays of different lengths";
+export function zip3<A, B, C>(a: A[], b: B[], c: C[]): [A, B, C][] {
+    if (a.length != b.length || a.length != c.length) {
+        throw new Error("Cannot merge arrays of different lengths");
     }
-    return a.map((x, i) => <[A,B,C]>[x, b[i], c[i]]);
+    return a.map((x, i) => <[A, B, C]>[x, b[i], c[i]]);
 }
 
-export function diff(size: number, a: number, b: number) : number {
+export function diff(size: number, a: number, b: number): number {
     const ax = a % size;
     const bx = b % size;
-    if(ax == bx) return 0;
+    if (ax == bx) return 0;
 
     const d1 = bx - ax;
     let d2 = 0;
 
-    if(d1 > 0) {
+    if (d1 > 0) {
         d2 = -((ax + size) - bx);
     }
     else {

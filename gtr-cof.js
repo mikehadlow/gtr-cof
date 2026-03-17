@@ -1358,8 +1358,8 @@ var require_d3 = __commonJS((exports, module) => {
       if (svg.createSVGPoint) {
         var point = svg.createSVGPoint();
         if (d3_mouse_bug44083 < 0) {
-          var window2 = d3_window(container);
-          if (window2.scrollX || window2.scrollY) {
+          var window = d3_window(container);
+          if (window.scrollX || window.scrollY) {
             svg = d3.select("body").append("svg").style({
               position: "absolute",
               top: 0,
@@ -1502,7 +1502,7 @@ var require_d3 = __commonJS((exports, module) => {
       return i;
     };
     d3.behavior.zoom = function() {
-      var view4 = {
+      var view2 = {
         x: 0,
         y: 0,
         k: 1
@@ -1521,20 +1521,20 @@ var require_d3 = __commonJS((exports, module) => {
       }
       zoom.event = function(g) {
         g.each(function() {
-          var dispatch = event.of(this, arguments), view1 = view4;
+          var dispatch = event.of(this, arguments), view1 = view2;
           if (d3_transitionInheritId) {
             d3.select(this).transition().each("start.zoom", function() {
-              view4 = this.__chart__ || {
+              view2 = this.__chart__ || {
                 x: 0,
                 y: 0,
                 k: 1
               };
               zoomstarted(dispatch);
             }).tween("zoom:zoom", function() {
-              var dx = size[0], dy = size[1], cx = center0 ? center0[0] : dx / 2, cy = center0 ? center0[1] : dy / 2, i = d3.interpolateZoom([(cx - view4.x) / view4.k, (cy - view4.y) / view4.k, dx / view4.k], [(cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k]);
+              var dx = size[0], dy = size[1], cx = center0 ? center0[0] : dx / 2, cy = center0 ? center0[1] : dy / 2, i = d3.interpolateZoom([(cx - view2.x) / view2.k, (cy - view2.y) / view2.k, dx / view2.k], [(cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k]);
               return function(t) {
                 var l = i(t), k = dx / l[2];
-                this.__chart__ = view4 = {
+                this.__chart__ = view2 = {
                   x: cx - l[0] * k,
                   y: cy - l[1] * k,
                   k
@@ -1547,7 +1547,7 @@ var require_d3 = __commonJS((exports, module) => {
               zoomended(dispatch);
             });
           } else {
-            this.__chart__ = view4;
+            this.__chart__ = view2;
             zoomstarted(dispatch);
             zoomed(dispatch);
             zoomended(dispatch);
@@ -1556,21 +1556,21 @@ var require_d3 = __commonJS((exports, module) => {
       };
       zoom.translate = function(_) {
         if (!arguments.length)
-          return [view4.x, view4.y];
-        view4 = {
+          return [view2.x, view2.y];
+        view2 = {
           x: +_[0],
           y: +_[1],
-          k: view4.k
+          k: view2.k
         };
         rescale();
         return zoom;
       };
       zoom.scale = function(_) {
         if (!arguments.length)
-          return view4.k;
-        view4 = {
-          x: view4.x,
-          y: view4.y,
+          return view2.k;
+        view2 = {
+          x: view2.x,
+          y: view2.y,
           k: null
         };
         scaleTo(+_);
@@ -1606,7 +1606,7 @@ var require_d3 = __commonJS((exports, module) => {
           return x1;
         x1 = z;
         x0 = z.copy();
-        view4 = {
+        view2 = {
           x: 0,
           y: 0,
           k: 1
@@ -1618,7 +1618,7 @@ var require_d3 = __commonJS((exports, module) => {
           return y1;
         y1 = z;
         y0 = z.copy();
-        view4 = {
+        view2 = {
           x: 0,
           y: 0,
           k: 1
@@ -1626,24 +1626,24 @@ var require_d3 = __commonJS((exports, module) => {
         return zoom;
       };
       function location2(p) {
-        return [(p[0] - view4.x) / view4.k, (p[1] - view4.y) / view4.k];
+        return [(p[0] - view2.x) / view2.k, (p[1] - view2.y) / view2.k];
       }
       function point(l) {
-        return [l[0] * view4.k + view4.x, l[1] * view4.k + view4.y];
+        return [l[0] * view2.k + view2.x, l[1] * view2.k + view2.y];
       }
       function scaleTo(s) {
-        view4.k = Math.max(scaleExtent[0], Math.min(scaleExtent[1], s));
+        view2.k = Math.max(scaleExtent[0], Math.min(scaleExtent[1], s));
       }
       function translateTo(p, l) {
         l = point(l);
-        view4.x += p[0] - l[0];
-        view4.y += p[1] - l[1];
+        view2.x += p[0] - l[0];
+        view2.y += p[1] - l[1];
       }
       function zoomTo(that, p, l, k) {
         that.__chart__ = {
-          x: view4.x,
-          y: view4.y,
-          k: view4.k
+          x: view2.x,
+          y: view2.y,
+          k: view2.k
         };
         scaleTo(Math.pow(2, k));
         translateTo(center0 = p, l);
@@ -1655,11 +1655,11 @@ var require_d3 = __commonJS((exports, module) => {
       function rescale() {
         if (x1)
           x1.domain(x0.range().map(function(x) {
-            return (x - view4.x) / view4.k;
+            return (x - view2.x) / view2.k;
           }).map(x0.invert));
         if (y1)
           y1.domain(y0.range().map(function(y) {
-            return (y - view4.y) / view4.k;
+            return (y - view2.y) / view2.k;
           }).map(y0.invert));
       }
       function zoomstarted(dispatch) {
@@ -1672,8 +1672,8 @@ var require_d3 = __commonJS((exports, module) => {
         rescale();
         dispatch({
           type: "zoom",
-          scale: view4.k,
-          translate: [view4.x, view4.y]
+          scale: view2.k,
+          translate: [view2.x, view2.y]
         });
       }
       function zoomended(dispatch) {
@@ -1704,7 +1704,7 @@ var require_d3 = __commonJS((exports, module) => {
         subject.on(mousedown, null).on(touchstart, started);
         function relocate() {
           var touches = d3.touches(that);
-          scale0 = view4.k;
+          scale0 = view2.k;
           touches.forEach(function(t) {
             if (t.identifier in locations0)
               locations0[t.identifier] = location2(t);
@@ -1723,7 +1723,7 @@ var require_d3 = __commonJS((exports, module) => {
           if (touches.length === 1) {
             if (now - touchtime < 500) {
               var p = touches[0];
-              zoomTo(that, p, locations0[p.identifier], Math.floor(Math.log(view4.k) / Math.LN2) + 1);
+              zoomTo(that, p, locations0[p.identifier], Math.floor(Math.log(view2.k) / Math.LN2) + 1);
               d3_eventPreventDefault();
             }
             touchtime = now;
@@ -1780,12 +1780,12 @@ var require_d3 = __commonJS((exports, module) => {
           zoomended(dispatch);
         }, 50);
         d3_eventPreventDefault();
-        scaleTo(Math.pow(2, d3_behavior_zoomDelta() * 0.002) * view4.k);
+        scaleTo(Math.pow(2, d3_behavior_zoomDelta() * 0.002) * view2.k);
         translateTo(center0, translate0);
         zoomed(dispatch);
       }
       function dblclicked() {
-        var p = d3.mouse(this), k = Math.log(view4.k) / Math.LN2;
+        var p = d3.mouse(this), k = Math.log(view2.k) / Math.LN2;
         zoomTo(this, p, location2(p), d3.event.shiftKey ? Math.ceil(k) - 1 : Math.floor(k) + 1);
       }
       return d3.rebind(zoom, event, "on");
@@ -10437,126 +10437,6 @@ var require_d3 = __commonJS((exports, module) => {
   })();
 });
 
-// src/settings.ts
-var exports_settings = {};
-__export(exports_settings, {
-  view: () => view,
-  onSetCToNoon: () => onSetCToNoon,
-  onLeftHandedClick: () => onLeftHandedClick,
-  onFlipNut: () => onFlipNut,
-  onFbNoteTextClick: () => onFbNoteTextClick
-});
-var _raise = null;
-var view = ({ state }, ctx, raise) => {
-  const setCheckbox = (id, checked) => {
-    const checkbox = document.getElementById(id);
-    checkbox.checked = checked;
-  };
-  if (ctx.init) {
-    setCheckbox("left-handed-checkbox", state.isLeftHanded);
-    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-    const selected = "fb-note-text-" + state.fretboardLabelType;
-    const radio = document.getElementById(selected);
-    radio.checked = true;
-    _raise = raise;
-  }
-};
-function onLeftHandedClick(e) {
-  if (_raise) {
-    _raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
-  }
-}
-function onFlipNut(e) {
-  if (_raise) {
-    _raise({ id: "FlipNut", isNutFlipped: e.checked });
-  }
-}
-function onSetCToNoon(e) {
-  if (_raise) {
-    _raise({ id: "SetCToNoon", isC: e.checked });
-  }
-}
-function onFbNoteTextClick(e) {
-  if (_raise) {
-    _raise({ id: "FretboardLabelChange", labelType: e.value });
-  }
-}
-
-// src/permalink.ts
-var exports_permalink = {};
-__export(exports_permalink, {
-  view: () => view2,
-  updateStateFromQuerystring: () => updateStateFromQuerystring,
-  populatePermalinkText: () => populatePermalinkText
-});
-
-// src/defaultState.ts
-var defaultState = {
-  index: 3,
-  naturalIndex: 3,
-  chordIndex: -1,
-  chordIntervals: [0, 2, 4],
-  toggledIndexes: 0,
-  scaleFamilyIndex: 0,
-  modeIndex: 0,
-  midiToggledIndexes: 0,
-  isLeftHanded: false,
-  isNutFlipped: false,
-  fretboardLabelType: "NoteName",
-  circleIsCNoon: true,
-  tuningIndex: 0
-};
-
-// src/permalink.ts
-var currentState = null;
-var view2 = ({ state }, _ctx, _raise2) => {
-  currentState = state;
-};
-function populatePermalinkText() {
-  const permalink = generatePermalink();
-  const inputbox = document.getElementById("permalink-text");
-  inputbox.value = permalink;
-  navigator.clipboard.writeText(permalink);
-}
-function generatePermalink() {
-  if (currentState === null) {
-    throw "No stateChange event published before querystring requested";
-  }
-  const params = new URLSearchParams;
-  Object.keys(currentState).forEach((key) => {
-    if (currentState[key] !== defaultState[key]) {
-      params.append(key, currentState[key]);
-    }
-  });
-  return `${location.protocol}//${location.host}${location.pathname}?${params.toString()}`;
-}
-function updateStateFromQuerystring(existingState) {
-  const queryString = location.search;
-  const params = new URLSearchParams(queryString);
-  const mutableState = existingState;
-  Object.keys(existingState).forEach((x) => {
-    const value = params.get(x);
-    if (value == null)
-      return;
-    switch (typeof mutableState[x]) {
-      case "boolean":
-        mutableState[x] = value === "true";
-        break;
-      case "number":
-        mutableState[x] = parseInt(value);
-        break;
-      case "object":
-        mutableState[x] = JSON.parse("[" + value + "]");
-        break;
-      case "string":
-        mutableState[x] = value;
-        break;
-    }
-  });
-  return mutableState;
-}
-
 // src/wakelock.ts
 var lock;
 function setWakeLock() {
@@ -10572,8 +10452,10 @@ function setWakeLock() {
 }
 function tryAcquireWakeLock() {
   try {
-    navigator.wakeLock.request("screen").then((lock2) => lock2 = lock2);
-  } catch (e) {}
+    navigator.wakeLock.request("screen").then((l) => lock = l);
+  } catch (e) {
+    console.log("Could not aquire wake lock");
+  }
 }
 
 // src/mod.ts
@@ -10609,13 +10491,13 @@ class Mod {
 }
 function zip(a, b) {
   if (a.length != b.length) {
-    throw "Cannot merge arrays of different lengths";
+    throw new Error("Cannot merge arrays of different lengths");
   }
   return a.map((x, i) => [x, b[i]]);
 }
 function zip3(a, b, c) {
   if (a.length != b.length || a.length != c.length) {
-    throw "Cannot merge arrays of different lengths";
+    throw new Error("Cannot merge arrays of different lengths");
   }
   return a.map((x, i) => [x, b[i], c[i]]);
 }
@@ -10699,11 +10581,11 @@ var indexList = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
 function createNoteSpec(naturalIndex, index) {
   const natural = naturals.filter((x) => x.index === naturalIndex)[0];
   if (!naturals.some((x) => x.index === naturalIndex)) {
-    throw "naturalIndex is not valid: " + naturalIndex;
+    throw new Error("naturalIndex is not valid: " + naturalIndex);
   }
   const offset = diff(12, naturalIndex, index);
   if (Math.abs(offset) > 2) {
-    throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+    throw new Error("offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset);
   }
   const noteLabel = noteLabels.filter((x) => x.offset === offset)[0];
   return {
@@ -10919,11 +10801,11 @@ function chromatic() {
 var updateScale = (current) => {
   const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
   if (!scaleFamily2) {
-    throw "scaleFamily is " + scaleFamily2 + ", current.scaleFamilyIndex = " + current.scaleFamilyIndex;
+    throw new Error("Invalid scaleFamilyIndex, current.scaleFamilyIndex = " + current.scaleFamilyIndex);
   }
   const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
   if (!mode) {
-    throw "mode is " + mode + "current.modeIndex" + current.modeIndex;
+    throw new Error("Invalid modeIndex, current.modeIndex = " + current.modeIndex);
   }
   const noteSpec = createNoteSpec(current.naturalIndex, current.index);
   const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily2);
@@ -10938,7 +10820,7 @@ var updateScale = (current) => {
 };
 
 // src/menu.ts
-var view3 = (_, ctx, raise) => {
+var view = (_, ctx, raise) => {
   if (ctx.init) {
     init();
   }
@@ -10975,7 +10857,7 @@ function onMenuClick(event) {
 
 // src/tonics.ts
 var import_d3 = __toESM(require_d3(), 1);
-var view4 = (model, ctx, raise) => {
+var view2 = (model, ctx, raise) => {
   if (ctx.init) {
     const pad = 5;
     const buttonHeight = 25;
@@ -11015,7 +10897,7 @@ function isSameNoteAsNatural(noteSpec) {
 
 // src/modes.ts
 var import_d32 = __toESM(require_d3(), 1);
-var view5 = (model, ctx, raise) => {
+var view3 = (model, ctx, raise) => {
   if (ctx.init) {
     const svg = import_d32.default.select("#modes");
     modes = svg.append("g").attr("transform", "translate(0, 280)");
@@ -11049,7 +10931,7 @@ function index(mode) {
 var import_d33 = __toESM(require_d3(), 1);
 var buttons3;
 var toggle = 0;
-var view6 = (model, ctx, raise) => {
+var view4 = (model, ctx, raise) => {
   const onClick = (x) => {
     const updatedToggle = toggle ^ 2 ** x;
     const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter((x2) => (2 ** x2 & updatedToggle) === 2 ** x2);
@@ -11140,13 +11022,13 @@ function parseTuning(tuning) {
       tokens[tokenIndex - 1] = tokens[tokenIndex - 1] + noteChar;
       lastWasChar = false;
     } else {
-      throw "Invalid tuning char";
+      throw new Error("Invalid tuning char");
     }
   }
   for (const token of tokens) {
     const noteName = noteNames.filter((x) => x.name === token);
     if (noteName.length != 1) {
-      throw "Invalid token";
+      throw new Error("Invalid token");
     }
     result.push(noteName[0].index);
   }
@@ -11168,7 +11050,7 @@ function buildTunings() {
   }
   return tunings2;
 }
-var view7 = (_, ctx, raise) => {
+var view5 = (_, ctx, raise) => {
   const raiseTuningChangedEvent = (tuning) => {
     raise({
       id: "TuningChanged",
@@ -11182,7 +11064,7 @@ var view7 = (_, ctx, raise) => {
 
 // src/scale-family.ts
 var import_d34 = __toESM(require_d3(), 1);
-var view8 = (_, ctx, raise) => {
+var view6 = (_, ctx, raise) => {
   function raiseScaleFamilyChangedEvent(scaleFamily2) {
     raise({
       id: "ScaleFamilyChange",
@@ -24744,23 +24626,144 @@ var StateSchema = exports_external.object({
   tuningIndex: exports_external.number()
 });
 
+// src/defaultState.ts
+var defaultState = Object.freeze({
+  index: 3,
+  naturalIndex: 3,
+  chordIndex: -1,
+  chordIntervals: [0, 2, 4],
+  toggledIndexes: 0,
+  scaleFamilyIndex: 0,
+  modeIndex: 0,
+  midiToggledIndexes: 0,
+  isLeftHanded: false,
+  isNutFlipped: false,
+  fretboardLabelType: "NoteName",
+  circleIsCNoon: true,
+  tuningIndex: 0
+});
+
 // src/storage.ts
 var STORAGE_KEY = "app_state";
-var view9 = ({ state }, _ctx, _raise2) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+var view7 = ({ state }, _ctx, _raise) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.log(`Could not store state in local storage: ${e}`);
+  }
 };
 var getStateFromLocalStorage = () => {
   const stateString = localStorage.getItem(STORAGE_KEY);
   if (!stateString) {
-    return defaultState;
+    return { ...defaultState };
   }
   const parsed = StateSchema.safeParse(JSON.parse(stateString));
   if (!parsed.success) {
     console.log("Invalid cookie state:", parsed.error.message);
-    return defaultState;
+    return { ...defaultState };
   }
   return parsed.data;
 };
+
+// src/settings.ts
+var LH_CHKBOX_ID = "left-handed-checkbox";
+var FLIPNUT_CHKBOX_ID = "flip-nut-checkbox";
+var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
+var FB_NT_NONE_ID = "fb-note-text-None";
+var FB_NT_NAME_ID = "fb-note-text-NoteName";
+var FB_NT_INT_ID = "fb-note-text-Interval";
+var view8 = ({ state }, ctx, raise) => {
+  const setCheckbox = (id, checked) => {
+    const checkbox = document.getElementById(id);
+    checkbox.checked = checked;
+  };
+  const setClickHandler = (id, handler) => {
+    const element = document.getElementById(id);
+    element.onclick = (x) => handler(x.currentTarget, raise);
+  };
+  if (ctx.init) {
+    setCheckbox("left-handed-checkbox", state.isLeftHanded);
+    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+    const selected = "fb-note-text-" + state.fretboardLabelType;
+    const radio = document.getElementById(selected);
+    radio.checked = true;
+    setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
+    setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
+    setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
+    setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
+    setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
+    setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
+  }
+};
+function onLeftHandedClick(e, raise) {
+  raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
+}
+function onFlipNut(e, raise) {
+  raise({ id: "FlipNut", isNutFlipped: e.checked });
+}
+function onSetCToNoon(e, raise) {
+  raise({ id: "SetCToNoon", isC: e.checked });
+}
+function onFbNoteTextClick(e, raise) {
+  raise({ id: "FretboardLabelChange", labelType: e.value });
+}
+
+// src/permalink.ts
+var PERMALINK_BUTTON_ID = "permalink-button";
+var PERMALINK_TEXT_ID = "permalink-text";
+var view9 = ({ state }, _ctx, _raise) => {
+  const permalinkButton = document.getElementById(PERMALINK_BUTTON_ID);
+  if (permalinkButton) {
+    permalinkButton.onclick = () => populatePermalinkText(state);
+  }
+};
+function populatePermalinkText(state) {
+  const permalink = generatePermalink(state);
+  const inputbox = document.getElementById(PERMALINK_TEXT_ID);
+  inputbox.value = permalink;
+  navigator.clipboard.writeText(permalink);
+}
+function generatePermalink(state) {
+  const params = new URLSearchParams;
+  Object.keys(state).forEach((key) => {
+    if (state[key] !== defaultState[key]) {
+      params.append(key, state[key]);
+    }
+  });
+  const queryString = params.size === 0 ? "" : `?${params.toString()}`;
+  return `${location.protocol}//${location.host}${location.pathname}${queryString}`;
+}
+function updateStateFromQuerystring(existingState) {
+  const queryString = location.search;
+  const params = new URLSearchParams(queryString);
+  const mutableState = existingState;
+  try {
+    Object.keys(existingState).forEach((x) => {
+      const value = params.get(x);
+      if (value == null)
+        return;
+      switch (typeof mutableState[x]) {
+        case "boolean":
+          mutableState[x] = value === "true";
+          break;
+        case "number":
+          mutableState[x] = parseInt(value, 10);
+          break;
+        case "object":
+          mutableState[x] = JSON.parse("[" + value + "]");
+          break;
+        case "string":
+          mutableState[x] = value;
+          break;
+      }
+    });
+  } catch (e) {
+    console.log(`Error reading query string: ${e}`);
+    return existingState;
+  }
+  return mutableState;
+}
 
 // src/circle.ts
 var import_d35 = __toESM(require_d3(), 1);
@@ -24860,7 +24863,7 @@ function update(scaleChnaged, state) {
   state.noteText.data(data, indexer2).text((d) => d.node.scaleNote.note.label);
   state.intervalSegments.data(data, indexer2).attr("class", (d) => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
   state.intervalText.data(data, indexer2).text((d) => d.node.intervalName);
-  state.intervalNotes.data(data, indexer2).attr("class", (d) => d.node.toggle ? "interval-note-selected" : "interval-note").style("fill", (d) => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16) : "none").style("stroke-width", (d) => d.node.midiToggle ? "20px" : "2px").style("stroke", (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
+  state.intervalNotes.data(data, indexer2).attr("class", (d) => d.node.toggle ? "interval-note-selected" : "interval-note").style("fill", (d) => d.node.toggle ? "#" + d.node.chordInterval.colour.toString(16).padStart(6, "0") : "none").style("stroke-width", (d) => d.node.midiToggle ? "20px" : "2px").style("stroke", (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
   state.chordText.data(data, indexer2).text((d) => d.node.scaleNote.chord.romanNumeral + "");
   state.chordSegments.data(data, indexer2).attr("class", (d) => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
   state.chordNotes.data(data, indexer2).attr("class", (d) => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
@@ -24874,7 +24877,7 @@ function getChordSegmentClass(chord) {
     return "chord-segment-minor";
   if (chord.type === 0 /* Major */)
     return "chord-segment-major";
-  throw "Unexpected ChordType";
+  throw new Error("Unexpected ChordType");
 }
 function generateSegments(fifths2) {
   const count = fifths2.length;
@@ -24894,7 +24897,7 @@ function generateSegments(fifths2) {
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
   if (Math.abs(noteSpec.offset) > 1) {
     const naturalId = noteSpec.natural.id;
-    const newNaturalId = noteSpec.offset > 0 ? naturalId + 1 % 7 : naturalId == 0 ? 6 : naturalId - 1;
+    const newNaturalId = noteSpec.offset > 0 ? (naturalId + 1) % 7 : naturalId == 0 ? 6 : naturalId - 1;
     const newNatural = naturals.filter((x) => x.id === newNaturalId)[0];
     return createNoteSpec(newNatural.index, noteSpec.index);
   }
@@ -25056,18 +25059,18 @@ var createViews = () => {
   const cofView = create("#cof", fifths(), "Circle of Fifths");
   const guitarView = create2();
   const views = [
+    view,
+    view2,
     view3,
     view4,
     view5,
-    view6,
-    view7,
     chromaticView,
     cofView,
     guitarView,
+    view6,
     view8,
-    view,
-    view9,
-    view2
+    view7,
+    view9
   ];
   return (model, ctx, raise) => {
     for (const view10 of views) {
@@ -25199,8 +25202,6 @@ var update2 = (model, msg) => {
 };
 
 // src/index.ts
-window.settings = exports_settings;
-window.permalink = exports_permalink;
 var initModel = () => {
   const state = updateStateFromQuerystring(getStateFromLocalStorage());
   return updateScale(state);
@@ -25217,5 +25218,5 @@ var main = () => {
 };
 main();
 
-//# debugId=10835B7E9A16BF8564756E2164756E21
+//# debugId=5220555CF01D7F7C64756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

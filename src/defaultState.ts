@@ -1,6 +1,6 @@
 import { State } from './types';
 
-export const defaultState: State = {
+export const defaultState: State = Object.freeze({
     index: 3, // C
     naturalIndex: 3, // C
     chordIndex: -1, // no chord
@@ -14,4 +14,4 @@ export const defaultState: State = {
     fretboardLabelType: "NoteName",
     circleIsCNoon: true,
     tuningIndex: 0,
-};
+} as const satisfies State);

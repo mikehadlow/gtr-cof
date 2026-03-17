@@ -172,7 +172,7 @@ export const create = (): View<Model, Msg, Svg> => {
             .attr("stroke", stroke)
             .attr("stroke-width", strokeWidth);
 
-        noteLabels.data(data, indexer)
+        noteLabels.data(data, indexer);
         setLabels();
     }
 

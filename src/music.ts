@@ -96,12 +96,12 @@ export type NoteSpec = {
 export function createNoteSpec(naturalIndex: number, index: number): NoteSpec {
     const natural = naturals.filter(x => x.index === naturalIndex)[0];
     if (!naturals.some(x => x.index === naturalIndex)) {
-        throw "naturalIndex is not valid: " + naturalIndex;
+        throw new Error("naturalIndex is not valid: " + naturalIndex);
     }
 
     const offset = diff(12, naturalIndex, index);
     if (Math.abs(offset) > 2) {
-        throw "offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset;
+        throw new Error("offset between naturalIndex: " + naturalIndex + ", and index: " + index + ", is invalid: " + offset);
     }
 
     const noteLabel = noteLabels.filter(x => x.offset === offset)[0];

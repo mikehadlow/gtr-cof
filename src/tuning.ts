@@ -91,14 +91,14 @@ function parseTuning(tuning: string): Array<number> {
             lastWasChar = false;
         }
         else {
-            throw "Invalid tuning char";
+            throw new Error("Invalid tuning char");
         }
     }
 
     for (const token of tokens) {
         const noteName = music.noteNames.filter(x => x.name === token);
         if (noteName.length != 1) {
-            throw "Invalid token";
+            throw new Error("Invalid token");
         }
         result.push(noteName[0].index);
     }
