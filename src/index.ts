@@ -1,12 +1,9 @@
-import { setWakeLock } from "./wakelock";
 import { type State } from "./types";
 import { type Model } from "./model";
-import { updateScale } from "./update/updateScale";
-import { createViews } from "./view";
 import { type Msg } from "./message";
-import { update } from "./update";
-import { getStateFromLocalStorage } from "./view/storage";
-import { updateStateFromQuerystring } from "./view/permalink";
+import { createViews, getStateFromLocalStorage, updateStateFromQuerystring } from "./view";
+import { update, updateScale } from "./update";
+import { setWakeLock } from "./wakelock";
 
 const initModel = (): Model => {
     const state: State = updateStateFromQuerystring(getStateFromLocalStorage());

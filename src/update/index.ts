@@ -15,6 +15,8 @@ import { Update as UpdateFretboardLabelChange } from "./update-fretboard-label-c
 import { Update as UpdateMidiNote } from "./update-midi-note";
 import { Update as UpdateSetCToNoon } from "./update-set-c-to-noon";
 
+export { updateScale } from "./updateScale";
+
 export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model => {
     switch (msg.id) {
         case "TonicChanged":

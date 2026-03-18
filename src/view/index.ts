@@ -15,6 +15,9 @@ import { view as permalinkView } from "./permalink";
 import { create as createCircle } from "./circle";
 import { create as createGuitar } from "./guitar";
 
+export { getStateFromLocalStorage } from "./storage";
+export { updateStateFromQuerystring } from "./permalink";
+
 export const createViews = (): View<Model, Msg, Svg> => {
     const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
     const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
