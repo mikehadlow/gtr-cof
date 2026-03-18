@@ -1,6 +1,7 @@
 import d3 from 'd3';
 import * as music from '../music';
 import * as tuning from './tuning';
+import { icons } from '../ui';
 import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
 import type { Model } from "../model";
 import type { Msg } from "../message";
@@ -59,6 +60,7 @@ export const create = (): View<Model, Msg, Svg> => {
 
         d3.selectAll("#gtr > *").remove();
         const svg = d3.select("#gtr");
+
         svg.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
@@ -69,6 +71,21 @@ export const create = (): View<Model, Msg, Svg> => {
                 + (isNutFlipped ? ", Nut Flipped" : ""));
         const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = <SVGGElement>gtr.node();
+
+        // gear (settings) icon
+        svg.append("use")
+            .attr("href", icons.gear)
+            .attr("x", parseInt(svg.attr("width")) - 30)
+            .attr("y", 0)
+            .attr("width", 25)
+            .attr("height", 25)
+            .on("click", d => {
+                console.log("great clicked")
+                // TODO: Show a modal dialog with the settings currently
+                // defined in the #settings-dropdown div in docs/index.html
+                // all except set-C-to-noon, which is relevant to cirle.ts
+                // instead.
+            });
 
         // frets
         gtr.append("g").selectAll("rect")
