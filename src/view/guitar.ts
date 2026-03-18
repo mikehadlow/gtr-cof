@@ -3,6 +3,7 @@ import * as music from '../music';
 import * as tuning from './tuning';
 import { icons } from '../ui';
 import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
+import { showFretboardSettingsModal } from "./fretboard-settings-modal";
 import type { Model } from "../model";
 import type { Msg } from "../message";
 
@@ -45,8 +46,11 @@ export const create = (): View<Model, Msg, Svg> => {
         fretboardLabelType = model.state.fretboardLabelType;
     }
 
+    let currentState: Model["state"];
+
     // return view function
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+        currentState = model.state;
         if (ctx.init || fretboardStateHasChanged(model)) {
             setFretboardState(model);
             drawFretboard(tuning.tunings[model.state.tuningIndex], raise);
@@ -73,19 +77,29 @@ export const create = (): View<Model, Msg, Svg> => {
         fretboardElement = <SVGGElement>gtr.node();
 
         // gear (settings) icon
-        svg.append("use")
-            .attr("href", icons.gear)
-            .attr("x", parseInt(svg.attr("width")) - 30)
+        const gearX = parseInt(svg.attr("width")) - 30;
+        const gearGroup = svg.append("g")
+            .style("cursor", "pointer")
+            .on("mouseover", function (this: Element) { d3.select(this).select("use").style("fill", "black"); })
+            .on("mouseout", function (this: Element) { d3.select(this).select("use").style("fill", "none"); })
+            .on("click", () => {
+                showFretboardSettingsModal(currentState, raise);
+            });
+        gearGroup.append("rect")
+            .attr("x", gearX)
             .attr("y", 0)
             .attr("width", 25)
             .attr("height", 25)
-            .on("click", d => {
-                console.log("great clicked")
-                // TODO: Show a modal dialog with the settings currently
-                // defined in the #settings-dropdown div in docs/index.html
-                // all except set-C-to-noon, which is relevant to cirle.ts
-                // instead.
-            });
+            .style("fill", "transparent");
+        gearGroup.append("use")
+            .attr("href", icons.gear)
+            .attr("x", gearX)
+            .attr("y", 0)
+            .attr("width", 25)
+            .attr("height", 25)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("pointer-events", "none");
 
         // frets
         gtr.append("g").selectAll("rect")

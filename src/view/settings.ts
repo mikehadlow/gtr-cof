@@ -25,14 +25,14 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, 
         const element = document.getElementById(id) as HTMLInputElement;
         element.onclick = (x) => handler(x.currentTarget as HTMLInputElement, raise);
     }
+    setCheckbox("left-handed-checkbox", state.isLeftHanded);
+    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+
+    const selected = "fb-note-text-" + state.fretboardLabelType;
+    setCheckbox(selected, true);
+
     if (ctx.init) {
-        setCheckbox("left-handed-checkbox", state.isLeftHanded);
-        setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-        setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-
-        const selected = "fb-note-text-" + state.fretboardLabelType;
-        setCheckbox(selected, true);
-
         setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
         setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
         setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
