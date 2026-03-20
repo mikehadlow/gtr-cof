@@ -5,13 +5,14 @@ export const defaultState: State = Object.freeze({
     naturalIndex: 3, // C
     chordIndex: -1, // no chord
     chordIntervals: [0, 2, 4], // standard triad
-    toggledIndexes: 0, // index bitflag
+    toggledNotesBitmask: 0, // index bitflag
     scaleFamilyIndex: 0, // diatornic
     modeIndex: 0, // major
-    midiToggledIndexes: 0,
+    midiToggledNotesBitmask: 0,
     isLeftHanded: false,
     isNutFlipped: false,
     fretboardLabelType: "NoteName",
     circleIsCNoon: true,
     tuningIndex: 0,
+    modalState: "closed",
 } as const satisfies State);

@@ -2,8 +2,6 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
-type Init<TModel> = () => TModel;
-
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
 export type ViewContext = {
@@ -17,20 +15,24 @@ export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: 
 export const FretboardLabelTypeSchema = z.enum(["None", "NoteName", "Interval"]);
 export type FretboardLabelType = z.infer<typeof FretboardLabelTypeSchema>;
 
+export const ModalStateSchema = z.enum(["closed", "guitar-settings"]);
+export type ModalState = z.infer<typeof ModalStateSchema>;
+
 export const StateSchema = z.object({
     index: z.number(),
     naturalIndex: z.number(),
     chordIndex: z.number(),
     chordIntervals: z.array(z.number()),
-    toggledIndexes: z.number(),
+    toggledNotesBitmask: z.number(),
     scaleFamilyIndex: z.number(),
     modeIndex: z.number(),
-    midiToggledIndexes: z.number(),
+    midiToggledNotesBitmask: z.number(),
     isLeftHanded: z.boolean(),
     isNutFlipped: z.boolean(),
     fretboardLabelType: FretboardLabelTypeSchema,
     circleIsCNoon: z.boolean(),
     tuningIndex: z.number(),
+    modalState: ModalStateSchema,
 });
 
 export type State = z.infer<typeof StateSchema>;

@@ -9464,15 +9464,15 @@ var require_d3 = __commonJS((exports, module) => {
     var d3_selection_interrupt = d3_selection_interruptNS(d3_transitionNamespace());
     function d3_selection_interruptNS(ns) {
       return function() {
-        var lock2, activeId, active;
-        if ((lock2 = this[ns]) && (active = lock2[activeId = lock2.active])) {
+        var lock, activeId, active;
+        if ((lock = this[ns]) && (active = lock[activeId = lock.active])) {
           active.timer.c = null;
           active.timer.t = NaN;
-          if (--lock2.count)
-            delete lock2[activeId];
+          if (--lock.count)
+            delete lock[activeId];
           else
             delete this[ns];
-          lock2.active += 0.5;
+          lock.active += 0.5;
           active.event && active.event.interrupt.call(this, this.__data__, active.index);
         }
       };
@@ -9737,10 +9737,10 @@ var require_d3 = __commonJS((exports, module) => {
       return name == null ? "__transition__" : "__transition_" + name + "__";
     }
     function d3_transitionNode(node, i, ns, id, inherit) {
-      var lock2 = node[ns] || (node[ns] = {
+      var lock = node[ns] || (node[ns] = {
         active: 0,
         count: 0
-      }), transition = lock2[id], time, timer, duration, ease, tweens;
+      }), transition = lock[id], time, timer, duration, ease, tweens;
       function schedule(elapsed) {
         var delay = transition.delay;
         timer.t = delay + time;
@@ -9749,21 +9749,21 @@ var require_d3 = __commonJS((exports, module) => {
         timer.c = start;
       }
       function start(elapsed) {
-        var activeId = lock2.active, active = lock2[activeId];
+        var activeId = lock.active, active = lock[activeId];
         if (active) {
           active.timer.c = null;
           active.timer.t = NaN;
-          --lock2.count;
-          delete lock2[activeId];
+          --lock.count;
+          delete lock[activeId];
           active.event && active.event.interrupt.call(node, node.__data__, active.index);
         }
-        for (var cancelId in lock2) {
+        for (var cancelId in lock) {
           if (+cancelId < id) {
-            var cancel = lock2[cancelId];
+            var cancel = lock[cancelId];
             cancel.timer.c = null;
             cancel.timer.t = NaN;
-            --lock2.count;
-            delete lock2[cancelId];
+            --lock.count;
+            delete lock[cancelId];
           }
         }
         timer.c = tick;
@@ -9774,7 +9774,7 @@ var require_d3 = __commonJS((exports, module) => {
           }
           return 1;
         }, 0, time);
-        lock2.active = id;
+        lock.active = id;
         transition.event && transition.event.start.call(node, node.__data__, i);
         tweens = [];
         transition.tween.forEach(function(key, value) {
@@ -9792,8 +9792,8 @@ var require_d3 = __commonJS((exports, module) => {
         }
         if (t >= 1) {
           transition.event && transition.event.end.call(node, node.__data__, i);
-          if (--lock2.count)
-            delete lock2[id];
+          if (--lock.count)
+            delete lock[id];
           else
             delete node[ns];
           return 1;
@@ -9802,7 +9802,7 @@ var require_d3 = __commonJS((exports, module) => {
       if (!transition) {
         time = inherit.time;
         timer = d3_timer(schedule, 0, time);
-        transition = lock2[id] = {
+        transition = lock[id] = {
           tween: new d3_Map,
           time,
           timer,
@@ -9812,7 +9812,7 @@ var require_d3 = __commonJS((exports, module) => {
           index: i
         };
         inherit = null;
-        ++lock2.count;
+        ++lock.count;
       }
     }
     d3.svg.axis = function() {
@@ -10437,27 +10437,6 @@ var require_d3 = __commonJS((exports, module) => {
   })();
 });
 
-// src/wakelock.ts
-var lock;
-function setWakeLock() {
-  if (!("wakeLock" in navigator)) {
-    return;
-  }
-  tryAcquireWakeLock();
-  document.addEventListener("visibilitychange", async () => {
-    if (lock !== null && document.visibilityState === "visible") {
-      tryAcquireWakeLock();
-    }
-  });
-}
-function tryAcquireWakeLock() {
-  try {
-    navigator.wakeLock.request("screen").then((l) => lock = l);
-  } catch (e) {
-    console.log("Could not aquire wake lock");
-  }
-}
-
 // src/mod.ts
 class Mod {
   size = 0;
@@ -10797,29 +10776,7 @@ function chromatic() {
   return indexes;
 }
 
-// src/update/updateScale.ts
-var updateScale = (current) => {
-  const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
-  if (!scaleFamily2) {
-    throw new Error("Invalid scaleFamilyIndex, current.scaleFamilyIndex = " + current.scaleFamilyIndex);
-  }
-  const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
-  if (!mode) {
-    throw new Error("Invalid modeIndex, current.modeIndex = " + current.modeIndex);
-  }
-  const noteSpec = createNoteSpec(current.naturalIndex, current.index);
-  const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledIndexes, current.midiToggledIndexes, scaleFamily2);
-  current.toggledIndexes = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
-  return {
-    music: {
-      nodes,
-      mode
-    },
-    state: current
-  };
-};
-
-// src/menu.ts
+// src/view/menu.ts
 var view = (_, ctx, raise) => {
   if (ctx.init) {
     init();
@@ -10855,7 +10812,7 @@ function onMenuClick(event) {
   }
 }
 
-// src/tonics.ts
+// src/view/tonics.ts
 var import_d3 = __toESM(require_d3(), 1);
 var view2 = (model, ctx, raise) => {
   if (ctx.init) {
@@ -10895,7 +10852,7 @@ function isSameNoteAsNatural(noteSpec) {
   return naturals.some((x) => x.index === noteSpec.index && x.index != noteSpec.natural.index);
 }
 
-// src/modes.ts
+// src/view/modes.ts
 var import_d32 = __toESM(require_d3(), 1);
 var view3 = (model, ctx, raise) => {
   if (ctx.init) {
@@ -10927,7 +10884,7 @@ function index(mode) {
   return mode.index.toString();
 }
 
-// src/chord-interval.ts
+// src/view/chord-interval.ts
 var import_d33 = __toESM(require_d3(), 1);
 var buttons3;
 var toggle = 0;
@@ -10959,8 +10916,8 @@ var view4 = (model, ctx, raise) => {
   }).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
 };
 
-// src/tuning.ts
-var d34 = __toESM(require_d3(), 1);
+// src/view/tuning.ts
+var import_d34 = __toESM(require_d3(), 1);
 var guitarDots = [
   [3, 0],
   [5, 0],
@@ -11058,12 +11015,12 @@ var view5 = (_, ctx, raise) => {
     });
   };
   if (ctx.init) {
-    d34.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseTuningChangedEvent).text((x) => x.tuning + "   " + x.description);
+    import_d34.default.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseTuningChangedEvent).text((x) => x.tuning + "   " + x.description);
   }
 };
 
-// src/scale-family.ts
-var import_d34 = __toESM(require_d3(), 1);
+// src/view/scale-family.ts
+var import_d35 = __toESM(require_d3(), 1);
 var view6 = (_, ctx, raise) => {
   function raiseScaleFamilyChangedEvent(scaleFamily2) {
     raise({
@@ -11072,7 +11029,7 @@ var view6 = (_, ctx, raise) => {
     });
   }
   if (ctx.init) {
-    import_d34.default.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseScaleFamilyChangedEvent).text((x) => x.name);
+    import_d35.default.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseScaleFamilyChangedEvent).text((x) => x.name);
   }
 };
 
@@ -24610,20 +24567,22 @@ function date4(params) {
 config(en_default());
 // src/types.ts
 var FretboardLabelTypeSchema = exports_external.enum(["None", "NoteName", "Interval"]);
+var ModalStateSchema = exports_external.enum(["closed", "guitar-settings"]);
 var StateSchema = exports_external.object({
   index: exports_external.number(),
   naturalIndex: exports_external.number(),
   chordIndex: exports_external.number(),
   chordIntervals: exports_external.array(exports_external.number()),
-  toggledIndexes: exports_external.number(),
+  toggledNotesBitmask: exports_external.number(),
   scaleFamilyIndex: exports_external.number(),
   modeIndex: exports_external.number(),
-  midiToggledIndexes: exports_external.number(),
+  midiToggledNotesBitmask: exports_external.number(),
   isLeftHanded: exports_external.boolean(),
   isNutFlipped: exports_external.boolean(),
   fretboardLabelType: FretboardLabelTypeSchema,
   circleIsCNoon: exports_external.boolean(),
-  tuningIndex: exports_external.number()
+  tuningIndex: exports_external.number(),
+  modalState: ModalStateSchema
 });
 
 // src/defaultState.ts
@@ -24632,18 +24591,19 @@ var defaultState = Object.freeze({
   naturalIndex: 3,
   chordIndex: -1,
   chordIntervals: [0, 2, 4],
-  toggledIndexes: 0,
+  toggledNotesBitmask: 0,
   scaleFamilyIndex: 0,
   modeIndex: 0,
-  midiToggledIndexes: 0,
+  midiToggledNotesBitmask: 0,
   isLeftHanded: false,
   isNutFlipped: false,
   fretboardLabelType: "NoteName",
   circleIsCNoon: true,
-  tuningIndex: 0
+  tuningIndex: 0,
+  modalState: "closed"
 });
 
-// src/storage.ts
+// src/view/storage.ts
 var STORAGE_KEY = "app_state";
 var view7 = ({ state }, _ctx, _raise) => {
   try {
@@ -24659,13 +24619,13 @@ var getStateFromLocalStorage = () => {
   }
   const parsed = StateSchema.safeParse(JSON.parse(stateString));
   if (!parsed.success) {
-    console.log("Invalid cookie state:", parsed.error.message);
+    console.log("Invalid storage state:", parsed.error.message);
     return { ...defaultState };
   }
   return parsed.data;
 };
 
-// src/settings.ts
+// src/view/settings.ts
 var LH_CHKBOX_ID = "left-handed-checkbox";
 var FLIPNUT_CHKBOX_ID = "flip-nut-checkbox";
 var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
@@ -24675,19 +24635,21 @@ var FB_NT_INT_ID = "fb-note-text-Interval";
 var view8 = ({ state }, ctx, raise) => {
   const setCheckbox = (id, checked) => {
     const checkbox = document.getElementById(id);
+    if (checkbox === null) {
+      throw new Error(`checkbox with id '${id}' not found.`);
+    }
     checkbox.checked = checked;
   };
   const setClickHandler = (id, handler) => {
     const element = document.getElementById(id);
     element.onclick = (x) => handler(x.currentTarget, raise);
   };
+  setCheckbox("left-handed-checkbox", state.isLeftHanded);
+  setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+  setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+  const selected = "fb-note-text-" + state.fretboardLabelType;
+  setCheckbox(selected, true);
   if (ctx.init) {
-    setCheckbox("left-handed-checkbox", state.isLeftHanded);
-    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-    const selected = "fb-note-text-" + state.fretboardLabelType;
-    const radio = document.getElementById(selected);
-    radio.checked = true;
     setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
     setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
     setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
@@ -24709,7 +24671,7 @@ function onFbNoteTextClick(e, raise) {
   raise({ id: "FretboardLabelChange", labelType: e.value });
 }
 
-// src/permalink.ts
+// src/view/permalink.ts
 var PERMALINK_BUTTON_ID = "permalink-button";
 var PERMALINK_TEXT_ID = "permalink-text";
 var view9 = ({ state }, _ctx, _raise) => {
@@ -24726,23 +24688,25 @@ function populatePermalinkText(state) {
 }
 function generatePermalink(state) {
   const params = new URLSearchParams;
-  Object.keys(state).forEach((key) => {
+  const keys = Object.keys(state);
+  for (const key of keys) {
     if (state[key] !== defaultState[key]) {
-      params.append(key, state[key]);
+      params.append(key, state[key].toString());
     }
-  });
+  }
   const queryString = params.size === 0 ? "" : `?${params.toString()}`;
   return `${location.protocol}//${location.host}${location.pathname}${queryString}`;
 }
 function updateStateFromQuerystring(existingState) {
   const queryString = location.search;
   const params = new URLSearchParams(queryString);
-  const mutableState = existingState;
+  const mutableState = { ...existingState };
+  const keys = Object.keys(existingState);
   try {
-    Object.keys(existingState).forEach((x) => {
+    for (const x of keys) {
       const value = params.get(x);
       if (value == null)
-        return;
+        continue;
       switch (typeof mutableState[x]) {
         case "boolean":
           mutableState[x] = value === "true";
@@ -24757,7 +24721,7 @@ function updateStateFromQuerystring(existingState) {
           mutableState[x] = value;
           break;
       }
-    });
+    }
   } catch (e) {
     console.log(`Error reading query string: ${e}`);
     return existingState;
@@ -24765,10 +24729,10 @@ function updateStateFromQuerystring(existingState) {
   return mutableState;
 }
 
-// src/circle.ts
-var import_d35 = __toESM(require_d3(), 1);
+// src/view/circle.ts
+var import_d36 = __toESM(require_d3(), 1);
 var create = (svgId, noteIndexes, label) => {
-  const svg = import_d35.default.select(svgId);
+  const svg = import_d36.default.select(svgId);
   let state;
   let isCNoon = true;
   return (model, ctx, raise) => {
@@ -24809,9 +24773,9 @@ function draw(svg, noteIndexes, label, raise) {
   const cof = svg.append("g").attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
   cof.append("text").attr("text-anchor", "middle").attr("x", 0).attr("y", 0).text(label);
   const segments = generateSegments(noteIndexes);
-  const noteArc = import_d35.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
-  const degreeArc = import_d35.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
-  const chordArc = import_d35.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
+  const noteArc = import_d36.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
+  const degreeArc = import_d36.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
+  const chordArc = import_d36.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
   const noteSegments = cof.append("g").selectAll("path").data(segments, indexer2).enter().append("path").attr("d", noteArc).attr("class", "note-segment").on("click", handleNoteClick);
   const noteText = cof.append("g").selectAll("text").data(segments).enter().append("text").attr("x", function(x) {
     return noteArc.centroid(x)[0];
@@ -24851,8 +24815,8 @@ function draw(svg, noteIndexes, label, raise) {
     chordText
   };
 }
-function update(scaleChnaged, state) {
-  const data = scaleChnaged.nodes.map((node) => ({
+function update(scaleChanged, state) {
+  const data = scaleChanged.nodes.map((node) => ({
     startAngle: 0,
     endAngle: 0,
     scaleNote: {},
@@ -24911,8 +24875,15 @@ function rotate(array2, offset) {
   return newArray;
 }
 
-// src/guitar.ts
-var import_d36 = __toESM(require_d3(), 1);
+// src/view/guitar.ts
+var import_d37 = __toESM(require_d3(), 1);
+
+// src/ui/index.ts
+var icons = {
+  gear: "#icon-gear"
+};
+
+// src/view/guitar.ts
 var stringGap = 40;
 var fretGap = 70;
 var fretWidth = 5;
@@ -24935,7 +24906,9 @@ var create2 = () => {
     isNutFlipped = model.state.isNutFlipped;
     fretboardLabelType = model.state.fretboardLabelType;
   };
+  let currentState;
   return (model, ctx, raise) => {
+    currentState = model.state;
     if (ctx.init || fretboardStateHasChanged(model)) {
       setFretboardState(model);
       drawFretboard(tunings[model.state.tuningIndex], raise);
@@ -24945,11 +24918,19 @@ var create2 = () => {
   function drawFretboard(tuningInfo, raise) {
     const fretData = getFretData(numberOfFrets);
     const dots = tuningInfo.dots;
-    import_d36.default.selectAll("#gtr > *").remove();
-    const svg = import_d36.default.select("#gtr");
+    import_d37.default.selectAll("#gtr > *").remove();
+    const svg = import_d37.default.select("#gtr");
     svg.append("text").attr("class", "mode-text").attr("x", 30).attr("y", 11).text(tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : ""));
     const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
     fretboardElement = gtr.node();
+    const gearX = parseInt(svg.attr("width")) - 30;
+    const gearGroup = svg.append("g").style("cursor", "pointer").on("mouseover", function() {
+      import_d37.default.select(this).select("use").style("fill", "black");
+    }).on("mouseout", function() {
+      import_d37.default.select(this).select("use").style("fill", "none");
+    }).on("click", () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
+    gearGroup.append("rect").attr("x", gearX).attr("y", 0).attr("width", 25).attr("height", 25).style("fill", "transparent");
+    gearGroup.append("use").attr("href", icons.gear).attr("x", gearX).attr("y", 0).attr("width", 25).attr("height", 25).style("fill", "none").style("stroke", "black").style("pointer-events", "none");
     gtr.append("g").selectAll("rect").data(fretData).enter().append("rect").attr("x", function(d, i) {
       return (i + 1) * fretGap + pad - fretWidth;
     }).attr("y", pad + stringGap / 2 - fretWidth).attr("width", fretWidth).attr("height", stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2).attr("fill", function(d, i) {
@@ -25053,11 +25034,141 @@ var create2 = () => {
   }
 };
 
+// src/view/modal.ts
+var MODAL_BACKDROP_CLASS = "modal-backdrop";
+var MODAL_CONTAINER_CLASS = "modal-container";
+var create3 = () => {
+  let previousState = "closed";
+  return ({ state }, _ctx, raise) => {
+    if (state.modalState === previousState) {
+      return;
+    }
+    switch (state.modalState) {
+      case "closed":
+        removeExistingModal();
+        break;
+      case "guitar-settings":
+        showFretboardSettingsModal(state, raise);
+        break;
+      default:
+        const _exhaustiveCheck = state.modalState;
+    }
+    previousState = state.modalState;
+  };
+};
+function removeExistingModal() {
+  const existing = document.querySelector(`.${MODAL_BACKDROP_CLASS}`);
+  if (existing) {
+    existing.remove();
+    return true;
+  }
+  return false;
+}
+function showFretboardSettingsModal(state, raise) {
+  if (removeExistingModal())
+    return;
+  const backdrop = document.createElement("div");
+  backdrop.className = MODAL_BACKDROP_CLASS;
+  backdrop.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  const modal = document.createElement("div");
+  modal.className = MODAL_CONTAINER_CLASS;
+  modal.addEventListener("click", (e) => e.stopPropagation());
+  const header = document.createElement("div");
+  header.className = "modal-header";
+  const title = document.createElement("span");
+  title.textContent = "Fretboard Settings";
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close";
+  closeBtn.textContent = "×";
+  closeBtn.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  modal.appendChild(header);
+  const tuningSection = createSection("Tuning");
+  const select = document.createElement("select");
+  select.className = "modal-select";
+  for (const t of tunings) {
+    const opt = document.createElement("option");
+    opt.value = String(t.index);
+    opt.textContent = `${t.tuning}  ${t.description}`;
+    if (t.index === state.tuningIndex)
+      opt.selected = true;
+    select.appendChild(opt);
+  }
+  select.addEventListener("change", () => {
+    raise({ id: "TuningChanged", index: parseInt(select.value) });
+  });
+  tuningSection.appendChild(select);
+  modal.appendChild(tuningSection);
+  const lhSection = createSection();
+  const lhLabel = createCheckboxLabel("Left Handed", state.isLeftHanded);
+  const lhCheckbox = lhLabel.querySelector("input");
+  lhCheckbox.addEventListener("change", () => {
+    raise({ id: "LeftHandedFretboard", isLeftHanded: lhCheckbox.checked });
+  });
+  lhSection.appendChild(lhLabel);
+  modal.appendChild(lhSection);
+  const fnSection = createSection();
+  const fnLabel = createCheckboxLabel("Flip Nut", state.isNutFlipped);
+  const fnCheckbox = fnLabel.querySelector("input");
+  fnCheckbox.addEventListener("change", () => {
+    raise({ id: "FlipNut", isNutFlipped: fnCheckbox.checked });
+  });
+  fnSection.appendChild(fnLabel);
+  modal.appendChild(fnSection);
+  const nlSection = createSection("Note Labels");
+  const labelOptions = [
+    { label: "None", value: "None" },
+    { label: "Note Names", value: "NoteName" },
+    { label: "Intervals", value: "Interval" }
+  ];
+  for (const opt of labelOptions) {
+    const radioLabel = document.createElement("label");
+    radioLabel.className = "modal-radio-label";
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "modal-fb-note-text";
+    radio.value = opt.value;
+    radio.checked = state.fretboardLabelType === opt.value;
+    radio.addEventListener("change", () => {
+      raise({ id: "FretboardLabelChange", labelType: opt.value });
+    });
+    radioLabel.appendChild(radio);
+    radioLabel.appendChild(document.createTextNode(" " + opt.label));
+    nlSection.appendChild(radioLabel);
+  }
+  modal.appendChild(nlSection);
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+}
+function createSection(titleText) {
+  const section = document.createElement("div");
+  section.className = "modal-section";
+  if (titleText) {
+    const label = document.createElement("div");
+    label.className = "modal-section-title";
+    label.textContent = titleText;
+    section.appendChild(label);
+  }
+  return section;
+}
+function createCheckboxLabel(text, checked) {
+  const label = document.createElement("label");
+  label.className = "modal-checkbox-label";
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = checked;
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(" " + text));
+  return label;
+}
+
 // src/view/index.ts
 var createViews = () => {
   const chromaticView = create("#chromatic", chromatic(), "Chromatic");
   const cofView = create("#cof", fifths(), "Circle of Fifths");
   const guitarView = create2();
+  const modalView = create3();
   const views = [
     view,
     view2,
@@ -25070,12 +25181,35 @@ var createViews = () => {
     view6,
     view8,
     view7,
-    view9
+    view9,
+    modalView
   ];
   return (model, ctx, raise) => {
     for (const view10 of views) {
       view10(model, ctx, raise);
     }
+  };
+};
+
+// src/update/updateScale.ts
+var updateScale = (current) => {
+  const scaleFamily2 = scaleFamily.find((x) => x.index == current.scaleFamilyIndex);
+  if (!scaleFamily2) {
+    throw new Error("Invalid scaleFamilyIndex, current.scaleFamilyIndex = " + current.scaleFamilyIndex);
+  }
+  const mode = scaleFamily2.modes.find((x) => x.index == current.modeIndex);
+  if (!mode) {
+    throw new Error("Invalid modeIndex, current.modeIndex = " + current.modeIndex);
+  }
+  const noteSpec = createNoteSpec(current.naturalIndex, current.index);
+  const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledNotesBitmask, current.midiToggledNotesBitmask, scaleFamily2);
+  current.toggledNotesBitmask = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
+  return {
+    music: {
+      nodes,
+      mode
+    },
+    state: current
   };
 };
 
@@ -25104,14 +25238,14 @@ var Update3 = (model, msg) => {
   } else {
     current.chordIndex = msg.chordIndex;
   }
-  current.toggledIndexes = 0;
+  current.toggledNotesBitmask = 0;
   return updateScale(current);
 };
 
 // src/update/update-toggle.ts
 var Update4 = (model, msg) => {
   const current = model.state;
-  current.toggledIndexes = current.toggledIndexes ^ 2 ** msg.index;
+  current.toggledNotesBitmask = current.toggledNotesBitmask ^ 2 ** msg.index;
   return updateScale(current);
 };
 
@@ -25119,7 +25253,7 @@ var Update4 = (model, msg) => {
 var Update5 = (model, msg) => {
   const current = model.state;
   current.chordIntervals = msg.chordIntervals;
-  current.toggledIndexes = 0;
+  current.toggledNotesBitmask = 0;
   return updateScale(current);
 };
 
@@ -25158,13 +25292,19 @@ var Update10 = (model, msg) => {
 
 // src/update/update-midi-note.ts
 var Update11 = (model, msg) => {
-  model.state.midiToggledIndexes = msg.toggledIndexes;
+  model.state.midiToggledNotesBitmask = msg.toggledIndexes;
   return updateScale(model.state);
 };
 
 // src/update/update-set-c-to-noon.ts
 var Update12 = (model, msg) => {
   model.state.circleIsCNoon = msg.isC;
+  return model;
+};
+
+// src/update/update-modal-state.ts
+var Update13 = (model, msg) => {
+  model.state.modalState = msg.modalState;
   return model;
 };
 
@@ -25195,11 +25335,34 @@ var update2 = (model, msg) => {
       return Update11(model, msg);
     case "SetCToNoon":
       return Update12(model, msg);
+    case "ModalStateChange":
+      return Update13(model, msg);
     default:
       const _exhaustiveCheck = msg;
       return _exhaustiveCheck;
   }
 };
+
+// src/wakelock.ts
+var lock;
+function setWakeLock() {
+  if (!("wakeLock" in navigator)) {
+    return;
+  }
+  tryAcquireWakeLock();
+  document.addEventListener("visibilitychange", async () => {
+    if (lock !== null && document.visibilityState === "visible") {
+      tryAcquireWakeLock();
+    }
+  });
+}
+function tryAcquireWakeLock() {
+  try {
+    navigator.wakeLock.request("screen").then((l) => lock = l);
+  } catch (e) {
+    console.log("Could not aquire wake lock");
+  }
+}
 
 // src/index.ts
 var initModel = () => {
@@ -25218,5 +25381,5 @@ var main = () => {
 };
 main();
 
-//# debugId=5220555CF01D7F7C64756E2164756E21
+//# debugId=F18890B62DCEF9D364756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

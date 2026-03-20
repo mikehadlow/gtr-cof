@@ -1,4 +1,4 @@
-import type { FretboardLabelType } from './types';
+import type { FretboardLabelType, ModalState } from './types';
 import * as music from './music';
 
 export type Msg = {
@@ -37,4 +37,7 @@ export type Msg = {
 } | { // CoF only message
     id: "SetCToNoon",
     isC: boolean
+} | {
+    id: "ModalStateChange",
+    modalState: ModalState
 }
