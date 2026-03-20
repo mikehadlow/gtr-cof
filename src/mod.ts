@@ -1,5 +1,4 @@
 export class Mod<T> {
-
     size: number = 0;
     items: T[];
     start: number = 0;
@@ -37,14 +36,14 @@ export class Mod<T> {
 }
 
 export function zip<A, B>(a: A[], b: B[]): [A, B][] {
-    if (a.length != b.length) {
+    if (a.length !== b.length) {
         throw new Error("Cannot merge arrays of different lengths");
     }
     return a.map((x, i) => <[A, B]>[x, b[i]]);
 }
 
 export function zip3<A, B, C>(a: A[], b: B[], c: C[]): [A, B, C][] {
-    if (a.length != b.length || a.length != c.length) {
+    if (a.length !== b.length || a.length !== c.length) {
         throw new Error("Cannot merge arrays of different lengths");
     }
     return a.map((x, i) => <[A, B, C]>[x, b[i], c[i]]);
@@ -53,16 +52,15 @@ export function zip3<A, B, C>(a: A[], b: B[], c: C[]): [A, B, C][] {
 export function diff(size: number, a: number, b: number): number {
     const ax = a % size;
     const bx = b % size;
-    if (ax == bx) return 0;
+    if (ax === bx) return 0;
 
     const d1 = bx - ax;
     let d2 = 0;
 
     if (d1 > 0) {
-        d2 = -((ax + size) - bx);
-    }
-    else {
-        d2 = (bx + size) - ax;
+        d2 = -(ax + size - bx);
+    } else {
+        d2 = bx + size - ax;
     }
     return Math.abs(d1) > Math.abs(d2) ? d2 : d1;
 }
