@@ -3,7 +3,6 @@ import * as music from '../music';
 import * as tuning from './tuning';
 import { icons } from '../ui';
 import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
-import { showFretboardSettingsModal } from "./modal";
 import type { Model } from "../model";
 import type { Msg } from "../message";
 
@@ -82,9 +81,7 @@ export const create = (): View<Model, Msg, Svg> => {
             .style("cursor", "pointer")
             .on("mouseover", function (this: Element) { d3.select(this).select("use").style("fill", "black"); })
             .on("mouseout", function (this: Element) { d3.select(this).select("use").style("fill", "none"); })
-            .on("click", () => {
-                showFretboardSettingsModal(currentState, raise);
-            });
+            .on("click", () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
         gearGroup.append("rect")
             .attr("x", gearX)
             .attr("y", 0)

@@ -1,9 +1,31 @@
 import { tunings } from './tuning';
-import type { State, FretboardLabelType } from '../types';
+import type { State, FretboardLabelType, ModalState } from '../types';
 import type { Msg } from '../message';
+import { type View, ViewContext, type Svg } from "../types";
+import type { Model } from "../model";
 
 const MODAL_BACKDROP_CLASS = 'modal-backdrop';
 const MODAL_CONTAINER_CLASS = 'modal-container';
+
+export const create = (): View<Model, Msg, Svg> => {
+    let previousState: ModalState = "closed";
+    return ({ state }: Model, _ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+        if (state.modalState === previousState) {
+            return; // no modal state change.
+        }
+        switch (state.modalState) {
+            case "closed":
+                removeExistingModal();
+                break;
+            case "guitar-settings":
+                showFretboardSettingsModal(state, raise);
+                break;
+            default:
+                const _exhaustiveCheck: never = state.modalState;
+        }
+        previousState = state.modalState;
+    }
+}
 
 function removeExistingModal(): boolean {
     const existing = document.querySelector(`.${MODAL_BACKDROP_CLASS}`);
@@ -14,12 +36,12 @@ function removeExistingModal(): boolean {
     return false;
 }
 
-export function showFretboardSettingsModal(state: State, raise: (msg: Msg) => void): void {
+function showFretboardSettingsModal(state: State, raise: (msg: Msg) => void): void {
     if (removeExistingModal()) return;
 
     const backdrop = document.createElement('div');
     backdrop.className = MODAL_BACKDROP_CLASS;
-    backdrop.addEventListener('click', () => backdrop.remove());
+    backdrop.addEventListener('click', () => raise({ id: "ModalStateChange", modalState: "closed" }));
 
     const modal = document.createElement('div');
     modal.className = MODAL_CONTAINER_CLASS;
@@ -33,7 +55,7 @@ export function showFretboardSettingsModal(state: State, raise: (msg: Msg) => vo
     const closeBtn = document.createElement('button');
     closeBtn.className = 'modal-close';
     closeBtn.textContent = '\u00d7';
-    closeBtn.addEventListener('click', () => backdrop.remove());
+    closeBtn.addEventListener('click', () => raise({ id: "ModalStateChange", modalState: "closed" }));
     header.appendChild(title);
     header.appendChild(closeBtn);
     modal.appendChild(header);

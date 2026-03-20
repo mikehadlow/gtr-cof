@@ -14,6 +14,7 @@ import { Update as UpdateFlipNut } from "./update-flip-nut";
 import { Update as UpdateFretboardLabelChange } from "./update-fretboard-label-change";
 import { Update as UpdateMidiNote } from "./update-midi-note";
 import { Update as UpdateSetCToNoon } from "./update-set-c-to-noon";
+import { Update as UpdateModalState } from "./update-modal-state";
 
 export { updateScale } from "./updateScale";
 
@@ -43,6 +44,8 @@ export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model =
             return UpdateMidiNote(model, msg);
         case "SetCToNoon":
             return UpdateSetCToNoon(model, msg);
+        case "ModalStateChange":
+            return UpdateModalState(model, msg);
         default:
             const _exhaustiveCheck: never = msg;
             return _exhaustiveCheck;

@@ -14,6 +14,7 @@ import { view as settingsView } from "./settings";
 import { view as permalinkView } from "./permalink";
 import { create as createCircle } from "./circle";
 import { create as createGuitar } from "./guitar";
+import { create as createModal } from "./modal";
 
 export { getStateFromLocalStorage } from "./storage";
 export { updateStateFromQuerystring } from "./permalink";
@@ -22,6 +23,7 @@ export const createViews = (): View<Model, Msg, Svg> => {
     const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
     const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
     const guitarView = createGuitar();
+    const modalView = createModal();
 
     const views: View<Model, Msg, Svg>[] = [
         menuView,
@@ -35,7 +37,8 @@ export const createViews = (): View<Model, Msg, Svg> => {
         scaleFamilyView,
         settingsView,
         storageView,
-        permalinkView
+        permalinkView,
+        modalView,
     ];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
