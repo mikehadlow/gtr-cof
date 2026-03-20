@@ -24,6 +24,7 @@ function makeInputModel(scaleFamilyIndex: number): Model {
         fretboardLabelType: "NoteName",
         circleIsCNoon: true,
         tuningIndex: 0,
+        modalState: "closed",
     };
 
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);

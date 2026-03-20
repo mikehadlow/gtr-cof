@@ -21,6 +21,7 @@ function makeInputModel(): Model {
         fretboardLabelType: "NoteName",
         circleIsCNoon: true,
         tuningIndex: 0,
+        modalState: "closed",
     };
 
     // music field isn't read by the Update function, but we need a valid Model shape.

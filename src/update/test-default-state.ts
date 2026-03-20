@@ -14,4 +14,5 @@ export const defaultState: State = {
     fretboardLabelType: "NoteName",
     circleIsCNoon: true,
     tuningIndex: 0,
+    modalState: "closed",
 };

@@ -20,6 +20,7 @@ function makeInputModel(): Model {
         fretboardLabelType: "NoteName",
         circleIsCNoon: true,
         tuningIndex: 0,
+        modalState: "closed",
     };
 
     const scaleFamily = music.scaleFamily[0];
@@ -38,8 +39,8 @@ function makeInputModel(): Model {
 
 const suffixes = [
     { offset: -1, suffix: "flat" },
-    { offset: 0,  suffix: "natural" },
-    { offset: 1,  suffix: "sharp" },
+    { offset: 0, suffix: "natural" },
+    { offset: 1, suffix: "sharp" },
 ] as const;
 
 const artifactsDir = join(import.meta.dir, "test-artifacts", "tonic-changed");
