@@ -436,14 +436,15 @@
       2,
       4
     ],
-    "toggledIndexes": 1156,
+    "toggledNotesBitmask": 1156,
     "scaleFamilyIndex": 0,
     "modeIndex": 0,
-    "midiToggledIndexes": 0,
+    "midiToggledNotesBitmask": 0,
     "isLeftHanded": false,
     "isNutFlipped": false,
     "fretboardLabelType": "NoteName",
     "circleIsCNoon": true,
-    "tuningIndex": 0
+    "tuningIndex": 0,
+    "modalState": "closed"
   }
 }
