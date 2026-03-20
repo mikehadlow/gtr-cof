@@ -3,6 +3,7 @@ import * as music from '../music';
 import { View, ViewContext, Svg } from "../types";
 import { Model } from "../model";
 import { Msg } from "../message";
+import { appendSettingsIcon } from "../ui";
 
 type Segment = {
     readonly startAngle: number;
@@ -70,6 +71,9 @@ function draw(svg: d3.Selection<any>, noteIndexes: number[], label: string, rais
     }
 
     svg.selectAll("*").remove();
+
+    appendSettingsIcon(svg,
+        () => raise({ id: "ModalStateChange", modalState: "circle-settings" }));
 
     const cof = svg
         .append("g")
