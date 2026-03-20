@@ -1,9 +1,9 @@
-import { describe, test, expect } from "bun:test";
-import { join } from "path";
+import { describe, expect, test } from "bun:test";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-tonic-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 function makeInputModel(): Model {
     const state: State = {
@@ -24,11 +24,16 @@ function makeInputModel(): Model {
     };
 
     const scaleFamily = music.scaleFamily[0];
-    const mode = scaleFamily.modes.find(x => x.index === 0)!;
+    const mode = scaleFamily.modes.find((x) => x.index === 0)!;
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
+        noteSpec,
+        mode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        scaleFamily,
     );
 
     return {

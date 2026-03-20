@@ -1,7 +1,7 @@
-import { describe, test, expect } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { defaultState } from "./test-default-state";
 import { Update } from "./update-left-handed-fretboard";
 import { updateScale } from "./updateScale";
-import { defaultState } from "./test-default-state";
 
 describe("update-left-handed-fretboard", () => {
     test("sets isLeftHanded to true", () => {

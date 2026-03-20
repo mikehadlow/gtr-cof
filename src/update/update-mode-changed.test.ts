@@ -1,13 +1,13 @@
-import { describe, test, expect } from "bun:test";
-import { join } from "path";
+import { describe, expect, test } from "bun:test";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-mode-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 function makeInputModel(scaleFamilyIndex: number): Model {
     const sf = music.scaleFamily[scaleFamilyIndex];
-    const defaultMode = sf.modes.find(x => x.index === sf.defaultModeIndex)!;
+    const defaultMode = sf.modes.find((x) => x.index === sf.defaultModeIndex)!;
 
     const state: State = {
         index: 3,
@@ -28,8 +28,13 @@ function makeInputModel(scaleFamilyIndex: number): Model {
 
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, defaultMode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, sf
+        noteSpec,
+        defaultMode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        sf,
     );
 
     return {

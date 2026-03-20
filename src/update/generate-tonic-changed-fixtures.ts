@@ -1,9 +1,9 @@
-import { mkdirSync, writeFileSync } from "fs";
-import { join } from "path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-tonic-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 // Build a fresh input model with diatonic scale family, zero toggles.
 function makeInputModel(): Model {
@@ -27,11 +27,16 @@ function makeInputModel(): Model {
     // music field isn't read by the Update function, but we need a valid Model shape.
     // Generate a real one so the type is satisfied.
     const scaleFamily = music.scaleFamily[0];
-    const mode = scaleFamily.modes.find(x => x.index === 0)!;
+    const mode = scaleFamily.modes.find((x) => x.index === 0)!;
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
+        noteSpec,
+        mode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        scaleFamily,
     );
 
     return {
@@ -60,7 +65,7 @@ for (const v of variants) {
     const result = Update(model, msg);
 
     const filename = `${v.natural.label}-${v.suffix}.json`;
-    writeFileSync(join(outDir, filename), JSON.stringify(result, null, 2) + "\n");
+    writeFileSync(join(outDir, filename), `${JSON.stringify(result, null, 2)}\n`);
     console.log(`wrote ${filename}`);
 }
 

@@ -1,8 +1,8 @@
-import d3 from 'd3';
-import * as music from '../music';
-import type { View, ViewContext, Svg } from "../types";
-import type { Model } from "../model";
+import d3 from "d3";
 import type { Msg } from "../message";
+import type { Model } from "../model";
+import * as music from "../music";
+import type { Svg, View, ViewContext } from "../types";
 
 const guitarDots: Array<[number, number]> = [
     [3, 0], // [fret, position]
@@ -11,24 +11,24 @@ const guitarDots: Array<[number, number]> = [
     [9, 0],
     [12, -1],
     [12, 1],
-    [15, 0]
+    [15, 0],
 ];
 
 // Viola/violin for beginners.
 const violaDots: Array<[number, number]> = [
-    [2, 0],   // 1st finger
-    [4, 0],   // 2nd finger
-    [5, 0],   // 3rd finger
-    [7, 0],   // 4th finger
+    [2, 0], // 1st finger
+    [4, 0], // 2nd finger
+    [5, 0], // 3rd finger
+    [7, 0], // 4th finger
     [12, -1],
-    [12, 1]
+    [12, 1],
 ];
 
 type TuningInfo = {
     readonly tuning: string;
     readonly dots: Array<[number, number]>;
     readonly description: string;
-}
+};
 
 export type Tuning = {
     readonly index: number;
@@ -36,7 +36,7 @@ export type Tuning = {
     readonly dots: Array<[number, number]>;
     readonly description: string;
     readonly notes: Array<number>;
-}
+};
 
 const tuningInfos: Array<TuningInfo> = [
     { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
@@ -68,7 +68,7 @@ const tuningInfos: Array<TuningInfo> = [
     { tuning: "CGDA", dots: violaDots, description: "Cello" },
     { tuning: "GDAE", dots: violaDots, description: "Violin" },
     { tuning: "CGDA", dots: violaDots, description: "Viola" },
-]
+];
 
 export const tunings: Array<Tuning> = buildTunings();
 
@@ -85,19 +85,17 @@ function parseTuning(tuning: string): Array<number> {
             tokens[tokenIndex] = noteChar;
             tokenIndex++;
             lastWasChar = true;
-        }
-        else if ("♯♭".indexOf(noteChar) >= 0 && lastWasChar) {
+        } else if ("♯♭".indexOf(noteChar) >= 0 && lastWasChar) {
             tokens[tokenIndex - 1] = tokens[tokenIndex - 1] + noteChar;
             lastWasChar = false;
-        }
-        else {
+        } else {
             throw new Error("Invalid tuning char");
         }
     }
 
     for (const token of tokens) {
-        const noteName = music.noteNames.filter(x => x.name === token);
-        if (noteName.length != 1) {
+        const noteName = music.noteNames.filter((x) => x.name === token);
+        if (noteName.length !== 1) {
             throw new Error("Invalid token");
         }
         result.push(noteName[0].index);
@@ -115,7 +113,7 @@ function buildTunings(): Tuning[] {
             tuning: info.tuning,
             dots: info.dots,
             description: info.description,
-            notes: parseTuning(info.tuning)
+            notes: parseTuning(info.tuning),
         };
         tunings.push(tuning);
         index++;
@@ -127,9 +125,9 @@ export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (
     const raiseTuningChangedEvent = (tuning: Tuning): void => {
         raise({
             id: "TuningChanged",
-            index: tuning.index
+            index: tuning.index,
         });
-    }
+    };
     if (ctx.init) {
         d3.select("#tuning-dropdown")
             .selectAll("div")
@@ -138,6 +136,6 @@ export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (
             .append("div")
             .attr("class", "dropdown-content-item")
             .on("click", raiseTuningChangedEvent)
-            .text(x => x.tuning + "   " + x.description);
+            .text((x) => `${x.tuning}   ${x.description}`);
     }
-}
+};

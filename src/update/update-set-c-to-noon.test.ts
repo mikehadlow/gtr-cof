@@ -1,7 +1,7 @@
-import { describe, test, expect } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { defaultState } from "./test-default-state";
 import { Update } from "./update-set-c-to-noon";
 import { updateScale } from "./updateScale";
-import { defaultState } from "./test-default-state";
 
 describe("update-set-c-to-noon", () => {
     test("sets circleIsCNoon to false", () => {

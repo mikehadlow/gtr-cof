@@ -1,14 +1,14 @@
-import { mkdirSync, writeFileSync } from "fs";
-import { join } from "path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-mode-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 // Build a fresh input model with diatonic scale family, zero toggles.
 function makeInputModel(scaleFamilyIndex: number): Model {
     const sf = music.scaleFamily[scaleFamilyIndex];
-    const defaultMode = sf.modes.find(x => x.index === sf.defaultModeIndex)!;
+    const defaultMode = sf.modes.find((x) => x.index === sf.defaultModeIndex)!;
 
     const state: State = {
         index: 3,
@@ -29,8 +29,13 @@ function makeInputModel(scaleFamilyIndex: number): Model {
 
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, defaultMode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, sf
+        noteSpec,
+        defaultMode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        sf,
     );
 
     return {
@@ -51,7 +56,7 @@ for (const sf of music.scaleFamily) {
 
         const safeName = mode.name.replace(/[^a-zA-Z0-9-]/g, "_");
         const filename = `${sf.name}-${safeName}.json`;
-        writeFileSync(join(outDir, filename), JSON.stringify(result, null, 2) + "\n");
+        writeFileSync(join(outDir, filename), `${JSON.stringify(result, null, 2)}\n`);
         console.log(`wrote ${filename}`);
         count++;
     }

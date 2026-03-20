@@ -1,8 +1,7 @@
-import type { State } from '../types';
-import type { View, ViewContext, Svg } from "../types";
-import type { Model } from "../model";
+import { defaultState } from "../defaultState";
 import type { Msg } from "../message";
-import { defaultState } from '../defaultState';
+import type { Model } from "../model";
+import type { State, Svg, View, ViewContext } from "../types";
 
 const PERMALINK_BUTTON_ID = "permalink-button";
 const PERMALINK_TEXT_ID = "permalink-text";
@@ -12,11 +11,11 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, _ctx: ViewContext,
     if (permalinkButton) {
         permalinkButton.onclick = () => populatePermalinkText(state);
     }
-}
+};
 
 function populatePermalinkText(state: State): void {
     const permalink = generatePermalink(state);
-    const inputbox = document.getElementById(PERMALINK_TEXT_ID) as HTMLInputElement
+    const inputbox = document.getElementById(PERMALINK_TEXT_ID) as HTMLInputElement;
     inputbox.value = permalink;
     navigator.clipboard.writeText(permalink);
 }
@@ -48,22 +47,21 @@ export function updateStateFromQuerystring(existingState: State): State {
             if (value == null) continue;
 
             switch (typeof mutableState[x]) {
-                case 'boolean':
-                    (mutableState[x] as boolean) = (value === "true");
+                case "boolean":
+                    (mutableState[x] as boolean) = value === "true";
                     break;
-                case 'number':
+                case "number":
                     (mutableState[x] as number) = parseInt(value, 10);
                     break;
-                case 'object':
-                    (mutableState[x] as object) = JSON.parse("[" + value + "]");
+                case "object":
+                    (mutableState[x] as object) = JSON.parse(`[${value}]`);
                     break;
-                case 'string':
+                case "string":
                     (mutableState[x] as string) = value;
                     break;
             }
         }
-    }
-    catch (e) {
+    } catch (e) {
         console.log(`Error reading query string: ${e}`);
         return existingState;
     }

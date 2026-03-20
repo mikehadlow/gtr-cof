@@ -1,4 +1,4 @@
-import { type State } from "../types";
+import type { State } from "../types";
 
 export const defaultState: State = {
     index: 0,

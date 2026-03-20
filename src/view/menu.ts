@@ -1,18 +1,17 @@
-import { View, ViewContext, Svg } from "../types";
-import { Model } from "../model";
-import { Msg } from "../message";
+import type { Msg } from "../message";
+import type { Model } from "../model";
+import type { Svg, View, ViewContext } from "../types";
 
-export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, _raise: (msg: Msg) => void): Svg => {
     if (ctx.init) {
         init();
     }
-}
+};
 
 function init(): void {
-
     const menuItems = document.getElementsByClassName("menu");
     for (const menuItem of menuItems) {
-        menuItem.addEventListener("click", onMenuClick)
+        menuItem.addEventListener("click", onMenuClick);
     }
 
     // close open menu when document is clicked outside
@@ -31,14 +30,13 @@ function init(): void {
 
 function onMenuClick(event: Event): void {
     const menuElement = <Element>event.target;
-    const currentContentElement = menuElement.parentElement!.querySelector(".dropdown-content")
+    const currentContentElement = menuElement.parentElement!.querySelector(".dropdown-content");
 
     const contentElements = document.getElementsByClassName("dropdown-content");
     for (const contentElement of contentElements) {
         if (contentElement === currentContentElement) {
             currentContentElement!.classList.toggle("dropdown-content-visible");
-        }
-        else {
+        } else {
             contentElement.classList.remove("dropdown-content-visible");
         }
     }

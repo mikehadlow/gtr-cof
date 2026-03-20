@@ -1,7 +1,6 @@
-import { FretboardLabelType } from '../types';
-import { View, ViewContext, Svg } from "../types";
-import { Model } from "../model";
-import { Msg } from "../message";
+import type { Msg } from "../message";
+import type { Model } from "../model";
+import type { FretboardLabelType, Svg, View, ViewContext } from "../types";
 
 type Raise = (msg: Msg) => void;
 
@@ -20,16 +19,16 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, 
             throw new Error(`checkbox with id '${id}' not found.`);
         }
         checkbox.checked = checked;
-    }
+    };
     const setClickHandler = (id: string, handler: (e: HTMLInputElement, raise: Raise) => void) => {
         const element = document.getElementById(id) as HTMLInputElement;
         element.onclick = (x) => handler(x.currentTarget as HTMLInputElement, raise);
-    }
+    };
     setCheckbox("left-handed-checkbox", state.isLeftHanded);
     setCheckbox("flip-nut-checkbox", state.isNutFlipped);
     setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
 
-    const selected = "fb-note-text-" + state.fretboardLabelType;
+    const selected = `fb-note-text-${state.fretboardLabelType}`;
     setCheckbox(selected, true);
 
     if (ctx.init) {
@@ -40,20 +39,20 @@ export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, 
         setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
         setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
     }
-}
+};
 
 function onLeftHandedClick(e: HTMLInputElement, raise: Raise) {
-    raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked })
+    raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
 }
 
 function onFlipNut(e: HTMLInputElement, raise: Raise) {
-    raise({ id: "FlipNut", isNutFlipped: e.checked })
+    raise({ id: "FlipNut", isNutFlipped: e.checked });
 }
 
 function onSetCToNoon(e: HTMLInputElement, raise: Raise) {
-    raise({ id: "SetCToNoon", isC: e.checked })
+    raise({ id: "SetCToNoon", isC: e.checked });
 }
 
 function onFbNoteTextClick(e: HTMLInputElement, raise: Raise) {
-    raise({ id: "FretboardLabelChange", labelType: e.value as FretboardLabelType })
+    raise({ id: "FretboardLabelChange", labelType: e.value as FretboardLabelType });
 }

@@ -1,9 +1,9 @@
-import { mkdirSync, writeFileSync } from "fs";
-import { join } from "path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-chord-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 // Build a fresh input model with diatonic scale family, no chord selected.
 function makeInputModel(chordIndex: number): Model {
@@ -25,11 +25,16 @@ function makeInputModel(chordIndex: number): Model {
     };
 
     const scaleFamily = music.scaleFamily[0];
-    const mode = scaleFamily.modes.find(x => x.index === 0)!;
+    const mode = scaleFamily.modes.find((x) => x.index === 0)!;
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
+        noteSpec,
+        mode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        scaleFamily,
     );
 
     return {
@@ -44,8 +49,8 @@ mkdirSync(outDir, { recursive: true });
 // Get the scale note indexes from a baseline model (no chord selected).
 const baseline = makeInputModel(-1);
 const scaleNoteIndexes = baseline.music.nodes
-    .filter(x => x.scaleNote.note.index !== -1)
-    .map(x => x.scaleNote.note.index);
+    .filter((x) => x.scaleNote.note.index !== -1)
+    .map((x) => x.scaleNote.note.index);
 
 let count = 0;
 
@@ -56,7 +61,7 @@ for (const noteIndex of scaleNoteIndexes) {
     const result = Update(model, msg);
 
     const filename = `select-${noteIndex}.json`;
-    writeFileSync(join(outDir, filename), JSON.stringify(result, null, 2) + "\n");
+    writeFileSync(join(outDir, filename), `${JSON.stringify(result, null, 2)}\n`);
     console.log(`wrote ${filename}`);
     count++;
 }
@@ -68,7 +73,7 @@ for (const noteIndex of scaleNoteIndexes) {
     const result = Update(model, msg);
 
     const filename = `toggle-off-${noteIndex}.json`;
-    writeFileSync(join(outDir, filename), JSON.stringify(result, null, 2) + "\n");
+    writeFileSync(join(outDir, filename), `${JSON.stringify(result, null, 2)}\n`);
     console.log(`wrote ${filename}`);
     count++;
 }

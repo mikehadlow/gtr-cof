@@ -1,7 +1,7 @@
-import { describe, test, expect } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { defaultState } from "./test-default-state";
 import { Update } from "./update-chord-interval-change";
 import { updateScale } from "./updateScale";
-import { defaultState } from "./test-default-state";
 
 describe("update-chord-interval-change", () => {
     test("sets chordIntervals", () => {
@@ -11,7 +11,7 @@ describe("update-chord-interval-change", () => {
     });
 
     test("clears toggledIndexes", () => {
-        const model = updateScale({ ...defaultState, toggledNotesBitmask: 2 ** 0 | 2 ** 4 });
+        const model = updateScale({ ...defaultState, toggledNotesBitmask: (2 ** 0) | (2 ** 4) });
         const result = Update(model, { id: "ChordIntervalChange", chordIntervals: [0, 2, 4] });
         expect(result.state.toggledNotesBitmask).toBe(0);
     });

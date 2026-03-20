@@ -1,9 +1,9 @@
-import { describe, test, expect } from "bun:test";
-import { join } from "path";
+import { describe, expect, test } from "bun:test";
+import { join } from "node:path";
+import type { Model } from "../model";
 import * as music from "../music";
+import type { State } from "../types";
 import { Update } from "./update-chord-changed";
-import { type State } from "../types";
-import { type Model } from "../model";
 
 function makeInputModel(chordIndex: number): Model {
     const state: State = {
@@ -24,11 +24,16 @@ function makeInputModel(chordIndex: number): Model {
     };
 
     const scaleFamily = music.scaleFamily[0];
-    const mode = scaleFamily.modes.find(x => x.index === 0)!;
+    const mode = scaleFamily.modes.find((x) => x.index === 0)!;
     const noteSpec = music.createNoteSpec(state.naturalIndex, state.index);
     const nodes = music.generateScaleShim(
-        noteSpec, mode, state.chordIndex, state.chordIntervals,
-        state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily
+        noteSpec,
+        mode,
+        state.chordIndex,
+        state.chordIntervals,
+        state.toggledNotesBitmask,
+        state.midiToggledNotesBitmask,
+        scaleFamily,
     );
 
     return {
@@ -42,8 +47,8 @@ const artifactsDir = join(import.meta.dir, "test-artifacts", "chord-changed");
 // Get scale note indexes from a baseline model.
 const baseline = makeInputModel(-1);
 const scaleNoteIndexes = baseline.music.nodes
-    .filter(x => x.scaleNote.note.index !== -1)
-    .map(x => x.scaleNote.note.index);
+    .filter((x) => x.scaleNote.note.index !== -1)
+    .map((x) => x.scaleNote.note.index);
 
 describe("update-chord-changed", () => {
     describe("select chord from no-chord state", () => {

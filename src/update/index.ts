@@ -1,20 +1,19 @@
-import { type Update as UpdateModel } from "../types";
-import { type Model } from "../model";
-import { type Msg } from "../message";
-
-import { Update as UpdateTonicChanged } from "./update-tonic-changed";
-import { Update as UpdateModeChanged } from "./update-mode-changed";
+import type { Msg } from "../message";
+import type { Model } from "../model";
+import type { Update as UpdateModel } from "../types";
 import { Update as UpdateChordChanged } from "./update-chord-changed";
-import { Update as UpdateToggle } from "./update-toggle";
 import { Update as UpdateChordIntervalChange } from "./update-chord-interval-change";
-import { Update as UpdateScaleFamilyChange } from "./update-scale-family-change";
-import { Update as UpdateTuningChanged } from "./update-tuning-changed";
-import { Update as UpdateLeftHandedFretboard } from "./update-left-handed-fretboard";
 import { Update as UpdateFlipNut } from "./update-flip-nut";
 import { Update as UpdateFretboardLabelChange } from "./update-fretboard-label-change";
+import { Update as UpdateLeftHandedFretboard } from "./update-left-handed-fretboard";
 import { Update as UpdateMidiNote } from "./update-midi-note";
-import { Update as UpdateSetCToNoon } from "./update-set-c-to-noon";
 import { Update as UpdateModalState } from "./update-modal-state";
+import { Update as UpdateModeChanged } from "./update-mode-changed";
+import { Update as UpdateScaleFamilyChange } from "./update-scale-family-change";
+import { Update as UpdateSetCToNoon } from "./update-set-c-to-noon";
+import { Update as UpdateToggle } from "./update-toggle";
+import { Update as UpdateTonicChanged } from "./update-tonic-changed";
+import { Update as UpdateTuningChanged } from "./update-tuning-changed";
 
 export { updateScale } from "./updateScale";
 
@@ -46,8 +45,9 @@ export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model =
             return UpdateSetCToNoon(model, msg);
         case "ModalStateChange":
             return UpdateModalState(model, msg);
-        default:
+        default: {
             const _exhaustiveCheck: never = msg;
             return _exhaustiveCheck;
+        }
     }
-}
+};
