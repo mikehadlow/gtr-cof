@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import * as music from '../music';
 import * as tuning from './tuning';
-import { icons } from '../ui';
+import { appendSettingsIcon, icons } from '../ui';
 import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
 import type { Model } from "../model";
 import type { Msg } from "../message";
@@ -75,28 +75,8 @@ export const create = (): View<Model, Msg, Svg> => {
         const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
         fretboardElement = <SVGGElement>gtr.node();
 
-        // gear (settings) icon
-        const gearX = parseInt(svg.attr("width")) - 30;
-        const gearGroup = svg.append("g")
-            .style("cursor", "pointer")
-            .on("mouseover", function (this: Element) { d3.select(this).select("use").style("fill", "black"); })
-            .on("mouseout", function (this: Element) { d3.select(this).select("use").style("fill", "none"); })
-            .on("click", () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
-        gearGroup.append("rect")
-            .attr("x", gearX)
-            .attr("y", 0)
-            .attr("width", 25)
-            .attr("height", 25)
-            .style("fill", "transparent");
-        gearGroup.append("use")
-            .attr("href", icons.gear)
-            .attr("x", gearX)
-            .attr("y", 0)
-            .attr("width", 25)
-            .attr("height", 25)
-            .style("fill", "none")
-            .style("stroke", "black")
-            .style("pointer-events", "none");
+        appendSettingsIcon(svg,
+            () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
 
         // frets
         gtr.append("g").selectAll("rect")
