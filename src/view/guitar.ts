@@ -3,7 +3,7 @@ import * as music from '../music';
 import * as tuning from './tuning';
 import { icons } from '../ui';
 import type { View, ViewContext, Svg, FretboardLabelType } from "../types";
-import { showFretboardSettingsModal } from "./fretboard-settings-modal";
+import { showFretboardSettingsModal } from "./modal";
 import type { Model } from "../model";
 import type { Msg } from "../message";
 
