@@ -15,7 +15,7 @@ export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: 
 export const FretboardLabelTypeSchema = z.enum(["None", "NoteName", "Interval"]);
 export type FretboardLabelType = z.infer<typeof FretboardLabelTypeSchema>;
 
-export const ModalStateSchema = z.enum(["closed", "guitar-settings"]);
+export const ModalStateSchema = z.enum(["closed", "guitar-settings", "circle-settings"]);
 export type ModalState = z.infer<typeof ModalStateSchema>;
 
 export const StateSchema = z.object({

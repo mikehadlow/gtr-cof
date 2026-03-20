@@ -24567,7 +24567,7 @@ function date4(params) {
 config(en_default());
 // src/types.ts
 var FretboardLabelTypeSchema = exports_external.enum(["None", "NoteName", "Interval"]);
-var ModalStateSchema = exports_external.enum(["closed", "guitar-settings"]);
+var ModalStateSchema = exports_external.enum(["closed", "guitar-settings", "circle-settings"]);
 var StateSchema = exports_external.object({
   index: exports_external.number(),
   naturalIndex: exports_external.number(),
@@ -24730,9 +24730,29 @@ function updateStateFromQuerystring(existingState) {
 }
 
 // src/view/circle.ts
+var import_d37 = __toESM(require_d3(), 1);
+
+// src/ui/index.ts
 var import_d36 = __toESM(require_d3(), 1);
+var icons = {
+  gear: "#icon-gear"
+};
+var appendSettingsIcon = (svg, onClick) => {
+  const gearX = parseInt(svg.attr("width")) - 30;
+  const gearY = 0;
+  const size = 25;
+  const gearGroup = svg.append("g").style("cursor", "pointer").on("mouseover", function() {
+    import_d36.default.select(this).select("use").style("fill", "black");
+  }).on("mouseout", function() {
+    import_d36.default.select(this).select("use").style("fill", "none");
+  }).on("click", onClick);
+  gearGroup.append("rect").attr("x", gearX).attr("y", gearY).attr("width", size).attr("height", size).style("fill", "transparent");
+  gearGroup.append("use").attr("href", icons.gear).attr("x", gearX).attr("y", gearY).attr("width", size).attr("height", size).style("fill", "none").style("stroke", "black").style("pointer-events", "none");
+};
+
+// src/view/circle.ts
 var create = (svgId, noteIndexes, label) => {
-  const svg = import_d36.default.select(svgId);
+  const svg = import_d37.default.select(svgId);
   let state;
   let isCNoon = true;
   return (model, ctx, raise) => {
@@ -24770,12 +24790,13 @@ function draw(svg, noteIndexes, label, raise) {
     });
   };
   svg.selectAll("*").remove();
+  appendSettingsIcon(svg, () => raise({ id: "ModalStateChange", modalState: "circle-settings" }));
   const cof = svg.append("g").attr("transform", "translate(" + (noteRadius + pad) + ", " + (noteRadius + pad) + ")");
   cof.append("text").attr("text-anchor", "middle").attr("x", 0).attr("y", 0).text(label);
   const segments = generateSegments(noteIndexes);
-  const noteArc = import_d36.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
-  const degreeArc = import_d36.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
-  const chordArc = import_d36.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
+  const noteArc = import_d37.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
+  const degreeArc = import_d37.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
+  const chordArc = import_d37.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
   const noteSegments = cof.append("g").selectAll("path").data(segments, indexer2).enter().append("path").attr("d", noteArc).attr("class", "note-segment").on("click", handleNoteClick);
   const noteText = cof.append("g").selectAll("text").data(segments).enter().append("text").attr("x", function(x) {
     return noteArc.centroid(x)[0];
@@ -24876,14 +24897,7 @@ function rotate(array2, offset) {
 }
 
 // src/view/guitar.ts
-var import_d37 = __toESM(require_d3(), 1);
-
-// src/ui/index.ts
-var icons = {
-  gear: "#icon-gear"
-};
-
-// src/view/guitar.ts
+var import_d38 = __toESM(require_d3(), 1);
 var stringGap = 40;
 var fretGap = 70;
 var fretWidth = 5;
@@ -24918,19 +24932,12 @@ var create2 = () => {
   function drawFretboard(tuningInfo, raise) {
     const fretData = getFretData(numberOfFrets);
     const dots = tuningInfo.dots;
-    import_d37.default.selectAll("#gtr > *").remove();
-    const svg = import_d37.default.select("#gtr");
+    import_d38.default.selectAll("#gtr > *").remove();
+    const svg = import_d38.default.select("#gtr");
     svg.append("text").attr("class", "mode-text").attr("x", 30).attr("y", 11).text(tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : ""));
     const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
     fretboardElement = gtr.node();
-    const gearX = parseInt(svg.attr("width")) - 30;
-    const gearGroup = svg.append("g").style("cursor", "pointer").on("mouseover", function() {
-      import_d37.default.select(this).select("use").style("fill", "black");
-    }).on("mouseout", function() {
-      import_d37.default.select(this).select("use").style("fill", "none");
-    }).on("click", () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
-    gearGroup.append("rect").attr("x", gearX).attr("y", 0).attr("width", 25).attr("height", 25).style("fill", "transparent");
-    gearGroup.append("use").attr("href", icons.gear).attr("x", gearX).attr("y", 0).attr("width", 25).attr("height", 25).style("fill", "none").style("stroke", "black").style("pointer-events", "none");
+    appendSettingsIcon(svg, () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
     gtr.append("g").selectAll("rect").data(fretData).enter().append("rect").attr("x", function(d, i) {
       return (i + 1) * fretGap + pad - fretWidth;
     }).attr("y", pad + stringGap / 2 - fretWidth).attr("width", fretWidth).attr("height", stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2).attr("fill", function(d, i) {
@@ -25034,7 +25041,62 @@ var create2 = () => {
   }
 };
 
-// src/view/modal.ts
+// src/view/modal/circleSettings.ts
+function showCircleSettings(state, raise) {
+  const modal = createModal("Circle Settings", raise);
+  createCheckbox(modal, "Set C To Noon", state.circleIsCNoon, (isChecked) => raise({ id: "SetCToNoon", isC: isChecked }));
+}
+
+// src/view/modal/fretboardSettings.ts
+function showFretboardSettings(state, raise) {
+  const modal = createModal("Fretboard Settings", raise);
+  {
+    const tuningSection = createSection("Tuning");
+    const select = document.createElement("select");
+    select.className = "modal-select";
+    for (const t of tunings) {
+      const opt = document.createElement("option");
+      opt.value = String(t.index);
+      opt.textContent = `${t.tuning}  ${t.description}`;
+      if (t.index === state.tuningIndex)
+        opt.selected = true;
+      select.appendChild(opt);
+    }
+    select.addEventListener("change", () => {
+      raise({ id: "TuningChanged", index: parseInt(select.value) });
+    });
+    tuningSection.appendChild(select);
+    modal.appendChild(tuningSection);
+  }
+  createCheckbox(modal, "Left Handed", state.isLeftHanded, (isChecked) => raise({ id: "LeftHandedFretboard", isLeftHanded: isChecked }));
+  createCheckbox(modal, "Flip Nut", state.isNutFlipped, (isChecked) => raise({ id: "FlipNut", isNutFlipped: isChecked }));
+  {
+    const nlSection = createSection("Note Labels");
+    const labelOptions = [
+      { label: "None", value: "None" },
+      { label: "Note Names", value: "NoteName" },
+      { label: "Intervals", value: "Interval" }
+    ];
+    for (const opt of labelOptions) {
+      const radioLabel = document.createElement("label");
+      radioLabel.className = "modal-radio-label";
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "modal-fb-note-text";
+      radio.value = opt.value;
+      radio.checked = state.fretboardLabelType === opt.value;
+      radio.addEventListener("change", () => {
+        raise({ id: "FretboardLabelChange", labelType: opt.value });
+      });
+      radioLabel.appendChild(radio);
+      radioLabel.appendChild(document.createTextNode(" " + opt.label));
+      nlSection.appendChild(radioLabel);
+    }
+    modal.appendChild(nlSection);
+  }
+}
+
+// src/view/modal/index.ts
 var MODAL_BACKDROP_CLASS = "modal-backdrop";
 var MODAL_CONTAINER_CLASS = "modal-container";
 var create3 = () => {
@@ -25048,7 +25110,10 @@ var create3 = () => {
         removeExistingModal();
         break;
       case "guitar-settings":
-        showFretboardSettingsModal(state, raise);
+        showModal(state, raise);
+        break;
+      case "circle-settings":
+        showModal(state, raise);
         break;
       default:
         const _exhaustiveCheck = state.modalState;
@@ -25064,82 +25129,19 @@ function removeExistingModal() {
   }
   return false;
 }
-function showFretboardSettingsModal(state, raise) {
-  if (removeExistingModal())
-    return;
-  const backdrop = document.createElement("div");
-  backdrop.className = MODAL_BACKDROP_CLASS;
-  backdrop.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
-  const modal = document.createElement("div");
-  modal.className = MODAL_CONTAINER_CLASS;
-  modal.addEventListener("click", (e) => e.stopPropagation());
-  const header = document.createElement("div");
-  header.className = "modal-header";
-  const title = document.createElement("span");
-  title.textContent = "Fretboard Settings";
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "modal-close";
-  closeBtn.textContent = "×";
-  closeBtn.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-  modal.appendChild(header);
-  const tuningSection = createSection("Tuning");
-  const select = document.createElement("select");
-  select.className = "modal-select";
-  for (const t of tunings) {
-    const opt = document.createElement("option");
-    opt.value = String(t.index);
-    opt.textContent = `${t.tuning}  ${t.description}`;
-    if (t.index === state.tuningIndex)
-      opt.selected = true;
-    select.appendChild(opt);
+function showModal(state, raise) {
+  switch (state.modalState) {
+    case "closed":
+      break;
+    case "guitar-settings":
+      showFretboardSettings(state, raise);
+      break;
+    case "circle-settings":
+      showCircleSettings(state, raise);
+      break;
+    default:
+      const _exhaustiveCheck = state.modalState;
   }
-  select.addEventListener("change", () => {
-    raise({ id: "TuningChanged", index: parseInt(select.value) });
-  });
-  tuningSection.appendChild(select);
-  modal.appendChild(tuningSection);
-  const lhSection = createSection();
-  const lhLabel = createCheckboxLabel("Left Handed", state.isLeftHanded);
-  const lhCheckbox = lhLabel.querySelector("input");
-  lhCheckbox.addEventListener("change", () => {
-    raise({ id: "LeftHandedFretboard", isLeftHanded: lhCheckbox.checked });
-  });
-  lhSection.appendChild(lhLabel);
-  modal.appendChild(lhSection);
-  const fnSection = createSection();
-  const fnLabel = createCheckboxLabel("Flip Nut", state.isNutFlipped);
-  const fnCheckbox = fnLabel.querySelector("input");
-  fnCheckbox.addEventListener("change", () => {
-    raise({ id: "FlipNut", isNutFlipped: fnCheckbox.checked });
-  });
-  fnSection.appendChild(fnLabel);
-  modal.appendChild(fnSection);
-  const nlSection = createSection("Note Labels");
-  const labelOptions = [
-    { label: "None", value: "None" },
-    { label: "Note Names", value: "NoteName" },
-    { label: "Intervals", value: "Interval" }
-  ];
-  for (const opt of labelOptions) {
-    const radioLabel = document.createElement("label");
-    radioLabel.className = "modal-radio-label";
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "modal-fb-note-text";
-    radio.value = opt.value;
-    radio.checked = state.fretboardLabelType === opt.value;
-    radio.addEventListener("change", () => {
-      raise({ id: "FretboardLabelChange", labelType: opt.value });
-    });
-    radioLabel.appendChild(radio);
-    radioLabel.appendChild(document.createTextNode(" " + opt.label));
-    nlSection.appendChild(radioLabel);
-  }
-  modal.appendChild(nlSection);
-  backdrop.appendChild(modal);
-  document.body.appendChild(backdrop);
 }
 function createSection(titleText) {
   const section = document.createElement("div");
@@ -25161,6 +25163,36 @@ function createCheckboxLabel(text, checked) {
   label.appendChild(checkbox);
   label.appendChild(document.createTextNode(" " + text));
   return label;
+}
+function createCheckbox(modal, labelText, checkboxState, onClick) {
+  const section = createSection();
+  const label = createCheckboxLabel(labelText, checkboxState);
+  const checkbox = label.querySelector("input");
+  checkbox.addEventListener("change", () => onClick(checkbox.checked));
+  section.appendChild(label);
+  modal.appendChild(section);
+}
+function createModal(modalTitle, raise) {
+  const backdrop = document.createElement("div");
+  backdrop.className = MODAL_BACKDROP_CLASS;
+  backdrop.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  const modal = document.createElement("div");
+  modal.className = MODAL_CONTAINER_CLASS;
+  modal.addEventListener("click", (e) => e.stopPropagation());
+  const header = document.createElement("div");
+  header.className = "modal-header";
+  const title = document.createElement("span");
+  title.textContent = modalTitle;
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close";
+  closeBtn.textContent = "×";
+  closeBtn.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  modal.appendChild(header);
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+  return modal;
 }
 
 // src/view/index.ts
@@ -25381,5 +25413,5 @@ var main = () => {
 };
 main();
 
-//# debugId=F18890B62DCEF9D364756E2164756E21
+//# debugId=8312F2B4AA0BA68464756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
