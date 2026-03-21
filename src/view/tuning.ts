@@ -51,6 +51,7 @@ const tuningInfos: Array<TuningInfo> = [
     { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G" },
     { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert" },
     { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)" },
+    { tuning: "CFA♯D♯GC", dots: guitarDots, description: "C Standard" },
 
     { tuning: "BEADF♯B", dots: guitarDots, description: "Baritone B" },
     { tuning: "ADGCEA", dots: guitarDots, description: "Baritone A" },
