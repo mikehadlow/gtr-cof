@@ -10650,7 +10650,7 @@ var naturals = [
   { id: 6, index: 10, label: "G" }
 ];
 var naturalList = new Mod(naturals);
-var noteNames = [
+var notes = [
   { name: "A", index: 0 },
   { name: "A♯", index: 1 },
   { name: "A♭", index: 11 },
@@ -10686,7 +10686,7 @@ var nullNode = {
       natural: {
         id: 0,
         index: 0,
-        label: ""
+        label: "A"
       },
       index: 0,
       offset: 0,
@@ -11205,6 +11205,7 @@ var tuningInfos = [
   { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G" },
   { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert" },
   { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)" },
+  { tuning: "CFA♯D♯GC", dots: guitarDots, description: "C Standard" },
   { tuning: "BEADF♯B", dots: guitarDots, description: "Baritone B" },
   { tuning: "ADGCEA", dots: guitarDots, description: "Baritone A" },
   { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
@@ -11240,7 +11241,7 @@ function parseTuning(tuning) {
     }
   }
   for (const token of tokens) {
-    const noteName = noteNames.filter((x) => x.name === token);
+    const noteName = notes.filter((x) => x.name === token);
     if (noteName.length !== 1) {
       throw new Error("Invalid token");
     }
@@ -11289,7 +11290,7 @@ var create2 = () => {
   let isLeftHanded = false;
   let isNutFlipped = false;
   let fretboardLabelType = "NoteName";
-  let notes;
+  let notes2;
   let noteLabels2;
   let fretboardElement;
   const fretboardStateHasChanged = (model) => tuningIndex !== model.state.tuningIndex || isLeftHanded !== model.state.isLeftHanded || isNutFlipped !== model.state.isNutFlipped || fretboardLabelType !== model.state.fretboardLabelType;
@@ -11321,7 +11322,7 @@ var create2 = () => {
     gtr.append("g").selectAll("circle").data(dots).enter().append("circle").attr("r", 10).attr("cx", (d) => d[0] * fretGap + pad + 30 + d[1] * 10).attr("cy", (_d) => tuningInfo.notes.length * stringGap + pad + 15).attr("fill", "lightgrey").attr("stroke", "none");
     const strings = gtr.append("g").selectAll("g").data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => `${i}`).enter().append("g").attr("transform", (_d, i) => `translate(0, ${i * stringGap + pad})`);
     strings.append("line").attr("x1", pad + fretGap).attr("y1", stringGap / 2).attr("x2", pad + fretGap * numberOfFrets + 20).attr("y2", stringGap / 2).attr("stroke", "black").attr("stroke-width", 2);
-    notes = strings.selectAll("circle").data((d) => allNotesFrom(d, numberOfFrets), indexer2).enter().append("circle").attr("r", noteRadius).attr("cy", stringGap / 2).attr("cx", (_d, i) => i * fretGap + pad + 30).on("click", (d) => raise({ id: "Toggle", index: d.index }));
+    notes2 = strings.selectAll("circle").data((d) => allNotesFrom(d, numberOfFrets), indexer2).enter().append("circle").attr("r", noteRadius).attr("cy", stringGap / 2).attr("cx", (_d, i) => i * fretGap + pad + 30).on("click", (d) => raise({ id: "Toggle", index: d.index }));
     noteLabels2 = strings.selectAll("text").data((d) => allNotesFrom(d, numberOfFrets), indexer2).enter().append("text").attr("transform", "translate(0, 0) scale(1, 1)").attr("text-anchor", "middle").attr("x", (_d, i) => i * fretGap + pad + 30).attr("y", stringGap / 2 + 5).text("");
     setHandedness();
   }
@@ -11331,7 +11332,7 @@ var create2 = () => {
     const stroke = (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? `#${d.node.chordInterval.colour.toString(16)}` : hasToggledNotes ? "none" : d.node.scaleNote.isScaleNote ? "grey" : "none";
     const strokeWidth = (d) => d.node.midiToggle ? 10 : d.node.toggle ? 4 : d.node.scaleNote.isScaleNote ? 2 : 0;
     const data = repeatTo(music.nodes, numberOfFrets);
-    notes.data(data, indexer2).attr("fill", fill).attr("stroke", stroke).attr("stroke-width", strokeWidth);
+    notes2.data(data, indexer2).attr("fill", fill).attr("stroke", stroke).attr("stroke-width", strokeWidth);
     noteLabels2.data(data, indexer2);
     setLabels();
   }
@@ -25434,5 +25435,5 @@ var main = () => {
 };
 main();
 
-//# debugId=C2D4B3E06D4D8D5B64756E2164756E21
+//# debugId=DC46875175575F8064756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

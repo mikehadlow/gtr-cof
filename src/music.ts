@@ -180,10 +180,14 @@ export function createNoteSpec(naturalIndex: number, index: number): NoteSpec {
     };
 }
 
+export type NaturalName = "A" | "B" | "C" | "D" | "E" | "F" | "G";
+export type AccidentalName = "" | "♯" | "x" | "♭" | "♭♭";
+export type NoteName = `${NaturalName}${AccidentalName}`;
+
 export type Natural = {
     id: number; // order of the number in the natural set.
     index: number; // number against the fixed chromatic series
-    label: string; // the natural name, e.g: 'A'
+    label: NaturalName; // the natural name, e.g: 'A'
 };
 
 // fixed index:
@@ -201,12 +205,12 @@ export const naturals: Natural[] = [
 
 const naturalList = new Mod(naturals);
 
-type NoteName = {
-    readonly name: string;
+type Note = {
+    readonly name: NoteName;
     readonly index: number;
 };
 
-export const noteNames: NoteName[] = [
+export const notes: Note[] = [
     { name: "A", index: 0 },
     { name: "A♯", index: 1 },
     { name: "A♭", index: 11 },
@@ -238,7 +242,7 @@ export const noteNames: NoteName[] = [
 
 type NoteLabel = {
     readonly offset: number;
-    readonly label: string;
+    readonly label: AccidentalName;
 };
 
 const noteLabels: Array<NoteLabel> = [
@@ -302,7 +306,7 @@ export const nullNode: Node = {
             natural: {
                 id: 0,
                 index: 0,
-                label: "",
+                label: "A",
             },
             index: 0,
             offset: 0,
