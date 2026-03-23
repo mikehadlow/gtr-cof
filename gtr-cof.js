@@ -10621,7 +10621,6 @@ var scaleFamily = [
     defaultModeIndex: 0
   }
 ];
-var _diatonic = new Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
 var indexList = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
 function createNoteSpec(naturalIndex, index) {
   const natural = naturals.filter((x) => x.index === naturalIndex)[0];
@@ -10799,16 +10798,16 @@ function generateChordNumbers(scaleNotes, mode, scaleFamilyIntervals) {
       let roman = romanNumeral[scaleNote.noteNumber];
       const nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamilyIntervals);
       let diminished = "";
-      let type = 1 /* Minor */;
+      let type = "Minor";
       if (nodes.some((x) => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === "Dim")) {
         diminished = "°";
-        type = 2 /* Diminished */;
+        type = "Diminished";
       } else if (nodes.some((x) => x.scaleNote.isScaleNote && x.chordInterval.ord === 4 && x.chordInterval.type === "Aug")) {
         diminished = "+";
-        type = 3 /* Augmented */;
+        type = "Augmented";
       } else if (nodes.some((x) => x.scaleNote.isScaleNote && x.chordInterval.ord === 2 && x.chordInterval.type === "Maj")) {
         roman = roman.toLocaleUpperCase();
-        type = 0 /* Major */;
+        type = "Major";
       }
       return {
         romanNumeral: roman + diminished,
@@ -10817,7 +10816,7 @@ function generateChordNumbers(scaleNotes, mode, scaleFamilyIntervals) {
     }
     return {
       romanNumeral: "",
-      type: 0 /* Major */
+      type: "Major"
     };
   });
 }
@@ -11128,13 +11127,13 @@ function update2(scaleChanged, state) {
   state.chordNotes.data(data, indexer).attr("class", (d) => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
 }
 function getChordSegmentClass(chord) {
-  if (chord.type === 2 /* Diminished */)
+  if (chord.type === "Diminished")
     return "chord-segment-dim";
-  if (chord.type === 3 /* Augmented */)
+  if (chord.type === "Augmented")
     return "chord-segment-aug";
-  if (chord.type === 1 /* Minor */)
+  if (chord.type === "Minor")
     return "chord-segment-minor";
-  if (chord.type === 0 /* Major */)
+  if (chord.type === "Major")
     return "chord-segment-major";
   throw new Error("Unexpected ChordType");
 }
@@ -25435,5 +25434,5 @@ var main = () => {
 };
 main();
 
-//# debugId=DC46875175575F8064756E2164756E21
+//# debugId=5EB0AC6BFE1A636364756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
