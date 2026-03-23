@@ -23,7 +23,7 @@
           "noteNumber": 0,
           "chord": {
             "romanNumeral": "I",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -58,7 +58,7 @@
           "noteNumber": 1,
           "chord": {
             "romanNumeral": "",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -93,7 +93,7 @@
           "noteNumber": 1,
           "chord": {
             "romanNumeral": "ii°",
-            "type": 2
+            "type": "Diminished"
           }
         },
         "chordInterval": {
@@ -128,7 +128,7 @@
           "noteNumber": 2,
           "chord": {
             "romanNumeral": "",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -163,7 +163,7 @@
           "noteNumber": 2,
           "chord": {
             "romanNumeral": "iii°",
-            "type": 2
+            "type": "Diminished"
           }
         },
         "chordInterval": {
@@ -198,7 +198,7 @@
           "noteNumber": 3,
           "chord": {
             "romanNumeral": "iv",
-            "type": 1
+            "type": "Minor"
           }
         },
         "chordInterval": {
@@ -233,7 +233,7 @@
           "noteNumber": 4,
           "chord": {
             "romanNumeral": "",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -268,7 +268,7 @@
           "noteNumber": 4,
           "chord": {
             "romanNumeral": "v",
-            "type": 1
+            "type": "Minor"
           }
         },
         "chordInterval": {
@@ -303,7 +303,7 @@
           "noteNumber": 5,
           "chord": {
             "romanNumeral": "vi+",
-            "type": 3
+            "type": "Augmented"
           }
         },
         "chordInterval": {
@@ -338,7 +338,7 @@
           "noteNumber": 5,
           "chord": {
             "romanNumeral": "",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -373,7 +373,7 @@
           "noteNumber": 6,
           "chord": {
             "romanNumeral": "VII",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {
@@ -408,7 +408,7 @@
           "noteNumber": 6,
           "chord": {
             "romanNumeral": "",
-            "type": 0
+            "type": "Major"
           }
         },
         "chordInterval": {

@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Model } from "../model";
-import * as music from "../music";
-import type { State } from "../types";
-import { Update } from "./update-chord-changed";
+import type { Model } from "../src/model";
+import * as music from "../src/music";
+import type { State } from "../src/types";
+import { Update } from "../src/update/update-chord-changed";
 
 // Build a fresh input model with diatonic scale family, no chord selected.
 function makeInputModel(chordIndex: number): Model {
@@ -43,7 +43,7 @@ function makeInputModel(chordIndex: number): Model {
     };
 }
 
-const outDir = join(import.meta.dir, "test-artifacts", "chord-changed");
+const outDir = join(import.meta.dir, "..", "src", "update", "test-artifacts", "chord-changed");
 mkdirSync(outDir, { recursive: true });
 
 // Get the scale note indexes from a baseline model (no chord selected).

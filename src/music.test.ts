@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import {
-    ChordType,
     chromatic,
     createNoteSpec,
     fifths,
@@ -205,25 +204,25 @@ describe("generateChordNumbers", () => {
 
         // Major scale chord pattern: I ii iii IV V vi vii°
         expect(scaleChords[0].romanNumeral).toBe("I");
-        expect(scaleChords[0].type).toBe(ChordType.Major);
+        expect(scaleChords[0].type).toBe("Major");
 
         expect(scaleChords[1].romanNumeral).toBe("ii");
-        expect(scaleChords[1].type).toBe(ChordType.Minor);
+        expect(scaleChords[1].type).toBe("Minor");
 
         expect(scaleChords[2].romanNumeral).toBe("iii");
-        expect(scaleChords[2].type).toBe(ChordType.Minor);
+        expect(scaleChords[2].type).toBe("Minor");
 
         expect(scaleChords[3].romanNumeral).toBe("IV");
-        expect(scaleChords[3].type).toBe(ChordType.Major);
+        expect(scaleChords[3].type).toBe("Major");
 
         expect(scaleChords[4].romanNumeral).toBe("V");
-        expect(scaleChords[4].type).toBe(ChordType.Major);
+        expect(scaleChords[4].type).toBe("Major");
 
         expect(scaleChords[5].romanNumeral).toBe("vi");
-        expect(scaleChords[5].type).toBe(ChordType.Minor);
+        expect(scaleChords[5].type).toBe("Minor");
 
         expect(scaleChords[6].romanNumeral).toBe("vii°");
-        expect(scaleChords[6].type).toBe(ChordType.Diminished);
+        expect(scaleChords[6].type).toBe("Diminished");
     });
 
     test("generates correct chord types for natural minor scale", () => {
@@ -236,25 +235,25 @@ describe("generateChordNumbers", () => {
 
         // Natural minor chord pattern: i ii° III iv v VI VII
         expect(scaleChords[0].romanNumeral).toBe("i");
-        expect(scaleChords[0].type).toBe(ChordType.Minor);
+        expect(scaleChords[0].type).toBe("Minor");
 
         expect(scaleChords[1].romanNumeral).toBe("ii°");
-        expect(scaleChords[1].type).toBe(ChordType.Diminished);
+        expect(scaleChords[1].type).toBe("Diminished");
 
         expect(scaleChords[2].romanNumeral).toBe("III");
-        expect(scaleChords[2].type).toBe(ChordType.Major);
+        expect(scaleChords[2].type).toBe("Major");
 
         expect(scaleChords[3].romanNumeral).toBe("iv");
-        expect(scaleChords[3].type).toBe(ChordType.Minor);
+        expect(scaleChords[3].type).toBe("Minor");
 
         expect(scaleChords[4].romanNumeral).toBe("v");
-        expect(scaleChords[4].type).toBe(ChordType.Minor);
+        expect(scaleChords[4].type).toBe("Minor");
 
         expect(scaleChords[5].romanNumeral).toBe("VI");
-        expect(scaleChords[5].type).toBe(ChordType.Major);
+        expect(scaleChords[5].type).toBe("Major");
 
         expect(scaleChords[6].romanNumeral).toBe("VII");
-        expect(scaleChords[6].type).toBe(ChordType.Major);
+        expect(scaleChords[6].type).toBe("Major");
     });
 });
 

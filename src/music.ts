@@ -148,8 +148,6 @@ export const scaleFamily: ScaleFamily[] = [
     },
 ];
 
-// root diatonic scale is major
-const _diatonic: Mod<boolean> = new Mod([true, false, true, false, true, true, false, true, false, true, false, true]);
 const indexList: Mod<number> = new Mod([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
 
 export type NoteSpec = {
@@ -258,24 +256,7 @@ export type Mode = {
     readonly index: number;
 };
 
-type ScaleSpec = {
-    noteSpec: NoteSpec;
-    mode: Mode;
-};
-
-function _createScaleSpec(index: number, naturalIndex: number, modeIndex: number): ScaleSpec {
-    return {
-        noteSpec: createNoteSpec(naturalIndex, index),
-        mode: scaleFamily[0].modes[modeIndex],
-    };
-}
-
-export enum ChordType {
-    Major,
-    Minor,
-    Diminished,
-    Augmented,
-}
+export type ChordType = "Major" | "Minor" | "Diminished" | "Augmented";
 
 export type Chord = {
     readonly romanNumeral: string;
@@ -483,7 +464,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
             let roman = romanNumeral[scaleNote.noteNumber];
             const nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamilyIntervals);
             let diminished = "";
-            let type: ChordType = ChordType.Minor;
+            let type: ChordType = "Minor";
             // does it have a diminished 5th?
             if (
                 nodes.some(
@@ -491,7 +472,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
                 )
             ) {
                 diminished = "°";
-                type = ChordType.Diminished;
+                type = "Diminished";
             }
             // does it have an augmented 5th?
             else if (
@@ -500,7 +481,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
                 )
             ) {
                 diminished = "+";
-                type = ChordType.Augmented;
+                type = "Augmented";
             }
             // does it have a major 3rd?
             else if (
@@ -509,7 +490,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
                 )
             ) {
                 roman = roman.toLocaleUpperCase();
-                type = ChordType.Major;
+                type = "Major";
             }
             return {
                 romanNumeral: roman + diminished,
@@ -519,7 +500,7 @@ export function generateChordNumbers(scaleNotes: ScaleNote[], mode: Mode, scaleF
 
         return {
             romanNumeral: "",
-            type: ChordType.Major,
+            type: "Major",
         };
     });
 }

@@ -244,10 +244,10 @@ function update(scaleChanged: Model["music"], state: NoteCircleState): void {
 }
 
 function getChordSegmentClass(chord: music.Chord): string {
-    if (chord.type === music.ChordType.Diminished) return "chord-segment-dim";
-    if (chord.type === music.ChordType.Augmented) return "chord-segment-aug";
-    if (chord.type === music.ChordType.Minor) return "chord-segment-minor";
-    if (chord.type === music.ChordType.Major) return "chord-segment-major";
+    if (chord.type === "Diminished") return "chord-segment-dim";
+    if (chord.type === "Augmented") return "chord-segment-aug";
+    if (chord.type === "Minor") return "chord-segment-minor";
+    if (chord.type === "Major") return "chord-segment-major";
     throw new Error("Unexpected ChordType");
 }
 

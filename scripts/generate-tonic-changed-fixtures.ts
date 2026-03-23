@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Model } from "../model";
-import * as music from "../music";
-import type { State } from "../types";
-import { Update } from "./update-tonic-changed";
+import type { Model } from "../src/model";
+import * as music from "../src/music";
+import type { State } from "../src/types";
+import { Update } from "../src/update/update-tonic-changed";
 
 // Build a fresh input model with diatonic scale family, zero toggles.
 function makeInputModel(): Model {
@@ -53,7 +53,7 @@ for (const nat of music.naturals) {
     variants.push({ natural: nat, offset: 1, suffix: "sharp" });
 }
 
-const outDir = join(import.meta.dir, "test-artifacts", "tonic-changed");
+const outDir = join(import.meta.dir, "..", "src", "update", "test-artifacts", "tonic-changed");
 mkdirSync(outDir, { recursive: true });
 
 for (const v of variants) {

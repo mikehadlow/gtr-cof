@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Model } from "../model";
-import * as music from "../music";
-import type { State } from "../types";
-import { Update } from "./update-mode-changed";
+import type { Model } from "../src/model";
+import * as music from "../src/music";
+import type { State } from "../src/types";
+import { Update } from "../src/update/update-mode-changed";
 
 // Build a fresh input model with diatonic scale family, zero toggles.
 function makeInputModel(scaleFamilyIndex: number): Model {
@@ -44,7 +44,7 @@ function makeInputModel(scaleFamilyIndex: number): Model {
     };
 }
 
-const outDir = join(import.meta.dir, "test-artifacts", "mode-changed");
+const outDir = join(import.meta.dir, "..", "src", "update", "test-artifacts", "mode-changed");
 mkdirSync(outDir, { recursive: true });
 
 let count = 0;
