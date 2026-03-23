@@ -443,7 +443,14 @@ function generateNodes(
     });
 }
 
-function buildScaleCounter(diatonic: boolean[], startAt: number = 0): [boolean, number][] {
+// This takes a set of 12 bools which represent the notes of a scale in the
+// chromatic sequence and numbers them:
+// input: (C Maj) 1 0 1 0 1 1 0 1 0 1 0 1
+// output:        0 0 1 0 2 3 0 4 0 5 0 6
+// or..
+// input: (A Min) 1 0 1 1 0 1 0 1 1 0 1 0
+// output:        0 0 1 2 0 3 0 4 5 0 6 0
+export function buildScaleCounter(diatonic: boolean[], startAt: number = 0): [boolean, number][] {
     const noteCount = diatonic.filter((x) => x).length;
     let i = (noteCount - startAt) % noteCount;
     return diatonic.map((isNote) => {

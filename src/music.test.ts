@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+    buildScaleCounter,
     chromatic,
     createNoteSpec,
     fifths,
@@ -270,5 +271,25 @@ describe("naturals array", () => {
     test("natural notes have correct chromatic indexes", () => {
         // A=0, B=2, C=3, D=5, E=7, F=8, G=10
         expect(naturals.map((n) => n.index)).toEqual([0, 2, 3, 5, 7, 8, 10]);
+    });
+});
+
+describe("buildScaleCounter", () => {
+    test("counts notes for diatonic C maj", () => {
+        const diatonicCMaj: boolean[] = [true, false, true, false, true, true, false, true, false, true, false, true];
+        const counter = buildScaleCounter(diatonicCMaj);
+        expect(counter.map((x) => x[1])).toEqual([0, 0, 1, 0, 2, 3, 0, 4, 0, 5, 0, 6]);
+    });
+
+    test("counts notes for diatonic A min", () => {
+        const diatonicAMin: boolean[] = [true, false, true, true, false, true, false, true, true, false, true, false];
+        const counter = buildScaleCounter(diatonicAMin);
+        expect(counter.map((x) => x[1])).toEqual([0, 0, 1, 2, 0, 3, 0, 4, 5, 0, 6, 0]);
+    });
+
+    test("counts notes for whole tone", () => {
+        const diatonicAMin: boolean[] = [true, false, true, false, true, false, true, false, true, false, true, false];
+        const counter = buildScaleCounter(diatonicAMin);
+        expect(counter.map((x) => x[1])).toEqual([0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0]);
     });
 });
