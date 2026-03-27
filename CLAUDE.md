@@ -49,6 +49,10 @@ the UI.
 - `src/index.ts` - Main initialization, bootstraps all modules
 - `docs/index.html` - Frontend entry, contains SVG containers and UI controls
 
+## Long-running Plans
+
+Plans for significant refactors or multi-phase work are kept in the `plans/` folder at the repo root.
+
 ## Important Notes
 
 - Edit only `.ts` files in `/src/`, never edit generated `.js` files
