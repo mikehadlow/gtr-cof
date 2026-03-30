@@ -10996,136 +10996,323 @@ var update = (model, msg) => {
   }
 };
 
-// src/view/chord-interval.ts
-var import_d3 = __toESM(require_d3(), 1);
-var buttons;
-var toggle = 0;
-var view = (model, ctx, raise) => {
-  const onClick = (x) => {
-    const updatedToggle = toggle ^ 2 ** x;
-    const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter((x2) => (2 ** x2 & updatedToggle) === 2 ** x2);
-    raise({ id: "ChordIntervalChange", chordIntervals });
-  };
-  if (ctx.init) {
-    const radius = 10;
-    const pad = 2;
-    const svg = import_d3.default.select("#modes");
-    const intervals2 = svg.append("g").attr("transform", "translate(0, 240)");
-    const gs = intervals2.selectAll("g").data([0, 1, 2, 3, 4, 5, 6], (i) => i.toString()).enter().append("g").attr("transform", (_d, i) => `translate(${i * (radius * 2 + pad) + pad}, 0)`);
-    buttons = gs.append("circle").attr("cx", radius).attr("cy", radius).attr("r", radius).attr("strokeWidth", 2).attr("class", "mode-button").on("click", onClick);
-    gs.append("text").attr("x", radius).attr("y", radius + 5).attr("text-anchor", "middle").text((x) => x + 1);
-  }
-  toggle = 0;
-  model.state.chordIntervals.forEach((x) => {
-    toggle = toggle + 2 ** x;
-  });
-  buttons.data(model.state.chordIntervals, (m) => m.toString()).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
-};
-
-// src/view/circle.ts
-var import_d33 = __toESM(require_d3(), 1);
-
 // src/ui/index.ts
-var import_d32 = __toESM(require_d3(), 1);
+var import_d3 = __toESM(require_d3(), 1);
+function arcPath(innerR, outerR, startAngle, endAngle, padAngle = 0) {
+  const sa = startAngle + padAngle / 2;
+  const ea = endAngle - padAngle / 2;
+  const x1 = Math.sin(sa) * outerR, y1 = -Math.cos(sa) * outerR;
+  const x2 = Math.sin(ea) * outerR, y2 = -Math.cos(ea) * outerR;
+  const x3 = Math.sin(ea) * innerR, y3 = -Math.cos(ea) * innerR;
+  const x4 = Math.sin(sa) * innerR, y4 = -Math.cos(sa) * innerR;
+  const largeArc = ea - sa > Math.PI ? 1 : 0;
+  return `M ${x1},${y1} A ${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} L ${x3},${y3} A ${innerR},${innerR} 0 ${largeArc},0 ${x4},${y4} Z`;
+}
+function arcCentroid(innerR, outerR, startAngle, endAngle) {
+  const midAngle = (startAngle + endAngle) / 2;
+  const midR = (innerR + outerR) / 2;
+  return [Math.sin(midAngle) * midR, -Math.cos(midAngle) * midR];
+}
+var SVG_NS = "http://www.w3.org/2000/svg";
+function renderToSvg(container, nodes) {
+  while (container.firstChild)
+    container.removeChild(container.firstChild);
+  for (const node of nodes)
+    container.appendChild(createElement(node));
+}
+function createElement(node) {
+  switch (node.type) {
+    case "g": {
+      const el = document.createElementNS(SVG_NS, "g");
+      if (node.transform)
+        el.setAttribute("transform", node.transform);
+      for (const child of node.children)
+        el.appendChild(createElement(child));
+      return el;
+    }
+    case "circle": {
+      const el = document.createElementNS(SVG_NS, "circle");
+      el.setAttribute("cx", String(node.cx));
+      el.setAttribute("cy", String(node.cy));
+      el.setAttribute("r", String(node.r));
+      if (node.class)
+        el.setAttribute("class", node.class);
+      if (node.fill)
+        el.setAttribute("fill", node.fill);
+      if (node.stroke)
+        el.setAttribute("stroke", node.stroke);
+      if (node.strokeWidth != null)
+        el.setAttribute("stroke-width", String(node.strokeWidth));
+      if (node.pointerEvents)
+        el.setAttribute("pointer-events", node.pointerEvents);
+      if (node.onClick)
+        el.addEventListener("click", node.onClick);
+      return el;
+    }
+    case "rect": {
+      const el = document.createElementNS(SVG_NS, "rect");
+      el.setAttribute("x", String(node.x));
+      el.setAttribute("y", String(node.y));
+      el.setAttribute("width", String(node.width));
+      el.setAttribute("height", String(node.height));
+      if (node.class)
+        el.setAttribute("class", node.class);
+      if (node.fill)
+        el.setAttribute("fill", node.fill);
+      if (node.stroke)
+        el.setAttribute("stroke", node.stroke);
+      if (node.strokeWidth != null)
+        el.setAttribute("stroke-width", String(node.strokeWidth));
+      if (node.onClick)
+        el.addEventListener("click", node.onClick);
+      return el;
+    }
+    case "path": {
+      const el = document.createElementNS(SVG_NS, "path");
+      el.setAttribute("d", node.d);
+      if (node.class)
+        el.setAttribute("class", node.class);
+      if (node.onClick)
+        el.addEventListener("click", node.onClick);
+      return el;
+    }
+    case "text": {
+      const el = document.createElementNS(SVG_NS, "text");
+      el.setAttribute("x", String(node.x));
+      el.setAttribute("y", String(node.y));
+      if (node.class)
+        el.setAttribute("class", node.class);
+      if (node.textAnchor)
+        el.setAttribute("text-anchor", node.textAnchor);
+      if (node.transform)
+        el.setAttribute("transform", node.transform);
+      el.textContent = node.content;
+      return el;
+    }
+    case "line": {
+      const el = document.createElementNS(SVG_NS, "line");
+      el.setAttribute("x1", String(node.x1));
+      el.setAttribute("y1", String(node.y1));
+      el.setAttribute("x2", String(node.x2));
+      el.setAttribute("y2", String(node.y2));
+      if (node.stroke)
+        el.setAttribute("stroke", node.stroke);
+      if (node.strokeWidth != null)
+        el.setAttribute("stroke-width", String(node.strokeWidth));
+      return el;
+    }
+    case "use": {
+      const el = document.createElementNS(SVG_NS, "use");
+      el.setAttribute("href", node.href);
+      el.setAttribute("x", String(node.x));
+      el.setAttribute("y", String(node.y));
+      el.setAttribute("width", String(node.width));
+      el.setAttribute("height", String(node.height));
+      if (node.style) {
+        for (const [key, value] of Object.entries(node.style)) {
+          el.style.setProperty(key, value);
+        }
+      }
+      return el;
+    }
+  }
+}
 var icons = {
   gear: "#icon-gear"
 };
-var appendSettingsIcon = (svg, onClick) => {
-  const gearX = parseInt(svg.attr("width"), 10) - 30;
-  const gearY = 0;
+function settingsIconNodes(svgWidth, onClick) {
   const size = 25;
-  const gearGroup = svg.append("g").style("cursor", "pointer").on("mouseover", function() {
-    import_d32.default.select(this).select("use").style("fill", "black");
-  }).on("mouseout", function() {
-    import_d32.default.select(this).select("use").style("fill", "none");
-  }).on("click", onClick);
-  gearGroup.append("rect").attr("x", gearX).attr("y", gearY).attr("width", size).attr("height", size).style("fill", "transparent");
-  gearGroup.append("use").attr("href", icons.gear).attr("x", gearX).attr("y", gearY).attr("width", size).attr("height", size).style("fill", "none").style("stroke", "black").style("pointer-events", "none");
-};
+  const gearX = svgWidth - 30;
+  const gearY = 0;
+  return [
+    {
+      type: "g",
+      children: [
+        { type: "rect", x: gearX, y: gearY, width: size, height: size, fill: "transparent", onClick },
+        {
+          type: "use",
+          href: icons.gear,
+          x: gearX,
+          y: gearY,
+          width: size,
+          height: size,
+          style: { fill: "none", stroke: "black", "pointer-events": "none" }
+        }
+      ]
+    }
+  ];
+}
+
+// src/view/chord-interval.ts
+var import_d32 = __toESM(require_d3(), 1);
+function chordIntervalNodes(model, raise) {
+  const radius = 10;
+  const pad = 2;
+  const children = [0, 1, 2, 3, 4, 5, 6].map((i) => ({
+    type: "g",
+    transform: `translate(${i * (radius * 2 + pad) + pad}, 0)`,
+    children: [
+      {
+        type: "circle",
+        cx: radius,
+        cy: radius,
+        r: radius,
+        class: model.state.chordIntervals.includes(i) ? "mode-button mode-button-selected" : "mode-button",
+        onClick: () => {
+          const currentToggle = model.state.chordIntervals.reduce((acc, ci) => acc | 2 ** ci, 0);
+          const updatedToggle = currentToggle ^ 2 ** i;
+          const chordIntervals = [0, 1, 2, 3, 4, 5, 6].filter((ci) => (2 ** ci & updatedToggle) === 2 ** ci);
+          raise({ id: "ChordIntervalChange", chordIntervals });
+        }
+      },
+      {
+        type: "text",
+        x: radius,
+        y: radius + 5,
+        textAnchor: "middle",
+        content: `${i + 1}`
+      }
+    ]
+  }));
+  return [{ type: "g", transform: "translate(0, 240)", children }];
+}
 
 // src/view/circle.ts
-var create = (svgId, noteIndexes, label) => {
-  const svg = import_d33.default.select(svgId);
-  let state;
-  let isCNoon = true;
-  return (model, ctx, raise) => {
-    if (ctx.init || isCNoon !== model.state.circleIsCNoon) {
-      const offset = model.state.circleIsCNoon ? 3 : 0;
-      state = draw(svg, rotate(noteIndexes, offset), label, raise);
-      isCNoon = model.state.circleIsCNoon;
-    }
-    update2(model.music, state);
+var circleNodes = (noteIndexes, label, svgWidth) => {
+  return (model, raise) => {
+    const offset = model.state.circleIsCNoon ? 3 : 0;
+    const segments = generateSegments(rotate(noteIndexes, offset));
+    const pad = 50;
+    const chordRadius = 240;
+    const noteRadius = 200;
+    const degreeRadius = 135;
+    const innerRadius = 90;
+    const cx = noteRadius + pad;
+    const cy = noteRadius + pad;
+    const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
+    const noteSegments = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const isTonic = node.scaleNote.note.index === model.state.index;
+      const cls = "note-segment" + (node.scaleNote.isScaleNote ? isTonic ? " note-segment-tonic" : " note-segment-scale" : "");
+      return {
+        type: "path",
+        d: arcPath(degreeRadius, noteRadius, seg.startAngle, seg.endAngle),
+        class: cls,
+        onClick: () => raise({
+          id: "TonicChanged",
+          noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(node.scaleNote.note)
+        })
+      };
+    });
+    const noteTexts = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const [x, y] = arcCentroid(degreeRadius, noteRadius, seg.startAngle, seg.endAngle);
+      return {
+        type: "text",
+        x,
+        y: y + 11,
+        class: "note-segment-text",
+        content: node.scaleNote.note.label
+      };
+    });
+    const intervalSegments = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      return {
+        type: "path",
+        d: arcPath(innerRadius, degreeRadius, seg.startAngle, seg.endAngle),
+        class: node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment",
+        onClick: () => raise({
+          id: "Toggle",
+          index: node.scaleNote.note.index
+        })
+      };
+    });
+    const intervalNotes = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const [cx2, cy2] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
+      const fill = node.toggle ? `#${node.chordInterval.colour.toString(16).padStart(6, "0")}` : "none";
+      const stroke = node.midiToggle ? "OrangeRed" : node.toggle ? "black" : "none";
+      const strokeWidth = node.midiToggle ? 20 : 2;
+      return {
+        type: "circle",
+        cx: cx2,
+        cy: cy2,
+        r: 25,
+        class: node.toggle ? "interval-note-selected" : "interval-note",
+        fill,
+        stroke,
+        strokeWidth,
+        pointerEvents: "none"
+      };
+    });
+    const intervalTexts = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const [x, y] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
+      return {
+        type: "text",
+        x,
+        y: y + 8,
+        class: "degree-segment-text",
+        content: node.intervalName
+      };
+    });
+    const chordSegments = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const cls = node.scaleNote.isScaleNote ? getChordSegmentClass(node.scaleNote.chord) : "chord-segment";
+      return {
+        type: "path",
+        d: arcPath(noteRadius, chordRadius, seg.startAngle, seg.endAngle),
+        class: cls,
+        onClick: () => raise({
+          id: "ChordChanged",
+          chordIndex: node.scaleNote.note.index
+        })
+      };
+    });
+    const chordNotes = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const [cx2, cy2] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
+      const cls = node.isChordRoot ? getChordSegmentClass(node.scaleNote.chord) : "chord-segment-note";
+      return {
+        type: "circle",
+        cx: cx2,
+        cy: cy2,
+        r: 28,
+        class: cls,
+        pointerEvents: "none"
+      };
+    });
+    const chordTexts = segments.map((seg) => {
+      const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const [x, y] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
+      return {
+        type: "text",
+        x,
+        y: y + 8,
+        class: "degree-segment-text",
+        content: node.scaleNote.chord?.romanNumeral ?? ""
+      };
+    });
+    return [
+      ...settingsIconNodes(svgWidth, () => raise({ id: "ModalStateChange", modalState: "circle-settings" })),
+      {
+        type: "g",
+        transform: `translate(${cx}, ${cy})`,
+        children: [
+          { type: "text", x: 0, y: 0, textAnchor: "middle", content: label },
+          { type: "g", children: noteSegments },
+          { type: "g", children: noteTexts },
+          { type: "g", children: intervalSegments },
+          { type: "g", children: intervalNotes },
+          { type: "g", children: intervalTexts },
+          { type: "g", children: chordSegments },
+          { type: "g", children: chordNotes },
+          { type: "g", children: chordTexts }
+        ]
+      }
+    ];
   };
 };
-var indexer = (x) => x.index.toString();
-function draw(svg, noteIndexes, label, raise) {
-  const pad = 50;
-  const chordRadius = 240;
-  const noteRadius = 200;
-  const degreeRadius = 135;
-  const innerRadius = 90;
-  const handleNoteClick = (segment, _i) => {
-    raise({
-      id: "TonicChanged",
-      noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(segment.node.scaleNote.note)
-    });
-  };
-  const handleChordClick = (segment, _i) => {
-    raise({
-      id: "ChordChanged",
-      chordIndex: segment.node.scaleNote.note.index
-    });
-  };
-  const handleIntervalClick = (segment, _i) => {
-    raise({
-      id: "Toggle",
-      index: segment.node.scaleNote.note.index
-    });
-  };
-  svg.selectAll("*").remove();
-  appendSettingsIcon(svg, () => raise({ id: "ModalStateChange", modalState: "circle-settings" }));
-  const cof = svg.append("g").attr("transform", `translate(${noteRadius + pad}, ${noteRadius + pad})`);
-  cof.append("text").attr("text-anchor", "middle").attr("x", 0).attr("y", 0).text(label);
-  const segments = generateSegments(noteIndexes);
-  const noteArc = import_d33.default.svg.arc().innerRadius(degreeRadius).outerRadius(noteRadius);
-  const degreeArc = import_d33.default.svg.arc().innerRadius(innerRadius).outerRadius(degreeRadius);
-  const chordArc = import_d33.default.svg.arc().innerRadius(noteRadius).outerRadius(chordRadius);
-  const noteSegments = cof.append("g").selectAll("path").data(segments, indexer).enter().append("path").attr("d", noteArc).attr("class", "note-segment").on("click", handleNoteClick);
-  const noteText = cof.append("g").selectAll("text").data(segments).enter().append("text").attr("x", (x) => noteArc.centroid(x)[0]).attr("y", (x) => noteArc.centroid(x)[1] + 11).text("").attr("class", "note-segment-text");
-  const intervalSegments = cof.append("g").selectAll("path").data(segments, indexer).enter().append("path").attr("d", degreeArc).attr("class", "interval-segment").on("click", handleIntervalClick);
-  const intervalNotes = cof.append("g").selectAll("circle").data(segments, indexer).enter().append("circle").style("pointer-events", "none").attr("r", 25).attr("cx", (x) => degreeArc.centroid(x)[0]).attr("cy", (x) => degreeArc.centroid(x)[1]).attr("class", "interval-note");
-  const intervalText = cof.append("g").selectAll("text").data(segments, indexer).enter().append("text").attr("x", (x) => degreeArc.centroid(x)[0]).attr("y", (x) => degreeArc.centroid(x)[1] + 8).text("").attr("class", "degree-segment-text");
-  const chordSegments = cof.append("g").selectAll("path").data(segments, indexer).enter().append("path").attr("d", chordArc).attr("class", "chord-segment").on("click", handleChordClick);
-  const chordNotes = cof.append("g").selectAll("circle").data(segments, indexer).enter().append("circle").style("pointer-events", "none").attr("r", 28).attr("cx", (x) => chordArc.centroid(x)[0]).attr("cy", (x) => chordArc.centroid(x)[1]).attr("class", "chord-segment-note");
-  const chordText = cof.append("g").selectAll("text").data(segments, indexer).enter().append("text").attr("x", (x) => chordArc.centroid(x)[0]).attr("y", (x) => chordArc.centroid(x)[1] + 8).text("").attr("class", "degree-segment-text");
-  return {
-    noteSegments,
-    noteText,
-    intervalSegments,
-    intervalNotes,
-    intervalText,
-    chordSegments,
-    chordNotes,
-    chordText
-  };
-}
-function update2(scaleChanged, state) {
-  const data = scaleChanged.nodes.map((node) => ({
-    startAngle: 0,
-    endAngle: 0,
-    scaleNote: {},
-    index: node.scaleNote.note.index,
-    node
-  }));
-  state.noteSegments.data(data, indexer).attr("class", (d, i) => "note-segment " + (d.node.scaleNote.isScaleNote ? i === 0 ? "note-segment-tonic" : "note-segment-scale" : ""));
-  state.noteText.data(data, indexer).text((d) => d.node.scaleNote.note.label);
-  state.intervalSegments.data(data, indexer).attr("class", (d) => d.node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment");
-  state.intervalText.data(data, indexer).text((d) => d.node.intervalName);
-  state.intervalNotes.data(data, indexer).attr("class", (d) => d.node.toggle ? "interval-note-selected" : "interval-note").style("fill", (d) => d.node.toggle ? `#${d.node.chordInterval.colour.toString(16).padStart(6, "0")}` : "none").style("stroke-width", (d) => d.node.midiToggle ? "20px" : "2px").style("stroke", (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? "black" : "none");
-  state.chordText.data(data, indexer).text((d) => `${d.node.scaleNote.chord.romanNumeral}`);
-  state.chordSegments.data(data, indexer).attr("class", (d) => d.node.scaleNote.isScaleNote ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment");
-  state.chordNotes.data(data, indexer).attr("class", (d) => d.node.isChordRoot ? getChordSegmentClass(d.node.scaleNote.chord) : "chord-segment-note");
-}
 function getChordSegmentClass(chord) {
   if (chord.type === "Diminished")
     return "chord-segment-dim";
@@ -11139,18 +11326,11 @@ function getChordSegmentClass(chord) {
 }
 function generateSegments(fifths2) {
   const count = fifths2.length;
-  const items = [];
   const angle = Math.PI * (2 / count);
-  for (let i = 0;i < count; i++) {
+  return fifths2.map((index, i) => {
     const itemAngle = angle * i - angle / 2;
-    items.push({
-      startAngle: itemAngle,
-      endAngle: itemAngle + angle,
-      index: fifths2[i],
-      node: nullNode
-    });
-  }
-  return items;
+    return { startAngle: itemAngle, endAngle: itemAngle + angle, index };
+  });
 }
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
   if (Math.abs(noteSpec.offset) > 1) {
@@ -11162,18 +11342,14 @@ function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
   return noteSpec;
 }
 function rotate(array, offset) {
-  const newArray = [];
-  for (const item of array) {
-    newArray.push((item + offset) % 12);
-  }
-  return newArray;
+  return array.map((item) => (item + offset) % 12);
 }
 
 // src/view/guitar.ts
-var import_d35 = __toESM(require_d3(), 1);
+var import_d34 = __toESM(require_d3(), 1);
 
 // src/view/tuning.ts
-var import_d34 = __toESM(require_d3(), 1);
+var import_d33 = __toESM(require_d3(), 1);
 var guitarDots = [
   [3, 0],
   [5, 0],
@@ -11264,7 +11440,7 @@ function buildTunings() {
   }
   return tunings2;
 }
-var view2 = (_, ctx, raise) => {
+var view = (_, ctx, raise) => {
   const raiseTuningChangedEvent = (tuning) => {
     raise({
       id: "TuningChanged",
@@ -11272,7 +11448,7 @@ var view2 = (_, ctx, raise) => {
     });
   };
   if (ctx.init) {
-    import_d34.default.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseTuningChangedEvent).text((x) => `${x.tuning}   ${x.description}`);
+    import_d33.default.select("#tuning-dropdown").selectAll("div").data(tunings).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseTuningChangedEvent).text((x) => `${x.tuning}   ${x.description}`);
   }
 };
 
@@ -11283,123 +11459,153 @@ var fretWidth = 5;
 var noteRadius = 15;
 var pad = 20;
 var numberOfFrets = 16;
-var indexer2 = (stringNote) => `${stringNote.index}_${stringNote.octave}`;
-var create2 = () => {
-  let tuningIndex = 0;
-  let isLeftHanded = false;
-  let isNutFlipped = false;
-  let fretboardLabelType = "NoteName";
-  let notes2;
-  let noteLabels2;
-  let fretboardElement;
-  const fretboardStateHasChanged = (model) => tuningIndex !== model.state.tuningIndex || isLeftHanded !== model.state.isLeftHanded || isNutFlipped !== model.state.isNutFlipped || fretboardLabelType !== model.state.fretboardLabelType;
-  const setFretboardState = (model) => {
-    tuningIndex = model.state.tuningIndex;
-    isLeftHanded = model.state.isLeftHanded;
-    isNutFlipped = model.state.isNutFlipped;
-    fretboardLabelType = model.state.fretboardLabelType;
+var svgWidth = 1160;
+function noteX(i) {
+  return i * fretGap + pad + 30;
+}
+function noteFill(sn, hasToggledNotes) {
+  if (sn.node.toggle)
+    return "white";
+  if (sn.node.scaleNote.isScaleNote) {
+    if (sn.node.scaleNote.noteNumber === 0) {
+      return hasToggledNotes ? "white" : "yellow";
+    }
+    return "white";
+  }
+  return "rgba(255, 255, 255, 0.01)";
+}
+function noteStroke(sn, hasToggledNotes) {
+  if (sn.node.midiToggle)
+    return "OrangeRed";
+  if (sn.node.toggle)
+    return `#${sn.node.chordInterval.colour.toString(16).padStart(6, "0")}`;
+  if (hasToggledNotes)
+    return "none";
+  if (sn.node.scaleNote.isScaleNote)
+    return "grey";
+  return "none";
+}
+function noteStrokeWidth(sn) {
+  if (sn.node.midiToggle)
+    return 10;
+  if (sn.node.toggle)
+    return 4;
+  if (sn.node.scaleNote.isScaleNote)
+    return 2;
+  return 0;
+}
+function labelText(sn, labelType) {
+  const visible = sn.node.scaleNote.isScaleNote || sn.node.toggle;
+  if (!visible)
+    return "";
+  switch (labelType) {
+    case "None":
+      return "";
+    case "NoteName":
+      return sn.node.scaleNote.note.label;
+    case "Interval":
+      return sn.node.intervalName;
+    default:
+      throw new Error(`Unexpected label type: ${labelType}`);
+  }
+}
+function allNotesFromWithNodes(startIndex, nodeByIndex) {
+  const items = [];
+  for (let i = 0;i < numberOfFrets; i++) {
+    const idx = (i + startIndex) % 12;
+    items.push({
+      octave: Math.floor((i + 1) / 12),
+      index: idx,
+      node: nodeByIndex.get(idx) ?? nullNode
+    });
+  }
+  return items;
+}
+var guitarNodes = (model, raise) => {
+  const { tuningIndex, isLeftHanded, isNutFlipped, fretboardLabelType } = model.state;
+  const tuningInfo = tunings[tuningIndex];
+  const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
+  const hasToggledNotes = model.music.nodes.some((x) => x.toggle);
+  const titleContent = tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : "");
+  const titleNode = {
+    type: "text",
+    x: 30,
+    y: 11,
+    class: "mode-text",
+    content: titleContent
   };
-  let _currentState;
-  return (model, ctx, raise) => {
-    _currentState = model.state;
-    if (ctx.init || fretboardStateHasChanged(model)) {
-      setFretboardState(model);
-      drawFretboard(tunings[model.state.tuningIndex], raise);
-    }
-    update3(model.music);
+  const fretRects = Array.from({ length: numberOfFrets }, (_, i) => ({
+    type: "rect",
+    x: (i + 1) * fretGap + pad - fretWidth,
+    y: pad + stringGap / 2 - fretWidth,
+    width: fretWidth,
+    height: stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2,
+    fill: i === 0 ? "black" : "none",
+    stroke: "grey",
+    strokeWidth: 1
+  }));
+  const dotCircles = tuningInfo.dots.map(([fret, pos]) => ({
+    type: "circle",
+    r: 10,
+    cx: fret * fretGap + pad + 30 + pos * 10,
+    cy: tuningInfo.notes.length * stringGap + pad + 15,
+    fill: "lightgrey"
+  }));
+  const stringOrder = isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse();
+  const stringGroups = stringOrder.map((startIndex, si) => {
+    const fretNotes = allNotesFromWithNodes(startIndex, nodeByIndex);
+    const stringLine = {
+      type: "line",
+      x1: pad + fretGap,
+      y1: stringGap / 2,
+      x2: pad + fretGap * numberOfFrets + 20,
+      y2: stringGap / 2,
+      stroke: "black",
+      strokeWidth: 2
+    };
+    const noteCircles = fretNotes.map((sn, i) => ({
+      type: "circle",
+      r: noteRadius,
+      cy: stringGap / 2,
+      cx: noteX(i),
+      fill: noteFill(sn, hasToggledNotes),
+      stroke: noteStroke(sn, hasToggledNotes),
+      strokeWidth: noteStrokeWidth(sn),
+      onClick: () => raise({ id: "Toggle", index: sn.index })
+    }));
+    const noteTexts = fretNotes.map((sn, i) => {
+      const x = isLeftHanded ? -noteX(i) : noteX(i);
+      const transform = isLeftHanded ? "translate(0, 0) scale(-1, 1)" : "translate(0, 0) scale(1, 1)";
+      return {
+        type: "text",
+        x,
+        y: stringGap / 2 + 5,
+        textAnchor: "middle",
+        transform,
+        content: labelText(sn, fretboardLabelType)
+      };
+    });
+    return {
+      type: "g",
+      transform: `translate(0, ${si * stringGap + pad})`,
+      children: [stringLine, ...noteCircles, ...noteTexts]
+    };
+  });
+  const fretboardTransform = isLeftHanded ? "translate(1200, 0) scale(-1, 1)" : "translate(0, 0) scale(1, 1)";
+  const fretboardGroup = {
+    type: "g",
+    transform: fretboardTransform,
+    children: [{ type: "g", children: fretRects }, { type: "g", children: dotCircles }, ...stringGroups]
   };
-  function drawFretboard(tuningInfo, raise) {
-    const fretData = getFretData(numberOfFrets);
-    const dots = tuningInfo.dots;
-    import_d35.default.selectAll("#gtr > *").remove();
-    const svg = import_d35.default.select("#gtr");
-    svg.append("text").attr("class", "mode-text").attr("x", 30).attr("y", 11).text(tuningInfo.tuning + " " + tuningInfo.description + (isLeftHanded ? ", Left Handed" : "") + (isNutFlipped ? ", Nut Flipped" : ""));
-    const gtr = svg.append("g").attr("transform", "translate(0, 0) scale(1, 1)");
-    fretboardElement = gtr.node();
-    appendSettingsIcon(svg, () => raise({ id: "ModalStateChange", modalState: "guitar-settings" }));
-    gtr.append("g").selectAll("rect").data(fretData).enter().append("rect").attr("x", (_d, i) => (i + 1) * fretGap + pad - fretWidth).attr("y", pad + stringGap / 2 - fretWidth).attr("width", fretWidth).attr("height", stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2).attr("fill", (_d, i) => i === 0 ? "black" : "none").attr("stroke", "grey").attr("stroke-width", 1);
-    gtr.append("g").selectAll("circle").data(dots).enter().append("circle").attr("r", 10).attr("cx", (d) => d[0] * fretGap + pad + 30 + d[1] * 10).attr("cy", (_d) => tuningInfo.notes.length * stringGap + pad + 15).attr("fill", "lightgrey").attr("stroke", "none");
-    const strings = gtr.append("g").selectAll("g").data(isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse(), (_, i) => `${i}`).enter().append("g").attr("transform", (_d, i) => `translate(0, ${i * stringGap + pad})`);
-    strings.append("line").attr("x1", pad + fretGap).attr("y1", stringGap / 2).attr("x2", pad + fretGap * numberOfFrets + 20).attr("y2", stringGap / 2).attr("stroke", "black").attr("stroke-width", 2);
-    notes2 = strings.selectAll("circle").data((d) => allNotesFrom(d, numberOfFrets), indexer2).enter().append("circle").attr("r", noteRadius).attr("cy", stringGap / 2).attr("cx", (_d, i) => i * fretGap + pad + 30).on("click", (d) => raise({ id: "Toggle", index: d.index }));
-    noteLabels2 = strings.selectAll("text").data((d) => allNotesFrom(d, numberOfFrets), indexer2).enter().append("text").attr("transform", "translate(0, 0) scale(1, 1)").attr("text-anchor", "middle").attr("x", (_d, i) => i * fretGap + pad + 30).attr("y", stringGap / 2 + 5).text("");
-    setHandedness();
-  }
-  function update3(music) {
-    const hasToggledNotes = music.nodes.some((x) => x.toggle);
-    const fill = (d) => d.node.toggle ? "white" : d.node.scaleNote.isScaleNote ? d.node.scaleNote.noteNumber === 0 ? hasToggledNotes ? "white" : "yellow" : "white" : "rgba(255, 255, 255, 0.01)";
-    const stroke = (d) => d.node.midiToggle ? "OrangeRed" : d.node.toggle ? `#${d.node.chordInterval.colour.toString(16)}` : hasToggledNotes ? "none" : d.node.scaleNote.isScaleNote ? "grey" : "none";
-    const strokeWidth = (d) => d.node.midiToggle ? 10 : d.node.toggle ? 4 : d.node.scaleNote.isScaleNote ? 2 : 0;
-    const data = repeatTo(music.nodes, numberOfFrets);
-    notes2.data(data, indexer2).attr("fill", fill).attr("stroke", stroke).attr("stroke-width", strokeWidth);
-    noteLabels2.data(data, indexer2);
-    setLabels();
-  }
-  function allNotesFrom(index, numberOfNotes) {
-    const items = [];
-    for (let i = 0;i < numberOfNotes; i++) {
-      items.push({
-        octave: Math.floor((i + 1) / 12),
-        index: (i + index) % 12,
-        node: nullNode
-      });
-    }
-    return items;
-  }
-  function getFretData(numberOfFrets2) {
-    const data = [];
-    for (let i = 0;i < numberOfFrets2; i++) {
-      data.push(i);
-    }
-    return data;
-  }
-  function repeatTo(nodes, count) {
-    let stringNotes = [];
-    for (let i = 0;i <= Math.floor(count / 12); i++) {
-      stringNotes = stringNotes.concat(nodes.map((x) => ({
-        octave: i,
-        index: x.scaleNote.note.index,
-        node: x
-      })));
-    }
-    return stringNotes;
-  }
-  function setHandedness() {
-    if (isLeftHanded) {
-      fretboardElement.transform.baseVal.getItem(0).setTranslate(1200, 0);
-      fretboardElement.transform.baseVal.getItem(1).setScale(-1, 1);
-      noteLabels2.attr("transform", (_d, _i) => "translate(0, 0) scale(-1, 1)").attr("x", (_d, i) => -(i * fretGap + pad + 30));
-    } else {
-      fretboardElement.transform.baseVal.getItem(0).setTranslate(0, 0);
-      fretboardElement.transform.baseVal.getItem(1).setScale(1, 1);
-      noteLabels2.attr("transform", (_d, _i) => "translate(0, 0) scale(1, 1)").attr("x", (_d, i) => i * fretGap + pad + 30);
-    }
-  }
-  function setLabels() {
-    function setNoteName(note) {
-      return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.scaleNote.note.label : "";
-    }
-    function setInterval(note) {
-      return note.node.scaleNote.isScaleNote || note.node.toggle ? note.node.intervalName : "";
-    }
-    switch (fretboardLabelType) {
-      case "None":
-        noteLabels2.text("");
-        break;
-      case "NoteName":
-        noteLabels2.text(setNoteName);
-        break;
-      case "Interval":
-        noteLabels2.text(setInterval);
-        break;
-      default:
-        throw new Error(`Unexpected label type: ${fretboardLabelType}`);
-    }
-  }
+  return [
+    titleNode,
+    ...settingsIconNodes(svgWidth, () => raise({ id: "ModalStateChange", modalState: "guitar-settings" })),
+    fretboardGroup
+  ];
 };
 
 // src/view/menu.ts
-var view3 = (_, ctx, _raise) => {
+var view2 = (_, ctx, _raise) => {
   if (ctx.init) {
     init();
   }
@@ -11492,7 +11698,7 @@ function showFretboardSettings(state, raise) {
 // src/view/modal/index.ts
 var MODAL_BACKDROP_CLASS = "modal-backdrop";
 var MODAL_CONTAINER_CLASS = "modal-container";
-var create3 = () => {
+var create = () => {
   let previousState = "closed";
   return ({ state }, _ctx, raise) => {
     if (state.modalState === previousState) {
@@ -11559,9 +11765,9 @@ function createCheckboxLabel(text, checked) {
   label.appendChild(document.createTextNode(` ${text}`));
   return label;
 }
-function createCheckbox(modal, labelText, checkboxState, onClick) {
+function createCheckbox(modal, labelText2, checkboxState, onClick) {
   const section = createSection();
-  const label = createCheckboxLabel(labelText, checkboxState);
+  const label = createCheckboxLabel(labelText2, checkboxState);
   const checkbox = label.querySelector("input");
   checkbox.addEventListener("change", () => onClick(checkbox.checked));
   section.appendChild(label);
@@ -11591,35 +11797,35 @@ function createModal(modalTitle, raise) {
 }
 
 // src/view/modes.ts
-var import_d36 = __toESM(require_d3(), 1);
-var view4 = (model, ctx, raise) => {
-  if (ctx.init) {
-    const svg = import_d36.default.select("#modes");
-    modes = svg.append("g").attr("transform", "translate(0, 280)");
-  }
-  const scaleFamily2 = scaleFamily[model.state.scaleFamilyIndex];
-  const activeMode = scaleFamily2.modes.find((x) => x.index === model.state.modeIndex);
-  if (!activeMode) {
-    throw new Error("Invalid mode index");
-  }
+var import_d35 = __toESM(require_d3(), 1);
+function modesNodes(model, raise) {
   const pad2 = 5;
   const buttonHeight = 25;
-  modes.selectAll("g").remove();
-  const gs = modes.selectAll("g").data(scaleFamily2.modes, index);
-  gs.exit().remove();
-  gs.enter().append("g").attr("transform", (_d, i) => `translate(0, ${i * (buttonHeight + pad2) + pad2})`);
-  buttons2 = gs.append("rect").attr("x", pad2).attr("y", 0).attr("strokeWidth", 2).attr("width", 150).attr("height", 25).attr("class", "mode-button").on("click", (d) => raise({ id: "ModeChanged", mode: d }));
-  gs.append("text").attr("x", pad2 + 10).attr("y", 17).text((x) => x.name).attr("class", "mode-text");
-  highlightActiveMode(activeMode);
-};
-var buttons2;
-var modes;
-function highlightActiveMode(mode) {
-  const modes2 = [mode];
-  buttons2.data(modes2, index).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
-}
-function index(mode) {
-  return mode.index.toString();
+  const scaleFamily2 = scaleFamily[model.state.scaleFamilyIndex];
+  const activeMode = scaleFamily2.modes.find((m) => m.index === model.state.modeIndex);
+  const children = scaleFamily2.modes.map((mode, i) => ({
+    type: "g",
+    transform: `translate(0, ${i * (buttonHeight + pad2) + pad2})`,
+    children: [
+      {
+        type: "rect",
+        x: pad2,
+        y: 0,
+        width: 150,
+        height: buttonHeight,
+        class: mode.index === activeMode.index ? "mode-button mode-button-selected" : "mode-button",
+        onClick: () => raise({ id: "ModeChanged", mode })
+      },
+      {
+        type: "text",
+        x: pad2 + 10,
+        y: 17,
+        class: "mode-text",
+        content: mode.name
+      }
+    ]
+  }));
+  return [{ type: "g", transform: "translate(0, 280)", children }];
 }
 
 // src/defaultState.ts
@@ -11643,7 +11849,7 @@ var defaultState = Object.freeze({
 // src/view/permalink.ts
 var PERMALINK_BUTTON_ID = "permalink-button";
 var PERMALINK_TEXT_ID = "permalink-text";
-var view5 = ({ state }, _ctx, _raise) => {
+var view3 = ({ state }, _ctx, _raise) => {
   const permalinkButton = document.getElementById(PERMALINK_BUTTON_ID);
   if (permalinkButton) {
     permalinkButton.onclick = () => populatePermalinkText(state);
@@ -11699,8 +11905,8 @@ function updateStateFromQuerystring(existingState) {
 }
 
 // src/view/scale-family.ts
-var import_d37 = __toESM(require_d3(), 1);
-var view6 = (_, ctx, raise) => {
+var import_d36 = __toESM(require_d3(), 1);
+var view4 = (_, ctx, raise) => {
   function raiseScaleFamilyChangedEvent(scaleFamily2) {
     raise({
       id: "ScaleFamilyChange",
@@ -11708,7 +11914,7 @@ var view6 = (_, ctx, raise) => {
     });
   }
   if (ctx.init) {
-    import_d37.default.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseScaleFamilyChangedEvent).text((x) => x.name);
+    import_d36.default.select("#scale-dropdown").selectAll("div").data(scaleFamily).enter().append("div").attr("class", "dropdown-content-item").on("click", raiseScaleFamilyChangedEvent).text((x) => x.name);
   }
 };
 
@@ -11719,7 +11925,7 @@ var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
 var FB_NT_NONE_ID = "fb-note-text-None";
 var FB_NT_NAME_ID = "fb-note-text-NoteName";
 var FB_NT_INT_ID = "fb-note-text-Interval";
-var view7 = ({ state }, ctx, raise) => {
+var view5 = ({ state }, ctx, raise) => {
   const setCheckbox = (id, checked) => {
     const checkbox = document.getElementById(id);
     if (checkbox === null) {
@@ -14598,11 +14804,11 @@ var $ZodDate = /* @__PURE__ */ $constructor("$ZodDate", (inst, def) => {
     return payload;
   };
 });
-function handleArrayResult(result, final, index2) {
+function handleArrayResult(result, final, index) {
   if (result.issues.length) {
-    final.issues.push(...prefixIssues(index2, result.issues));
+    final.issues.push(...prefixIssues(index, result.issues));
   }
-  final.value[index2] = result.value;
+  final.value[index] = result.value;
 }
 var $ZodArray = /* @__PURE__ */ $constructor("$ZodArray", (inst, def) => {
   $ZodType.init(inst, def);
@@ -15093,14 +15299,14 @@ function mergeValues(a, b) {
       return { valid: false, mergeErrorPath: [] };
     }
     const newArray = [];
-    for (let index2 = 0;index2 < a.length; index2++) {
-      const itemA = a[index2];
-      const itemB = b[index2];
+    for (let index = 0;index < a.length; index++) {
+      const itemA = a[index];
+      const itemB = b[index];
       const sharedValue = mergeValues(itemA, itemB);
       if (!sharedValue.valid) {
         return {
           valid: false,
-          mergeErrorPath: [index2, ...sharedValue.mergeErrorPath]
+          mergeErrorPath: [index, ...sharedValue.mergeErrorPath]
         };
       }
       newArray.push(sharedValue.data);
@@ -15216,11 +15422,11 @@ var $ZodTuple = /* @__PURE__ */ $constructor("$ZodTuple", (inst, def) => {
     return payload;
   };
 });
-function handleTupleResult(result, final, index2) {
+function handleTupleResult(result, final, index) {
   if (result.issues.length) {
-    final.issues.push(...prefixIssues(index2, result.issues));
+    final.issues.push(...prefixIssues(index, result.issues));
   }
-  final.value[index2] = result.value;
+  final.value[index] = result.value;
 }
 var $ZodRecord = /* @__PURE__ */ $constructor("$ZodRecord", (inst, def) => {
   $ZodType.init(inst, def);
@@ -25312,7 +25518,7 @@ var StateSchema = exports_external.object({
 
 // src/view/storage.ts
 var STORAGE_KEY = "app_state";
-var view8 = ({ state }, _ctx, _raise) => {
+var view6 = ({ state }, _ctx, _raise) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
@@ -25333,25 +25539,46 @@ var getStateFromLocalStorage = () => {
 };
 
 // src/view/tonics.ts
-var import_d38 = __toESM(require_d3(), 1);
-var view9 = (model, ctx, raise) => {
-  if (ctx.init) {
-    const pad2 = 5;
-    const buttonHeight = 25;
-    const svg = import_d38.default.select("#modes");
-    const tonics = svg.append("g");
-    const gs = tonics.selectAll("g").data(naturals).enter().append("g").attr("transform", (_d, i) => `translate(0, ${i * (buttonHeight + pad2) + pad2})`).selectAll("g").data((d) => bg(d), indexer3).enter().append("g").attr("transform", (_d, i) => `translate(${i * 55}, 0)`);
-    buttons3 = gs.append("rect").attr("x", pad2).attr("y", 0).attr("strokeWidth", 2).attr("width", 40).attr("height", 25).attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button").on("click", (d) => raise({ id: "TonicChanged", noteSpec: d.noteSpec }));
-    gs.append("text").attr("x", pad2 + 10).attr("y", 17).text((x) => x.noteSpec.label).attr("class", "tonic-text");
-  }
-  const ds = [
-    {
-      noteSpec: createNoteSpec(model.state.naturalIndex, model.state.index)
-    }
-  ];
-  buttons3.data(ds, indexer3).attr("class", "tonic-button tonic-button-selected").exit().attr("class", (d) => isSameNoteAsNatural(d.noteSpec) ? "tonic-button tonic-button-grey" : "tonic-button");
-};
-var buttons3;
+var import_d37 = __toESM(require_d3(), 1);
+function tonicsNodes(model, raise) {
+  const pad2 = 5;
+  const buttonHeight = 25;
+  const selectedNoteSpec = createNoteSpec(model.state.naturalIndex, model.state.index);
+  const children = naturals.map((natural, i) => ({
+    type: "g",
+    transform: `translate(0, ${i * (buttonHeight + pad2) + pad2})`,
+    children: bg(natural).map((data, j) => ({
+      type: "g",
+      transform: `translate(${j * 55}, 0)`,
+      children: [
+        {
+          type: "rect",
+          x: pad2,
+          y: 0,
+          width: 40,
+          height: buttonHeight,
+          class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
+          onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec })
+        },
+        {
+          type: "text",
+          x: pad2 + 10,
+          y: 17,
+          class: "tonic-text",
+          content: data.noteSpec.label
+        }
+      ]
+    }))
+  }));
+  return [{ type: "g", children }];
+}
+function tonicButtonClass(noteSpec, selectedNoteSpec) {
+  if (noteSpec.label === selectedNoteSpec.label)
+    return "tonic-button tonic-button-selected";
+  if (isSameNoteAsNatural(noteSpec))
+    return "tonic-button tonic-button-grey";
+  return "tonic-button";
+}
 function bg(natural) {
   const flatIndex = natural.index === 0 ? 11 : natural.index - 1;
   const sharpIndex = (natural.index + 1) % 12;
@@ -25361,37 +25588,42 @@ function bg(natural) {
     { noteSpec: createNoteSpec(natural.index, sharpIndex) }
   ];
 }
-function indexer3(d) {
-  return d.noteSpec.label;
-}
 function isSameNoteAsNatural(noteSpec) {
   return naturals.some((x) => x.index === noteSpec.index && x.index !== noteSpec.natural.index);
 }
 
 // src/view/index.ts
+var modesPanelView = (model, raise) => [
+  ...tonicsNodes(model, raise),
+  ...chordIntervalNodes(model, raise),
+  ...modesNodes(model, raise)
+];
+var svgViews = [
+  { containerId: "modes", view: modesPanelView },
+  { containerId: "chromatic", view: circleNodes(chromatic(), "Chromatic", 500) },
+  { containerId: "cof", view: circleNodes(fifths(), "Circle of Fifths", 500) },
+  { containerId: "gtr", view: guitarNodes }
+];
 var createViews = () => {
-  const chromaticView = create("#chromatic", chromatic(), "Chromatic");
-  const cofView = create("#cof", fifths(), "Circle of Fifths");
-  const guitarView = create2();
-  const modalView = create3();
+  const modalView = create();
   const views = [
-    view3,
-    view9,
-    view4,
-    view,
     view2,
-    chromaticView,
-    cofView,
-    guitarView,
-    view6,
-    view7,
-    view8,
+    view,
+    view4,
     view5,
+    view6,
+    view3,
     modalView
   ];
   return (model, ctx, raise) => {
-    for (const view10 of views) {
-      view10(model, ctx, raise);
+    for (const view7 of views) {
+      view7(model, ctx, raise);
+    }
+    for (const { containerId, view: view7 } of svgViews) {
+      const container = document.getElementById(containerId);
+      if (container) {
+        renderToSvg(container, view7(model, raise));
+      }
     }
   };
 };
@@ -25424,15 +25656,15 @@ var initModel = () => {
 };
 var main = () => {
   let model = initModel();
-  const view10 = createViews();
+  const view7 = createViews();
   const raise = (msg) => {
     model = update(model, msg);
-    view10(model, { init: false }, raise);
+    view7(model, { init: false }, raise);
   };
-  view10(model, { init: true }, raise);
+  view7(model, { init: true }, raise);
   setWakeLock();
 };
 main();
 
-//# debugId=5EB0AC6BFE1A636364756E2164756E21
+//# debugId=6690444CC40F0ACB64756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { RenderNode } from "./ui";
 
 // Elm inspired architectural types
 
@@ -9,6 +10,8 @@ export type ViewContext = {
 };
 
 export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: (msg: TMsg) => void) => TSvg;
+
+export type SvgView<TModel, TMsg> = (model: TModel, raise: (msg: TMsg) => void) => RenderNode[];
 
 // State
 
