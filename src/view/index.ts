@@ -3,25 +3,29 @@ import type { Model } from "../model";
 import * as music from "../music";
 import type { Svg, SvgView, View, ViewContext } from "../types";
 import { renderToSvg } from "../ui";
-import { view as chordIntervalView } from "./chord-interval";
+import { chordIntervalNodes } from "./chord-interval";
 import { create as createCircle } from "./circle";
 import { create as createGuitar } from "./guitar";
 import { view as menuView } from "./menu";
 import { create as createModal } from "./modal";
-import { view as modesView } from "./modes";
+import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
 import { view as scaleFamilyView } from "./scale-family";
 import { view as settingsView } from "./settings";
 import { view as storageView } from "./storage";
-import { view as tonicsView } from "./tonics";
+import { tonicsNodes } from "./tonics";
 import { view as tuningView } from "./tuning";
 
 export { updateStateFromQuerystring } from "./permalink";
 export { getStateFromLocalStorage } from "./storage";
 
-// SVG views ported to the new render model are registered here alongside their
-// container element IDs. Populated incrementally as Phase 3 progresses.
-const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [];
+const modesPanelView: SvgView<Model, Msg> = (model, raise) => [
+    ...tonicsNodes(model, raise),
+    ...chordIntervalNodes(model, raise),
+    ...modesNodes(model, raise),
+];
+
+const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [{ containerId: "modes", view: modesPanelView }];
 
 export const createViews = (): View<Model, Msg, Svg> => {
     const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
@@ -31,9 +35,6 @@ export const createViews = (): View<Model, Msg, Svg> => {
 
     const views: View<Model, Msg, Svg>[] = [
         menuView,
-        tonicsView,
-        modesView,
-        chordIntervalView,
         tuningView,
         chromaticView,
         cofView,

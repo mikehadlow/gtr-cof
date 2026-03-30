@@ -3,6 +3,7 @@ import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
 import type { Svg, View, ViewContext } from "../types";
+import type { RenderNode } from "../ui";
 
 export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     if (ctx.init) {
@@ -54,6 +55,47 @@ export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, rais
 };
 
 let buttons: d3.Selection<ButtonData>;
+
+export function tonicsNodes(model: Model, raise: (msg: Msg) => void): RenderNode[] {
+    const pad = 5;
+    const buttonHeight = 25;
+    const selectedNoteSpec = music.createNoteSpec(model.state.naturalIndex, model.state.index);
+
+    const children: RenderNode[] = music.naturals.map((natural, i) => ({
+        type: "g" as const,
+        transform: `translate(0, ${i * (buttonHeight + pad) + pad})`,
+        children: bg(natural).map((data, j) => ({
+            type: "g" as const,
+            transform: `translate(${j * 55}, 0)`,
+            children: [
+                {
+                    type: "rect" as const,
+                    x: pad,
+                    y: 0,
+                    width: 40,
+                    height: buttonHeight,
+                    class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
+                    onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec }),
+                },
+                {
+                    type: "text" as const,
+                    x: pad + 10,
+                    y: 17,
+                    class: "tonic-text",
+                    content: data.noteSpec.label,
+                },
+            ],
+        })),
+    }));
+
+    return [{ type: "g", children }];
+}
+
+function tonicButtonClass(noteSpec: music.NoteSpec, selectedNoteSpec: music.NoteSpec): string {
+    if (noteSpec.label === selectedNoteSpec.label) return "tonic-button tonic-button-selected";
+    if (isSameNoteAsNatural(noteSpec)) return "tonic-button tonic-button-grey";
+    return "tonic-button";
+}
 
 type ButtonData = {
     readonly noteSpec: music.NoteSpec;
