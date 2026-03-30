@@ -74,16 +74,16 @@ Registered in `svgViews`:
 ```
 svgWidth=500 is the `width` attribute on both `#chromatic` and `#cof` SVG elements in `docs/index.html`.
 
-### ⬜ Phase 3e — `src/view/guitar.ts`
-Not done.
+### ✅ Phase 3e — `src/view/guitar.ts`
+Done. `guitarNodes(model, raise): RenderNode[]` exported as `SvgView<Model, Msg>`.
+Old D3 `create` export still present but no longer called.
+Tests: `src/view/guitar.test.ts` (37 tests, pure data — no DOM needed).
 
-Migration steps:
-- Remove `fretboardStateHasChanged()` check — reconciler handles this.
-- Handedness flip: emit a `'g'` node with `transform="translate(1200,0) scale(-1,1)"` or `"translate(0,0) scale(1,1)"`.
-- Text label flip: `transform` attribute on each `'text'` node.
-- Remove `fretboardElement.transform.baseVal` manipulation (SVG DOM hack).
-- Return all fret/dot/string/note nodes on each render.
-- Register as `{ containerId: "gtr", view: guitarView }` in `svgViews`.
+Registered in `svgViews`:
+```typescript
+{ containerId: "gtr", view: guitarNodes },
+```
+Old `guitarView` removed from `views[]`.
 
 ---
 
@@ -142,7 +142,7 @@ After all views are ported:
 | `src/view/modes.ts` | ✅ | `modesNodes` done |
 | `src/view/tonics.ts` | ✅ | `tonicsNodes` done |
 | `src/view/circle.ts` | ✅ | `circleNodes` done; D3 removed |
-| `src/view/guitar.ts` | ⬜ | Port to return RenderNode[]; replace D3 transforms |
+| `src/view/guitar.ts` | ✅ | `guitarNodes` done; D3 `create` export dead |
 | `package.json` | ⬜ | Remove d3 dependency |
 
 ## Test Files
@@ -153,6 +153,7 @@ After all views are ported:
 | `src/ui/reconciler.test.ts` | `renderToSvg`, `createElement` all 7 node types (18 tests) |
 | `src/view/modes-panel.test.ts` | `chordIntervalNodes`, `modesNodes`, `tonicsNodes` (25 tests) |
 | `src/view/circle.test.ts` | `circleNodes` structure, classes, click handlers, rotation (30 tests) |
+| `src/view/guitar.test.ts` | `guitarNodes` structure, fret geometry, note styling, click handlers, handedness, nut flip, labels, settings icon (37 tests) |
 
 ## Reusable Utilities to Carry Forward
 
