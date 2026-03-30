@@ -155,6 +155,29 @@ export const icons = {
     gear: "#icon-gear",
 } as const;
 
+export function settingsIconNodes(svgWidth: number, onClick: () => void): RenderNode[] {
+    const size = 25;
+    const gearX = svgWidth - 30;
+    const gearY = 0;
+    return [
+        {
+            type: "g",
+            children: [
+                { type: "rect", x: gearX, y: gearY, width: size, height: size, fill: "transparent", onClick },
+                {
+                    type: "use",
+                    href: icons.gear,
+                    x: gearX,
+                    y: gearY,
+                    width: size,
+                    height: size,
+                    style: { fill: "none", stroke: "black", "pointer-events": "none" },
+                },
+            ],
+        },
+    ];
+}
+
 export const appendSettingsIcon = (svg: d3.Selection<any>, onClick: () => void): void => {
     const gearX = parseInt(svg.attr("width"), 10) - 30;
     const gearY = 0;

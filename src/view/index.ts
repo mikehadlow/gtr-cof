@@ -4,7 +4,7 @@ import * as music from "../music";
 import type { Svg, SvgView, View, ViewContext } from "../types";
 import { renderToSvg } from "../ui";
 import { chordIntervalNodes } from "./chord-interval";
-import { create as createCircle } from "./circle";
+import { circleNodes } from "./circle";
 import { create as createGuitar } from "./guitar";
 import { view as menuView } from "./menu";
 import { create as createModal } from "./modal";
@@ -25,19 +25,19 @@ const modesPanelView: SvgView<Model, Msg> = (model, raise) => [
     ...modesNodes(model, raise),
 ];
 
-const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [{ containerId: "modes", view: modesPanelView }];
+const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
+    { containerId: "modes", view: modesPanelView },
+    { containerId: "chromatic", view: circleNodes(music.chromatic(), "Chromatic", 500) },
+    { containerId: "cof", view: circleNodes(music.fifths(), "Circle of Fifths", 500) },
+];
 
 export const createViews = (): View<Model, Msg, Svg> => {
-    const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
-    const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
     const guitarView = createGuitar();
     const modalView = createModal();
 
     const views: View<Model, Msg, Svg>[] = [
         menuView,
         tuningView,
-        chromaticView,
-        cofView,
         guitarView,
         scaleFamilyView,
         settingsView,
