@@ -1,9 +1,10 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+
 GlobalRegistrator.register();
 
 import { describe, expect, test } from "bun:test";
-import { renderToSvg } from "./index";
 import type { RenderNode } from "./index";
+import { renderToSvg } from "./index";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -67,11 +68,19 @@ describe("createElement — circle", () => {
 
     test("sets optional class, fill, stroke, strokeWidth, pointerEvents", () => {
         const svg = makeSvg();
-        renderToSvg(svg, [{
-            type: "circle", cx: 0, cy: 0, r: 5,
-            class: "note-segment", fill: "red", stroke: "black",
-            strokeWidth: 2, pointerEvents: "none",
-        }]);
+        renderToSvg(svg, [
+            {
+                type: "circle",
+                cx: 0,
+                cy: 0,
+                r: 5,
+                class: "note-segment",
+                fill: "red",
+                stroke: "black",
+                strokeWidth: 2,
+                pointerEvents: "none",
+            },
+        ]);
         const el = svg.childNodes[0] as Element;
         expect(el.getAttribute("class")).toBe("note-segment");
         expect(el.getAttribute("fill")).toBe("red");
@@ -83,7 +92,17 @@ describe("createElement — circle", () => {
     test("attaches onClick via addEventListener", () => {
         const svg = makeSvg();
         let clicked = false;
-        renderToSvg(svg, [{ type: "circle", cx: 0, cy: 0, r: 5, onClick: () => { clicked = true; } }]);
+        renderToSvg(svg, [
+            {
+                type: "circle",
+                cx: 0,
+                cy: 0,
+                r: 5,
+                onClick: () => {
+                    clicked = true;
+                },
+            },
+        ]);
         const el = svg.childNodes[0] as Element;
         el.dispatchEvent(new Event("click"));
         expect(clicked).toBe(true);
@@ -105,7 +124,18 @@ describe("createElement — rect", () => {
     test("attaches onClick", () => {
         const svg = makeSvg();
         let clicked = false;
-        renderToSvg(svg, [{ type: "rect", x: 0, y: 0, width: 10, height: 10, onClick: () => { clicked = true; } }]);
+        renderToSvg(svg, [
+            {
+                type: "rect",
+                x: 0,
+                y: 0,
+                width: 10,
+                height: 10,
+                onClick: () => {
+                    clicked = true;
+                },
+            },
+        ]);
         (svg.childNodes[0] as Element).dispatchEvent(new Event("click"));
         expect(clicked).toBe(true);
     });
@@ -124,7 +154,15 @@ describe("createElement — path", () => {
     test("attaches onClick", () => {
         const svg = makeSvg();
         let clicked = false;
-        renderToSvg(svg, [{ type: "path", d: "M 0,0", onClick: () => { clicked = true; } }]);
+        renderToSvg(svg, [
+            {
+                type: "path",
+                d: "M 0,0",
+                onClick: () => {
+                    clicked = true;
+                },
+            },
+        ]);
         (svg.childNodes[0] as Element).dispatchEvent(new Event("click"));
         expect(clicked).toBe(true);
     });
@@ -133,10 +171,17 @@ describe("createElement — path", () => {
 describe("createElement — text", () => {
     test("sets x, y, textContent, textAnchor, class, transform", () => {
         const svg = makeSvg();
-        renderToSvg(svg, [{
-            type: "text", x: 5, y: 10, content: "C#",
-            class: "note-label", textAnchor: "middle", transform: "rotate(45)",
-        }]);
+        renderToSvg(svg, [
+            {
+                type: "text",
+                x: 5,
+                y: 10,
+                content: "C#",
+                class: "note-label",
+                textAnchor: "middle",
+                transform: "rotate(45)",
+            },
+        ]);
         const el = svg.childNodes[0] as Element;
         expect(el.tagName.toLowerCase()).toBe("text");
         expect(el.getAttribute("x")).toBe("5");
@@ -178,10 +223,17 @@ describe("createElement — use", () => {
 
     test("applies style entries", () => {
         const svg = makeSvg();
-        renderToSvg(svg, [{
-            type: "use", href: "#icon", x: 0, y: 0, width: 10, height: 10,
-            style: { fill: "none", stroke: "black" },
-        }]);
+        renderToSvg(svg, [
+            {
+                type: "use",
+                href: "#icon",
+                x: 0,
+                y: 0,
+                width: 10,
+                height: 10,
+                style: { fill: "none", stroke: "black" },
+            },
+        ]);
         const el = svg.childNodes[0] as HTMLElement;
         expect(el.style.fill).toBe("none");
         expect(el.style.stroke).toBe("black");
@@ -199,12 +251,15 @@ describe("createElement — g", () => {
 
     test("recurses into children", () => {
         const svg = makeSvg();
-        renderToSvg(svg, [{
-            type: "g", children: [
-                { type: "circle", cx: 1, cy: 2, r: 3 },
-                { type: "text", x: 0, y: 0, content: "A" },
-            ],
-        }]);
+        renderToSvg(svg, [
+            {
+                type: "g",
+                children: [
+                    { type: "circle", cx: 1, cy: 2, r: 3 },
+                    { type: "text", x: 0, y: 0, content: "A" },
+                ],
+            },
+        ]);
         const g = svg.childNodes[0] as Element;
         expect(g.childNodes.length).toBe(2);
         expect((g.childNodes[0] as Element).tagName.toLowerCase()).toBe("circle");
@@ -213,13 +268,17 @@ describe("createElement — g", () => {
 
     test("nests arbitrarily deep", () => {
         const svg = makeSvg();
-        renderToSvg(svg, [{
-            type: "g", children: [{
-                type: "g", children: [
-                    { type: "circle", cx: 0, cy: 0, r: 5 },
+        renderToSvg(svg, [
+            {
+                type: "g",
+                children: [
+                    {
+                        type: "g",
+                        children: [{ type: "circle", cx: 0, cy: 0, r: 5 }],
+                    },
                 ],
-            }],
-        }]);
+            },
+        ]);
         const outer = svg.childNodes[0] as Element;
         const inner = outer.childNodes[0] as Element;
         const circle = inner.childNodes[0] as Element;

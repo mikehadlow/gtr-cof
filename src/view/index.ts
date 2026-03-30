@@ -24,42 +24,36 @@ export { getStateFromLocalStorage } from "./storage";
 const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [];
 
 export const createViews = (): View<Model, Msg, Svg> => {
-  const chromaticView = createCircle(
-    "#chromatic",
-    music.chromatic(),
-    "Chromatic",
-  );
-  const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
-  const guitarView = createGuitar();
-  const modalView = createModal();
+    const chromaticView = createCircle("#chromatic", music.chromatic(), "Chromatic");
+    const cofView = createCircle("#cof", music.fifths(), "Circle of Fifths");
+    const guitarView = createGuitar();
+    const modalView = createModal();
 
-  const views: View<Model, Msg, Svg>[] = [
-    menuView,
-    tonicsView,
-    modesView,
-    chordIntervalView,
-    tuningView,
-    chromaticView,
-    cofView,
-    guitarView,
-    scaleFamilyView,
-    settingsView,
-    storageView,
-    permalinkView,
-    modalView,
-  ];
+    const views: View<Model, Msg, Svg>[] = [
+        menuView,
+        tonicsView,
+        modesView,
+        chordIntervalView,
+        tuningView,
+        chromaticView,
+        cofView,
+        guitarView,
+        scaleFamilyView,
+        settingsView,
+        storageView,
+        permalinkView,
+        modalView,
+    ];
 
-  return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
-    for (const view of views) {
-      view(model, ctx, raise);
-    }
-    for (const { containerId, view } of svgViews) {
-      const container = document.getElementById(
-        containerId,
-      ) as SVGElement | null;
-      if (container) {
-        renderToSvg(container, view(model, raise));
-      }
-    }
-  };
+    return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+        for (const view of views) {
+            view(model, ctx, raise);
+        }
+        for (const { containerId, view } of svgViews) {
+            const container = document.getElementById(containerId) as SVGElement | null;
+            if (container) {
+                renderToSvg(container, view(model, raise));
+            }
+        }
+    };
 };
