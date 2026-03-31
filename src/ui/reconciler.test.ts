@@ -4,7 +4,7 @@ GlobalRegistrator.register();
 
 import { describe, expect, test } from "bun:test";
 import type { RenderNode } from "./index";
-import { renderToHtml, renderToSvg } from "./index";
+import { renderToSvg } from "./index";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -286,7 +286,7 @@ describe("createElement — g", () => {
     });
 });
 
-describe("renderToHtml", () => {
+describe("renderToSvg for HTML", () => {
     function makeDiv(): HTMLElement {
         return document.createElement("div");
     }
@@ -296,7 +296,7 @@ describe("renderToHtml", () => {
         container.appendChild(document.createElement("div"));
         container.appendChild(document.createElement("div"));
 
-        renderToHtml(container, []);
+        renderToSvg(container, []);
 
         expect(container.childNodes.length).toBe(0);
     });
@@ -308,15 +308,15 @@ describe("renderToHtml", () => {
             { type: "div", textContent: "B" },
         ];
 
-        renderToHtml(container, nodes);
+        renderToSvg(container, nodes);
 
         expect(container.childNodes.length).toBe(2);
     });
 
     test("re-render clears old children and adds new ones", () => {
         const container = makeDiv();
-        renderToHtml(container, [{ type: "div", textContent: "old" }]);
-        renderToHtml(container, [
+        renderToSvg(container, [{ type: "div", textContent: "old" }]);
+        renderToSvg(container, [
             { type: "div", textContent: "new1" },
             { type: "div", textContent: "new2" },
         ]);
@@ -327,14 +327,14 @@ describe("renderToHtml", () => {
 
     test("sets class attribute", () => {
         const container = makeDiv();
-        renderToHtml(container, [{ type: "div", class: "dropdown-content-item" }]);
+        renderToSvg(container, [{ type: "div", class: "dropdown-content-item" }]);
         const el = container.childNodes[0] as HTMLElement;
         expect(el.getAttribute("class")).toBe("dropdown-content-item");
     });
 
     test("sets textContent", () => {
         const container = makeDiv();
-        renderToHtml(container, [{ type: "div", textContent: "Guitar Standard" }]);
+        renderToSvg(container, [{ type: "div", textContent: "Guitar Standard" }]);
         const el = container.childNodes[0] as HTMLElement;
         expect(el.textContent).toBe("Guitar Standard");
     });
@@ -342,7 +342,7 @@ describe("renderToHtml", () => {
     test("attaches click handler", () => {
         const container = makeDiv();
         let clicked = false;
-        renderToHtml(container, [
+        renderToSvg(container, [
             {
                 type: "div",
                 onClick: () => {
@@ -357,7 +357,7 @@ describe("renderToHtml", () => {
 
     test("renders nested children", () => {
         const container = makeDiv();
-        renderToHtml(container, [
+        renderToSvg(container, [
             {
                 type: "div",
                 children: [
@@ -370,10 +370,5 @@ describe("renderToHtml", () => {
         expect(parent.childNodes.length).toBe(2);
         expect((parent.childNodes[0] as HTMLElement).textContent).toBe("child1");
         expect((parent.childNodes[1] as HTMLElement).textContent).toBe("child2");
-    });
-
-    test("throws when passing non-div node", () => {
-        const container = makeDiv();
-        expect(() => renderToHtml(container, [{ type: "circle", cx: 0, cy: 0, r: 5 }])).toThrow();
     });
 });

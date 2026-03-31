@@ -2,7 +2,7 @@ import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
 import type { Svg, SvgView, View, ViewContext } from "../types";
-import { renderToHtml, renderToSvg } from "../ui";
+import { renderToSvg } from "../ui";
 import { chordIntervalNodes } from "./chord-interval";
 import { circleNodes } from "./circle";
 import { guitarNodes } from "./guitar";
@@ -30,9 +30,6 @@ const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "chromatic", view: circleNodes(music.chromatic(), "Chromatic", 500) },
     { containerId: "cof", view: circleNodes(music.fifths(), "Circle of Fifths", 500) },
     { containerId: "gtr", view: guitarNodes },
-];
-
-const htmlViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "scale-dropdown", view: scaleFamilyNodes },
     { containerId: "tuning-dropdown", view: tuningNodes },
 ];
@@ -47,15 +44,9 @@ export const createViews = (): View<Model, Msg, Svg> => {
             view(model, ctx, raise);
         }
         for (const { containerId, view } of svgViews) {
-            const container = document.getElementById(containerId) as SVGElement | null;
+            const container = document.getElementById(containerId) as Element | null;
             if (container) {
                 renderToSvg(container, view(model, raise));
-            }
-        }
-        for (const { containerId, view } of htmlViews) {
-            const container = document.getElementById(containerId) as HTMLElement | null;
-            if (container) {
-                renderToHtml(container, view(model, raise));
             }
         }
     };

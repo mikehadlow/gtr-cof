@@ -66,7 +66,7 @@ export function arcCentroid(innerR: number, outerR: number, startAngle: number, 
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-export function renderToSvg(container: SVGElement, nodes: RenderNode[]): void {
+export function renderToSvg(container: Element, nodes: RenderNode[]): void {
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
@@ -75,36 +75,7 @@ export function renderToSvg(container: SVGElement, nodes: RenderNode[]): void {
     }
 }
 
-export function renderToHtml(container: HTMLElement, nodes: RenderNode[]): void {
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-    for (const node of nodes) {
-        container.appendChild(createHtmlElement(node));
-    }
-}
-
-function createHtmlElement(node: RenderNode): HTMLElement {
-    if (node.type !== "div") {
-        throw new Error(`createHtmlElement: unsupported type "${node.type}"`);
-    }
-    const el = document.createElement("div");
-    if (node.class) {
-        el.setAttribute("class", node.class);
-    }
-    if (node.textContent) {
-        el.textContent = node.textContent;
-    }
-    if (node.onClick) {
-        el.addEventListener("click", node.onClick);
-    }
-    for (const child of node.children ?? []) {
-        el.appendChild(createHtmlElement(child));
-    }
-    return el;
-}
-
-function createElement(node: RenderNode): SVGElement {
+function createElement(node: RenderNode): Element {
     switch (node.type) {
         case "g": {
             const el = document.createElementNS(SVG_NS, "g");
@@ -219,8 +190,26 @@ function createElement(node: RenderNode): SVGElement {
             }
             return el;
         }
-        case "div":
-            throw new Error("createElement: use createHtmlElement for div nodes");
+        case "div": {
+            const el = document.createElement("div");
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
+            if (node.textContent) {
+                el.textContent = node.textContent;
+            }
+            if (node.onClick) {
+                el.addEventListener("click", node.onClick);
+            }
+            for (const child of node.children ?? []) {
+                el.appendChild(createElement(child));
+            }
+            return el;
+        }
+        default: {
+            const _exhaustiveCheck: never = node;
+            return _exhaustiveCheck;
+        }
     }
 }
 
