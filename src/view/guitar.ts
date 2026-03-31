@@ -26,7 +26,9 @@ function noteX(i: number): number {
 }
 
 function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
-    if (sn.node.toggle) return "white";
+    if (sn.node.toggle) {
+        return "white";
+    }
     if (sn.node.scaleNote.isScaleNote) {
         if (sn.node.scaleNote.noteNumber === 0) {
             return hasToggledNotes ? "white" : "yellow";
@@ -37,23 +39,39 @@ function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
 }
 
 function noteStroke(sn: StringNote, hasToggledNotes: boolean): string {
-    if (sn.node.midiToggle) return "OrangeRed";
-    if (sn.node.toggle) return `#${sn.node.chordInterval.colour.toString(16).padStart(6, "0")}`;
-    if (hasToggledNotes) return "none";
-    if (sn.node.scaleNote.isScaleNote) return "grey";
+    if (sn.node.midiToggle) {
+        return "OrangeRed";
+    }
+    if (sn.node.toggle) {
+        return `#${sn.node.chordInterval.colour.toString(16).padStart(6, "0")}`;
+    }
+    if (hasToggledNotes) {
+        return "none";
+    }
+    if (sn.node.scaleNote.isScaleNote) {
+        return "grey";
+    }
     return "none";
 }
 
 function noteStrokeWidth(sn: StringNote): number {
-    if (sn.node.midiToggle) return 10;
-    if (sn.node.toggle) return 4;
-    if (sn.node.scaleNote.isScaleNote) return 2;
+    if (sn.node.midiToggle) {
+        return 10;
+    }
+    if (sn.node.toggle) {
+        return 4;
+    }
+    if (sn.node.scaleNote.isScaleNote) {
+        return 2;
+    }
     return 0;
 }
 
 function labelText(sn: StringNote, labelType: FretboardLabelType): string {
     const visible = sn.node.scaleNote.isScaleNote || sn.node.toggle;
-    if (!visible) return "";
+    if (!visible) {
+        return "";
+    }
     switch (labelType) {
         case "None":
             return "";

@@ -34,7 +34,8 @@
             },
             "style": {
                 "noParameterAssign": "off",
-                "noNonNullAssertion": "off"
+                "noNonNullAssertion": "off",
+                "useBlockStatements": "error"
             }
         }
     },

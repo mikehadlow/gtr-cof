@@ -12,8 +12,12 @@ const std = tuning.tunings[0]; // EADGBE, 6 strings
 function collect<T extends RenderNode["type"]>(type: T, nodes: RenderNode[]): Extract<RenderNode, { type: T }>[] {
     const result: Extract<RenderNode, { type: T }>[] = [];
     for (const node of nodes) {
-        if (node.type === type) result.push(node as Extract<RenderNode, { type: T }>);
-        if (node.type === "g") result.push(...collect(type, node.children));
+        if (node.type === type) {
+            result.push(node as Extract<RenderNode, { type: T }>);
+        }
+        if (node.type === "g") {
+            result.push(...collect(type, node.children));
+        }
     }
     return result;
 }
@@ -21,7 +25,9 @@ function collect<T extends RenderNode["type"]>(type: T, nodes: RenderNode[]): Ex
 // Helper to get the fretboard group (last top-level node)
 function getFretboard(nodes: RenderNode[]) {
     const fb = nodes[nodes.length - 1];
-    if (fb.type !== "g") throw new Error("expected fretboard to be a g node");
+    if (fb.type !== "g") {
+        throw new Error("expected fretboard to be a g node");
+    }
     return fb;
 }
 
@@ -36,14 +42,18 @@ describe("guitarNodes - structure", () => {
 
     test("first node is title text with class mode-text", () => {
         expect(nodes[0].type).toBe("text");
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].class).toBe("mode-text");
         expect(nodes[0].x).toBe(30);
         expect(nodes[0].y).toBe(11);
     });
 
     test("title contains tuning string and description", () => {
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].content).toContain(std.tuning);
         expect(nodes[0].content).toContain(std.description);
     });
@@ -64,24 +74,34 @@ describe("guitarNodes - structure", () => {
     test("frets group (index 0) has 16 rect children", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
-        if (fretsGroup.type !== "g") throw new Error();
+        if (fretsGroup.type !== "g") {
+            throw new Error();
+        }
         expect(fretsGroup.children).toHaveLength(16);
-        for (const c of fretsGroup.children) expect(c.type).toBe("rect");
+        for (const c of fretsGroup.children) {
+            expect(c.type).toBe("rect");
+        }
     });
 
     test("dots group (index 1) has correct dot count", () => {
         const fb = getFretboard(nodes);
         const dotsGroup = fb.children[1];
-        if (dotsGroup.type !== "g") throw new Error();
+        if (dotsGroup.type !== "g") {
+            throw new Error();
+        }
         expect(dotsGroup.children).toHaveLength(std.dots.length);
-        for (const c of dotsGroup.children) expect(c.type).toBe("circle");
+        for (const c of dotsGroup.children) {
+            expect(c.type).toBe("circle");
+        }
     });
 
     test("each string group has 1 line + 16 circles + 16 texts = 33 children", () => {
         const fb = getFretboard(nodes);
         for (let si = 0; si < std.notes.length; si++) {
             const strGroup = fb.children[2 + si];
-            if (strGroup.type !== "g") throw new Error();
+            if (strGroup.type !== "g") {
+                throw new Error();
+            }
             expect(strGroup.children).toHaveLength(33);
         }
     });
@@ -90,7 +110,9 @@ describe("guitarNodes - structure", () => {
         const fb = getFretboard(nodes);
         for (let si = 0; si < std.notes.length; si++) {
             const strGroup = fb.children[2 + si];
-            if (strGroup.type !== "g") throw new Error();
+            if (strGroup.type !== "g") {
+                throw new Error();
+            }
             expect(strGroup.children[0].type).toBe("line");
         }
     });
@@ -99,7 +121,9 @@ describe("guitarNodes - structure", () => {
         const fb = getFretboard(nodes);
         for (let si = 0; si < std.notes.length; si++) {
             const strGroup = fb.children[2 + si];
-            if (strGroup.type !== "g") throw new Error();
+            if (strGroup.type !== "g") {
+                throw new Error();
+            }
             expect(strGroup.transform).toBe(`translate(0, ${si * 40 + 20})`);
         }
     });
@@ -107,10 +131,14 @@ describe("guitarNodes - structure", () => {
     test("note circles (indices 1-16 in string group) have r=15", () => {
         const fb = getFretboard(nodes);
         const strGroup = fb.children[2];
-        if (strGroup.type !== "g") throw new Error();
+        if (strGroup.type !== "g") {
+            throw new Error();
+        }
         for (let i = 1; i <= 16; i++) {
             const c = strGroup.children[i];
-            if (c.type !== "circle") throw new Error();
+            if (c.type !== "circle") {
+                throw new Error();
+            }
             expect(c.r).toBe(15);
         }
     });
@@ -118,10 +146,14 @@ describe("guitarNodes - structure", () => {
     test("note texts (indices 17-32 in string group) have text-anchor middle", () => {
         const fb = getFretboard(nodes);
         const strGroup = fb.children[2];
-        if (strGroup.type !== "g") throw new Error();
+        if (strGroup.type !== "g") {
+            throw new Error();
+        }
         for (let i = 17; i <= 32; i++) {
             const t = strGroup.children[i];
-            if (t.type !== "text") throw new Error();
+            if (t.type !== "text") {
+                throw new Error();
+            }
             expect(t.textAnchor).toBe("middle");
         }
     });
@@ -135,19 +167,27 @@ describe("guitarNodes - fret geometry", () => {
     test("first fret rect has fill black (nut)", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
-        if (fretsGroup.type !== "g") throw new Error();
+        if (fretsGroup.type !== "g") {
+            throw new Error();
+        }
         const firstRect = fretsGroup.children[0];
-        if (firstRect.type !== "rect") throw new Error();
+        if (firstRect.type !== "rect") {
+            throw new Error();
+        }
         expect(firstRect.fill).toBe("black");
     });
 
     test("remaining fret rects have fill none", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
-        if (fretsGroup.type !== "g") throw new Error();
+        if (fretsGroup.type !== "g") {
+            throw new Error();
+        }
         for (let i = 1; i < 16; i++) {
             const rect = fretsGroup.children[i];
-            if (rect.type !== "rect") throw new Error();
+            if (rect.type !== "rect") {
+                throw new Error();
+            }
             expect(rect.fill).toBe("none");
         }
     });
@@ -155,9 +195,13 @@ describe("guitarNodes - fret geometry", () => {
     test("fret rects have stroke grey and strokeWidth 1", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
-        if (fretsGroup.type !== "g") throw new Error();
+        if (fretsGroup.type !== "g") {
+            throw new Error();
+        }
         for (const c of fretsGroup.children) {
-            if (c.type !== "rect") throw new Error();
+            if (c.type !== "rect") {
+                throw new Error();
+            }
             expect(c.stroke).toBe("grey");
             expect(c.strokeWidth).toBe(1);
         }
@@ -200,9 +244,13 @@ describe("guitarNodes - click handlers", () => {
         });
         const fb = getFretboard(nodes);
         const strGroup = fb.children[2];
-        if (strGroup.type !== "g") throw new Error();
+        if (strGroup.type !== "g") {
+            throw new Error();
+        }
         const circle = strGroup.children[1];
-        if (circle.type !== "circle" || !circle.onClick) throw new Error("no onClick on circle");
+        if (circle.type !== "circle" || !circle.onClick) {
+            throw new Error("no onClick on circle");
+        }
         circle.onClick();
         expect((raised as { id: string })?.id).toBe("Toggle");
         expect((raised as { index: number })?.index).toBeDefined();
@@ -214,9 +262,13 @@ describe("guitarNodes - click handlers", () => {
             raised = msg;
         });
         const settingsG = nodes[1];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const rect = settingsG.children[0];
-        if (rect.type !== "rect" || !rect.onClick) throw new Error("no onClick on settings rect");
+        if (rect.type !== "rect" || !rect.onClick) {
+            throw new Error("no onClick on settings rect");
+        }
         rect.onClick();
         expect((raised as { id: string })?.id).toBe("ModalStateChange");
         expect((raised as { modalState: string })?.modalState).toBe("guitar-settings");
@@ -243,9 +295,13 @@ describe("guitarNodes - handedness", () => {
         const nodes = guitarNodes(model, noRaise);
         const fb = getFretboard(nodes);
         const strGroup = fb.children[2];
-        if (strGroup.type !== "g") throw new Error();
+        if (strGroup.type !== "g") {
+            throw new Error();
+        }
         const text = strGroup.children[17];
-        if (text.type !== "text") throw new Error();
+        if (text.type !== "text") {
+            throw new Error();
+        }
         expect(text.transform).toContain("scale(1, 1)");
     });
 
@@ -254,9 +310,13 @@ describe("guitarNodes - handedness", () => {
         const nodes = guitarNodes(m, noRaise);
         const fb = getFretboard(nodes);
         const strGroup = fb.children[2];
-        if (strGroup.type !== "g") throw new Error();
+        if (strGroup.type !== "g") {
+            throw new Error();
+        }
         const text = strGroup.children[17];
-        if (text.type !== "text") throw new Error();
+        if (text.type !== "text") {
+            throw new Error();
+        }
         expect(text.transform).toContain("scale(-1, 1)");
     });
 
@@ -269,23 +329,31 @@ describe("guitarNodes - handedness", () => {
         const fbLH = getFretboard(nodesLH);
         const strRH = fbRH.children[2];
         const strLH = fbLH.children[2];
-        if (strRH.type !== "g" || strLH.type !== "g") throw new Error();
+        if (strRH.type !== "g" || strLH.type !== "g") {
+            throw new Error();
+        }
         const textRH = strRH.children[17];
         const textLH = strLH.children[17];
-        if (textRH.type !== "text" || textLH.type !== "text") throw new Error();
+        if (textRH.type !== "text" || textLH.type !== "text") {
+            throw new Error();
+        }
         expect(textLH.x).toBe(-textRH.x);
     });
 
     test("right-handed title does not contain 'Left Handed'", () => {
         const nodes = guitarNodes(model, noRaise);
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].content).not.toContain("Left Handed");
     });
 
     test("left-handed title contains 'Left Handed'", () => {
         const m = updateScale({ ...defaultState, isLeftHanded: true });
         const nodes = guitarNodes(m, noRaise);
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].content).toContain("Left Handed");
     });
 });
@@ -296,13 +364,17 @@ describe("guitarNodes - nut flip", () => {
     test("nut flipped title contains 'Nut Flipped'", () => {
         const m = updateScale({ ...defaultState, isNutFlipped: true });
         const nodes = guitarNodes(m, noRaise);
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].content).toContain("Nut Flipped");
     });
 
     test("normal title does not contain 'Nut Flipped'", () => {
         const nodes = guitarNodes(model, noRaise);
-        if (nodes[0].type !== "text") throw new Error();
+        if (nodes[0].type !== "text") {
+            throw new Error();
+        }
         expect(nodes[0].content).not.toContain("Nut Flipped");
     });
 
@@ -326,11 +398,17 @@ describe("guitarNodes - nut flip", () => {
         // Second string group is at children[3] (index 2 = frets g, index 3 = second string)
         const strN = fbN.children[3];
         const strF = fbF.children[3];
-        if (strN.type !== "g" || strF.type !== "g") throw new Error();
+        if (strN.type !== "g" || strF.type !== "g") {
+            throw new Error();
+        }
         const circleN = strN.children[1];
         const circleF = strF.children[1];
-        if (circleN.type !== "circle" || circleF.type !== "circle") throw new Error();
-        if (!circleN.onClick || !circleF.onClick) throw new Error();
+        if (circleN.type !== "circle" || circleF.type !== "circle") {
+            throw new Error();
+        }
+        if (!circleN.onClick || !circleF.onClick) {
+            throw new Error();
+        }
         circleN.onClick();
         circleF.onClick();
         expect((raisedNormal as { index: number })?.index).not.toBe((raisedFlipped as { index: number })?.index);
@@ -344,7 +422,9 @@ describe("guitarNodes - labels", () => {
         const m = updateScale({ ...defaultState, fretboardLabelType: "None" });
         const nodes = guitarNodes(m, noRaise);
         const texts = collect("text", nodes).filter((t) => t.class !== "mode-text");
-        for (const t of texts) expect(t.content).toBe("");
+        for (const t of texts) {
+            expect(t.content).toBe("");
+        }
     });
 
     test("NoteName: scale notes have non-empty note name labels", () => {
@@ -381,18 +461,26 @@ describe("guitarNodes - settings icon", () => {
     test("gear rect x = svgWidth(1160) - 30 = 1130", () => {
         const nodes = guitarNodes(model, noRaise);
         const settingsG = nodes[1];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const rect = settingsG.children[0];
-        if (rect.type !== "rect") throw new Error();
+        if (rect.type !== "rect") {
+            throw new Error();
+        }
         expect(rect.x).toBe(1130);
     });
 
     test("gear use href is #icon-gear", () => {
         const nodes = guitarNodes(model, noRaise);
         const settingsG = nodes[1];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const useEl = settingsG.children[1];
-        if (useEl.type !== "use") throw new Error();
+        if (useEl.type !== "use") {
+            throw new Error();
+        }
         expect(useEl.href).toBe("#icon-gear");
     });
 });

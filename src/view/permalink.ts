@@ -44,7 +44,9 @@ export function updateStateFromQuerystring(existingState: State): State {
     try {
         for (const x of keys) {
             const value = params.get(x);
-            if (value == null) continue;
+            if (value == null) {
+                continue;
+            }
 
             switch (typeof mutableState[x]) {
                 case "boolean":

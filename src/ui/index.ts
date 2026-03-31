@@ -1,5 +1,3 @@
-import d3 from "d3";
-
 export type RenderNode =
     | { type: "g"; transform?: string; children: RenderNode[] }
     | {
@@ -68,16 +66,24 @@ export function arcCentroid(innerR: number, outerR: number, startAngle: number, 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 export function renderToSvg(container: SVGElement, nodes: RenderNode[]): void {
-    while (container.firstChild) container.removeChild(container.firstChild);
-    for (const node of nodes) container.appendChild(createElement(node));
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    for (const node of nodes) {
+        container.appendChild(createElement(node));
+    }
 }
 
 function createElement(node: RenderNode): SVGElement {
     switch (node.type) {
         case "g": {
             const el = document.createElementNS(SVG_NS, "g");
-            if (node.transform) el.setAttribute("transform", node.transform);
-            for (const child of node.children) el.appendChild(createElement(child));
+            if (node.transform) {
+                el.setAttribute("transform", node.transform);
+            }
+            for (const child of node.children) {
+                el.appendChild(createElement(child));
+            }
             return el;
         }
         case "circle": {
@@ -85,12 +91,24 @@ function createElement(node: RenderNode): SVGElement {
             el.setAttribute("cx", String(node.cx));
             el.setAttribute("cy", String(node.cy));
             el.setAttribute("r", String(node.r));
-            if (node.class) el.setAttribute("class", node.class);
-            if (node.fill) el.setAttribute("fill", node.fill);
-            if (node.stroke) el.setAttribute("stroke", node.stroke);
-            if (node.strokeWidth != null) el.setAttribute("stroke-width", String(node.strokeWidth));
-            if (node.pointerEvents) el.setAttribute("pointer-events", node.pointerEvents);
-            if (node.onClick) el.addEventListener("click", node.onClick);
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
+            if (node.fill) {
+                el.setAttribute("fill", node.fill);
+            }
+            if (node.stroke) {
+                el.setAttribute("stroke", node.stroke);
+            }
+            if (node.strokeWidth != null) {
+                el.setAttribute("stroke-width", String(node.strokeWidth));
+            }
+            if (node.pointerEvents) {
+                el.setAttribute("pointer-events", node.pointerEvents);
+            }
+            if (node.onClick) {
+                el.addEventListener("click", node.onClick);
+            }
             return el;
         }
         case "rect": {
@@ -99,27 +117,47 @@ function createElement(node: RenderNode): SVGElement {
             el.setAttribute("y", String(node.y));
             el.setAttribute("width", String(node.width));
             el.setAttribute("height", String(node.height));
-            if (node.class) el.setAttribute("class", node.class);
-            if (node.fill) el.setAttribute("fill", node.fill);
-            if (node.stroke) el.setAttribute("stroke", node.stroke);
-            if (node.strokeWidth != null) el.setAttribute("stroke-width", String(node.strokeWidth));
-            if (node.onClick) el.addEventListener("click", node.onClick);
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
+            if (node.fill) {
+                el.setAttribute("fill", node.fill);
+            }
+            if (node.stroke) {
+                el.setAttribute("stroke", node.stroke);
+            }
+            if (node.strokeWidth != null) {
+                el.setAttribute("stroke-width", String(node.strokeWidth));
+            }
+            if (node.onClick) {
+                el.addEventListener("click", node.onClick);
+            }
             return el;
         }
         case "path": {
             const el = document.createElementNS(SVG_NS, "path");
             el.setAttribute("d", node.d);
-            if (node.class) el.setAttribute("class", node.class);
-            if (node.onClick) el.addEventListener("click", node.onClick);
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
+            if (node.onClick) {
+                el.addEventListener("click", node.onClick);
+            }
             return el;
         }
         case "text": {
             const el = document.createElementNS(SVG_NS, "text");
             el.setAttribute("x", String(node.x));
             el.setAttribute("y", String(node.y));
-            if (node.class) el.setAttribute("class", node.class);
-            if (node.textAnchor) el.setAttribute("text-anchor", node.textAnchor);
-            if (node.transform) el.setAttribute("transform", node.transform);
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
+            if (node.textAnchor) {
+                el.setAttribute("text-anchor", node.textAnchor);
+            }
+            if (node.transform) {
+                el.setAttribute("transform", node.transform);
+            }
             el.textContent = node.content;
             return el;
         }
@@ -129,8 +167,12 @@ function createElement(node: RenderNode): SVGElement {
             el.setAttribute("y1", String(node.y1));
             el.setAttribute("x2", String(node.x2));
             el.setAttribute("y2", String(node.y2));
-            if (node.stroke) el.setAttribute("stroke", node.stroke);
-            if (node.strokeWidth != null) el.setAttribute("stroke-width", String(node.strokeWidth));
+            if (node.stroke) {
+                el.setAttribute("stroke", node.stroke);
+            }
+            if (node.strokeWidth != null) {
+                el.setAttribute("stroke-width", String(node.strokeWidth));
+            }
             return el;
         }
         case "use": {
@@ -177,36 +219,3 @@ export function settingsIconNodes(svgWidth: number, onClick: () => void): Render
         },
     ];
 }
-
-export const appendSettingsIcon = (svg: d3.Selection<any>, onClick: () => void): void => {
-    const gearX = parseInt(svg.attr("width"), 10) - 30;
-    const gearY = 0;
-    const size = 25;
-    const gearGroup = svg
-        .append("g")
-        .style("cursor", "pointer")
-        .on("mouseover", function (this: Element) {
-            d3.select(this).select("use").style("fill", "black");
-        })
-        .on("mouseout", function (this: Element) {
-            d3.select(this).select("use").style("fill", "none");
-        })
-        .on("click", onClick);
-    gearGroup
-        .append("rect")
-        .attr("x", gearX)
-        .attr("y", gearY)
-        .attr("width", size)
-        .attr("height", size)
-        .style("fill", "transparent");
-    gearGroup
-        .append("use")
-        .attr("href", icons.gear)
-        .attr("x", gearX)
-        .attr("y", gearY)
-        .attr("width", size)
-        .attr("height", size)
-        .style("fill", "none")
-        .style("stroke", "black")
-        .style("pointer-events", "none");
-};

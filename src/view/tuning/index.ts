@@ -4,6 +4,9 @@ import type { Model } from "../../model";
 import type { Svg, View, ViewContext } from "../../types";
 import { type Tuning, tunings } from "./tuning-model";
 
+export type { Tuning };
+export { tunings };
+
 export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
     const raiseTuningChangedEvent = (tuning: Tuning): void => {
         raise({

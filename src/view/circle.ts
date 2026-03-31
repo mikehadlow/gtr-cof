@@ -164,10 +164,18 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
 };
 
 function getChordSegmentClass(chord: music.Chord): string {
-    if (chord.type === "Diminished") return "chord-segment-dim";
-    if (chord.type === "Augmented") return "chord-segment-aug";
-    if (chord.type === "Minor") return "chord-segment-minor";
-    if (chord.type === "Major") return "chord-segment-major";
+    if (chord.type === "Diminished") {
+        return "chord-segment-dim";
+    }
+    if (chord.type === "Augmented") {
+        return "chord-segment-aug";
+    }
+    if (chord.type === "Minor") {
+        return "chord-segment-minor";
+    }
+    if (chord.type === "Major") {
+        return "chord-segment-major";
+    }
     throw new Error("Unexpected ChordType");
 }
 

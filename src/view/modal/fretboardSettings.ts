@@ -15,7 +15,9 @@ export function showFretboardSettings(state: State, raise: (msg: Msg) => void) {
             const opt = document.createElement("option");
             opt.value = String(t.index);
             opt.textContent = `${t.tuning}  ${t.description}`;
-            if (t.index === state.tuningIndex) opt.selected = true;
+            if (t.index === state.tuningIndex) {
+                opt.selected = true;
+            }
             select.appendChild(opt);
         }
         select.addEventListener("change", () => {

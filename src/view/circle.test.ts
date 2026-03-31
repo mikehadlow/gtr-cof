@@ -20,20 +20,28 @@ describe("circleNodes - structure", () => {
     });
 
     test("main g has translate(250, 250)", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         expect(nodes[1].transform).toBe("translate(250, 250)");
     });
 
     test("main g has 9 children: label text + 8 element groups", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         expect(nodes[1].children).toHaveLength(9);
     });
 
     test("first child of main g is label text", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const label = nodes[1].children[0];
         expect(label.type).toBe("text");
-        if (label.type !== "text") throw new Error();
+        if (label.type !== "text") {
+            throw new Error();
+        }
         expect(label.content).toBe("Chromatic");
         expect(label.textAnchor).toBe("middle");
         expect(label.x).toBe(0);
@@ -41,70 +49,118 @@ describe("circleNodes - structure", () => {
     });
 
     test("note segment group (index 1) has 12 path children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("path");
+        for (const c of g.children) {
+            expect(c.type).toBe("path");
+        }
     });
 
     test("note text group (index 2) has 12 text children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[2];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("text");
+        for (const c of g.children) {
+            expect(c.type).toBe("text");
+        }
     });
 
     test("interval segment group (index 3) has 12 path children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[3];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("path");
+        for (const c of g.children) {
+            expect(c.type).toBe("path");
+        }
     });
 
     test("interval note group (index 4) has 12 circle children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[4];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("circle");
+        for (const c of g.children) {
+            expect(c.type).toBe("circle");
+        }
     });
 
     test("interval text group (index 5) has 12 text children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[5];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("text");
+        for (const c of g.children) {
+            expect(c.type).toBe("text");
+        }
     });
 
     test("chord segment group (index 6) has 12 path children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[6];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("path");
+        for (const c of g.children) {
+            expect(c.type).toBe("path");
+        }
     });
 
     test("chord note group (index 7) has 12 circle children with r=28", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[7];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
         for (const c of g.children) {
-            if (c.type !== "circle") throw new Error();
+            if (c.type !== "circle") {
+                throw new Error();
+            }
             expect(c.r).toBe(28);
         }
     });
 
     test("chord text group (index 8) has 12 text children", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[8];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         expect(g.children).toHaveLength(12);
-        for (const c of g.children) expect(c.type).toBe("text");
+        for (const c of g.children) {
+            expect(c.type).toBe("text");
+        }
     });
 });
 
@@ -115,19 +171,29 @@ describe("circleNodes - note segments", () => {
     const nodes = view(model, noRaise);
 
     test("all paths have note-segment in class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         for (const c of g.children) {
-            if (c.type !== "path") throw new Error();
+            if (c.type !== "path") {
+                throw new Error();
+            }
             expect(c.class).toContain("note-segment");
         }
     });
 
     test("7 scale-note paths (note-segment-scale or note-segment-tonic)", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const scaleNotes = g.children.filter(
             (c) =>
                 c.type === "path" &&
@@ -137,9 +203,13 @@ describe("circleNodes - note segments", () => {
     });
 
     test("5 non-scale paths have only note-segment class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const nonScale = g.children.filter(
             (c) =>
                 c.type === "path" &&
@@ -150,18 +220,26 @@ describe("circleNodes - note segments", () => {
     });
 
     test("exactly one path has note-segment-tonic class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const tonic = g.children.filter((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
         expect(tonic).toHaveLength(1);
     });
 
     test("tonic path is at the segment whose note index matches model.state.index", () => {
         // defaultState index=0 (A). With circleIsCNoon=true (offset=3), A is at position 9
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const tonicIdx = g.children.findIndex((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
         // rotated chromatic with offset 3: [3,4,5,6,7,8,9,10,11,0,1,2] → A(0) is at position 9
         expect(tonicIdx).toBe(9);
@@ -171,9 +249,13 @@ describe("circleNodes - note segments", () => {
         // Change tonic to C (natural index 2, chromatic index 3)
         const modelC = updateScale({ ...defaultState, index: 3, naturalIndex: 2 });
         const nodesC = view(modelC, noRaise);
-        if (nodesC[1].type !== "g") throw new Error();
+        if (nodesC[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodesC[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         // With circleIsCNoon=true (offset=3), C(3) → (3+3)%12=6 is at position 0
         const tonicIdx = g.children.findIndex((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
         expect(tonicIdx).toBe(0);
@@ -187,17 +269,25 @@ describe("circleNodes - interval segments", () => {
     const nodes = view(model, noRaise);
 
     test("7 interval segment paths have degree-segment-selected class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[3];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const selected = g.children.filter((c) => c.type === "path" && c.class?.includes("degree-segment-selected"));
         expect(selected).toHaveLength(7);
     });
 
     test("5 non-scale interval segments have interval-segment class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[3];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const unselected = g.children.filter((c) => c.type === "path" && c.class === "interval-segment");
         expect(unselected).toHaveLength(5);
     });
@@ -210,11 +300,17 @@ describe("circleNodes - interval note circles", () => {
     const nodes = view(model, noRaise);
 
     test("all interval note circles have r=25 and pointer-events none", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[4];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         for (const c of g.children) {
-            if (c.type !== "circle") throw new Error();
+            if (c.type !== "circle") {
+                throw new Error();
+            }
             expect(c.r).toBe(25);
             expect(c.pointerEvents).toBe("none");
         }
@@ -222,13 +318,19 @@ describe("circleNodes - interval note circles", () => {
 
     test("untoggled interval notes have class interval-note and fill none", () => {
         // defaultState has no toggled notes
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[4];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const untoggled = g.children.filter((c) => c.type === "circle" && c.class === "interval-note");
         expect(untoggled.length).toBeGreaterThan(0);
         for (const c of untoggled) {
-            if (c.type !== "circle") throw new Error();
+            if (c.type !== "circle") {
+                throw new Error();
+            }
             expect(c.fill).toBe("none");
         }
     });
@@ -241,9 +343,13 @@ describe("circleNodes - chord segments", () => {
     const nodes = view(model, noRaise);
 
     test("scale note chord segments have chord type class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[6];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const typed = g.children.filter(
             (c) =>
                 c.type === "path" &&
@@ -256,9 +362,13 @@ describe("circleNodes - chord segments", () => {
     });
 
     test("non-scale chord segments have chord-segment class", () => {
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[6];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const plain = g.children.filter((c) => c.type === "path" && c.class === "chord-segment");
         expect(plain).toHaveLength(5);
     });
@@ -274,11 +384,17 @@ describe("circleNodes - click handlers", () => {
         const nodes = view(model, (msg: any) => {
             raised = msg;
         });
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[1];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) throw new Error("no onClick");
+        if (path.type !== "path" || !path.onClick) {
+            throw new Error("no onClick");
+        }
         path.onClick();
         expect(raised?.id).toBe("TonicChanged");
         expect(raised?.noteSpec).toBeDefined();
@@ -289,11 +405,17 @@ describe("circleNodes - click handlers", () => {
         const nodes = view(model, (msg: any) => {
             raised = msg;
         });
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[3];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) throw new Error("no onClick");
+        if (path.type !== "path" || !path.onClick) {
+            throw new Error("no onClick");
+        }
         path.onClick();
         expect(raised?.id).toBe("Toggle");
         expect(raised?.index).toBeDefined();
@@ -304,11 +426,17 @@ describe("circleNodes - click handlers", () => {
         const nodes = view(model, (msg: any) => {
             raised = msg;
         });
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const g = nodes[1].children[6];
-        if (g.type !== "g") throw new Error();
+        if (g.type !== "g") {
+            throw new Error();
+        }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) throw new Error("no onClick");
+        if (path.type !== "path" || !path.onClick) {
+            throw new Error("no onClick");
+        }
         path.onClick();
         expect(raised?.id).toBe("ChordChanged");
         expect(raised?.chordIndex).toBeDefined();
@@ -320,9 +448,13 @@ describe("circleNodes - click handlers", () => {
             raised = msg;
         });
         const settingsG = nodes[0];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const rect = settingsG.children[0];
-        if (rect.type !== "rect" || !rect.onClick) throw new Error("no onClick on rect");
+        if (rect.type !== "rect" || !rect.onClick) {
+            throw new Error("no onClick on rect");
+        }
         rect.onClick();
         expect(raised?.id).toBe("ModalStateChange");
         expect(raised?.modalState).toBe("circle-settings");
@@ -336,9 +468,13 @@ describe("circleNodes - settings icon", () => {
         const view = circleNodes(music.chromatic(), "Chromatic", 500);
         const nodes = view(model, noRaise);
         const settingsG = nodes[0];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const rect = settingsG.children[0];
-        if (rect.type !== "rect") throw new Error();
+        if (rect.type !== "rect") {
+            throw new Error();
+        }
         expect(rect.x).toBe(470);
     });
 
@@ -346,9 +482,13 @@ describe("circleNodes - settings icon", () => {
         const view = circleNodes(music.chromatic(), "Chromatic", 500);
         const nodes = view(model, noRaise);
         const settingsG = nodes[0];
-        if (settingsG.type !== "g") throw new Error();
+        if (settingsG.type !== "g") {
+            throw new Error();
+        }
         const useEl = settingsG.children[1];
-        if (useEl.type !== "use") throw new Error();
+        if (useEl.type !== "use") {
+            throw new Error();
+        }
         expect(useEl.href).toBe("#icon-gear");
     });
 });
@@ -365,11 +505,17 @@ describe("circleNodes - circleIsCNoon", () => {
         const view = circleNodes(music.chromatic(), "Chromatic", 500);
         const nodes = view(modelTrue, noRaise);
 
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const noteTextGroup = nodes[1].children[2];
-        if (noteTextGroup.type !== "g") throw new Error();
+        if (noteTextGroup.type !== "g") {
+            throw new Error();
+        }
         const firstText = noteTextGroup.children[0];
-        if (firstText.type !== "text") throw new Error();
+        if (firstText.type !== "text") {
+            throw new Error();
+        }
         expect(firstText.content).toBe("C");
     });
 
@@ -378,11 +524,17 @@ describe("circleNodes - circleIsCNoon", () => {
         const view = circleNodes(music.chromatic(), "Chromatic", 500);
         const nodes = view(modelFalse, noRaise);
 
-        if (nodes[1].type !== "g") throw new Error();
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
         const noteTextGroup = nodes[1].children[2];
-        if (noteTextGroup.type !== "g") throw new Error();
+        if (noteTextGroup.type !== "g") {
+            throw new Error();
+        }
         const firstText = noteTextGroup.children[0];
-        if (firstText.type !== "text") throw new Error();
+        if (firstText.type !== "text") {
+            throw new Error();
+        }
         expect(firstText.content).toBe("A");
     });
 
@@ -394,14 +546,20 @@ describe("circleNodes - circleIsCNoon", () => {
         const nodesTrue = view(modelTrue, noRaise);
         const nodesFalse = view(modelFalse, noRaise);
 
-        if (nodesTrue[1].type !== "g" || nodesFalse[1].type !== "g") throw new Error();
+        if (nodesTrue[1].type !== "g" || nodesFalse[1].type !== "g") {
+            throw new Error();
+        }
         const textGroupTrue = nodesTrue[1].children[2];
         const textGroupFalse = nodesFalse[1].children[2];
-        if (textGroupTrue.type !== "g" || textGroupFalse.type !== "g") throw new Error();
+        if (textGroupTrue.type !== "g" || textGroupFalse.type !== "g") {
+            throw new Error();
+        }
 
         const text0True = textGroupTrue.children[0];
         const text0False = textGroupFalse.children[0];
-        if (text0True.type !== "text" || text0False.type !== "text") throw new Error();
+        if (text0True.type !== "text" || text0False.type !== "text") {
+            throw new Error();
+        }
         expect(text0True.content).not.toBe(text0False.content);
     });
 });

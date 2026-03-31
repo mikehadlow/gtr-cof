@@ -39,8 +39,12 @@ export function tonicsNodes(model: Model, raise: (msg: Msg) => void): RenderNode
 }
 
 function tonicButtonClass(noteSpec: music.NoteSpec, selectedNoteSpec: music.NoteSpec): string {
-    if (noteSpec.label === selectedNoteSpec.label) return "tonic-button tonic-button-selected";
-    if (isSameNoteAsNatural(noteSpec)) return "tonic-button tonic-button-grey";
+    if (noteSpec.label === selectedNoteSpec.label) {
+        return "tonic-button tonic-button-selected";
+    }
+    if (isSameNoteAsNatural(noteSpec)) {
+        return "tonic-button tonic-button-grey";
+    }
     return "tonic-button";
 }
 
