@@ -1,16 +1,18 @@
 import { defaultState } from "../defaultState";
 import type { Msg } from "../message";
 import type { Model } from "../model";
-import type { State, Svg, View, ViewContext } from "../types";
+import type { State, SvgView } from "../types";
+import type { RenderNode } from "../ui";
 
 const PERMALINK_BUTTON_ID = "permalink-button";
 const PERMALINK_TEXT_ID = "permalink-text";
 
-export const view: View<Model, Msg, Svg> = ({ state }: Model, _ctx: ViewContext, _raise: (msg: Msg) => void): Svg => {
+export const view: SvgView<Model, Msg> = ({ state }: Model, _raise: (msg: Msg) => void): RenderNode[] => {
     const permalinkButton = document.getElementById(PERMALINK_BUTTON_ID);
     if (permalinkButton) {
         permalinkButton.onclick = () => populatePermalinkText(state);
     }
+    return [];
 };
 
 function populatePermalinkText(state: State): void {

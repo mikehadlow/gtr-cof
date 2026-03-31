@@ -1,16 +1,18 @@
 import { defaultState } from "../defaultState";
 import type { Msg } from "../message";
 import type { Model } from "../model";
-import { type State, StateSchema, type Svg, type View, type ViewContext } from "../types";
+import { type State, StateSchema, type SvgView } from "../types";
+import type { RenderNode } from "../ui";
 
 const STORAGE_KEY = "app_state";
 
-export const view: View<Model, Msg, Svg> = ({ state }: Model, _ctx: ViewContext, _raise: (msg: Msg) => void): Svg => {
+export const view: SvgView<Model, Msg> = ({ state }: Model, _raise: (msg: Msg) => void): RenderNode[] => {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) {
         console.log(`Could not store state in local storage: ${e}`);
     }
+    return [];
 };
 
 export const getStateFromLocalStorage = (): State => {

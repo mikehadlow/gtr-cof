@@ -34,12 +34,14 @@ const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "tuning-dropdown", view: tuningNodes },
     { containerId: "no-op", view: menuCreate() },
     { containerId: "no-op", view: settingsCreate() },
+    { containerId: "no-op", view: storageView },
+    { containerId: "no-op", view: permalinkView },
 ];
 
 export const createViews = (): View<Model, Msg, Svg> => {
     const modalView = modalCreate();
 
-    const views: View<Model, Msg, Svg>[] = [storageView, permalinkView, modalView];
+    const views: View<Model, Msg, Svg>[] = [modalView];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         for (const view of views) {
