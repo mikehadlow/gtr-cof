@@ -1,55 +1,7 @@
-import d3 from "d3";
 import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
-import type { Svg, View, ViewContext } from "../types";
 import type { RenderNode } from "../ui";
-
-export const view: View<Model, Msg, Svg> = (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
-    if (ctx.init) {
-        const svg = d3.select("#modes");
-        modes = svg.append("g").attr("transform", "translate(0, 280)");
-    }
-
-    const scaleFamily = music.scaleFamily[model.state.scaleFamilyIndex];
-    const activeMode = scaleFamily.modes.find((x) => x.index === model.state.modeIndex);
-    if (!activeMode) {
-        throw new Error("Invalid mode index");
-    }
-
-    const pad = 5;
-    const buttonHeight = 25;
-
-    modes.selectAll("g").remove();
-    const gs = modes.selectAll("g").data(scaleFamily.modes, index);
-
-    gs.exit().remove();
-
-    gs.enter()
-        .append("g")
-        .attr("transform", (_d, i) => `translate(0, ${i * (buttonHeight + pad) + pad})`);
-
-    buttons = gs
-        .append("rect")
-        .attr("x", pad)
-        .attr("y", 0)
-        .attr("strokeWidth", 2)
-        .attr("width", 150)
-        .attr("height", 25)
-        .attr("class", "mode-button")
-        .on("click", (d) => raise({ id: "ModeChanged", mode: d }));
-
-    gs.append("text")
-        .attr("x", pad + 10)
-        .attr("y", 17)
-        .text((x) => x.name)
-        .attr("class", "mode-text");
-
-    highlightActiveMode(activeMode);
-};
-
-let buttons: d3.Selection<music.Mode>;
-let modes: d3.Selection<any>;
 
 export function modesNodes(model: Model, raise: (msg: Msg) => void): RenderNode[] {
     const pad = 5;
@@ -81,13 +33,4 @@ export function modesNodes(model: Model, raise: (msg: Msg) => void): RenderNode[
     }));
 
     return [{ type: "g", transform: "translate(0, 280)", children }];
-}
-
-function highlightActiveMode(mode: music.Mode): void {
-    const modes: Array<music.Mode> = [mode];
-    buttons.data(modes, index).attr("class", "mode-button mode-button-selected").exit().attr("class", "mode-button");
-}
-
-function index(mode: music.Mode): string {
-    return mode.index.toString();
 }
