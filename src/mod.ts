@@ -52,7 +52,9 @@ export function zip3<A, B, C>(a: A[], b: B[], c: C[]): [A, B, C][] {
 export function diff(size: number, a: number, b: number): number {
     const ax = a % size;
     const bx = b % size;
-    if (ax === bx) return 0;
+    if (ax === bx) {
+        return 0;
+    }
 
     const d1 = bx - ax;
     let d2 = 0;
