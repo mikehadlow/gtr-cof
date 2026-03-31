@@ -19,7 +19,7 @@
 
 1. Refactor to Elm-style architecture. (DONE)
 1. Unit tests! (DONE)
-1. Replace D3js with a dedicated SVG library.
+1. Replace D3js with a dedicated SVG library. (DONE)
 
 ## Fixes
 
