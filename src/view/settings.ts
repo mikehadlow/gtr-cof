@@ -1,6 +1,6 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
-import type { FretboardLabelType, SvgView } from "../types";
+import type { FretboardLabelType, View } from "../types";
 import type { RenderNode } from "../ui";
 
 type Raise = (msg: Msg) => void;
@@ -13,7 +13,7 @@ const FB_NT_NONE_ID = "fb-note-text-None";
 const FB_NT_NAME_ID = "fb-note-text-NoteName";
 const FB_NT_INT_ID = "fb-note-text-Interval";
 
-export const create = (): SvgView<Model, Msg> => {
+export const create = (): View<Model, Msg, RenderNode> => {
     let uninitialised = true;
     return ({ state }: Model, raise: (msg: Msg) => void): RenderNode[] => {
         const setCheckbox = (id: string, checked: boolean): void => {

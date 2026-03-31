@@ -1,17 +1,18 @@
 import type { Msg } from "../../message";
 import type { Model } from "../../model";
-import type { ModalState, State, Svg, View, ViewContext } from "../../types";
+import type { ModalState, State, View } from "../../types";
+import type { RenderNode } from "../../ui";
 import { showCircleSettings } from "./circleSettings";
 import { showFretboardSettings } from "./fretboardSettings";
 
 const MODAL_BACKDROP_CLASS = "modal-backdrop";
 const MODAL_CONTAINER_CLASS = "modal-container";
 
-export const create = (): View<Model, Msg, Svg> => {
+export const create2 = (): View<Model, Msg, RenderNode> => {
     let previousState: ModalState = "closed";
-    return ({ state }: Model, _ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
+    return ({ state }: Model, raise: (msg: Msg) => void): RenderNode[] => {
         if (state.modalState === previousState) {
-            return; // no modal state change.
+            return []; // no modal state change.
         }
         switch (state.modalState) {
             case "closed":
@@ -28,6 +29,7 @@ export const create = (): View<Model, Msg, Svg> => {
             }
         }
         previousState = state.modalState;
+        return [];
     };
 };
 

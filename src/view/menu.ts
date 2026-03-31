@@ -1,9 +1,9 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
-import type { SvgView } from "../types";
+import type { View } from "../types";
 import type { RenderNode } from "../ui";
 
-export const create = (): SvgView<Model, Msg> => {
+export const create = (): View<Model, Msg, RenderNode> => {
     let uninitialised = true;
     return (_model: Model, _raise: (msg: Msg) => void): RenderNode[] => {
         if (uninitialised) {

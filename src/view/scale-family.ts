@@ -1,10 +1,10 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
-import type { SvgView } from "../types";
+import type { View } from "../types";
 import type { RenderNode } from "../ui";
 
-export const scaleFamilyNodes: SvgView<Model, Msg> = (_model, raise): RenderNode[] =>
+export const scaleFamilyNodes: View<Model, Msg, RenderNode> = (_model, raise): RenderNode[] =>
     music.scaleFamily.map((sf) => ({
         type: "div",
         class: "dropdown-content-item",

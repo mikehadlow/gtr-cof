@@ -1,7 +1,7 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
-import type { FretboardLabelType, SvgView } from "../types";
+import type { FretboardLabelType, View } from "../types";
 import type { RenderNode } from "../ui";
 import { settingsIconNodes } from "../ui";
 import * as tuning from "./tuning";
@@ -97,7 +97,7 @@ function allNotesFromWithNodes(startIndex: number, nodeByIndex: Map<number, musi
     return items;
 }
 
-export const guitarNodes: SvgView<Model, Msg> = (model: Model, raise: (msg: Msg) => void): RenderNode[] => {
+export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (msg: Msg) => void): RenderNode[] => {
     const { tuningIndex, isLeftHanded, isNutFlipped, fretboardLabelType } = model.state;
     const tuningInfo = tuning.tunings[tuningIndex];
     const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));

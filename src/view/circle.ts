@@ -1,7 +1,7 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
-import type { SvgView } from "../types";
+import type { View } from "../types";
 import type { RenderNode } from "../ui";
 import { arcCentroid, arcPath, settingsIconNodes } from "../ui";
 
@@ -11,7 +11,7 @@ type Segment = {
     readonly index: number;
 };
 
-export const circleNodes = (noteIndexes: number[], label: string, svgWidth: number): SvgView<Model, Msg> => {
+export const circleNodes = (noteIndexes: number[], label: string, svgWidth: number): View<Model, Msg, RenderNode> => {
     return (model: Model, raise: (msg: Msg) => void): RenderNode[] => {
         const offset = model.state.circleIsCNoon ? 3 : 0;
         const segments = generateSegments(rotate(noteIndexes, offset));

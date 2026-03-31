@@ -1,17 +1,10 @@
 import { z } from "zod";
-import type { RenderNode } from "./ui";
 
 // Elm inspired architectural types
 
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
-export type ViewContext = {
-    readonly init: boolean;
-};
-
-export type View<TModel, TMsg, TSvg> = (model: TModel, ctx: ViewContext, raise: (msg: TMsg) => void) => TSvg;
-
-export type SvgView<TModel, TMsg> = (model: TModel, raise: (msg: TMsg) => void) => RenderNode[];
+export type View<TModel, TMsg, TRenderNode> = (model: TModel, raise: (msg: TMsg) => void) => TRenderNode[];
 
 // State
 
