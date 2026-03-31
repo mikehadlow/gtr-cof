@@ -10,6 +10,7 @@
     "lint": "biome lint ./src",
     "format": "biome format --write ./src",
     "check": "biome check ./src",
+    "check-deps": "bunx dpdm --circular src/index.ts",
     "gen-artifact": "bun run ./scripts/generate-chord-changed-fixtures.ts && bun run ./scripts/generate-mode-changed-fixtures.ts && bun run ./scripts/generate-tonic-changed-fixtures.ts"
   },
   "author": "Mike Hadlow",

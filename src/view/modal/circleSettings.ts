@@ -1,6 +1,6 @@
 import type { Msg } from "../../message";
 import type { State } from "../../types";
-import { createCheckbox, createModal } from ".";
+import { createCheckbox, createModal } from "./common";
 
 export function showCircleSettings(state: State, raise: (msg: Msg) => void) {
     const modal = createModal("Circle Settings", raise);

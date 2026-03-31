@@ -1,7 +1,7 @@
 import type { Msg } from "../../message";
 import type { FretboardLabelType, State } from "../../types";
 import { tunings } from "../tuning";
-import { createCheckbox, createModal, createSection } from ".";
+import { createCheckbox, createModal, createSection } from "./common";
 
 export function showFretboardSettings(state: State, raise: (msg: Msg) => void) {
     const modal = createModal("Fretboard Settings", raise);

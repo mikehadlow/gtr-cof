@@ -7,7 +7,7 @@ import { chordIntervalNodes } from "./chord-interval";
 import { circleNodes } from "./circle";
 import { guitarNodes } from "./guitar";
 import { create as menuCreate } from "./menu";
-import { create2 as modalCreate } from "./modal";
+import { create as modalCreate } from "./modal";
 import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
 import { scaleFamilyNodes } from "./scale-family";
