@@ -113,7 +113,7 @@ export const guitarNodes: SvgView<Model, Msg> = (model: Model, raise: (msg: Msg)
     const titleNode: RenderNode = {
         type: "text",
         x: 30,
-        y: 11,
+        y: 15,
         class: "mode-text",
         content: titleContent,
     };
