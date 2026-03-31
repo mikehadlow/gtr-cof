@@ -6,7 +6,7 @@ import { renderToSvg } from "../ui";
 import { chordIntervalNodes } from "./chord-interval";
 import { circleNodes } from "./circle";
 import { guitarNodes } from "./guitar";
-import { view as menuView } from "./menu";
+import { create as menuCreate } from "./menu";
 import { create as createModal } from "./modal";
 import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
@@ -32,12 +32,13 @@ const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "gtr", view: guitarNodes },
     { containerId: "scale-dropdown", view: scaleFamilyNodes },
     { containerId: "tuning-dropdown", view: tuningNodes },
+    { containerId: "no-op", view: menuCreate() },
 ];
 
 export const createViews = (): View<Model, Msg, Svg> => {
     const modalView = createModal();
 
-    const views: View<Model, Msg, Svg>[] = [menuView, settingsView, storageView, permalinkView, modalView];
+    const views: View<Model, Msg, Svg>[] = [settingsView, storageView, permalinkView, modalView];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         for (const view of views) {
