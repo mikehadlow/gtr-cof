@@ -1,24 +1,13 @@
-import d3 from "d3";
 import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
-import type { Svg, View, ViewContext } from "../types";
+import type { SvgView } from "../types";
+import type { RenderNode } from "../ui";
 
-export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
-    function raiseScaleFamilyChangedEvent(scaleFamily: music.ScaleFamily): void {
-        raise({
-            id: "ScaleFamilyChange",
-            scaleFamily: scaleFamily,
-        });
-    }
-    if (ctx.init) {
-        d3.select("#scale-dropdown")
-            .selectAll("div")
-            .data(music.scaleFamily)
-            .enter()
-            .append("div")
-            .attr("class", "dropdown-content-item")
-            .on("click", raiseScaleFamilyChangedEvent)
-            .text((x) => x.name);
-    }
-};
+export const scaleFamilyNodes: SvgView<Model, Msg> = (_model, raise): RenderNode[] =>
+    music.scaleFamily.map((sf) => ({
+        type: "div",
+        class: "dropdown-content-item",
+        textContent: sf.name,
+        onClick: () => raise({ id: "ScaleFamilyChange", scaleFamily: sf }),
+    }));

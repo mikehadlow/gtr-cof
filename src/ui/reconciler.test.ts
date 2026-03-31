@@ -4,7 +4,7 @@ GlobalRegistrator.register();
 
 import { describe, expect, test } from "bun:test";
 import type { RenderNode } from "./index";
-import { renderToSvg } from "./index";
+import { renderToHtml, renderToSvg } from "./index";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -283,5 +283,97 @@ describe("createElement — g", () => {
         const inner = outer.childNodes[0] as Element;
         const circle = inner.childNodes[0] as Element;
         expect(circle.tagName.toLowerCase()).toBe("circle");
+    });
+});
+
+describe("renderToHtml", () => {
+    function makeDiv(): HTMLElement {
+        return document.createElement("div");
+    }
+
+    test("clears existing children before rendering", () => {
+        const container = makeDiv();
+        container.appendChild(document.createElement("div"));
+        container.appendChild(document.createElement("div"));
+
+        renderToHtml(container, []);
+
+        expect(container.childNodes.length).toBe(0);
+    });
+
+    test("appends one child per top-level node", () => {
+        const container = makeDiv();
+        const nodes: RenderNode[] = [
+            { type: "div", textContent: "A" },
+            { type: "div", textContent: "B" },
+        ];
+
+        renderToHtml(container, nodes);
+
+        expect(container.childNodes.length).toBe(2);
+    });
+
+    test("re-render clears old children and adds new ones", () => {
+        const container = makeDiv();
+        renderToHtml(container, [{ type: "div", textContent: "old" }]);
+        renderToHtml(container, [
+            { type: "div", textContent: "new1" },
+            { type: "div", textContent: "new2" },
+        ]);
+
+        expect(container.childNodes.length).toBe(2);
+        expect((container.childNodes[0] as HTMLElement).textContent).toBe("new1");
+    });
+
+    test("sets class attribute", () => {
+        const container = makeDiv();
+        renderToHtml(container, [{ type: "div", class: "dropdown-content-item" }]);
+        const el = container.childNodes[0] as HTMLElement;
+        expect(el.getAttribute("class")).toBe("dropdown-content-item");
+    });
+
+    test("sets textContent", () => {
+        const container = makeDiv();
+        renderToHtml(container, [{ type: "div", textContent: "Guitar Standard" }]);
+        const el = container.childNodes[0] as HTMLElement;
+        expect(el.textContent).toBe("Guitar Standard");
+    });
+
+    test("attaches click handler", () => {
+        const container = makeDiv();
+        let clicked = false;
+        renderToHtml(container, [
+            {
+                type: "div",
+                onClick: () => {
+                    clicked = true;
+                },
+            },
+        ]);
+        const el = container.childNodes[0] as HTMLElement;
+        el.dispatchEvent(new Event("click"));
+        expect(clicked).toBe(true);
+    });
+
+    test("renders nested children", () => {
+        const container = makeDiv();
+        renderToHtml(container, [
+            {
+                type: "div",
+                children: [
+                    { type: "div", textContent: "child1" },
+                    { type: "div", textContent: "child2" },
+                ],
+            },
+        ]);
+        const parent = container.childNodes[0] as HTMLElement;
+        expect(parent.childNodes.length).toBe(2);
+        expect((parent.childNodes[0] as HTMLElement).textContent).toBe("child1");
+        expect((parent.childNodes[1] as HTMLElement).textContent).toBe("child2");
+    });
+
+    test("throws when passing non-div node", () => {
+        const container = makeDiv();
+        expect(() => renderToHtml(container, [{ type: "circle", cx: 0, cy: 0, r: 5 }])).toThrow();
     });
 });

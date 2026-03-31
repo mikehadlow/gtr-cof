@@ -2,7 +2,7 @@ import type { Msg } from "../message";
 import type { Model } from "../model";
 import * as music from "../music";
 import type { Svg, SvgView, View, ViewContext } from "../types";
-import { renderToSvg } from "../ui";
+import { renderToHtml, renderToSvg } from "../ui";
 import { chordIntervalNodes } from "./chord-interval";
 import { circleNodes } from "./circle";
 import { guitarNodes } from "./guitar";
@@ -10,11 +10,11 @@ import { view as menuView } from "./menu";
 import { create as createModal } from "./modal";
 import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
-import { view as scaleFamilyView } from "./scale-family";
+import { scaleFamilyNodes } from "./scale-family";
 import { view as settingsView } from "./settings";
 import { view as storageView } from "./storage";
 import { tonicsNodes } from "./tonics";
-import { view as tuningView } from "./tuning";
+import { tuningNodes } from "./tuning";
 
 export { updateStateFromQuerystring } from "./permalink";
 export { getStateFromLocalStorage } from "./storage";
@@ -32,18 +32,15 @@ const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "gtr", view: guitarNodes },
 ];
 
+const htmlViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
+    { containerId: "scale-dropdown", view: scaleFamilyNodes },
+    { containerId: "tuning-dropdown", view: tuningNodes },
+];
+
 export const createViews = (): View<Model, Msg, Svg> => {
     const modalView = createModal();
 
-    const views: View<Model, Msg, Svg>[] = [
-        menuView,
-        tuningView,
-        scaleFamilyView,
-        settingsView,
-        storageView,
-        permalinkView,
-        modalView,
-    ];
+    const views: View<Model, Msg, Svg>[] = [menuView, settingsView, storageView, permalinkView, modalView];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         for (const view of views) {
@@ -53,6 +50,12 @@ export const createViews = (): View<Model, Msg, Svg> => {
             const container = document.getElementById(containerId) as SVGElement | null;
             if (container) {
                 renderToSvg(container, view(model, raise));
+            }
+        }
+        for (const { containerId, view } of htmlViews) {
+            const container = document.getElementById(containerId) as HTMLElement | null;
+            if (container) {
+                renderToHtml(container, view(model, raise));
             }
         }
     };

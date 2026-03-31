@@ -1,27 +1,16 @@
-import d3 from "d3";
 import type { Msg } from "../../message";
 import type { Model } from "../../model";
-import type { Svg, View, ViewContext } from "../../types";
+import type { SvgView } from "../../types";
+import type { RenderNode } from "../../ui";
 import { type Tuning, tunings } from "./tuning-model";
 
 export type { Tuning };
 export { tunings };
 
-export const view: View<Model, Msg, Svg> = (_: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
-    const raiseTuningChangedEvent = (tuning: Tuning): void => {
-        raise({
-            id: "TuningChanged",
-            index: tuning.index,
-        });
-    };
-    if (ctx.init) {
-        d3.select("#tuning-dropdown")
-            .selectAll("div")
-            .data(tunings)
-            .enter()
-            .append("div")
-            .attr("class", "dropdown-content-item")
-            .on("click", raiseTuningChangedEvent)
-            .text((x) => `${x.tuning}   ${x.description}`);
-    }
-};
+export const tuningNodes: SvgView<Model, Msg> = (_model, raise): RenderNode[] =>
+    tunings.map((t) => ({
+        type: "div",
+        class: "dropdown-content-item",
+        textContent: `${t.tuning}   ${t.description}`,
+        onClick: () => raise({ id: "TuningChanged", index: t.index }),
+    }));

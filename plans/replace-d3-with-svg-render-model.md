@@ -117,17 +117,11 @@ The `generateSegments` function and `rotate` helper in `circle.ts` are pure and 
 
 ---
 
-## Phase 4 — Remove D3
+## ✅ Phase 4 — Remove D3
 
-```bash
-bun remove d3 @types/d3
-```
-
-After all views are ported:
-- Remove all `import d3 from "d3"` statements.
-- Delete the old D3 `view` exports from `chord-interval.ts`, `modes.ts`, `tonics.ts`.
-- Delete `appendSettingsIcon` from `src/ui/index.ts` (replaced by `settingsIconNodes`).
-- Remove `d3` from `package.json`.
+Done. `renderToHtml` added to `src/ui/index.ts`. `div` added to `RenderNode`.
+`scaleFamilyNodes` and `tuningNodes` replace the old D3 views.
+`d3` and `@types/d3` removed from `package.json`.
 
 ---
 
@@ -143,7 +137,7 @@ After all views are ported:
 | `src/view/tonics.ts` | ✅ | `tonicsNodes` done |
 | `src/view/circle.ts` | ✅ | `circleNodes` done; D3 removed |
 | `src/view/guitar.ts` | ✅ | `guitarNodes` done; D3 `create` export dead |
-| `package.json` | ⬜ | Remove d3 dependency |
+| `package.json` | ✅ | d3 removed |
 
 ## Test Files
 

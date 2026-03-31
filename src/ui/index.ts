@@ -35,7 +35,8 @@ export type RenderNode =
           width: number;
           height: number;
           style?: Record<string, string>;
-      };
+      }
+    | { type: "div"; class?: string; textContent?: string; onClick?: () => void; children?: RenderNode[] };
 
 // Arc math — D3 convention: angle 0 = 12 o'clock, clockwise.
 // SVG coords: x = sin(a) * r,  y = -cos(a) * r
@@ -72,6 +73,35 @@ export function renderToSvg(container: SVGElement, nodes: RenderNode[]): void {
     for (const node of nodes) {
         container.appendChild(createElement(node));
     }
+}
+
+export function renderToHtml(container: HTMLElement, nodes: RenderNode[]): void {
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    for (const node of nodes) {
+        container.appendChild(createHtmlElement(node));
+    }
+}
+
+function createHtmlElement(node: RenderNode): HTMLElement {
+    if (node.type !== "div") {
+        throw new Error(`createHtmlElement: unsupported type "${node.type}"`);
+    }
+    const el = document.createElement("div");
+    if (node.class) {
+        el.setAttribute("class", node.class);
+    }
+    if (node.textContent) {
+        el.textContent = node.textContent;
+    }
+    if (node.onClick) {
+        el.addEventListener("click", node.onClick);
+    }
+    for (const child of node.children ?? []) {
+        el.appendChild(createHtmlElement(child));
+    }
+    return el;
 }
 
 function createElement(node: RenderNode): SVGElement {
@@ -189,6 +219,8 @@ function createElement(node: RenderNode): SVGElement {
             }
             return el;
         }
+        case "div":
+            throw new Error("createElement: use createHtmlElement for div nodes");
     }
 }
 
