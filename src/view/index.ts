@@ -7,11 +7,11 @@ import { chordIntervalNodes } from "./chord-interval";
 import { circleNodes } from "./circle";
 import { guitarNodes } from "./guitar";
 import { create as menuCreate } from "./menu";
-import { create as createModal } from "./modal";
+import { create as modalCreate } from "./modal";
 import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
 import { scaleFamilyNodes } from "./scale-family";
-import { view as settingsView } from "./settings";
+import { create as settingsCreate } from "./settings";
 import { view as storageView } from "./storage";
 import { tonicsNodes } from "./tonics";
 import { tuningNodes } from "./tuning";
@@ -33,12 +33,13 @@ const svgViews: { containerId: string; view: SvgView<Model, Msg> }[] = [
     { containerId: "scale-dropdown", view: scaleFamilyNodes },
     { containerId: "tuning-dropdown", view: tuningNodes },
     { containerId: "no-op", view: menuCreate() },
+    { containerId: "no-op", view: settingsCreate() },
 ];
 
 export const createViews = (): View<Model, Msg, Svg> => {
-    const modalView = createModal();
+    const modalView = modalCreate();
 
-    const views: View<Model, Msg, Svg>[] = [settingsView, storageView, permalinkView, modalView];
+    const views: View<Model, Msg, Svg>[] = [storageView, permalinkView, modalView];
 
     return (model: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
         for (const view of views) {

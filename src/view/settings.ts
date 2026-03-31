@@ -1,6 +1,7 @@
 import type { Msg } from "../message";
 import type { Model } from "../model";
-import type { FretboardLabelType, Svg, View, ViewContext } from "../types";
+import type { FretboardLabelType, SvgView } from "../types";
+import type { RenderNode } from "../ui";
 
 type Raise = (msg: Msg) => void;
 
@@ -12,33 +13,37 @@ const FB_NT_NONE_ID = "fb-note-text-None";
 const FB_NT_NAME_ID = "fb-note-text-NoteName";
 const FB_NT_INT_ID = "fb-note-text-Interval";
 
-export const view: View<Model, Msg, Svg> = ({ state }: Model, ctx: ViewContext, raise: (msg: Msg) => void): Svg => {
-    const setCheckbox = (id: string, checked: boolean): void => {
-        const checkbox = document.getElementById(id) as HTMLInputElement | null;
-        if (checkbox === null) {
-            throw new Error(`checkbox with id '${id}' not found.`);
+export const create = (): SvgView<Model, Msg> => {
+    let uninitialised = true;
+    return ({ state }: Model, raise: (msg: Msg) => void): RenderNode[] => {
+        const setCheckbox = (id: string, checked: boolean): void => {
+            const checkbox = document.getElementById(id) as HTMLInputElement | null;
+            if (checkbox === null) {
+                throw new Error(`checkbox with id '${id}' not found.`);
+            }
+            checkbox.checked = checked;
+        };
+        const setClickHandler = (id: string, handler: (e: HTMLInputElement, raise: Raise) => void) => {
+            const element = document.getElementById(id) as HTMLInputElement;
+            element.onclick = (x) => handler(x.currentTarget as HTMLInputElement, raise);
+        };
+        setCheckbox("left-handed-checkbox", state.isLeftHanded);
+        setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+        setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+
+        const selected = `fb-note-text-${state.fretboardLabelType}`;
+        setCheckbox(selected, true);
+        if (uninitialised) {
+            setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
+            setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
+            setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
+            setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
+            setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
+            setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
+            uninitialised = false;
         }
-        checkbox.checked = checked;
+        return [];
     };
-    const setClickHandler = (id: string, handler: (e: HTMLInputElement, raise: Raise) => void) => {
-        const element = document.getElementById(id) as HTMLInputElement;
-        element.onclick = (x) => handler(x.currentTarget as HTMLInputElement, raise);
-    };
-    setCheckbox("left-handed-checkbox", state.isLeftHanded);
-    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-
-    const selected = `fb-note-text-${state.fretboardLabelType}`;
-    setCheckbox(selected, true);
-
-    if (ctx.init) {
-        setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
-        setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
-        setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
-        setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
-        setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
-        setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
-    }
 };
 
 function onLeftHandedClick(e: HTMLInputElement, raise: Raise) {
