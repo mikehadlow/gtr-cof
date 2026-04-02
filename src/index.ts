@@ -16,10 +16,10 @@ const main = () => {
 
     const raise = (msg: Msg): void => {
         model = update(model, msg);
-        view(model, { init: false }, raise);
+        view(model, raise);
     };
 
-    view(model, { init: true }, raise);
+    view(model, raise);
     setWakeLock();
 };
 

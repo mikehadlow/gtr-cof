@@ -598,33 +598,6 @@ function renderToSvg(container, nodes) {
     container.appendChild(createElement(node));
   }
 }
-function renderToHtml(container, nodes) {
-  while (container.firstChild) {
-    container.removeChild(container.firstChild);
-  }
-  for (const node of nodes) {
-    container.appendChild(createHtmlElement(node));
-  }
-}
-function createHtmlElement(node) {
-  if (node.type !== "div") {
-    throw new Error(`createHtmlElement: unsupported type "${node.type}"`);
-  }
-  const el = document.createElement("div");
-  if (node.class) {
-    el.setAttribute("class", node.class);
-  }
-  if (node.textContent) {
-    el.textContent = node.textContent;
-  }
-  if (node.onClick) {
-    el.addEventListener("click", node.onClick);
-  }
-  for (const child of node.children ?? []) {
-    el.appendChild(createHtmlElement(child));
-  }
-  return el;
-}
 function createElement(node) {
   switch (node.type) {
     case "g": {
@@ -740,8 +713,64 @@ function createElement(node) {
       }
       return el;
     }
-    case "div":
-      throw new Error("createElement: use createHtmlElement for div nodes");
+    case "div": {
+      const el = document.createElement("div");
+      if (node.class) {
+        el.setAttribute("class", node.class);
+      }
+      if (node.textContent) {
+        el.textContent = node.textContent;
+      }
+      if (node.onClick) {
+        el.addEventListener("click", node.onClick);
+      }
+      for (const child of node.children ?? []) {
+        el.appendChild(createElement(child));
+      }
+      return el;
+    }
+    case "svgButton": {
+      const pad = 5;
+      const xPad = 15;
+      const width = 40;
+      const buttonNodeTree = {
+        type: "g",
+        transform: `translate(${node.xPos * (width + xPad)}, 0)`,
+        children: [
+          {
+            type: "rect",
+            x: pad,
+            y: 0,
+            width: width * node.xSize + xPad * (node.xSize - 1),
+            height: 25,
+            class: node.class,
+            onClick: node.onClick
+          },
+          {
+            type: "text",
+            x: pad + 10,
+            y: 17,
+            class: "tonic-text",
+            content: node.label
+          }
+        ]
+      };
+      return createElement(buttonNodeTree);
+    }
+    case "buttonRow": {
+      const pad = 5;
+      const buttonHeight = 25;
+      const buttonRowTree = {
+        type: "g",
+        transform: `translate(0, ${node.row * (buttonHeight + pad) + pad})`,
+        children: node.children
+      };
+      return createElement(buttonRowTree);
+    }
+    default: {
+      const _exhaustiveCheck = node;
+      return _exhaustiveCheck;
+    }
   }
 }
 var icons = {
@@ -1162,7 +1191,7 @@ var guitarNodes = (model, raise) => {
   const titleNode = {
     type: "text",
     x: 30,
-    y: 11,
+    y: 15,
     class: "mode-text",
     content: titleContent
   };
@@ -1237,10 +1266,15 @@ var guitarNodes = (model, raise) => {
 };
 
 // src/view/menu.ts
-var view = (_, ctx, _raise) => {
-  if (ctx.init) {
-    init();
-  }
+var create = () => {
+  let uninitialised = true;
+  return (_model, _raise) => {
+    if (uninitialised) {
+      init();
+      uninitialised = false;
+    }
+    return [];
+  };
 };
 function init() {
   const menuItems = document.getElementsByClassName("menu");
@@ -1270,6 +1304,61 @@ function onMenuClick(event) {
       contentElement.classList.remove("dropdown-content-visible");
     }
   }
+}
+
+// src/view/modal/common.ts
+var MODAL_BACKDROP_CLASS = "modal-backdrop";
+var MODAL_CONTAINER_CLASS = "modal-container";
+function createSection(titleText) {
+  const section = document.createElement("div");
+  section.className = "modal-section";
+  if (titleText) {
+    const label = document.createElement("div");
+    label.className = "modal-section-title";
+    label.textContent = titleText;
+    section.appendChild(label);
+  }
+  return section;
+}
+function createCheckboxLabel(text, checked) {
+  const label = document.createElement("label");
+  label.className = "modal-checkbox-label";
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = checked;
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(` ${text}`));
+  return label;
+}
+function createCheckbox(modal, labelText2, checkboxState, onClick) {
+  const section = createSection();
+  const label = createCheckboxLabel(labelText2, checkboxState);
+  const checkbox = label.querySelector("input");
+  checkbox.addEventListener("change", () => onClick(checkbox.checked));
+  section.appendChild(label);
+  modal.appendChild(section);
+}
+function createModal(modalTitle, raise) {
+  const backdrop = document.createElement("div");
+  backdrop.className = MODAL_BACKDROP_CLASS;
+  backdrop.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  const modal = document.createElement("div");
+  modal.className = MODAL_CONTAINER_CLASS;
+  modal.addEventListener("click", (e) => e.stopPropagation());
+  const header = document.createElement("div");
+  header.className = "modal-header";
+  const title = document.createElement("span");
+  title.textContent = modalTitle;
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close";
+  closeBtn.textContent = "×";
+  closeBtn.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  modal.appendChild(header);
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+  return modal;
 }
 
 // src/view/modal/circleSettings.ts
@@ -1329,13 +1418,12 @@ function showFretboardSettings(state, raise) {
 }
 
 // src/view/modal/index.ts
-var MODAL_BACKDROP_CLASS = "modal-backdrop";
-var MODAL_CONTAINER_CLASS = "modal-container";
-var create = () => {
+var MODAL_BACKDROP_CLASS2 = "modal-backdrop";
+var create2 = () => {
   let previousState = "closed";
-  return ({ state }, _ctx, raise) => {
+  return ({ state }, raise) => {
     if (state.modalState === previousState) {
-      return;
+      return [];
     }
     switch (state.modalState) {
       case "closed":
@@ -1352,10 +1440,11 @@ var create = () => {
       }
     }
     previousState = state.modalState;
+    return [];
   };
 };
 function removeExistingModal() {
-  const existing = document.querySelector(`.${MODAL_BACKDROP_CLASS}`);
+  const existing = document.querySelector(`.${MODAL_BACKDROP_CLASS2}`);
   if (existing) {
     existing.remove();
     return true;
@@ -1377,83 +1466,22 @@ function showModal(state, raise) {
     }
   }
 }
-function createSection(titleText) {
-  const section = document.createElement("div");
-  section.className = "modal-section";
-  if (titleText) {
-    const label = document.createElement("div");
-    label.className = "modal-section-title";
-    label.textContent = titleText;
-    section.appendChild(label);
-  }
-  return section;
-}
-function createCheckboxLabel(text, checked) {
-  const label = document.createElement("label");
-  label.className = "modal-checkbox-label";
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = checked;
-  label.appendChild(checkbox);
-  label.appendChild(document.createTextNode(` ${text}`));
-  return label;
-}
-function createCheckbox(modal, labelText2, checkboxState, onClick) {
-  const section = createSection();
-  const label = createCheckboxLabel(labelText2, checkboxState);
-  const checkbox = label.querySelector("input");
-  checkbox.addEventListener("change", () => onClick(checkbox.checked));
-  section.appendChild(label);
-  modal.appendChild(section);
-}
-function createModal(modalTitle, raise) {
-  const backdrop = document.createElement("div");
-  backdrop.className = MODAL_BACKDROP_CLASS;
-  backdrop.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
-  const modal = document.createElement("div");
-  modal.className = MODAL_CONTAINER_CLASS;
-  modal.addEventListener("click", (e) => e.stopPropagation());
-  const header = document.createElement("div");
-  header.className = "modal-header";
-  const title = document.createElement("span");
-  title.textContent = modalTitle;
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "modal-close";
-  closeBtn.textContent = "×";
-  closeBtn.addEventListener("click", () => raise({ id: "ModalStateChange", modalState: "closed" }));
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-  modal.appendChild(header);
-  backdrop.appendChild(modal);
-  document.body.appendChild(backdrop);
-  return modal;
-}
 
 // src/view/modes.ts
 function modesNodes(model, raise) {
-  const pad2 = 5;
-  const buttonHeight = 25;
   const scaleFamily2 = scaleFamily[model.state.scaleFamilyIndex];
   const activeMode = scaleFamily2.modes.find((m) => m.index === model.state.modeIndex);
   const children = scaleFamily2.modes.map((mode, i) => ({
-    type: "g",
-    transform: `translate(0, ${i * (buttonHeight + pad2) + pad2})`,
+    type: "buttonRow",
+    row: i,
     children: [
       {
-        type: "rect",
-        x: pad2,
-        y: 0,
-        width: 150,
-        height: buttonHeight,
+        type: "svgButton",
         class: mode.index === activeMode.index ? "mode-button mode-button-selected" : "mode-button",
+        label: mode.name,
+        xPos: 0,
+        xSize: 3,
         onClick: () => raise({ id: "ModeChanged", mode })
-      },
-      {
-        type: "text",
-        x: pad2 + 10,
-        y: 17,
-        class: "mode-text",
-        content: mode.name
       }
     ]
   }));
@@ -1481,11 +1509,12 @@ var defaultState = Object.freeze({
 // src/view/permalink.ts
 var PERMALINK_BUTTON_ID = "permalink-button";
 var PERMALINK_TEXT_ID = "permalink-text";
-var view2 = ({ state }, _ctx, _raise) => {
+var view = ({ state }, _raise) => {
   const permalinkButton = document.getElementById(PERMALINK_BUTTON_ID);
   if (permalinkButton) {
     permalinkButton.onclick = () => populatePermalinkText(state);
   }
+  return [];
 };
 function populatePermalinkText(state) {
   const permalink = generatePermalink(state);
@@ -1552,31 +1581,36 @@ var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
 var FB_NT_NONE_ID = "fb-note-text-None";
 var FB_NT_NAME_ID = "fb-note-text-NoteName";
 var FB_NT_INT_ID = "fb-note-text-Interval";
-var view3 = ({ state }, ctx, raise) => {
-  const setCheckbox = (id, checked) => {
-    const checkbox = document.getElementById(id);
-    if (checkbox === null) {
-      throw new Error(`checkbox with id '${id}' not found.`);
+var create3 = () => {
+  let uninitialised = true;
+  return ({ state }, raise) => {
+    const setCheckbox = (id, checked) => {
+      const checkbox = document.getElementById(id);
+      if (checkbox === null) {
+        throw new Error(`checkbox with id '${id}' not found.`);
+      }
+      checkbox.checked = checked;
+    };
+    const setClickHandler = (id, handler) => {
+      const element = document.getElementById(id);
+      element.onclick = (x) => handler(x.currentTarget, raise);
+    };
+    setCheckbox("left-handed-checkbox", state.isLeftHanded);
+    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
+    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
+    const selected = `fb-note-text-${state.fretboardLabelType}`;
+    setCheckbox(selected, true);
+    if (uninitialised) {
+      setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
+      setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
+      setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
+      setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
+      setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
+      setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
+      uninitialised = false;
     }
-    checkbox.checked = checked;
+    return [];
   };
-  const setClickHandler = (id, handler) => {
-    const element = document.getElementById(id);
-    element.onclick = (x) => handler(x.currentTarget, raise);
-  };
-  setCheckbox("left-handed-checkbox", state.isLeftHanded);
-  setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-  setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-  const selected = `fb-note-text-${state.fretboardLabelType}`;
-  setCheckbox(selected, true);
-  if (ctx.init) {
-    setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
-    setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
-    setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
-    setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
-    setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
-    setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
-  }
 };
 function onLeftHandedClick(e, raise) {
   raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
@@ -15145,12 +15179,13 @@ var StateSchema = exports_external.object({
 
 // src/view/storage.ts
 var STORAGE_KEY = "app_state";
-var view4 = ({ state }, _ctx, _raise) => {
+var view2 = ({ state }, _raise) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
     console.log(`Could not store state in local storage: ${e}`);
   }
+  return [];
 };
 var getStateFromLocalStorage = () => {
   const stateString = localStorage.getItem(STORAGE_KEY);
@@ -15167,33 +15202,17 @@ var getStateFromLocalStorage = () => {
 
 // src/view/tonics.ts
 function tonicsNodes(model, raise) {
-  const pad2 = 5;
-  const buttonHeight = 25;
   const selectedNoteSpec = createNoteSpec(model.state.naturalIndex, model.state.index);
   const children = naturals.map((natural, i) => ({
-    type: "g",
-    transform: `translate(0, ${i * (buttonHeight + pad2) + pad2})`,
+    type: "buttonRow",
+    row: i,
     children: bg(natural).map((data, j) => ({
-      type: "g",
-      transform: `translate(${j * 55}, 0)`,
-      children: [
-        {
-          type: "rect",
-          x: pad2,
-          y: 0,
-          width: 40,
-          height: buttonHeight,
-          class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
-          onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec })
-        },
-        {
-          type: "text",
-          x: pad2 + 10,
-          y: 17,
-          class: "tonic-text",
-          content: data.noteSpec.label
-        }
-      ]
+      type: "svgButton",
+      class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
+      label: data.noteSpec.label,
+      xPos: j,
+      xSize: 1,
+      onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec })
     }))
   }));
   return [{ type: "g", children }];
@@ -15230,29 +15249,21 @@ var svgViews = [
   { containerId: "modes", view: modesPanelView },
   { containerId: "chromatic", view: circleNodes(chromatic(), "Chromatic", 500) },
   { containerId: "cof", view: circleNodes(fifths(), "Circle of Fifths", 500) },
-  { containerId: "gtr", view: guitarNodes }
-];
-var htmlViews = [
+  { containerId: "gtr", view: guitarNodes },
   { containerId: "scale-dropdown", view: scaleFamilyNodes },
-  { containerId: "tuning-dropdown", view: tuningNodes }
+  { containerId: "tuning-dropdown", view: tuningNodes },
+  { containerId: "no-op", view: create() },
+  { containerId: "no-op", view: create3() },
+  { containerId: "no-op", view: view2 },
+  { containerId: "no-op", view },
+  { containerId: "no-op", view: create2() }
 ];
 var createViews = () => {
-  const modalView = create();
-  const views = [view, view3, view4, view2, modalView];
-  return (model, ctx, raise) => {
-    for (const view5 of views) {
-      view5(model, ctx, raise);
-    }
-    for (const { containerId, view: view5 } of svgViews) {
+  return (model, raise) => {
+    for (const { containerId, view: view3 } of svgViews) {
       const container = document.getElementById(containerId);
       if (container) {
-        renderToSvg(container, view5(model, raise));
-      }
-    }
-    for (const { containerId, view: view5 } of htmlViews) {
-      const container = document.getElementById(containerId);
-      if (container) {
-        renderToHtml(container, view5(model, raise));
+        renderToSvg(container, view3(model, raise));
       }
     }
   };
@@ -15286,15 +15297,15 @@ var initModel = () => {
 };
 var main = () => {
   let model = initModel();
-  const view5 = createViews();
+  const view3 = createViews();
   const raise = (msg) => {
     model = update(model, msg);
-    view5(model, { init: false }, raise);
+    view3(model, raise);
   };
-  view5(model, { init: true }, raise);
+  view3(model, raise);
   setWakeLock();
 };
 main();
 
-//# debugId=C50FF58C825162AE64756E2164756E21
+//# debugId=E0D57C8BD887042164756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
