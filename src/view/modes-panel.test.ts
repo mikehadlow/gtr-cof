@@ -17,7 +17,7 @@ function collect<T extends RenderNode["type"]>(type: T, nodes: RenderNode[]): Ex
         if (node.type === type) {
             result.push(node as Extract<RenderNode, { type: T }>);
         }
-        if (node.type === "g") {
+        if (node.type === "g" || node.type === "buttonRow") {
             result.push(...collect(type, node.children));
         }
     }
@@ -156,39 +156,38 @@ describe("modesNodes", () => {
         expect(nodes[0].children).toHaveLength(scaleFamily0.modes.length);
     });
 
-    test("each child g has a rect then a text", () => {
+    test("each child buttonRow has an svgButton", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
         for (const child of nodes[0].children) {
-            if (child.type !== "g") {
+            if (child.type !== "buttonRow") {
                 throw new Error("expected g");
             }
-            expect(child.children[0].type).toBe("rect");
-            expect(child.children[1].type).toBe("text");
+            expect(child.children[0].type).toBe("svgButton");
         }
     });
 
-    test("exactly one rect has the selected class", () => {
-        const rects = collect("rect", nodes);
-        const selected = rects.filter((r) => r.class?.includes("mode-button-selected"));
+    test("exactly one button has the selected class", () => {
+        const buttons = collect("svgButton", nodes);
+        const selected = buttons.filter((r) => r.class?.includes("mode-button-selected"));
         expect(selected).toHaveLength(1);
     });
 
-    test("active mode (modeIndex 0) rect has selected class", () => {
+    test("active mode (modeIndex 0) button has selected class", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
         const activeModeArrayIdx = scaleFamily0.modes.findIndex((m) => m.index === model.state.modeIndex);
         const child = nodes[0].children[activeModeArrayIdx];
-        if (child.type !== "g") {
-            throw new Error("expected g");
+        if (child.type !== "buttonRow") {
+            throw new Error("expected buttonRow");
         }
-        const rect = child.children[0];
-        expect(rect.type === "rect" && rect.class).toContain("mode-button-selected");
+        const button = child.children[0];
+        expect(button.type === "svgButton" && button.class).toContain("mode-button-selected");
     });
 
-    test("inactive mode rects have mode-button class only", () => {
+    test("inactive mode buttons have mode-button class only", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
@@ -197,21 +196,21 @@ describe("modesNodes", () => {
             return mode.index !== model.state.modeIndex;
         });
         for (const child of inactiveChildren) {
-            if (child.type !== "g") {
-                throw new Error("expected g");
+            if (child.type !== "buttonRow") {
+                throw new Error("expected buttonRow");
             }
-            const rect = child.children[0];
-            if (rect.type === "rect") {
-                expect(rect.class).toBe("mode-button");
+            const button = child.children[0];
+            if (button.type === "svgButton") {
+                expect(button.class).toBe("mode-button");
             }
         }
     });
 
     test("text labels match mode names", () => {
-        const texts = collect("text", nodes);
-        expect(texts).toHaveLength(scaleFamily0.modes.length);
-        for (let i = 0; i < texts.length; i++) {
-            expect(texts[i].content).toBe(scaleFamily0.modes[i].name);
+        const buttons = collect("svgButton", nodes);
+        expect(buttons).toHaveLength(scaleFamily0.modes.length);
+        for (let i = 0; i < buttons.length; i++) {
+            expect(buttons[i].label).toBe(scaleFamily0.modes[i].name);
         }
     });
 
@@ -224,14 +223,14 @@ describe("modesNodes", () => {
             throw new Error();
         }
         const child = ns[0].children[0];
-        if (child.type !== "g") {
+        if (child.type !== "buttonRow") {
             throw new Error();
         }
-        const rect = child.children[0];
-        if (rect.type !== "rect" || !rect.onClick) {
+        const button = child.children[0];
+        if (button.type !== "svgButton" || !button.onClick) {
             throw new Error("no onClick");
         }
-        rect.onClick();
+        button.onClick();
         expect(raised!.id).toBe("ModeChanged");
         expect(raised!.mode).toBe(scaleFamily0.modes[0]);
     });
@@ -254,13 +253,13 @@ describe("tonicsNodes", () => {
         expect(nodes[0].children).toHaveLength(music.naturals.length);
     });
 
-    test("each row has 3 button g nodes", () => {
+    test("each row has 3 button svgButton nodes", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
         for (const row of nodes[0].children) {
-            if (row.type !== "g") {
-                throw new Error("expected g");
+            if (row.type !== "buttonRow") {
+                throw new Error("expected svgButton");
             }
             expect(row.children).toHaveLength(3);
         }
@@ -271,7 +270,7 @@ describe("tonicsNodes", () => {
             throw new Error("expected g");
         }
         for (const row of nodes[0].children) {
-            if (row.type !== "g") {
+            if (row.type !== "buttonRow") {
                 throw new Error();
             }
             for (const btn of row.children) {
@@ -308,7 +307,7 @@ describe("tonicsNodes", () => {
             throw new Error();
         }
         const firstRow = ns[0].children[0];
-        if (firstRow.type !== "g") {
+        if (firstRow.type !== "buttonRow") {
             throw new Error();
         }
         const firstBtn = firstRow.children[0];

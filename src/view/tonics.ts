@@ -4,13 +4,11 @@ import * as music from "../music";
 import type { RenderNode } from "../ui";
 
 export function tonicsNodes(model: Model, raise: (msg: Msg) => void): RenderNode[] {
-    const pad = 5;
-    const buttonHeight = 25;
     const selectedNoteSpec = music.createNoteSpec(model.state.naturalIndex, model.state.index);
 
     const children: RenderNode[] = music.naturals.map((natural, i) => ({
-        type: "g" as const,
-        transform: `translate(0, ${i * (buttonHeight + pad) + pad})`,
+        type: "buttonRow" as const,
+        row: i,
         children: bg(natural).map((data, j) => ({
             type: "svgButton" as const,
             class: tonicButtonClass(data.noteSpec, selectedNoteSpec),

@@ -37,7 +37,8 @@ export type RenderNode =
           style?: Record<string, string>;
       }
     | { type: "div"; class?: string; textContent?: string; onClick?: () => void; children?: RenderNode[] }
-    | { type: "svgButton"; class: string; label: string; xPos: number; xSize: number; onClick: () => void };
+    | { type: "svgButton"; class: string; label: string; xPos: number; xSize: number; onClick: () => void }
+    | { type: "buttonRow"; row: number; children: RenderNode[] };
 
 // Arc math — D3 convention: angle 0 = 12 o'clock, clockwise.
 // SVG coords: x = sin(a) * r,  y = -cos(a) * r
@@ -234,6 +235,16 @@ function createElement(node: RenderNode): Element {
                 ],
             };
             return createElement(buttonNodeTree);
+        }
+        case "buttonRow": {
+            const pad = 5;
+            const buttonHeight = 25;
+            const buttonRowTree = {
+                type: "g" as const,
+                transform: `translate(0, ${node.row * (buttonHeight + pad) + pad})`,
+                children: node.children,
+            };
+            return createElement(buttonRowTree);
         }
         default: {
             const _exhaustiveCheck: never = node;
