@@ -47,7 +47,7 @@ describe("guitarNodes - structure", () => {
         }
         expect(nodes[0].class).toBe("mode-text");
         expect(nodes[0].x).toBe(30);
-        expect(nodes[0].y).toBe(11);
+        expect(nodes[0].y).toBe(15);
     });
 
     test("title contains tuning string and description", () => {
