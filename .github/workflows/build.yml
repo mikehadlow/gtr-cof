@@ -8,6 +8,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun run check
+      - run: bun run check-deps
       - run: bun run build
       - run: bun test
       - run: mkdir docs/src
