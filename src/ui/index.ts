@@ -37,6 +37,7 @@ export type RenderNode =
           style?: Record<string, string>;
       }
     | { type: "div"; class?: string; textContent?: string; onClick?: () => void; children?: RenderNode[] }
+    // Below are meta-nodes that render low level nodes above
     | { type: "svgButton"; class: string; label: string; xPos: number; xSize: number; onClick: () => void }
     | { type: "buttonRow"; row: number; children: RenderNode[] };
 
