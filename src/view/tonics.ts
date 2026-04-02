@@ -12,26 +12,12 @@ export function tonicsNodes(model: Model, raise: (msg: Msg) => void): RenderNode
         type: "g" as const,
         transform: `translate(0, ${i * (buttonHeight + pad) + pad})`,
         children: bg(natural).map((data, j) => ({
-            type: "g" as const,
-            transform: `translate(${j * 55}, 0)`,
-            children: [
-                {
-                    type: "rect" as const,
-                    x: pad,
-                    y: 0,
-                    width: 40,
-                    height: buttonHeight,
-                    class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
-                    onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec }),
-                },
-                {
-                    type: "text" as const,
-                    x: pad + 10,
-                    y: 17,
-                    class: "tonic-text",
-                    content: data.noteSpec.label,
-                },
-            ],
+            type: "svgButton" as const,
+            class: tonicButtonClass(data.noteSpec, selectedNoteSpec),
+            label: data.noteSpec.label,
+            xPos: j,
+            xSize: 1,
+            onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec }),
         })),
     }));
 

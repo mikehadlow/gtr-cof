@@ -266,7 +266,7 @@ describe("tonicsNodes", () => {
         }
     });
 
-    test("each button g contains a rect then a text", () => {
+    test("each button g contains an svgButton", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
@@ -275,35 +275,27 @@ describe("tonicsNodes", () => {
                 throw new Error();
             }
             for (const btn of row.children) {
-                if (btn.type !== "g") {
+                if (btn.type !== "svgButton") {
                     throw new Error();
                 }
-                expect(btn.children[0].type).toBe("rect");
-                expect(btn.children[1].type).toBe("text");
             }
         }
     });
 
-    test("total 21 rects and 21 texts", () => {
-        expect(collect("rect", nodes)).toHaveLength(21);
-        expect(collect("text", nodes)).toHaveLength(21);
-    });
-
-    test("exactly one rect has tonic-button-selected class", () => {
-        const selected = collect("rect", nodes).filter((r) => r.class?.includes("tonic-button-selected"));
+    test("exactly one svgButton has tonic-button-selected class", () => {
+        const selected = collect("svgButton", nodes).filter((r) => r.class?.includes("tonic-button-selected"));
         expect(selected).toHaveLength(1);
     });
 
-    test("selected rect's text matches the model tonic label", () => {
-        const rects = collect("rect", nodes);
-        const texts = collect("text", nodes);
-        const selectedIdx = rects.findIndex((r) => r.class?.includes("tonic-button-selected"));
+    test("selected svgButton's text matches the model tonic label", () => {
+        const buttons = collect("svgButton", nodes);
+        const selected = buttons.find((r) => r.class?.includes("tonic-button-selected"));
         const expectedLabel = music.createNoteSpec(defaultState.naturalIndex, defaultState.index).label;
-        expect(texts[selectedIdx].content).toBe(expectedLabel);
+        expect(selected?.label).toBe(expectedLabel);
     });
 
-    test("some rects have tonic-button-grey class (enharmonic equivalents)", () => {
-        const grey = collect("rect", nodes).filter((r) => r.class?.includes("tonic-button-grey"));
+    test("some svgButtons have tonic-button-grey class (enharmonic equivalents)", () => {
+        const grey = collect("svgButton", nodes).filter((r) => r.class?.includes("tonic-button-grey"));
         expect(grey.length).toBeGreaterThan(0);
     });
 
@@ -320,14 +312,10 @@ describe("tonicsNodes", () => {
             throw new Error();
         }
         const firstBtn = firstRow.children[0];
-        if (firstBtn.type !== "g") {
+        if (firstBtn.type !== "svgButton") {
             throw new Error();
         }
-        const rect = firstBtn.children[0];
-        if (rect.type !== "rect" || !rect.onClick) {
-            throw new Error("no onClick");
-        }
-        rect.onClick();
+        firstBtn.onClick();
         expect(raised!.id).toBe("TonicChanged");
         expect(raised!.noteSpec).toBeDefined();
     });
