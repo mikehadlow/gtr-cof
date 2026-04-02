@@ -268,6 +268,7 @@ export type ScaleNote = {
     readonly interval: Interval;
     readonly intervalName: string;
     readonly isScaleNote: boolean;
+    readonly isTonic: boolean;
     readonly noteNumber: number;
     chord?: Chord;
 };
@@ -300,6 +301,7 @@ export const nullNode: Node = {
         },
         intervalName: "",
         isScaleNote: false,
+        isTonic: false,
         noteNumber: 0,
     },
     chordInterval: {
@@ -389,6 +391,7 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
             interval: activeInterval,
             intervalName: getIntervalName(activeInterval),
             isScaleNote: isScaleNote,
+            isTonic: index === noteSpec.index,
             noteNumber: noteNumber,
         };
     });

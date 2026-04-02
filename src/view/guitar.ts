@@ -30,7 +30,7 @@ function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
         return "white";
     }
     if (sn.node.scaleNote.isScaleNote) {
-        if (sn.node.scaleNote.noteNumber === 0) {
+        if (sn.node.scaleNote.isTonic) {
             return hasToggledNotes ? "white" : "yellow";
         }
         return "white";

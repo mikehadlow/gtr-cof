@@ -28,10 +28,13 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
 
         const noteSegments: RenderNode[] = segments.map((seg) => {
             const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const isTonic = node.scaleNote.note.index === model.state.index;
             const cls =
                 "note-segment" +
-                (node.scaleNote.isScaleNote ? (isTonic ? " note-segment-tonic" : " note-segment-scale") : "");
+                (node.scaleNote.isScaleNote
+                    ? node.scaleNote.isTonic
+                        ? " note-segment-tonic"
+                        : " note-segment-scale"
+                    : "");
             return {
                 type: "path",
                 d: arcPath(degreeRadius, noteRadius, seg.startAngle, seg.endAngle),

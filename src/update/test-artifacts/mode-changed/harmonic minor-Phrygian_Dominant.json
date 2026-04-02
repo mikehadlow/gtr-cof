@@ -20,6 +20,7 @@
           },
           "intervalName": "1",
           "isScaleNote": true,
+          "isTonic": true,
           "noteNumber": 0,
           "chord": {
             "romanNumeral": "I",
@@ -55,6 +56,7 @@
           },
           "intervalName": "m2",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 1,
           "chord": {
             "romanNumeral": "II",
@@ -90,6 +92,7 @@
           },
           "intervalName": "M2",
           "isScaleNote": false,
+          "isTonic": false,
           "noteNumber": 1,
           "chord": {
             "romanNumeral": "",
@@ -125,6 +128,7 @@
           },
           "intervalName": "m3",
           "isScaleNote": false,
+          "isTonic": false,
           "noteNumber": 2,
           "chord": {
             "romanNumeral": "",
@@ -160,6 +164,7 @@
           },
           "intervalName": "M3",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 2,
           "chord": {
             "romanNumeral": "iii°",
@@ -195,6 +200,7 @@
           },
           "intervalName": "4",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 3,
           "chord": {
             "romanNumeral": "iv",
@@ -230,6 +236,7 @@
           },
           "intervalName": "d5",
           "isScaleNote": false,
+          "isTonic": false,
           "noteNumber": 4,
           "chord": {
             "romanNumeral": "",
@@ -265,6 +272,7 @@
           },
           "intervalName": "5",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 4,
           "chord": {
             "romanNumeral": "v°",
@@ -300,6 +308,7 @@
           },
           "intervalName": "m6",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 5,
           "chord": {
             "romanNumeral": "vi+",
@@ -335,6 +344,7 @@
           },
           "intervalName": "M6",
           "isScaleNote": false,
+          "isTonic": false,
           "noteNumber": 5,
           "chord": {
             "romanNumeral": "",
@@ -370,6 +380,7 @@
           },
           "intervalName": "m7",
           "isScaleNote": true,
+          "isTonic": false,
           "noteNumber": 6,
           "chord": {
             "romanNumeral": "vii",
@@ -405,6 +416,7 @@
           },
           "intervalName": "M7",
           "isScaleNote": false,
+          "isTonic": false,
           "noteNumber": 6,
           "chord": {
             "romanNumeral": "",
