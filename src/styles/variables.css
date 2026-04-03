@@ -33,6 +33,20 @@
     --color-button-default: white;
     --color-button-disabled: #A8A8A8;
 
+    /* Interval colours (chromatic positions 0–11) */
+    --interval-color-0: #f44b42;
+    --interval-color-1: #f48942;
+    --interval-color-2: #f4bf42;
+    --interval-color-3: #f4ee42;
+    --interval-color-4: #8cf442;
+    --interval-color-5: #42f4bf;
+    --interval-color-6: #42d4f4;
+    --interval-color-7: #429ef4;
+    --interval-color-8: #e542f4;
+    --interval-color-9: #f44289;
+    --interval-color-10: #ff8282;
+    --interval-color-11: #ff82fc;
+
     /* Stroke */
     --stroke-width: 2px;
 

@@ -51,11 +51,10 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
 
         const intervalSegments: RenderNode[] = segments.map((seg) => {
             const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const selection: { selection?: { class: string; fill: string } } = node.toggle
+            const selection: { selection?: { class: string } } = node.toggle
                 ? {
                       selection: {
-                          class: "interval-note-selected",
-                          fill: `#${node.chordInterval.colour.toString(16).padStart(6, "0")}`,
+                          class: `interval-note-selected ${node.chordInterval.colour.replace("color", "fill")}`,
                       },
                   }
                 : {};

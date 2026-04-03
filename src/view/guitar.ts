@@ -38,12 +38,12 @@ function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
     return "rgba(255, 255, 255, 0.01)";
 }
 
-function noteStroke(sn: StringNote, hasToggledNotes: boolean): string {
+function noteStroke(sn: StringNote, hasToggledNotes: boolean): string | undefined {
     if (sn.node.midiToggle) {
         return "OrangeRed";
     }
     if (sn.node.toggle) {
-        return `#${sn.node.chordInterval.colour.toString(16).padStart(6, "0")}`;
+        return undefined;
     }
     if (hasToggledNotes) {
         return "none";
@@ -54,10 +54,14 @@ function noteStroke(sn: StringNote, hasToggledNotes: boolean): string {
     return "none";
 }
 
-function noteStrokeWidth(sn: StringNote): number {
-    if (sn.node.midiToggle) {
-        return 10;
+function noteClass(sn: StringNote): string | undefined {
+    if (sn.node.toggle) {
+        return sn.node.chordInterval.colour.replace("color", "stroke");
     }
+    return undefined;
+}
+
+function noteStrokeWidth(sn: StringNote): number {
     if (sn.node.toggle) {
         return 4;
     }
@@ -163,6 +167,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
                 r: noteRadius,
                 cy: stringGap / 2,
                 cx: noteX(i),
+                class: noteClass(sn),
                 fill: noteFill(sn, hasToggledNotes),
                 stroke: noteStroke(sn, hasToggledNotes),
                 strokeWidth: noteStrokeWidth(sn),

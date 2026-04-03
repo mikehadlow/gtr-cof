@@ -64,30 +64,30 @@ describe("createNoteSpec", () => {
 
 describe("getIntervalName", () => {
     test("returns correct name for natural intervals", () => {
-        expect(getIntervalName({ ord: 0, type: "Nat", colour: 0 })).toBe("1");
-        expect(getIntervalName({ ord: 4, type: "Nat", colour: 0 })).toBe("5");
+        expect(getIntervalName({ ord: 0, type: "Nat", colour: "interval-color-0" })).toBe("1");
+        expect(getIntervalName({ ord: 4, type: "Nat", colour: "interval-color-0" })).toBe("5");
     });
 
     test("returns correct name for major intervals", () => {
-        expect(getIntervalName({ ord: 1, type: "Maj", colour: 0 })).toBe("M2");
-        expect(getIntervalName({ ord: 2, type: "Maj", colour: 0 })).toBe("M3");
-        expect(getIntervalName({ ord: 5, type: "Maj", colour: 0 })).toBe("M6");
+        expect(getIntervalName({ ord: 1, type: "Maj", colour: "interval-color-0" })).toBe("M2");
+        expect(getIntervalName({ ord: 2, type: "Maj", colour: "interval-color-0" })).toBe("M3");
+        expect(getIntervalName({ ord: 5, type: "Maj", colour: "interval-color-0" })).toBe("M6");
     });
 
     test("returns correct name for minor intervals", () => {
-        expect(getIntervalName({ ord: 1, type: "Min", colour: 0 })).toBe("m2");
-        expect(getIntervalName({ ord: 2, type: "Min", colour: 0 })).toBe("m3");
-        expect(getIntervalName({ ord: 6, type: "Min", colour: 0 })).toBe("m7");
+        expect(getIntervalName({ ord: 1, type: "Min", colour: "interval-color-0" })).toBe("m2");
+        expect(getIntervalName({ ord: 2, type: "Min", colour: "interval-color-0" })).toBe("m3");
+        expect(getIntervalName({ ord: 6, type: "Min", colour: "interval-color-0" })).toBe("m7");
     });
 
     test("returns correct name for augmented intervals", () => {
-        expect(getIntervalName({ ord: 3, type: "Aug", colour: 0 })).toBe("A4");
-        expect(getIntervalName({ ord: 4, type: "Aug", colour: 0 })).toBe("A5");
+        expect(getIntervalName({ ord: 3, type: "Aug", colour: "interval-color-0" })).toBe("A4");
+        expect(getIntervalName({ ord: 4, type: "Aug", colour: "interval-color-0" })).toBe("A5");
     });
 
     test("returns correct name for diminished intervals", () => {
-        expect(getIntervalName({ ord: 4, type: "Dim", colour: 0 })).toBe("d5");
-        expect(getIntervalName({ ord: 6, type: "Dim", colour: 0 })).toBe("d7");
+        expect(getIntervalName({ ord: 4, type: "Dim", colour: "interval-color-0" })).toBe("d5");
+        expect(getIntervalName({ ord: 6, type: "Dim", colour: "interval-color-0" })).toBe("d7");
     });
 });
 

@@ -593,11 +593,11 @@ describe("circleNodes - segment selection", () => {
             if (c.type !== "segment" || !c.selection) {
                 throw new Error();
             }
-            expect(c.selection.class).toBe("interval-note-selected");
+            expect(c.selection.class).toMatch(/^interval-note-selected interval-fill-\d+$/);
         }
     });
 
-    test("toggled interval segments have selection.fill as a hex colour string", () => {
+    test("toggled interval segments have selection.class with an interval fill class", () => {
         const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
         const nodes = view(modelWithChord, noRaise);
         if (nodes[1].type !== "g") {
@@ -612,7 +612,7 @@ describe("circleNodes - segment selection", () => {
             if (c.type !== "segment" || !c.selection) {
                 throw new Error();
             }
-            expect(c.selection.fill).toMatch(/^#[0-9a-f]{6}$/);
+            expect(c.selection.class).toMatch(/interval-fill-\d+/);
         }
     });
 

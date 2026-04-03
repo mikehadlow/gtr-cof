@@ -16,7 +16,7 @@
           "interval": {
             "ord": 0,
             "type": "Nat",
-            "colour": 16010050
+            "colour": "interval-color-0"
           },
           "intervalName": "1",
           "isScaleNote": true,
@@ -30,7 +30,7 @@
         "chordInterval": {
           "ord": 0,
           "type": "Nat",
-          "colour": 16010050
+          "colour": "interval-color-0"
         },
         "intervalName": "1",
         "isChordRoot": false,
@@ -52,7 +52,7 @@
           "interval": {
             "ord": 1,
             "type": "Min",
-            "colour": 16025922
+            "colour": "interval-color-1"
           },
           "intervalName": "m2",
           "isScaleNote": true,
@@ -66,7 +66,7 @@
         "chordInterval": {
           "ord": 1,
           "type": "Min",
-          "colour": 16025922
+          "colour": "interval-color-1"
         },
         "intervalName": "m2",
         "isChordRoot": false,
@@ -88,7 +88,7 @@
           "interval": {
             "ord": 1,
             "type": "Maj",
-            "colour": 16039746
+            "colour": "interval-color-2"
           },
           "intervalName": "M2",
           "isScaleNote": false,
@@ -102,7 +102,7 @@
         "chordInterval": {
           "ord": 1,
           "type": "Maj",
-          "colour": 16039746
+          "colour": "interval-color-2"
         },
         "intervalName": "M2",
         "isChordRoot": false,
@@ -124,7 +124,7 @@
           "interval": {
             "ord": 2,
             "type": "Min",
-            "colour": 16051778
+            "colour": "interval-color-3"
           },
           "intervalName": "m3",
           "isScaleNote": true,
@@ -138,7 +138,7 @@
         "chordInterval": {
           "ord": 2,
           "type": "Min",
-          "colour": 16051778
+          "colour": "interval-color-3"
         },
         "intervalName": "m3",
         "isChordRoot": false,
@@ -160,7 +160,7 @@
           "interval": {
             "ord": 3,
             "type": "Dim",
-            "colour": 9237570
+            "colour": "interval-color-4"
           },
           "intervalName": "d4",
           "isScaleNote": true,
@@ -174,7 +174,7 @@
         "chordInterval": {
           "ord": 3,
           "type": "Dim",
-          "colour": 9237570
+          "colour": "interval-color-4"
         },
         "intervalName": "d4",
         "isChordRoot": false,
@@ -196,7 +196,7 @@
           "interval": {
             "ord": 3,
             "type": "Nat",
-            "colour": 4388031
+            "colour": "interval-color-5"
           },
           "intervalName": "4",
           "isScaleNote": false,
@@ -210,7 +210,7 @@
         "chordInterval": {
           "ord": 3,
           "type": "Nat",
-          "colour": 4388031
+          "colour": "interval-color-5"
         },
         "intervalName": "4",
         "isChordRoot": false,
@@ -232,7 +232,7 @@
           "interval": {
             "ord": 4,
             "type": "Dim",
-            "colour": 4379892
+            "colour": "interval-color-6"
           },
           "intervalName": "d5",
           "isScaleNote": true,
@@ -246,7 +246,7 @@
         "chordInterval": {
           "ord": 4,
           "type": "Dim",
-          "colour": 4379892
+          "colour": "interval-color-6"
         },
         "intervalName": "d5",
         "isChordRoot": false,
@@ -268,7 +268,7 @@
           "interval": {
             "ord": 4,
             "type": "Nat",
-            "colour": 4366068
+            "colour": "interval-color-7"
           },
           "intervalName": "5",
           "isScaleNote": false,
@@ -282,7 +282,7 @@
         "chordInterval": {
           "ord": 4,
           "type": "Nat",
-          "colour": 4366068
+          "colour": "interval-color-7"
         },
         "intervalName": "5",
         "isChordRoot": false,
@@ -304,7 +304,7 @@
           "interval": {
             "ord": 5,
             "type": "Min",
-            "colour": 15024884
+            "colour": "interval-color-8"
           },
           "intervalName": "m6",
           "isScaleNote": true,
@@ -318,7 +318,7 @@
         "chordInterval": {
           "ord": 5,
           "type": "Min",
-          "colour": 15024884
+          "colour": "interval-color-8"
         },
         "intervalName": "m6",
         "isChordRoot": false,
@@ -340,7 +340,7 @@
           "interval": {
             "ord": 6,
             "type": "Dim",
-            "colour": 16007817
+            "colour": "interval-color-9"
           },
           "intervalName": "d7",
           "isScaleNote": true,
@@ -354,7 +354,7 @@
         "chordInterval": {
           "ord": 6,
           "type": "Dim",
-          "colour": 16007817
+          "colour": "interval-color-9"
         },
         "intervalName": "d7",
         "isChordRoot": false,
@@ -376,7 +376,7 @@
           "interval": {
             "ord": 6,
             "type": "Min",
-            "colour": 16745090
+            "colour": "interval-color-10"
           },
           "intervalName": "m7",
           "isScaleNote": false,
@@ -390,7 +390,7 @@
         "chordInterval": {
           "ord": 6,
           "type": "Min",
-          "colour": 16745090
+          "colour": "interval-color-10"
         },
         "intervalName": "m7",
         "isChordRoot": false,
@@ -412,7 +412,7 @@
           "interval": {
             "ord": 6,
             "type": "Maj",
-            "colour": 16745212
+            "colour": "interval-color-11"
           },
           "intervalName": "M7",
           "isScaleNote": false,
@@ -426,7 +426,7 @@
         "chordInterval": {
           "ord": 6,
           "type": "Maj",
-          "colour": 16745212
+          "colour": "interval-color-11"
         },
         "intervalName": "M7",
         "isChordRoot": false,
