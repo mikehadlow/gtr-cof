@@ -13,6 +13,7 @@ jobs:
       - run: bun test
       - run: mkdir docs/src
       - run: cp src/*.ts docs/src
+      - run: sed -i "s/gtr-cof\.css/gtr-cof.css?v=$GITHUB_SHA/" docs/index.html
       - run: echo "Run number=$GITHUB_RUN_NUMBER, Actor=$GITHUB_ACTOR, Sha=$GITHUB_SHA" > docs/version.txt
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
