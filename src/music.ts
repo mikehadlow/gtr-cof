@@ -12,59 +12,59 @@ type IntervalType = keyof typeof intervalName;
 export type Interval = {
     readonly ord: number;
     readonly type: IntervalType;
-    readonly colour: number;
+    readonly colour: string;
 };
 
 export const getIntervalName: (x: Interval) => string = (interval) => intervalName[interval.type] + (interval.ord + 1);
 
 const intervals: Mod<Interval[]> = new Mod([
     [
-        { ord: 0, type: "Nat", colour: 0xf44b42 },
-        { ord: 1, type: "Dim", colour: 0xf44b42 },
+        { ord: 0, type: "Nat", colour: "interval-color-0" },
+        { ord: 1, type: "Dim", colour: "interval-color-0" },
     ],
     [
-        { ord: 1, type: "Min", colour: 0xf48942 },
-        { ord: 0, type: "Aug", colour: 0xf48942 },
+        { ord: 1, type: "Min", colour: "interval-color-1" },
+        { ord: 0, type: "Aug", colour: "interval-color-1" },
     ],
     [
-        { ord: 1, type: "Maj", colour: 0xf4bf42 },
-        { ord: 2, type: "Dim", colour: 0xf4bf42 },
+        { ord: 1, type: "Maj", colour: "interval-color-2" },
+        { ord: 2, type: "Dim", colour: "interval-color-2" },
     ],
     [
-        { ord: 2, type: "Min", colour: 0xf4ee42 },
-        { ord: 1, type: "Aug", colour: 0xf4ee42 },
+        { ord: 2, type: "Min", colour: "interval-color-3" },
+        { ord: 1, type: "Aug", colour: "interval-color-3" },
     ],
     [
-        { ord: 2, type: "Maj", colour: 0x8cf442 },
-        { ord: 3, type: "Dim", colour: 0x8cf442 },
+        { ord: 2, type: "Maj", colour: "interval-color-4" },
+        { ord: 3, type: "Dim", colour: "interval-color-4" },
     ],
     [
-        { ord: 3, type: "Nat", colour: 0x42f4bf },
-        { ord: 2, type: "Aug", colour: 0x42f4bf },
+        { ord: 3, type: "Nat", colour: "interval-color-5" },
+        { ord: 2, type: "Aug", colour: "interval-color-5" },
     ],
     [
-        { ord: 4, type: "Dim", colour: 0x42d4f4 },
-        { ord: 3, type: "Aug", colour: 0x42d4f4 },
+        { ord: 4, type: "Dim", colour: "interval-color-6" },
+        { ord: 3, type: "Aug", colour: "interval-color-6" },
     ],
     [
-        { ord: 4, type: "Nat", colour: 0x429ef4 },
-        { ord: 5, type: "Dim", colour: 0x429ef4 },
+        { ord: 4, type: "Nat", colour: "interval-color-7" },
+        { ord: 5, type: "Dim", colour: "interval-color-7" },
     ],
     [
-        { ord: 5, type: "Min", colour: 0xe542f4 },
-        { ord: 4, type: "Aug", colour: 0xe542f4 },
+        { ord: 5, type: "Min", colour: "interval-color-8" },
+        { ord: 4, type: "Aug", colour: "interval-color-8" },
     ],
     [
-        { ord: 5, type: "Maj", colour: 0xf44289 },
-        { ord: 6, type: "Dim", colour: 0xf44289 },
+        { ord: 5, type: "Maj", colour: "interval-color-9" },
+        { ord: 6, type: "Dim", colour: "interval-color-9" },
     ],
     [
-        { ord: 6, type: "Min", colour: 0xff8282 },
-        { ord: 5, type: "Aug", colour: 0xff8282 },
+        { ord: 6, type: "Min", colour: "interval-color-10" },
+        { ord: 5, type: "Aug", colour: "interval-color-10" },
     ],
     [
-        { ord: 6, type: "Maj", colour: 0xff82fc },
-        { ord: 0, type: "Dim", colour: 0xff82fc },
+        { ord: 6, type: "Maj", colour: "interval-color-11" },
+        { ord: 0, type: "Dim", colour: "interval-color-11" },
     ],
 ]);
 
@@ -297,7 +297,7 @@ export const nullNode: Node = {
         interval: {
             ord: 0,
             type: "Nat",
-            colour: 0,
+            colour: "interval-color-0",
         },
         intervalName: "",
         isScaleNote: false,
@@ -307,7 +307,7 @@ export const nullNode: Node = {
     chordInterval: {
         ord: 0,
         type: "Nat",
-        colour: 0,
+        colour: "interval-color-0",
     },
     intervalName: "",
     isChordRoot: false,

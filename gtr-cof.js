@@ -83,52 +83,52 @@ var intervalName = {
 var getIntervalName = (interval) => intervalName[interval.type] + (interval.ord + 1);
 var intervals = new Mod([
   [
-    { ord: 0, type: "Nat", colour: 16010050 },
-    { ord: 1, type: "Dim", colour: 16010050 }
+    { ord: 0, type: "Nat", colour: "interval-color-0" },
+    { ord: 1, type: "Dim", colour: "interval-color-0" }
   ],
   [
-    { ord: 1, type: "Min", colour: 16025922 },
-    { ord: 0, type: "Aug", colour: 16025922 }
+    { ord: 1, type: "Min", colour: "interval-color-1" },
+    { ord: 0, type: "Aug", colour: "interval-color-1" }
   ],
   [
-    { ord: 1, type: "Maj", colour: 16039746 },
-    { ord: 2, type: "Dim", colour: 16039746 }
+    { ord: 1, type: "Maj", colour: "interval-color-2" },
+    { ord: 2, type: "Dim", colour: "interval-color-2" }
   ],
   [
-    { ord: 2, type: "Min", colour: 16051778 },
-    { ord: 1, type: "Aug", colour: 16051778 }
+    { ord: 2, type: "Min", colour: "interval-color-3" },
+    { ord: 1, type: "Aug", colour: "interval-color-3" }
   ],
   [
-    { ord: 2, type: "Maj", colour: 9237570 },
-    { ord: 3, type: "Dim", colour: 9237570 }
+    { ord: 2, type: "Maj", colour: "interval-color-4" },
+    { ord: 3, type: "Dim", colour: "interval-color-4" }
   ],
   [
-    { ord: 3, type: "Nat", colour: 4388031 },
-    { ord: 2, type: "Aug", colour: 4388031 }
+    { ord: 3, type: "Nat", colour: "interval-color-5" },
+    { ord: 2, type: "Aug", colour: "interval-color-5" }
   ],
   [
-    { ord: 4, type: "Dim", colour: 4379892 },
-    { ord: 3, type: "Aug", colour: 4379892 }
+    { ord: 4, type: "Dim", colour: "interval-color-6" },
+    { ord: 3, type: "Aug", colour: "interval-color-6" }
   ],
   [
-    { ord: 4, type: "Nat", colour: 4366068 },
-    { ord: 5, type: "Dim", colour: 4366068 }
+    { ord: 4, type: "Nat", colour: "interval-color-7" },
+    { ord: 5, type: "Dim", colour: "interval-color-7" }
   ],
   [
-    { ord: 5, type: "Min", colour: 15024884 },
-    { ord: 4, type: "Aug", colour: 15024884 }
+    { ord: 5, type: "Min", colour: "interval-color-8" },
+    { ord: 4, type: "Aug", colour: "interval-color-8" }
   ],
   [
-    { ord: 5, type: "Maj", colour: 16007817 },
-    { ord: 6, type: "Dim", colour: 16007817 }
+    { ord: 5, type: "Maj", colour: "interval-color-9" },
+    { ord: 6, type: "Dim", colour: "interval-color-9" }
   ],
   [
-    { ord: 6, type: "Min", colour: 16745090 },
-    { ord: 5, type: "Aug", colour: 16745090 }
+    { ord: 6, type: "Min", colour: "interval-color-10" },
+    { ord: 5, type: "Aug", colour: "interval-color-10" }
   ],
   [
-    { ord: 6, type: "Maj", colour: 16745212 },
-    { ord: 0, type: "Dim", colour: 16745212 }
+    { ord: 6, type: "Maj", colour: "interval-color-11" },
+    { ord: 0, type: "Dim", colour: "interval-color-11" }
   ]
 ]);
 function notesInScaleFamily(scaleFamily) {
@@ -271,7 +271,7 @@ var nullNode = {
     interval: {
       ord: 0,
       type: "Nat",
-      colour: 0
+      colour: "interval-color-0"
     },
     intervalName: "",
     isScaleNote: false,
@@ -281,7 +281,7 @@ var nullNode = {
   chordInterval: {
     ord: 0,
     type: "Nat",
-    colour: 0
+    colour: "interval-color-0"
   },
   intervalName: "",
   isChordRoot: false,
@@ -460,7 +460,9 @@ var Update = (model, msg) => {
 var Update2 = (model, msg) => {
   const current = model.state;
   current.chordIntervals = msg.chordIntervals;
-  current.toggledNotesBitmask = 0;
+  if (current.chordIndex !== -1) {
+    current.toggledNotesBitmask = 0;
+  }
   return updateScale(current);
 };
 
@@ -919,8 +921,7 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
       const node = nodeByIndex.get(seg.index) ?? nullNode;
       const selection = node.toggle ? {
         selection: {
-          class: "interval-note-selected",
-          fill: `#${node.chordInterval.colour.toString(16).padStart(6, "0")}`
+          class: `interval-note-selected ${node.chordInterval.colour.replace("color", "fill")}`
         }
       } : {};
       return {
@@ -1134,11 +1135,8 @@ function noteFill(sn, hasToggledNotes) {
   return "rgba(255, 255, 255, 0.01)";
 }
 function noteStroke(sn, hasToggledNotes) {
-  if (sn.node.midiToggle) {
-    return "OrangeRed";
-  }
   if (sn.node.toggle) {
-    return `#${sn.node.chordInterval.colour.toString(16).padStart(6, "0")}`;
+    return;
   }
   if (hasToggledNotes) {
     return "none";
@@ -1148,10 +1146,13 @@ function noteStroke(sn, hasToggledNotes) {
   }
   return "none";
 }
-function noteStrokeWidth(sn) {
-  if (sn.node.midiToggle) {
-    return 10;
+function noteClass(sn) {
+  if (sn.node.toggle) {
+    return sn.node.chordInterval.colour.replace("color", "stroke");
   }
+  return;
+}
+function noteStrokeWidth(sn) {
   if (sn.node.toggle) {
     return 4;
   }
@@ -1235,6 +1236,7 @@ var guitarNodes = (model, raise) => {
       r: noteRadius,
       cy: stringGap / 2,
       cx: noteX(i),
+      class: noteClass(sn),
       fill: noteFill(sn, hasToggledNotes),
       stroke: noteStroke(sn, hasToggledNotes),
       strokeWidth: noteStrokeWidth(sn),
@@ -15313,5 +15315,5 @@ var main = () => {
 };
 main();
 
-//# debugId=990F56526274838064756E2164756E21
+//# debugId=3A37E1638D16560264756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

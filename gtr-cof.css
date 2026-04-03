@@ -28,6 +28,18 @@
   --color-button-selected: #ffe000;
   --color-button-default: white;
   --color-button-disabled: #a8a8a8;
+  --interval-color-0: #f44b42;
+  --interval-color-1: #f48942;
+  --interval-color-2: #f4bf42;
+  --interval-color-3: #f4ee42;
+  --interval-color-4: #8cf442;
+  --interval-color-5: #42f4bf;
+  --interval-color-6: #42d4f4;
+  --interval-color-7: #429ef4;
+  --interval-color-8: #e542f4;
+  --interval-color-9: #f44289;
+  --interval-color-10: #ff8282;
+  --interval-color-11: #ff82fc;
   --stroke-width: 2px;
   --z-dropdown: 1;
   --z-modal-backdrop: 1000;
@@ -210,6 +222,54 @@ div {
   stroke: none;
 }
 
+.interval-fill-0 {
+  fill: var(--interval-color-0);
+}
+
+.interval-fill-1 {
+  fill: var(--interval-color-1);
+}
+
+.interval-fill-2 {
+  fill: var(--interval-color-2);
+}
+
+.interval-fill-3 {
+  fill: var(--interval-color-3);
+}
+
+.interval-fill-4 {
+  fill: var(--interval-color-4);
+}
+
+.interval-fill-5 {
+  fill: var(--interval-color-5);
+}
+
+.interval-fill-6 {
+  fill: var(--interval-color-6);
+}
+
+.interval-fill-7 {
+  fill: var(--interval-color-7);
+}
+
+.interval-fill-8 {
+  fill: var(--interval-color-8);
+}
+
+.interval-fill-9 {
+  fill: var(--interval-color-9);
+}
+
+.interval-fill-10 {
+  fill: var(--interval-color-10);
+}
+
+.interval-fill-11 {
+  fill: var(--interval-color-11);
+}
+
 /* src/styles/buttons.css */
 .mode-button {
   fill: var(--color-button-default);
@@ -315,6 +375,55 @@ div {
 
 .modal-radio-label {
   margin-left: 4px;
+}
+
+/* src/styles/guitar.css */
+.interval-stroke-0 {
+  stroke: var(--interval-color-0);
+}
+
+.interval-stroke-1 {
+  stroke: var(--interval-color-1);
+}
+
+.interval-stroke-2 {
+  stroke: var(--interval-color-2);
+}
+
+.interval-stroke-3 {
+  stroke: var(--interval-color-3);
+}
+
+.interval-stroke-4 {
+  stroke: var(--interval-color-4);
+}
+
+.interval-stroke-5 {
+  stroke: var(--interval-color-5);
+}
+
+.interval-stroke-6 {
+  stroke: var(--interval-color-6);
+}
+
+.interval-stroke-7 {
+  stroke: var(--interval-color-7);
+}
+
+.interval-stroke-8 {
+  stroke: var(--interval-color-8);
+}
+
+.interval-stroke-9 {
+  stroke: var(--interval-color-9);
+}
+
+.interval-stroke-10 {
+  stroke: var(--interval-color-10);
+}
+
+.interval-stroke-11 {
+  stroke: var(--interval-color-11);
 }
 
 /* src/styles/index.css */
