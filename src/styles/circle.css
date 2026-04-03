@@ -88,3 +88,17 @@
     fill: none;
     stroke: none;
 }
+
+/* Interval fill classes — applied to interval ring selection circles */
+.interval-fill-0  { fill: var(--interval-color-0);  }
+.interval-fill-1  { fill: var(--interval-color-1);  }
+.interval-fill-2  { fill: var(--interval-color-2);  }
+.interval-fill-3  { fill: var(--interval-color-3);  }
+.interval-fill-4  { fill: var(--interval-color-4);  }
+.interval-fill-5  { fill: var(--interval-color-5);  }
+.interval-fill-6  { fill: var(--interval-color-6);  }
+.interval-fill-7  { fill: var(--interval-color-7);  }
+.interval-fill-8  { fill: var(--interval-color-8);  }
+.interval-fill-9  { fill: var(--interval-color-9);  }
+.interval-fill-10 { fill: var(--interval-color-10); }
+.interval-fill-11 { fill: var(--interval-color-11); }

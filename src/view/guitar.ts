@@ -39,9 +39,6 @@ function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
 }
 
 function noteStroke(sn: StringNote, hasToggledNotes: boolean): string | undefined {
-    if (sn.node.midiToggle) {
-        return "OrangeRed";
-    }
     if (sn.node.toggle) {
         return undefined;
     }

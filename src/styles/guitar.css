@@ -1,0 +1,15 @@
+/* Fretboard */
+
+/* Interval stroke classes — applied to note circles when a chord is selected */
+.interval-stroke-0  { stroke: var(--interval-color-0);  }
+.interval-stroke-1  { stroke: var(--interval-color-1);  }
+.interval-stroke-2  { stroke: var(--interval-color-2);  }
+.interval-stroke-3  { stroke: var(--interval-color-3);  }
+.interval-stroke-4  { stroke: var(--interval-color-4);  }
+.interval-stroke-5  { stroke: var(--interval-color-5);  }
+.interval-stroke-6  { stroke: var(--interval-color-6);  }
+.interval-stroke-7  { stroke: var(--interval-color-7);  }
+.interval-stroke-8  { stroke: var(--interval-color-8);  }
+.interval-stroke-9  { stroke: var(--interval-color-9);  }
+.interval-stroke-10 { stroke: var(--interval-color-10); }
+.interval-stroke-11 { stroke: var(--interval-color-11); }
