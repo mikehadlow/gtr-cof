@@ -25,7 +25,16 @@ export type RenderNode =
           onClick?: () => void;
       }
     | { type: "path"; d: string; class?: string; onClick?: () => void }
-    | { type: "text"; x: number; y: number; class?: string; textAnchor?: string; transform?: string; content: string }
+    | {
+          type: "text";
+          x: number;
+          y: number;
+          class?: string;
+          textAnchor?: string;
+          dominantBaseline?: string;
+          transform?: string;
+          content: string;
+      }
     | { type: "line"; x1: number; y1: number; x2: number; y2: number; stroke?: string; strokeWidth?: number }
     | {
           type: "use";
@@ -173,6 +182,9 @@ function createElement(node: RenderNode): Element[] {
             if (node.textAnchor) {
                 el.setAttribute("text-anchor", node.textAnchor);
             }
+            if (node.dominantBaseline) {
+                el.setAttribute("dominant-baseline", node.dominantBaseline);
+            }
             if (node.transform) {
                 el.setAttribute("transform", node.transform);
             }
@@ -264,7 +276,8 @@ function createElement(node: RenderNode): Element[] {
             return createElement(buttonRowTree);
         }
         case "segment": {
-            const path = {
+            const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+            const path = createElement({
                 type: "g" as const,
                 children: [
                     {
@@ -274,41 +287,40 @@ function createElement(node: RenderNode): Element[] {
                         onClick: node.onClick,
                     },
                 ],
-            };
-            const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
-            const text = {
+            });
+            const selectionElements: Element[] = node.selection
+                ? createElement({
+                      type: "g" as const,
+                      children: [
+                          {
+                              type: "circle" as const,
+                              cx: x,
+                              cy: y,
+                              r: 25,
+                              class: node.selection.class,
+                              fill: node.selection.fill,
+                              stroke: "black",
+                              strokeWidth: 2,
+                              pointerEvents: "none",
+                          },
+                      ],
+                  })
+                : [];
+            const text = createElement({
                 type: "g" as const,
                 children: [
                     {
                         type: "text" as const,
                         x,
-                        y: y + 11,
+                        y,
                         class: node.labelClass,
+                        textAnchor: "middle",
+                        dominantBaseline: "central",
                         content: node.label,
                     },
                 ],
-            };
-            let selectionElements: Element[] = [];
-            if (node.selection) {
-                const selection = {
-                    type: "g" as const,
-                    children: [
-                        {
-                            type: "circle" as const,
-                            cx: x,
-                            cy: y,
-                            r: 25,
-                            class: node.selection.class,
-                            fill: node.selection.fill,
-                            stroke: "black",
-                            strokeWidth: 2,
-                            pointerEvents: "none",
-                        },
-                    ],
-                };
-                selectionElements = createElement(selection);
-            }
-            return [...createElement(path), ...selectionElements, ...createElement(text)];
+            });
+            return [...path, ...selectionElements, ...text];
         }
         default: {
             const _exhaustiveCheck: never = node;
