@@ -39,7 +39,17 @@ export type RenderNode =
     | { type: "div"; class?: string; textContent?: string; onClick?: () => void; children?: RenderNode[] }
     // Below are meta-nodes that render low level nodes above
     | { type: "svgButton"; class: string; label: string; xPos: number; xSize: number; onClick: () => void }
-    | { type: "buttonRow"; row: number; children: RenderNode[] };
+    | { type: "buttonRow"; row: number; children: RenderNode[] }
+    | {
+          type: "segment";
+          class: string;
+          label: string;
+          labelClass: string;
+          radius: { inner: number; outer: number };
+          angle: { start: number; end: number };
+          selection?: { class: string; fill?: string };
+          onClick: () => void;
+      };
 
 // Arc math — D3 convention: angle 0 = 12 o'clock, clockwise.
 // SVG coords: x = sin(a) * r,  y = -cos(a) * r
@@ -74,11 +84,13 @@ export function renderToSvg(container: Element, nodes: RenderNode[]): void {
         container.removeChild(container.firstChild);
     }
     for (const node of nodes) {
-        container.appendChild(createElement(node));
+        for (const element of createElement(node)) {
+            container.appendChild(element);
+        }
     }
 }
 
-function createElement(node: RenderNode): Element {
+function createElement(node: RenderNode): Element[] {
     switch (node.type) {
         case "g": {
             const el = document.createElementNS(SVG_NS, "g");
@@ -86,9 +98,11 @@ function createElement(node: RenderNode): Element {
                 el.setAttribute("transform", node.transform);
             }
             for (const child of node.children) {
-                el.appendChild(createElement(child));
+                for (const element of createElement(child)) {
+                    el.appendChild(element);
+                }
             }
-            return el;
+            return [el];
         }
         case "circle": {
             const el = document.createElementNS(SVG_NS, "circle");
@@ -113,7 +127,7 @@ function createElement(node: RenderNode): Element {
             if (node.onClick) {
                 el.addEventListener("click", node.onClick);
             }
-            return el;
+            return [el];
         }
         case "rect": {
             const el = document.createElementNS(SVG_NS, "rect");
@@ -136,7 +150,7 @@ function createElement(node: RenderNode): Element {
             if (node.onClick) {
                 el.addEventListener("click", node.onClick);
             }
-            return el;
+            return [el];
         }
         case "path": {
             const el = document.createElementNS(SVG_NS, "path");
@@ -147,7 +161,7 @@ function createElement(node: RenderNode): Element {
             if (node.onClick) {
                 el.addEventListener("click", node.onClick);
             }
-            return el;
+            return [el];
         }
         case "text": {
             const el = document.createElementNS(SVG_NS, "text");
@@ -163,7 +177,7 @@ function createElement(node: RenderNode): Element {
                 el.setAttribute("transform", node.transform);
             }
             el.textContent = node.content;
-            return el;
+            return [el];
         }
         case "line": {
             const el = document.createElementNS(SVG_NS, "line");
@@ -177,7 +191,7 @@ function createElement(node: RenderNode): Element {
             if (node.strokeWidth != null) {
                 el.setAttribute("stroke-width", String(node.strokeWidth));
             }
-            return el;
+            return [el];
         }
         case "use": {
             const el = document.createElementNS(SVG_NS, "use");
@@ -191,7 +205,7 @@ function createElement(node: RenderNode): Element {
                     (el as unknown as HTMLElement).style.setProperty(key, value);
                 }
             }
-            return el;
+            return [el];
         }
         case "div": {
             const el = document.createElement("div");
@@ -205,9 +219,11 @@ function createElement(node: RenderNode): Element {
                 el.addEventListener("click", node.onClick);
             }
             for (const child of node.children ?? []) {
-                el.appendChild(createElement(child));
+                for (const element of createElement(child)) {
+                    el.appendChild(element);
+                }
             }
-            return el;
+            return [el];
         }
         case "svgButton": {
             const pad = 5;
@@ -246,6 +262,53 @@ function createElement(node: RenderNode): Element {
                 children: node.children,
             };
             return createElement(buttonRowTree);
+        }
+        case "segment": {
+            const path = {
+                type: "g" as const,
+                children: [
+                    {
+                        type: "path" as const,
+                        d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end),
+                        class: node.class,
+                        onClick: node.onClick,
+                    },
+                ],
+            };
+            const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+            const text = {
+                type: "g" as const,
+                children: [
+                    {
+                        type: "text" as const,
+                        x,
+                        y: y + 11,
+                        class: node.labelClass,
+                        content: node.label,
+                    },
+                ],
+            };
+            let selectionElements: Element[] = [];
+            if (node.selection) {
+                const selection = {
+                    type: "g" as const,
+                    children: [
+                        {
+                            type: "circle" as const,
+                            cx: x,
+                            cy: y,
+                            r: 25,
+                            class: node.selection.class,
+                            fill: node.selection.fill,
+                            stroke: "black",
+                            strokeWidth: 2,
+                            pointerEvents: "none",
+                        },
+                    ],
+                };
+                selectionElements = createElement(selection);
+            }
+            return [...createElement(path), ...selectionElements, ...createElement(text)];
         }
         default: {
             const _exhaustiveCheck: never = node;

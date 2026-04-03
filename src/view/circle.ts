@@ -3,7 +3,7 @@ import type { Model } from "../model";
 import * as music from "../music";
 import type { View } from "../types";
 import type { RenderNode } from "../ui";
-import { arcCentroid, arcPath, settingsIconNodes } from "../ui";
+import { settingsIconNodes } from "../ui";
 
 type Segment = {
     readonly startAngle: number;
@@ -16,13 +16,12 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
         const offset = model.state.circleIsCNoon ? 3 : 0;
         const segments = generateSegments(rotate(noteIndexes, offset));
 
-        const pad = 50;
-        const chordRadius = 240;
-        const noteRadius = 200;
-        const degreeRadius = 135;
-        const innerRadius = 90;
-        const cx = noteRadius + pad;
-        const cy = noteRadius + pad;
+        const cx = 250;
+        const cy = 250;
+
+        const chordRadiusX = { inner: 202, outer: 242 };
+        const tonicRadius = { inner: 135, outer: 198 };
+        const intervalRadius = { inner: 90, outer: 135 };
 
         const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
 
@@ -36,9 +35,12 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                         : " note-segment-scale"
                     : "");
             return {
-                type: "path",
-                d: arcPath(degreeRadius, noteRadius, seg.startAngle, seg.endAngle),
+                type: "segment",
                 class: cls,
+                label: node.scaleNote.note.label,
+                labelClass: "note-segment-text",
+                radius: tonicRadius,
+                angle: { start: seg.startAngle, end: seg.endAngle },
                 onClick: () =>
                     raise({
                         id: "TonicChanged",
@@ -47,101 +49,55 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
             };
         });
 
-        const noteTexts: RenderNode[] = segments.map((seg) => {
-            const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const [x, y] = arcCentroid(degreeRadius, noteRadius, seg.startAngle, seg.endAngle);
-            return {
-                type: "text",
-                x,
-                y: y + 11,
-                class: "note-segment-text",
-                content: node.scaleNote.note.label,
-            };
-        });
-
         const intervalSegments: RenderNode[] = segments.map((seg) => {
             const node = nodeByIndex.get(seg.index) ?? music.nullNode;
+            const selection: { selection?: { class: string; fill: string } } = node.toggle
+                ? {
+                      selection: {
+                          class: "interval-note-selected",
+                          fill: `#${node.chordInterval.colour.toString(16).padStart(6, "0")}`,
+                      },
+                  }
+                : {};
             return {
-                type: "path",
-                d: arcPath(innerRadius, degreeRadius, seg.startAngle, seg.endAngle),
+                type: "segment",
                 class: node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment",
+                label: node.intervalName,
+                labelClass: "degree-segment-text",
+                radius: intervalRadius,
+                angle: { start: seg.startAngle, end: seg.endAngle },
                 onClick: () =>
                     raise({
                         id: "Toggle",
                         index: node.scaleNote.note.index,
                     }),
-            };
-        });
-
-        const intervalNotes: RenderNode[] = segments.map((seg) => {
-            const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const [cx2, cy2] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
-            const fill = node.toggle ? `#${node.chordInterval.colour.toString(16).padStart(6, "0")}` : "none";
-            const stroke = node.midiToggle ? "OrangeRed" : node.toggle ? "black" : "none";
-            const strokeWidth = node.midiToggle ? 20 : 2;
-            return {
-                type: "circle",
-                cx: cx2,
-                cy: cy2,
-                r: 25,
-                class: node.toggle ? "interval-note-selected" : "interval-note",
-                fill,
-                stroke,
-                strokeWidth,
-                pointerEvents: "none",
-            };
-        });
-
-        const intervalTexts: RenderNode[] = segments.map((seg) => {
-            const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const [x, y] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
-            return {
-                type: "text",
-                x,
-                y: y + 8,
-                class: "degree-segment-text",
-                content: node.intervalName,
+                ...selection,
             };
         });
 
         const chordSegments: RenderNode[] = segments.map((seg) => {
             const node = nodeByIndex.get(seg.index) ?? music.nullNode;
             const cls = node.scaleNote.isScaleNote ? getChordSegmentClass(node.scaleNote.chord!) : "chord-segment";
+            const selection: { selection?: { class: string; fill?: string } } = node.isChordRoot
+                ? {
+                      selection: {
+                          class: getChordSegmentClass(node.scaleNote.chord!),
+                      },
+                  }
+                : {};
             return {
-                type: "path",
-                d: arcPath(noteRadius, chordRadius, seg.startAngle, seg.endAngle),
+                type: "segment",
                 class: cls,
+                label: node.scaleNote.chord?.romanNumeral ?? "",
+                labelClass: "degree-segment-text",
+                radius: chordRadiusX,
+                angle: { start: seg.startAngle, end: seg.endAngle },
                 onClick: () =>
                     raise({
                         id: "ChordChanged",
                         chordIndex: node.scaleNote.note.index,
                     }),
-            };
-        });
-
-        const chordNotes: RenderNode[] = segments.map((seg) => {
-            const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const [cx2, cy2] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
-            const cls = node.isChordRoot ? getChordSegmentClass(node.scaleNote.chord!) : "chord-segment-note";
-            return {
-                type: "circle",
-                cx: cx2,
-                cy: cy2,
-                r: 28,
-                class: cls,
-                pointerEvents: "none",
-            };
-        });
-
-        const chordTexts: RenderNode[] = segments.map((seg) => {
-            const node = nodeByIndex.get(seg.index) ?? music.nullNode;
-            const [x, y] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
-            return {
-                type: "text",
-                x,
-                y: y + 8,
-                class: "degree-segment-text",
-                content: node.scaleNote.chord?.romanNumeral ?? "",
+                ...selection,
             };
         });
 
@@ -153,13 +109,8 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                 children: [
                     { type: "text", x: 0, y: 0, textAnchor: "middle", content: label },
                     { type: "g", children: noteSegments },
-                    { type: "g", children: noteTexts },
                     { type: "g", children: intervalSegments },
-                    { type: "g", children: intervalNotes },
-                    { type: "g", children: intervalTexts },
                     { type: "g", children: chordSegments },
-                    { type: "g", children: chordNotes },
-                    { type: "g", children: chordTexts },
                 ],
             },
         ];

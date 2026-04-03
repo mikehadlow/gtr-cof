@@ -7,6 +7,12 @@ import { circleNodes } from "./circle";
 const model = updateScale({ ...defaultState });
 const noRaise = () => {};
 
+// Indexes into the main g's children array
+const LABEL_CHILD_IDX = 0;
+const NOTE_GROUP_IDX = 1;
+const INTERVAL_GROUP_IDX = 2;
+const CHORD_GROUP_IDX = 3;
+
 // ─── structure ───────────────────────────────────────────────────────────────
 
 describe("circleNodes - structure", () => {
@@ -26,18 +32,18 @@ describe("circleNodes - structure", () => {
         expect(nodes[1].transform).toBe("translate(250, 250)");
     });
 
-    test("main g has 9 children: label text + 8 element groups", () => {
+    test("main g has 4 children: label text + 3 segment groups", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        expect(nodes[1].children).toHaveLength(9);
+        expect(nodes[1].children).toHaveLength(4);
     });
 
     test("first child of main g is label text", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const label = nodes[1].children[0];
+        const label = nodes[1].children[LABEL_CHILD_IDX];
         expect(label.type).toBe("text");
         if (label.type !== "text") {
             throw new Error();
@@ -48,118 +54,45 @@ describe("circleNodes - structure", () => {
         expect(label.y).toBe(0);
     });
 
-    test("note segment group (index 1) has 12 path children", () => {
+    test("note segment group has 12 segment children", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         expect(g.children).toHaveLength(12);
         for (const c of g.children) {
-            expect(c.type).toBe("path");
+            expect(c.type).toBe("segment");
         }
     });
 
-    test("note text group (index 2) has 12 text children", () => {
+    test("interval segment group has 12 segment children", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[2];
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         expect(g.children).toHaveLength(12);
         for (const c of g.children) {
-            expect(c.type).toBe("text");
+            expect(c.type).toBe("segment");
         }
     });
 
-    test("interval segment group (index 3) has 12 path children", () => {
+    test("chord segment group has 12 segment children", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[3];
+        const g = nodes[1].children[CHORD_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         expect(g.children).toHaveLength(12);
         for (const c of g.children) {
-            expect(c.type).toBe("path");
-        }
-    });
-
-    test("interval note group (index 4) has 12 circle children", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[4];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        expect(g.children).toHaveLength(12);
-        for (const c of g.children) {
-            expect(c.type).toBe("circle");
-        }
-    });
-
-    test("interval text group (index 5) has 12 text children", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[5];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        expect(g.children).toHaveLength(12);
-        for (const c of g.children) {
-            expect(c.type).toBe("text");
-        }
-    });
-
-    test("chord segment group (index 6) has 12 path children", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[6];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        expect(g.children).toHaveLength(12);
-        for (const c of g.children) {
-            expect(c.type).toBe("path");
-        }
-    });
-
-    test("chord note group (index 7) has 12 circle children with r=28", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[7];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        expect(g.children).toHaveLength(12);
-        for (const c of g.children) {
-            if (c.type !== "circle") {
-                throw new Error();
-            }
-            expect(c.r).toBe(28);
-        }
-    });
-
-    test("chord text group (index 8) has 12 text children", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[8];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        expect(g.children).toHaveLength(12);
-        for (const c of g.children) {
-            expect(c.type).toBe("text");
+            expect(c.type).toBe("segment");
         }
     });
 });
@@ -174,12 +107,12 @@ describe("circleNodes - note segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         for (const c of g.children) {
-            if (c.type !== "path") {
+            if (c.type !== "segment") {
                 throw new Error();
             }
             expect(c.class).toContain("note-segment");
@@ -190,13 +123,13 @@ describe("circleNodes - note segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const scaleNotes = g.children.filter(
             (c) =>
-                c.type === "path" &&
+                c.type === "segment" &&
                 (c.class?.includes("note-segment-scale") || c.class?.includes("note-segment-tonic")),
         );
         expect(scaleNotes).toHaveLength(7);
@@ -206,13 +139,13 @@ describe("circleNodes - note segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const nonScale = g.children.filter(
             (c) =>
-                c.type === "path" &&
+                c.type === "segment" &&
                 !c.class?.includes("note-segment-scale") &&
                 !c.class?.includes("note-segment-tonic"),
         );
@@ -223,11 +156,11 @@ describe("circleNodes - note segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
-        const tonic = g.children.filter((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
+        const tonic = g.children.filter((c) => c.type === "segment" && c.class?.includes("note-segment-tonic"));
         expect(tonic).toHaveLength(1);
     });
 
@@ -236,11 +169,11 @@ describe("circleNodes - note segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
-        const tonicIdx = g.children.findIndex((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
+        const tonicIdx = g.children.findIndex((c) => c.type === "segment" && c.class?.includes("note-segment-tonic"));
         // rotated chromatic with offset 3: [3,4,5,6,7,8,9,10,11,0,1,2] → A(0) is at position 9
         expect(tonicIdx).toBe(9);
     });
@@ -252,12 +185,12 @@ describe("circleNodes - note segments", () => {
         if (nodesC[1].type !== "g") {
             throw new Error();
         }
-        const g = nodesC[1].children[1];
+        const g = nodesC[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         // With circleIsCNoon=true (offset=3), C(3) → (3+3)%12=6 is at position 0
-        const tonicIdx = g.children.findIndex((c) => c.type === "path" && c.class?.includes("note-segment-tonic"));
+        const tonicIdx = g.children.findIndex((c) => c.type === "segment" && c.class?.includes("note-segment-tonic"));
         expect(tonicIdx).toBe(0);
     });
 });
@@ -272,11 +205,11 @@ describe("circleNodes - interval segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[3];
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
-        const selected = g.children.filter((c) => c.type === "path" && c.class?.includes("degree-segment-selected"));
+        const selected = g.children.filter((c) => c.type === "segment" && c.class?.includes("degree-segment-selected"));
         expect(selected).toHaveLength(7);
     });
 
@@ -284,55 +217,12 @@ describe("circleNodes - interval segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[3];
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
-        const unselected = g.children.filter((c) => c.type === "path" && c.class === "interval-segment");
+        const unselected = g.children.filter((c) => c.type === "segment" && c.class === "interval-segment");
         expect(unselected).toHaveLength(5);
-    });
-});
-
-// ─── interval note circles ───────────────────────────────────────────────────
-
-describe("circleNodes - interval note circles", () => {
-    const view = circleNodes(music.chromatic(), "Chromatic", 500);
-    const nodes = view(model, noRaise);
-
-    test("all interval note circles have r=25 and pointer-events none", () => {
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[4];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        for (const c of g.children) {
-            if (c.type !== "circle") {
-                throw new Error();
-            }
-            expect(c.r).toBe(25);
-            expect(c.pointerEvents).toBe("none");
-        }
-    });
-
-    test("untoggled interval notes have class interval-note and fill none", () => {
-        // defaultState has no toggled notes
-        if (nodes[1].type !== "g") {
-            throw new Error();
-        }
-        const g = nodes[1].children[4];
-        if (g.type !== "g") {
-            throw new Error();
-        }
-        const untoggled = g.children.filter((c) => c.type === "circle" && c.class === "interval-note");
-        expect(untoggled.length).toBeGreaterThan(0);
-        for (const c of untoggled) {
-            if (c.type !== "circle") {
-                throw new Error();
-            }
-            expect(c.fill).toBe("none");
-        }
     });
 });
 
@@ -346,13 +236,13 @@ describe("circleNodes - chord segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[6];
+        const g = nodes[1].children[CHORD_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const typed = g.children.filter(
             (c) =>
-                c.type === "path" &&
+                c.type === "segment" &&
                 (c.class?.includes("chord-segment-major") ||
                     c.class?.includes("chord-segment-minor") ||
                     c.class?.includes("chord-segment-dim") ||
@@ -365,11 +255,11 @@ describe("circleNodes - chord segments", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[6];
+        const g = nodes[1].children[CHORD_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
-        const plain = g.children.filter((c) => c.type === "path" && c.class === "chord-segment");
+        const plain = g.children.filter((c) => c.type === "segment" && c.class === "chord-segment");
         expect(plain).toHaveLength(5);
     });
 });
@@ -387,12 +277,12 @@ describe("circleNodes - click handlers", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[1];
+        const g = nodes[1].children[NOTE_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) {
+        if (path.type !== "segment" || !path.onClick) {
             throw new Error("no onClick");
         }
         path.onClick();
@@ -408,12 +298,12 @@ describe("circleNodes - click handlers", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[3];
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) {
+        if (path.type !== "segment" || !path.onClick) {
             throw new Error("no onClick");
         }
         path.onClick();
@@ -429,12 +319,12 @@ describe("circleNodes - click handlers", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const g = nodes[1].children[6];
+        const g = nodes[1].children[CHORD_GROUP_IDX];
         if (g.type !== "g") {
             throw new Error();
         }
         const path = g.children[0];
-        if (path.type !== "path" || !path.onClick) {
+        if (path.type !== "segment" || !path.onClick) {
             throw new Error("no onClick");
         }
         path.onClick();
@@ -508,15 +398,15 @@ describe("circleNodes - circleIsCNoon", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const noteTextGroup = nodes[1].children[2];
-        if (noteTextGroup.type !== "g") {
+        const noteSegmentGroup = nodes[1].children[NOTE_GROUP_IDX];
+        if (noteSegmentGroup.type !== "g") {
             throw new Error();
         }
-        const firstText = noteTextGroup.children[0];
-        if (firstText.type !== "text") {
+        const firstSegment = noteSegmentGroup.children[0];
+        if (firstSegment.type !== "segment") {
             throw new Error();
         }
-        expect(firstText.content).toBe("C");
+        expect(firstSegment.label).toBe("C");
     });
 
     test("with circleIsCNoon false, A is at position 0", () => {
@@ -527,15 +417,15 @@ describe("circleNodes - circleIsCNoon", () => {
         if (nodes[1].type !== "g") {
             throw new Error();
         }
-        const noteTextGroup = nodes[1].children[2];
-        if (noteTextGroup.type !== "g") {
+        const noteSegmentGroup = nodes[1].children[NOTE_GROUP_IDX];
+        if (noteSegmentGroup.type !== "g") {
             throw new Error();
         }
-        const firstText = noteTextGroup.children[0];
-        if (firstText.type !== "text") {
+        const firstSegment = noteSegmentGroup.children[0];
+        if (firstSegment.type !== "segment") {
             throw new Error();
         }
-        expect(firstText.content).toBe("A");
+        expect(firstSegment.label).toBe("A");
     });
 
     test("circleIsCNoon true vs false show different note text at position 0", () => {
@@ -549,17 +439,228 @@ describe("circleNodes - circleIsCNoon", () => {
         if (nodesTrue[1].type !== "g" || nodesFalse[1].type !== "g") {
             throw new Error();
         }
-        const textGroupTrue = nodesTrue[1].children[2];
-        const textGroupFalse = nodesFalse[1].children[2];
-        if (textGroupTrue.type !== "g" || textGroupFalse.type !== "g") {
+        const segGroupTrue = nodesTrue[1].children[NOTE_GROUP_IDX];
+        const segGroupFalse = nodesFalse[1].children[NOTE_GROUP_IDX];
+        if (segGroupTrue.type !== "g" || segGroupFalse.type !== "g") {
             throw new Error();
         }
 
-        const text0True = textGroupTrue.children[0];
-        const text0False = textGroupFalse.children[0];
-        if (text0True.type !== "text" || text0False.type !== "text") {
+        const seg0True = segGroupTrue.children[0];
+        const seg0False = segGroupFalse.children[0];
+        if (seg0True.type !== "segment" || seg0False.type !== "segment") {
             throw new Error();
         }
-        expect(text0True.content).not.toBe(text0False.content);
+        expect(seg0True.label).not.toBe(seg0False.label);
+    });
+});
+
+// ─── segment labels ───────────────────────────────────────────────────────────
+
+describe("circleNodes - segment labels", () => {
+    // With circleIsCNoon=true (offset=3) and tonic A (index 0):
+    //   position 9 → note index 0 = A (tonic)
+    //   position 0 → note index 3 = C
+
+    const view = circleNodes(music.chromatic(), "Chromatic", 500);
+    const nodes = view(model, noRaise);
+
+    if (nodes[1].type !== "g") {
+        throw new Error();
+    }
+    const noteGroup = nodes[1].children[NOTE_GROUP_IDX];
+    const intervalGroup = nodes[1].children[INTERVAL_GROUP_IDX];
+    const chordGroup = nodes[1].children[CHORD_GROUP_IDX];
+    if (noteGroup.type !== "g" || intervalGroup.type !== "g" || chordGroup.type !== "g") {
+        throw new Error();
+    }
+
+    test("note segment at tonic position (9) has label 'A'", () => {
+        const seg = noteGroup.children[9];
+        if (seg.type !== "segment") {
+            throw new Error();
+        }
+        expect(seg.label).toBe("A");
+    });
+
+    test("note segment at position 0 (C noon) has label 'C'", () => {
+        const seg = noteGroup.children[0];
+        if (seg.type !== "segment") {
+            throw new Error();
+        }
+        expect(seg.label).toBe("C");
+    });
+
+    test("interval segment at tonic position (9) has intervalName '1'", () => {
+        // Tonic = A, interval ord=0 type=Nat → getIntervalName gives "" + (0+1) = "1"
+        const seg = intervalGroup.children[9];
+        if (seg.type !== "segment") {
+            throw new Error();
+        }
+        expect(seg.label).toBe("1");
+    });
+
+    test("interval segments for scale notes have non-empty labels", () => {
+        const scaleSegments = intervalGroup.children.filter(
+            (c) => c.type === "segment" && c.class?.includes("degree-segment-selected"),
+        );
+        for (const c of scaleSegments) {
+            if (c.type !== "segment") {
+                throw new Error();
+            }
+            expect(c.label.length).toBeGreaterThan(0);
+        }
+    });
+
+    test("chord segment at tonic position (9) has roman numeral 'I'", () => {
+        // A major chord = uppercase I
+        const seg = chordGroup.children[9];
+        if (seg.type !== "segment") {
+            throw new Error();
+        }
+        expect(seg.label).toBe("I");
+    });
+
+    test("chord segments for non-scale notes have empty labels", () => {
+        const nonScaleSegments = chordGroup.children.filter((c) => c.type === "segment" && c.class === "chord-segment");
+        for (const c of nonScaleSegments) {
+            if (c.type !== "segment") {
+                throw new Error();
+            }
+            expect(c.label).toBe("");
+        }
+    });
+});
+
+// ─── segment selection ────────────────────────────────────────────────────────
+
+describe("circleNodes - segment selection", () => {
+    const view = circleNodes(music.chromatic(), "Chromatic", 500);
+
+    test("interval segments have no selection when no notes are toggled", () => {
+        const nodes = view(model, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const withSelection = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        expect(withSelection).toHaveLength(0);
+    });
+
+    test("chord segments have no selection when no chord is selected", () => {
+        // defaultState has chordIndex: -1
+        const nodes = view(model, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[CHORD_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const withSelection = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        expect(withSelection).toHaveLength(0);
+    });
+
+    test("with A chord selected, 3 interval segments have selection (root, 3rd, 5th)", () => {
+        // chordIndex=0 selects the A chord; chordIntervals=[0,2,4] → A(pos 9), C#(pos 1), E(pos 4)
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const withSelection = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        expect(withSelection).toHaveLength(3);
+    });
+
+    test("toggled interval segments have selection.class 'interval-note-selected'", () => {
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const toggled = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        for (const c of toggled) {
+            if (c.type !== "segment" || !c.selection) {
+                throw new Error();
+            }
+            expect(c.selection.class).toBe("interval-note-selected");
+        }
+    });
+
+    test("toggled interval segments have selection.fill as a hex colour string", () => {
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[INTERVAL_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const toggled = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        for (const c of toggled) {
+            if (c.type !== "segment" || !c.selection) {
+                throw new Error();
+            }
+            expect(c.selection.fill).toMatch(/^#[0-9a-f]{6}$/);
+        }
+    });
+
+    test("chord root segment (A at position 9) has selection when A chord is selected", () => {
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[CHORD_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const seg = g.children[9]; // A is at position 9 with circleIsCNoon=true
+        if (seg.type !== "segment") {
+            throw new Error();
+        }
+        expect(seg.selection).toBeDefined();
+    });
+
+    test("chord root selection.class matches the chord type (A major → chord-segment-major)", () => {
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[CHORD_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const seg = g.children[9];
+        if (seg.type !== "segment" || !seg.selection) {
+            throw new Error();
+        }
+        expect(seg.selection.class).toBe("chord-segment-major");
+    });
+
+    test("exactly one chord segment has selection when a chord is selected", () => {
+        const modelWithChord = updateScale({ ...defaultState, chordIndex: 0 });
+        const nodes = view(modelWithChord, noRaise);
+        if (nodes[1].type !== "g") {
+            throw new Error();
+        }
+        const g = nodes[1].children[CHORD_GROUP_IDX];
+        if (g.type !== "g") {
+            throw new Error();
+        }
+        const withSelection = g.children.filter((c) => c.type === "segment" && c.selection !== undefined);
+        expect(withSelection).toHaveLength(1);
     });
 });
