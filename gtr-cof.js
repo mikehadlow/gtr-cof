@@ -275,6 +275,7 @@ var nullNode = {
     },
     intervalName: "",
     isScaleNote: false,
+    isTonic: false,
     noteNumber: 0
   },
   chordInterval: {
@@ -328,6 +329,7 @@ function generateScale(noteSpec, mode, scaleFamilyArg) {
       interval: activeInterval,
       intervalName: getIntervalName(activeInterval),
       isScaleNote,
+      isTonic: index === noteSpec.index,
       noteNumber
     };
   });
@@ -595,7 +597,9 @@ function renderToSvg(container, nodes) {
     container.removeChild(container.firstChild);
   }
   for (const node of nodes) {
-    container.appendChild(createElement(node));
+    for (const element of createElement(node)) {
+      container.appendChild(element);
+    }
   }
 }
 function createElement(node) {
@@ -606,9 +610,11 @@ function createElement(node) {
         el.setAttribute("transform", node.transform);
       }
       for (const child of node.children) {
-        el.appendChild(createElement(child));
+        for (const element of createElement(child)) {
+          el.appendChild(element);
+        }
       }
-      return el;
+      return [el];
     }
     case "circle": {
       const el = document.createElementNS(SVG_NS, "circle");
@@ -633,7 +639,7 @@ function createElement(node) {
       if (node.onClick) {
         el.addEventListener("click", node.onClick);
       }
-      return el;
+      return [el];
     }
     case "rect": {
       const el = document.createElementNS(SVG_NS, "rect");
@@ -656,7 +662,7 @@ function createElement(node) {
       if (node.onClick) {
         el.addEventListener("click", node.onClick);
       }
-      return el;
+      return [el];
     }
     case "path": {
       const el = document.createElementNS(SVG_NS, "path");
@@ -667,7 +673,7 @@ function createElement(node) {
       if (node.onClick) {
         el.addEventListener("click", node.onClick);
       }
-      return el;
+      return [el];
     }
     case "text": {
       const el = document.createElementNS(SVG_NS, "text");
@@ -683,7 +689,7 @@ function createElement(node) {
         el.setAttribute("transform", node.transform);
       }
       el.textContent = node.content;
-      return el;
+      return [el];
     }
     case "line": {
       const el = document.createElementNS(SVG_NS, "line");
@@ -697,7 +703,7 @@ function createElement(node) {
       if (node.strokeWidth != null) {
         el.setAttribute("stroke-width", String(node.strokeWidth));
       }
-      return el;
+      return [el];
     }
     case "use": {
       const el = document.createElementNS(SVG_NS, "use");
@@ -711,7 +717,7 @@ function createElement(node) {
           el.style.setProperty(key, value);
         }
       }
-      return el;
+      return [el];
     }
     case "div": {
       const el = document.createElement("div");
@@ -725,9 +731,11 @@ function createElement(node) {
         el.addEventListener("click", node.onClick);
       }
       for (const child of node.children ?? []) {
-        el.appendChild(createElement(child));
+        for (const element of createElement(child)) {
+          el.appendChild(element);
+        }
       }
-      return el;
+      return [el];
     }
     case "svgButton": {
       const pad = 5;
@@ -766,6 +774,53 @@ function createElement(node) {
         children: node.children
       };
       return createElement(buttonRowTree);
+    }
+    case "segment": {
+      const path = {
+        type: "g",
+        children: [
+          {
+            type: "path",
+            d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end),
+            class: node.class,
+            onClick: node.onClick
+          }
+        ]
+      };
+      const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+      const text = {
+        type: "g",
+        children: [
+          {
+            type: "text",
+            x,
+            y: y + 11,
+            class: node.labelClass,
+            content: node.label
+          }
+        ]
+      };
+      let selectionElements = [];
+      if (node.selection) {
+        const selection = {
+          type: "g",
+          children: [
+            {
+              type: "circle",
+              cx: x,
+              cy: y,
+              r: 25,
+              class: node.selection.class,
+              fill: node.selection.fill,
+              stroke: "black",
+              strokeWidth: 2,
+              pointerEvents: "none"
+            }
+          ]
+        };
+        selectionElements = createElement(selection);
+      }
+      return [...createElement(path), ...selectionElements, ...createElement(text)];
     }
     default: {
       const _exhaustiveCheck = node;
@@ -837,115 +892,70 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
   return (model, raise) => {
     const offset = model.state.circleIsCNoon ? 3 : 0;
     const segments = generateSegments(rotate(noteIndexes, offset));
-    const pad = 50;
-    const chordRadius = 240;
-    const noteRadius = 200;
-    const degreeRadius = 135;
-    const innerRadius = 90;
-    const cx = noteRadius + pad;
-    const cy = noteRadius + pad;
+    const cx = 250;
+    const cy = 250;
+    const chordRadiusX = { inner: 202, outer: 242 };
+    const tonicRadius = { inner: 135, outer: 198 };
+    const intervalRadius = { inner: 90, outer: 135 };
     const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
     const noteSegments = segments.map((seg) => {
       const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const isTonic = node.scaleNote.note.index === model.state.index;
-      const cls = "note-segment" + (node.scaleNote.isScaleNote ? isTonic ? " note-segment-tonic" : " note-segment-scale" : "");
+      const cls = "note-segment" + (node.scaleNote.isScaleNote ? node.scaleNote.isTonic ? " note-segment-tonic" : " note-segment-scale" : "");
       return {
-        type: "path",
-        d: arcPath(degreeRadius, noteRadius, seg.startAngle, seg.endAngle),
+        type: "segment",
         class: cls,
+        label: node.scaleNote.note.label,
+        labelClass: "note-segment-text",
+        radius: tonicRadius,
+        angle: { start: seg.startAngle, end: seg.endAngle },
         onClick: () => raise({
           id: "TonicChanged",
           noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(node.scaleNote.note)
         })
       };
     });
-    const noteTexts = segments.map((seg) => {
-      const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const [x, y] = arcCentroid(degreeRadius, noteRadius, seg.startAngle, seg.endAngle);
-      return {
-        type: "text",
-        x,
-        y: y + 11,
-        class: "note-segment-text",
-        content: node.scaleNote.note.label
-      };
-    });
     const intervalSegments = segments.map((seg) => {
       const node = nodeByIndex.get(seg.index) ?? nullNode;
+      const selection = node.toggle ? {
+        selection: {
+          class: "interval-note-selected",
+          fill: `#${node.chordInterval.colour.toString(16).padStart(6, "0")}`
+        }
+      } : {};
       return {
-        type: "path",
-        d: arcPath(innerRadius, degreeRadius, seg.startAngle, seg.endAngle),
+        type: "segment",
         class: node.scaleNote.isScaleNote ? "degree-segment-selected" : "interval-segment",
+        label: node.intervalName,
+        labelClass: "degree-segment-text",
+        radius: intervalRadius,
+        angle: { start: seg.startAngle, end: seg.endAngle },
         onClick: () => raise({
           id: "Toggle",
           index: node.scaleNote.note.index
-        })
-      };
-    });
-    const intervalNotes = segments.map((seg) => {
-      const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const [cx2, cy2] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
-      const fill = node.toggle ? `#${node.chordInterval.colour.toString(16).padStart(6, "0")}` : "none";
-      const stroke = node.midiToggle ? "OrangeRed" : node.toggle ? "black" : "none";
-      const strokeWidth = node.midiToggle ? 20 : 2;
-      return {
-        type: "circle",
-        cx: cx2,
-        cy: cy2,
-        r: 25,
-        class: node.toggle ? "interval-note-selected" : "interval-note",
-        fill,
-        stroke,
-        strokeWidth,
-        pointerEvents: "none"
-      };
-    });
-    const intervalTexts = segments.map((seg) => {
-      const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const [x, y] = arcCentroid(innerRadius, degreeRadius, seg.startAngle, seg.endAngle);
-      return {
-        type: "text",
-        x,
-        y: y + 8,
-        class: "degree-segment-text",
-        content: node.intervalName
+        }),
+        ...selection
       };
     });
     const chordSegments = segments.map((seg) => {
       const node = nodeByIndex.get(seg.index) ?? nullNode;
       const cls = node.scaleNote.isScaleNote ? getChordSegmentClass(node.scaleNote.chord) : "chord-segment";
+      const selection = node.isChordRoot ? {
+        selection: {
+          class: getChordSegmentClass(node.scaleNote.chord)
+        }
+      } : {};
       return {
-        type: "path",
-        d: arcPath(noteRadius, chordRadius, seg.startAngle, seg.endAngle),
+        type: "segment",
         class: cls,
+        label: node.scaleNote.chord?.romanNumeral ?? "",
+        labelClass: "degree-segment-text",
+        radius: chordRadiusX,
+        angle: { start: seg.startAngle, end: seg.endAngle },
         onClick: () => raise({
           id: "ChordChanged",
           chordIndex: node.scaleNote.note.index
-        })
-      };
-    });
-    const chordNotes = segments.map((seg) => {
-      const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const [cx2, cy2] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
-      const cls = node.isChordRoot ? getChordSegmentClass(node.scaleNote.chord) : "chord-segment-note";
-      return {
-        type: "circle",
-        cx: cx2,
-        cy: cy2,
-        r: 28,
-        class: cls,
-        pointerEvents: "none"
-      };
-    });
-    const chordTexts = segments.map((seg) => {
-      const node = nodeByIndex.get(seg.index) ?? nullNode;
-      const [x, y] = arcCentroid(noteRadius, chordRadius, seg.startAngle, seg.endAngle);
-      return {
-        type: "text",
-        x,
-        y: y + 8,
-        class: "degree-segment-text",
-        content: node.scaleNote.chord?.romanNumeral ?? ""
+        }),
+        ...selection
       };
     });
     return [
@@ -956,13 +966,8 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
         children: [
           { type: "text", x: 0, y: 0, textAnchor: "middle", content: label },
           { type: "g", children: noteSegments },
-          { type: "g", children: noteTexts },
           { type: "g", children: intervalSegments },
-          { type: "g", children: intervalNotes },
-          { type: "g", children: intervalTexts },
-          { type: "g", children: chordSegments },
-          { type: "g", children: chordNotes },
-          { type: "g", children: chordTexts }
+          { type: "g", children: chordSegments }
         ]
       }
     ];
@@ -1120,7 +1125,7 @@ function noteFill(sn, hasToggledNotes) {
     return "white";
   }
   if (sn.node.scaleNote.isScaleNote) {
-    if (sn.node.scaleNote.noteNumber === 0) {
+    if (sn.node.scaleNote.isTonic) {
       return hasToggledNotes ? "white" : "yellow";
     }
     return "white";
@@ -15307,5 +15312,5 @@ var main = () => {
 };
 main();
 
-//# debugId=E0D57C8BD887042164756E2164756E21
+//# debugId=BA6CC2F308FB4FE464756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
