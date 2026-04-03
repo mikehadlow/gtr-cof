@@ -685,6 +685,9 @@ function createElement(node) {
       if (node.textAnchor) {
         el.setAttribute("text-anchor", node.textAnchor);
       }
+      if (node.dominantBaseline) {
+        el.setAttribute("dominant-baseline", node.dominantBaseline);
+      }
       if (node.transform) {
         el.setAttribute("transform", node.transform);
       }
@@ -776,7 +779,8 @@ function createElement(node) {
       return createElement(buttonRowTree);
     }
     case "segment": {
-      const path = {
+      const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+      const path = createElement({
         type: "g",
         children: [
           {
@@ -786,41 +790,38 @@ function createElement(node) {
             onClick: node.onClick
           }
         ]
-      };
-      const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
-      const text = {
+      });
+      const selectionElements = node.selection ? createElement({
+        type: "g",
+        children: [
+          {
+            type: "circle",
+            cx: x,
+            cy: y,
+            r: 25,
+            class: node.selection.class,
+            fill: node.selection.fill,
+            stroke: "black",
+            strokeWidth: 2,
+            pointerEvents: "none"
+          }
+        ]
+      }) : [];
+      const text = createElement({
         type: "g",
         children: [
           {
             type: "text",
             x,
-            y: y + 11,
+            y,
             class: node.labelClass,
+            textAnchor: "middle",
+            dominantBaseline: "central",
             content: node.label
           }
         ]
-      };
-      let selectionElements = [];
-      if (node.selection) {
-        const selection = {
-          type: "g",
-          children: [
-            {
-              type: "circle",
-              cx: x,
-              cy: y,
-              r: 25,
-              class: node.selection.class,
-              fill: node.selection.fill,
-              stroke: "black",
-              strokeWidth: 2,
-              pointerEvents: "none"
-            }
-          ]
-        };
-        selectionElements = createElement(selection);
-      }
-      return [...createElement(path), ...selectionElements, ...createElement(text)];
+      });
+      return [...path, ...selectionElements, ...text];
     }
     default: {
       const _exhaustiveCheck = node;
@@ -1126,7 +1127,7 @@ function noteFill(sn, hasToggledNotes) {
   }
   if (sn.node.scaleNote.isScaleNote) {
     if (sn.node.scaleNote.isTonic) {
-      return hasToggledNotes ? "white" : "yellow";
+      return hasToggledNotes ? "white" : "#FFE000";
     }
     return "white";
   }
@@ -1143,7 +1144,7 @@ function noteStroke(sn, hasToggledNotes) {
     return "none";
   }
   if (sn.node.scaleNote.isScaleNote) {
-    return "grey";
+    return "#1A1A2E";
   }
   return "none";
 }
@@ -15312,5 +15313,5 @@ var main = () => {
 };
 main();
 
-//# debugId=BA6CC2F308FB4FE464756E2164756E21
+//# debugId=990F56526274838064756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

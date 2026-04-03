@@ -1,253 +1,321 @@
+/* src/styles/variables.css */
+:root {
+  --font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  --font-size-base: 12pt;
+  --font-size-title: 14pt;
+  --font-size-note: 35px;
+  --font-size-degree: 20px;
+  --font-size-button: 15px;
+  --font-size-modal-close: 20pt;
+  --font-size-modal-select: 11pt;
+  --color-header-bg: #333;
+  --color-header-hover: #444;
+  --color-header-text: white;
+  --color-dropdown-bg: #f9f9f9;
+  --color-dropdown-hover: #f1f1f1;
+  --color-dropdown-text: black;
+  --color-border: #ddd;
+  --color-muted: #666;
+  --color-segment-default: #bec4d0;
+  --color-segment-tonic: #ffe000;
+  --color-segment-scale: #fefaf4;
+  --color-segment-dim: #e06868;
+  --color-segment-aug: #eca040;
+  --color-segment-minor: #5aaee0;
+  --color-segment-major: #5ec45e;
+  --color-segment-interval: #fefaf4;
+  --color-segment-stroke: #1a1a2e;
+  --color-button-selected: #ffe000;
+  --color-button-default: white;
+  --color-button-disabled: #a8a8a8;
+  --stroke-width: 2px;
+  --z-dropdown: 1;
+  --z-modal-backdrop: 1000;
+  --z-modal: 1001;
+  --content-max-width: 1320px;
+}
+
+/* src/styles/base.css */
 body {
-    font-family:
-        "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-    font-size: 12pt;
-    margin: 0px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  margin: 0;
 }
 
 text {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 div {
-    margin: 0px;
-    padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
+/* src/styles/header.css */
 .header {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
+  overflow: hidden;
+  background-color: var(--color-header-bg);
+  margin: 0;
+  padding: 0;
 }
 
 .title {
-    font-weight: bold;
-    font-size: 14pt;
-    margin: 0pt;
+  font-weight: bold;
+  font-size: var(--font-size-title);
+  margin: 0;
 }
 
 .menu {
-    display: inline-block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    cursor: default;
+  display: inline-block;
+  color: var(--color-header-text);
+  text-align: center;
+  text-decoration: none;
+  cursor: default;
+  padding: 14px 16px;
 }
 
 .dropdown {
-    display: inline-block;
+  display: inline-block;
 }
 
 .dropdown:hover {
-    background-color: #444;
+  background-color: var(--color-header-hover);
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    color: black;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    text-align: left;
-    z-index: 1;
+  display: none;
+  position: absolute;
+  background-color: var(--color-dropdown-bg);
+  color: var(--color-dropdown-text);
+  text-align: left;
+  z-index: var(--z-dropdown);
+  min-width: 160px;
+  box-shadow: 0 8px 16px #0003;
 }
 
 .with-padding {
-    padding: 12px 16px;
+  padding: 12px 16px;
 }
 
-/* Links inside the dropdown */
 .dropdown-content-item {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    cursor: default;
+  color: var(--color-dropdown-text);
+  text-decoration: none;
+  display: block;
+  cursor: default;
+  padding: 12px 16px;
 }
 
-/* Change color of dropdown links on hover */
 .dropdown-content-item:hover {
-    background-color: #f1f1f1;
+  background-color: var(--color-dropdown-hover);
 }
 
 .dropdown-content-visible {
-    display: block;
+  display: block;
 }
 
+/* src/styles/layout.css */
 .content {
-    padding: 10px;
-    max-width: 1320px;
-    margin: 0 auto;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 10px;
 }
 
-/* Circle of Fifths */
+/* src/styles/circle.css */
 .note-segment {
-    fill: lightgrey;
-    stroke: none;
+  fill: var(--color-segment-default);
+  stroke: none;
 }
+
 .note-segment-tonic {
-    fill: yellow;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-tonic);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .note-segment-scale {
-    fill: white;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-scale);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .note-segment-text {
-    font-size: 35px;
-    text-anchor: middle;
-    fill: black;
+  font-size: var(--font-size-note);
+  text-anchor: middle;
+  fill: var(--color-segment-stroke);
 }
+
 .degree-segment {
-    fill: none;
-    stroke: none;
+  fill: none;
+  stroke: none;
 }
+
 .degree-segment-selected {
-    fill: white;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-scale);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .degree-segment-text {
-    font-size: 20px;
-    text-anchor: middle;
-    fill: black;
+  font-size: var(--font-size-degree);
+  text-anchor: middle;
+  fill: var(--color-segment-stroke);
 }
+
 .chord-segment {
-    fill: none;
-    stroke: none;
+  fill: none;
+  stroke: none;
 }
+
 .chord-segment-dim {
-    fill: lightcoral;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-dim);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .chord-segment-aug {
-    fill: lightsalmon;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-aug);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .chord-segment-minor {
-    fill: lightblue;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-minor);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .chord-segment-major {
-    fill: lightgreen;
-    stroke: black;
-    stroke-width: 2px;
+  fill: var(--color-segment-major);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .chord-segment-note {
-    fill: none;
-    stroke: none;
+  fill: none;
+  stroke: none;
 }
+
 .interval-note-selected {
-    stroke: black;
-    stroke-width: 2px;
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
 }
+
 .interval-segment {
-    fill: white;
-    stroke: none;
+  fill: var(--color-segment-interval);
+  stroke: none;
 }
+
 .interval-note {
-    fill: none;
-    stroke: none;
+  fill: none;
+  stroke: none;
 }
-/* Modes */
+
+/* src/styles/buttons.css */
 .mode-button {
-    fill: white;
-    stroke: black;
+  fill: var(--color-button-default);
+  stroke: var(--color-segment-stroke);
 }
+
 .mode-button-selected {
-    fill: yellow;
+  fill: var(--color-button-selected);
 }
+
 .mode-text {
-    font-size: 15;
-    text-anchor: left;
-    fill: black;
+  font-size: var(--font-size-button);
+  text-anchor: left;
+  fill: var(--color-segment-stroke);
 }
 
-/* Tonics */
 .tonic-button {
-    fill: white;
-    stroke: black;
-}
-.tonic-button-grey {
-    fill: grey;
-}
-.tonic-button-selected {
-    fill: yellow;
-}
-.tonic-text {
-    font-size: 15;
-    text-anchor: left;
-    fill: black;
+  fill: var(--color-button-default);
+  stroke: var(--color-segment-stroke);
 }
 
-/* Fretboard Settings Modal */
+.tonic-button-grey {
+  fill: var(--color-button-disabled);
+}
+
+.tonic-button-selected {
+  fill: var(--color-button-selected);
+}
+
+.tonic-text {
+  font-size: var(--font-size-button);
+  text-anchor: left;
+  fill: var(--color-segment-stroke);
+}
+
+/* src/styles/modal.css */
 .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  background: #0006;
+  justify-content: center;
+  align-items:  center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 }
+
 .modal-container {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 90%;
-    z-index: 1001;
+  background: var(--color-button-default);
+  z-index: var(--z-modal);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 24px #0000004d;
 }
+
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid #ddd;
-    font-weight: bold;
-    font-size: 14pt;
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: bold;
+  font-size: var(--font-size-title);
+  justify-content: space-between;
+  align-items:  center;
+  padding: 12px 16px;
 }
+
 .modal-close {
-    background: none;
-    border: none;
-    font-size: 20pt;
-    cursor: pointer;
-    padding: 0 4px;
-    line-height: 1;
-    color: #666;
+  font-size: var(--font-size-modal-close);
+  cursor: pointer;
+  color: var(--color-muted);
+  background: none;
+  border: none;
+  padding: 0 4px;
+  line-height: 1;
 }
+
 .modal-close:hover {
-    color: black;
+  color: var(--color-segment-stroke);
 }
+
 .modal-section {
-    padding: 10px 16px;
+  padding: 10px 16px;
 }
+
 .modal-section-title {
-    font-weight: bold;
-    margin-bottom: 6px;
+  margin-bottom: 6px;
+  font-weight: bold;
 }
+
 .modal-select {
-    width: 100%;
-    padding: 4px;
-    font-size: 11pt;
+  font-size: var(--font-size-modal-select);
+  width: 100%;
+  padding: 4px;
 }
-.modal-checkbox-label,
+
+.modal-checkbox-label, .modal-radio-label {
+  display: block;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
 .modal-radio-label {
-    display: block;
-    padding: 4px 0;
-    cursor: pointer;
+  margin-left: 4px;
 }
-.modal-radio-label {
-    margin-left: 4px;
-}
+
+/* src/styles/index.css */
+
