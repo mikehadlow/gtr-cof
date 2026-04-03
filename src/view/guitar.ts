@@ -31,7 +31,7 @@ function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
     }
     if (sn.node.scaleNote.isScaleNote) {
         if (sn.node.scaleNote.isTonic) {
-            return hasToggledNotes ? "white" : "yellow";
+            return hasToggledNotes ? "white" : "#FFE000";
         }
         return "white";
     }
@@ -49,7 +49,7 @@ function noteStroke(sn: StringNote, hasToggledNotes: boolean): string {
         return "none";
     }
     if (sn.node.scaleNote.isScaleNote) {
-        return "grey";
+        return "#1A1A2E";
     }
     return "none";
 }

@@ -1,0 +1,46 @@
+:root {
+    /* Typography */
+    --font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    --font-size-base: 12pt;
+    --font-size-title: 14pt;
+    --font-size-note: 35px;
+    --font-size-degree: 20px;
+    --font-size-button: 15px;
+    --font-size-modal-close: 20pt;
+    --font-size-modal-select: 11pt;
+
+    /* Colours — UI chrome */
+    --color-header-bg: #333;
+    --color-header-hover: #444;
+    --color-header-text: white;
+    --color-dropdown-bg: #f9f9f9;
+    --color-dropdown-hover: #f1f1f1;
+    --color-dropdown-text: black;
+    --color-border: #ddd;
+    --color-muted: #666;
+
+    /* Colours — music segments */
+    --color-segment-default: #BEC4D0;
+    --color-segment-tonic: #FFE000;
+    --color-segment-scale: #FEFAF4;
+    --color-segment-dim: #E06868;
+    --color-segment-aug: #ECA040;
+    --color-segment-minor: #5AAEE0;
+    --color-segment-major: #5EC45E;
+    --color-segment-interval: #FEFAF4;
+    --color-segment-stroke: #1A1A2E;
+    --color-button-selected: #FFE000;
+    --color-button-default: white;
+    --color-button-disabled: #A8A8A8;
+
+    /* Stroke */
+    --stroke-width: 2px;
+
+    /* Z-index */
+    --z-dropdown: 1;
+    --z-modal-backdrop: 1000;
+    --z-modal: 1001;
+
+    /* Layout */
+    --content-max-width: 1320px;
+}

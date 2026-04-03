@@ -1,0 +1,14 @@
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    margin: 0px;
+}
+
+text {
+    pointer-events: none;
+}
+
+div {
+    margin: 0px;
+    padding: 0px;
+}

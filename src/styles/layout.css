@@ -1,0 +1,5 @@
+.content {
+    padding: 10px;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}

@@ -225,12 +225,12 @@ describe("guitarNodes - note circle styling", () => {
         expect(transparent.length).toBeGreaterThan(0);
     });
 
-    test("tonic (noteNumber=0) with no toggled notes has yellow fill", () => {
-        // defaultState has no toggled notes; the tonic note gets yellow fill
+    test("tonic (noteNumber=0) with no toggled notes has tonic fill", () => {
+        // defaultState has no toggled notes; the tonic note gets tonic fill
         const nodes = guitarNodes(model, noRaise);
         const noteCircles = collect("circle", nodes).filter((c) => c.r === 15);
-        const yellow = noteCircles.filter((c) => c.fill === "yellow");
-        expect(yellow.length).toBeGreaterThan(0);
+        const tonic = noteCircles.filter((c) => c.fill === "#FFE000");
+        expect(tonic.length).toBeGreaterThan(0);
     });
 });
 

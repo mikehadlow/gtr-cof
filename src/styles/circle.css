@@ -1,0 +1,90 @@
+/* Circle of Fifths */
+
+.note-segment {
+    fill: var(--color-segment-default);
+    stroke: none;
+}
+
+.note-segment-tonic {
+    fill: var(--color-segment-tonic);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.note-segment-scale {
+    fill: var(--color-segment-scale);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.note-segment-text {
+    font-size: var(--font-size-note);
+    text-anchor: middle;
+    fill: var(--color-segment-stroke);
+}
+
+.degree-segment {
+    fill: none;
+    stroke: none;
+}
+
+.degree-segment-selected {
+    fill: var(--color-segment-scale);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.degree-segment-text {
+    font-size: var(--font-size-degree);
+    text-anchor: middle;
+    fill: var(--color-segment-stroke);
+}
+
+.chord-segment {
+    fill: none;
+    stroke: none;
+}
+
+.chord-segment-dim {
+    fill: var(--color-segment-dim);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.chord-segment-aug {
+    fill: var(--color-segment-aug);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.chord-segment-minor {
+    fill: var(--color-segment-minor);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.chord-segment-major {
+    fill: var(--color-segment-major);
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.chord-segment-note {
+    fill: none;
+    stroke: none;
+}
+
+.interval-note-selected {
+    stroke: var(--color-segment-stroke);
+    stroke-width: var(--stroke-width);
+}
+
+.interval-segment {
+    fill: var(--color-segment-interval);
+    stroke: none;
+}
+
+.interval-note {
+    fill: none;
+    stroke: none;
+}

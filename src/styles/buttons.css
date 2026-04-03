@@ -1,0 +1,35 @@
+/* Modes */
+.mode-button {
+    fill: var(--color-button-default);
+    stroke: var(--color-segment-stroke);
+}
+
+.mode-button-selected {
+    fill: var(--color-button-selected);
+}
+
+.mode-text {
+    font-size: var(--font-size-button);
+    text-anchor: left;
+    fill: var(--color-segment-stroke);
+}
+
+/* Tonics */
+.tonic-button {
+    fill: var(--color-button-default);
+    stroke: var(--color-segment-stroke);
+}
+
+.tonic-button-grey {
+    fill: var(--color-button-disabled);
+}
+
+.tonic-button-selected {
+    fill: var(--color-button-selected);
+}
+
+.tonic-text {
+    font-size: var(--font-size-button);
+    text-anchor: left;
+    fill: var(--color-segment-stroke);
+}
