@@ -44,6 +44,12 @@ class Mod {
     return zip3(theseItems, items2, items3);
   }
 }
+function previous(a, i) {
+  return a[i - 1 < 0 ? a.length - 1 : i - 1];
+}
+function next(a, i) {
+  return a[i + 1 >= a.length ? 0 : i + 1];
+}
 function zip(a, b) {
   if (a.length !== b.length) {
     throw new Error("Cannot merge arrays of different lengths");
@@ -578,7 +584,7 @@ var update = (model, msg) => {
 };
 
 // src/ui/index.ts
-function arcPath(innerR, outerR, startAngle, endAngle, padAngle = 0) {
+function arcPath(innerR, outerR, startAngle, endAngle, padAngle = 0, rounding) {
   const sa = startAngle + padAngle / 2;
   const ea = endAngle - padAngle / 2;
   const x1 = Math.sin(sa) * outerR, y1 = -Math.cos(sa) * outerR;
@@ -586,7 +592,38 @@ function arcPath(innerR, outerR, startAngle, endAngle, padAngle = 0) {
   const x3 = Math.sin(ea) * innerR, y3 = -Math.cos(ea) * innerR;
   const x4 = Math.sin(sa) * innerR, y4 = -Math.cos(sa) * innerR;
   const largeArc = ea - sa > Math.PI ? 1 : 0;
-  return `M ${x1},${y1} A ${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} L ${x3},${y3} A ${innerR},${innerR} 0 ${largeArc},0 ${x4},${y4} Z`;
+  if (!rounding) {
+    return `M ${x1},${y1} A ${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} L ${x3},${y3} A ${innerR},${innerR} 0 ${largeArc},0 ${x4},${y4} Z`;
+  }
+  const cr = 10;
+  const os0x = x1 - cr * Math.sin(sa), os0y = y1 + cr * Math.cos(sa);
+  const os1x = x1 + cr * Math.cos(sa), os1y = y1 + cr * Math.sin(sa);
+  const oe0x = x2 - cr * Math.cos(ea), oe0y = y2 - cr * Math.sin(ea);
+  const oe1x = x2 - cr * Math.sin(ea), oe1y = y2 + cr * Math.cos(ea);
+  const ie0x = x3 + cr * Math.sin(ea), ie0y = y3 - cr * Math.cos(ea);
+  const ie1x = x3 - cr * Math.cos(ea), ie1y = y3 - cr * Math.sin(ea);
+  const is0x = x4 + cr * Math.cos(sa), is0y = y4 + cr * Math.sin(sa);
+  const is1x = x4 + cr * Math.sin(sa), is1y = y4 - cr * Math.cos(sa);
+  const { outerStart, outerEnd, innerStart, innerEnd } = rounding;
+  const ca = (r, x, y) => ` A ${r},${r} 0 0,1 ${x},${y}`;
+  let d = `M ${outerStart ? `${os1x},${os1y}` : `${x1},${y1}`}`;
+  d += ` A ${outerR},${outerR} 0 ${largeArc},1 ${outerEnd ? `${oe0x},${oe0y}` : `${x2},${y2}`}`;
+  if (outerEnd) {
+    d += ca(cr, oe1x, oe1y);
+  }
+  d += ` L ${innerEnd ? `${ie0x},${ie0y}` : `${x3},${y3}`}`;
+  if (innerEnd) {
+    d += ca(cr, ie1x, ie1y);
+  }
+  d += ` A ${innerR},${innerR} 0 ${largeArc},0 ${innerStart ? `${is0x},${is0y}` : `${x4},${y4}`}`;
+  if (innerStart) {
+    d += ca(cr, is1x, is1y);
+  }
+  if (outerStart) {
+    d += ` L ${os0x},${os0y}${ca(cr, os1x, os1y)}`;
+  }
+  d += ` Z`;
+  return d;
 }
 function arcCentroid(innerR, outerR, startAngle, endAngle) {
   const midAngle = (startAngle + endAngle) / 2;
@@ -702,6 +739,9 @@ function createElement(node) {
       el.setAttribute("y1", String(node.y1));
       el.setAttribute("x2", String(node.x2));
       el.setAttribute("y2", String(node.y2));
+      if (node.class) {
+        el.setAttribute("class", node.class);
+      }
       if (node.stroke) {
         el.setAttribute("stroke", node.stroke);
       }
@@ -782,12 +822,18 @@ function createElement(node) {
     }
     case "segment": {
       const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+      const rounding = node.rouding || {
+        outerStart: false,
+        outerEnd: false,
+        innerEnd: false,
+        innerStart: false
+      };
       const path = createElement({
         type: "g",
         children: [
           {
             type: "path",
-            d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end),
+            d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end, 0, rounding),
             class: node.class,
             onClick: node.onClick
           }
@@ -894,13 +940,13 @@ function chordIntervalNodes(model, raise) {
 var circleNodes = (noteIndexes, label, svgWidth) => {
   return (model, raise) => {
     const offset = model.state.circleIsCNoon ? 3 : 0;
-    const segments = generateSegments(rotate(noteIndexes, offset));
+    const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
+    const segments = generateSegments(rotate(noteIndexes, offset), nodeByIndex);
     const cx = 250;
     const cy = 250;
     const chordRadiusX = { inner: 202, outer: 242 };
     const tonicRadius = { inner: 135, outer: 198 };
     const intervalRadius = { inner: 90, outer: 135 };
-    const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
     const noteSegments = segments.map((seg) => {
       const node = nodeByIndex.get(seg.index) ?? nullNode;
       const cls = "note-segment" + (node.scaleNote.isScaleNote ? node.scaleNote.isTonic ? " note-segment-tonic" : " note-segment-scale" : "");
@@ -911,6 +957,12 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
         labelClass: "note-segment-text",
         radius: tonicRadius,
         angle: { start: seg.startAngle, end: seg.endAngle },
+        rouding: {
+          outerStart: seg.start,
+          outerEnd: seg.end,
+          innerEnd: false,
+          innerStart: false
+        },
         onClick: () => raise({
           id: "TonicChanged",
           noteSpec: replaceDoubleSharpsAndFlatsWithEquivalentNote(node.scaleNote.note)
@@ -931,6 +983,12 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
         labelClass: "degree-segment-text",
         radius: intervalRadius,
         angle: { start: seg.startAngle, end: seg.endAngle },
+        rouding: {
+          outerStart: false,
+          outerEnd: false,
+          innerEnd: seg.end,
+          innerStart: seg.start
+        },
         onClick: () => raise({
           id: "Toggle",
           index: node.scaleNote.note.index
@@ -953,6 +1011,12 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
         labelClass: "degree-segment-text",
         radius: chordRadiusX,
         angle: { start: seg.startAngle, end: seg.endAngle },
+        rouding: {
+          outerStart: seg.start,
+          outerEnd: seg.end,
+          innerEnd: seg.end,
+          innerStart: seg.start
+        },
         onClick: () => raise({
           id: "ChordChanged",
           chordIndex: node.scaleNote.note.index
@@ -990,13 +1054,29 @@ function getChordSegmentClass(chord) {
   }
   throw new Error("Unexpected ChordType");
 }
-function generateSegments(fifths2) {
+function generateSegments(fifths2, nodes) {
   const count = fifths2.length;
   const angle = Math.PI * (2 / count);
   return fifths2.map((index, i) => {
+    const [isStart, isEnd] = isStartOrEnd(fifths2, nodes, i);
     const itemAngle = angle * i - angle / 2;
-    return { startAngle: itemAngle, endAngle: itemAngle + angle, index };
+    return {
+      startAngle: itemAngle,
+      endAngle: itemAngle + angle,
+      index,
+      start: isStart,
+      end: isEnd
+    };
   });
+}
+function isStartOrEnd(fifths2, nodes, i) {
+  const currentNode = nodes.get(fifths2[i]);
+  const previousNode = nodes.get(previous(fifths2, i));
+  const nextNode = nodes.get(next(fifths2, i));
+  if (currentNode?.scaleNote.isScaleNote) {
+    return [!previousNode?.scaleNote.isScaleNote, !nextNode?.scaleNote.isScaleNote];
+  }
+  return [false, false];
 }
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec) {
   if (Math.abs(noteSpec.offset) > 1) {
@@ -1122,44 +1202,17 @@ var svgWidth = 1160;
 function noteX(i) {
   return i * fretGap + pad + 30;
 }
-function noteFill(sn, hasToggledNotes) {
+function noteClass(sn, hasToggledNotes) {
   if (sn.node.toggle) {
-    return "white";
+    return `fret-note fret-note-toggle ${sn.node.chordInterval.colour.replace("color", "stroke")}`;
   }
   if (sn.node.scaleNote.isScaleNote) {
-    if (sn.node.scaleNote.isTonic) {
-      return hasToggledNotes ? "white" : "#FFE000";
+    if (!hasToggledNotes) {
+      return sn.node.scaleNote.isTonic ? "fret-note fret-note-tonic" : "fret-note fret-note-scale";
     }
-    return "white";
+    return "fret-note fret-note-dimmed";
   }
-  return "rgba(255, 255, 255, 0.01)";
-}
-function noteStroke(sn, hasToggledNotes) {
-  if (sn.node.toggle) {
-    return;
-  }
-  if (hasToggledNotes) {
-    return "none";
-  }
-  if (sn.node.scaleNote.isScaleNote) {
-    return "#1A1A2E";
-  }
-  return "none";
-}
-function noteClass(sn) {
-  if (sn.node.toggle) {
-    return sn.node.chordInterval.colour.replace("color", "stroke");
-  }
-  return;
-}
-function noteStrokeWidth(sn) {
-  if (sn.node.toggle) {
-    return 4;
-  }
-  if (sn.node.scaleNote.isScaleNote) {
-    return 2;
-  }
-  return 0;
+  return "fret-note";
 }
 function labelText(sn, labelType) {
   const visible = sn.node.scaleNote.isScaleNote || sn.node.toggle;
@@ -1208,16 +1261,14 @@ var guitarNodes = (model, raise) => {
     y: pad + stringGap / 2 - fretWidth,
     width: fretWidth,
     height: stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2,
-    fill: i === 0 ? "black" : "none",
-    stroke: "grey",
-    strokeWidth: 1
+    class: i === 0 ? "fret-nut" : "fret-line"
   }));
   const dotCircles = tuningInfo.dots.map(([fret, pos]) => ({
     type: "circle",
     r: 10,
     cx: fret * fretGap + pad + 30 + pos * 10,
     cy: tuningInfo.notes.length * stringGap + pad + 15,
-    fill: "lightgrey"
+    class: "fret-dot"
   }));
   const stringOrder = isNutFlipped ? tuningInfo.notes.slice() : tuningInfo.notes.slice().reverse();
   const stringGroups = stringOrder.map((startIndex, si) => {
@@ -1228,18 +1279,14 @@ var guitarNodes = (model, raise) => {
       y1: stringGap / 2,
       x2: pad + fretGap * numberOfFrets + 20,
       y2: stringGap / 2,
-      stroke: "black",
-      strokeWidth: 2
+      class: "fret-string"
     };
     const noteCircles = fretNotes.map((sn, i) => ({
       type: "circle",
       r: noteRadius,
       cy: stringGap / 2,
       cx: noteX(i),
-      class: noteClass(sn),
-      fill: noteFill(sn, hasToggledNotes),
-      stroke: noteStroke(sn, hasToggledNotes),
-      strokeWidth: noteStrokeWidth(sn),
+      class: noteClass(sn, hasToggledNotes),
       onClick: () => raise({ id: "Toggle", index: sn.index })
     }));
     const noteTexts = fretNotes.map((sn, i) => {
@@ -5589,12 +5636,12 @@ var $ZodPipe = /* @__PURE__ */ $constructor("$ZodPipe", (inst, def) => {
     return handlePipeResult(left, def.out, ctx);
   };
 });
-function handlePipeResult(left, next, ctx) {
+function handlePipeResult(left, next2, ctx) {
   if (left.issues.length) {
     left.aborted = true;
     return left;
   }
-  return next._zod.run({ value: left.value, issues: left.issues }, ctx);
+  return next2._zod.run({ value: left.value, issues: left.issues }, ctx);
 }
 var $ZodCodec = /* @__PURE__ */ $constructor("$ZodCodec", (inst, def) => {
   $ZodType.init(inst, def);
@@ -15315,5 +15362,5 @@ var main = () => {
 };
 main();
 
-//# debugId=3A37E1638D16560264756E2164756E21
+//# debugId=D7C718F77A36788264756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

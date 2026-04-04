@@ -40,7 +40,15 @@
   --interval-color-9: #f44289;
   --interval-color-10: #ff8282;
   --interval-color-11: #ff82fc;
+  --color-fret-note: white;
+  --color-fret-note-hidden: #ffffff03;
+  --color-fret-nut: black;
+  --color-fret-line: grey;
+  --color-fret-dot: lightgrey;
+  --color-fret-string: black;
+  --stroke-width-fret: 1px;
   --stroke-width: 2px;
+  --stroke-width-toggle: 4px;
   --z-dropdown: 1;
   --z-modal-backdrop: 1000;
   --z-modal: 1001;
@@ -378,6 +386,34 @@ div {
 }
 
 /* src/styles/guitar.css */
+.fret-note {
+  fill: var(--color-fret-note-hidden);
+  stroke: none;
+  stroke-width: 0;
+}
+
+.fret-note-scale {
+  fill: var(--color-fret-note);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
+}
+
+.fret-note-tonic {
+  fill: var(--color-segment-tonic);
+  stroke: var(--color-segment-stroke);
+  stroke-width: var(--stroke-width);
+}
+
+.fret-note-dimmed {
+  fill: var(--color-fret-note);
+  stroke: none;
+}
+
+.fret-note-toggle {
+  fill: var(--color-fret-note);
+  stroke-width: var(--stroke-width-toggle);
+}
+
 .interval-stroke-0 {
   stroke: var(--interval-color-0);
 }
@@ -424,6 +460,27 @@ div {
 
 .interval-stroke-11 {
   stroke: var(--interval-color-11);
+}
+
+.fret-nut {
+  fill: var(--color-fret-nut);
+  stroke: var(--color-fret-line);
+  stroke-width: var(--stroke-width-fret);
+}
+
+.fret-line {
+  fill: none;
+  stroke: var(--color-fret-line);
+  stroke-width: var(--stroke-width-fret);
+}
+
+.fret-dot {
+  fill: var(--color-fret-dot);
+}
+
+.fret-string {
+  stroke: var(--color-fret-string);
+  stroke-width: var(--stroke-width);
 }
 
 /* src/styles/index.css */
