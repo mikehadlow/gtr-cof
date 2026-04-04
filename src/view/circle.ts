@@ -1,4 +1,5 @@
 import type { Msg } from "../message";
+import { next, previous } from "../mod";
 import type { Model } from "../model";
 import * as music from "../music";
 import type { View } from "../types";
@@ -9,12 +10,15 @@ type Segment = {
     readonly startAngle: number;
     readonly endAngle: number;
     readonly index: number;
+    readonly start: boolean;
+    readonly end: boolean;
 };
 
 export const circleNodes = (noteIndexes: number[], label: string, svgWidth: number): View<Model, Msg, RenderNode> => {
     return (model: Model, raise: (msg: Msg) => void): RenderNode[] => {
         const offset = model.state.circleIsCNoon ? 3 : 0;
-        const segments = generateSegments(rotate(noteIndexes, offset));
+        const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
+        const segments = generateSegments(rotate(noteIndexes, offset), nodeByIndex);
 
         const cx = 250;
         const cy = 250;
@@ -22,8 +26,6 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
         const chordRadiusX = { inner: 202, outer: 242 };
         const tonicRadius = { inner: 135, outer: 198 };
         const intervalRadius = { inner: 90, outer: 135 };
-
-        const nodeByIndex = new Map(model.music.nodes.map((n) => [n.scaleNote.note.index, n]));
 
         const noteSegments: RenderNode[] = segments.map((seg) => {
             const node = nodeByIndex.get(seg.index) ?? music.nullNode;
@@ -41,6 +43,12 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                 labelClass: "note-segment-text",
                 radius: tonicRadius,
                 angle: { start: seg.startAngle, end: seg.endAngle },
+                rouding: {
+                    outerStart: seg.start,
+                    outerEnd: seg.end,
+                    innerEnd: false,
+                    innerStart: false,
+                },
                 onClick: () =>
                     raise({
                         id: "TonicChanged",
@@ -65,6 +73,12 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                 labelClass: "degree-segment-text",
                 radius: intervalRadius,
                 angle: { start: seg.startAngle, end: seg.endAngle },
+                rouding: {
+                    outerStart: false,
+                    outerEnd: false,
+                    innerEnd: seg.end,
+                    innerStart: seg.start,
+                },
                 onClick: () =>
                     raise({
                         id: "Toggle",
@@ -91,6 +105,12 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                 labelClass: "degree-segment-text",
                 radius: chordRadiusX,
                 angle: { start: seg.startAngle, end: seg.endAngle },
+                rouding: {
+                    outerStart: seg.start,
+                    outerEnd: seg.end,
+                    innerEnd: seg.end,
+                    innerStart: seg.start,
+                },
                 onClick: () =>
                     raise({
                         id: "ChordChanged",
@@ -132,13 +152,30 @@ function getChordSegmentClass(chord: music.Chord): string {
     throw new Error("Unexpected ChordType");
 }
 
-function generateSegments(fifths: number[]): Segment[] {
+function generateSegments(fifths: number[], nodes: Map<number, music.Node>): Segment[] {
     const count = fifths.length;
     const angle = Math.PI * (2 / count);
     return fifths.map((index, i) => {
+        const [isStart, isEnd] = isStartOrEnd(fifths, nodes, i);
         const itemAngle = angle * i - angle / 2;
-        return { startAngle: itemAngle, endAngle: itemAngle + angle, index };
+        return {
+            startAngle: itemAngle,
+            endAngle: itemAngle + angle,
+            index,
+            start: isStart,
+            end: isEnd,
+        };
     });
+}
+
+function isStartOrEnd(fifths: number[], nodes: Map<number, music.Node>, i: number): [boolean, boolean] {
+    const currentNode = nodes.get(fifths[i]);
+    const previousNode = nodes.get(previous(fifths, i));
+    const nextNode = nodes.get(next(fifths, i));
+    if (currentNode?.scaleNote.isScaleNote) {
+        return [!previousNode?.scaleNote.isScaleNote, !nextNode?.scaleNote.isScaleNote];
+    }
+    return [false, false];
 }
 
 function replaceDoubleSharpsAndFlatsWithEquivalentNote(noteSpec: music.NoteSpec): music.NoteSpec {

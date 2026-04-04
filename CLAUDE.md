@@ -18,7 +18,10 @@ bun run build        # Bundle to JS
 bun run start        # Development mode: local server at http://localhost:3000
 bun run typecheck    # Run tsc with --noEmit
 bun test             # Run unit tests with the Bun test runner
+bun run check        # Run all checks: typecheck, tests, biome lint/format, dep-cruise
 ```
+
+Run `bun run check` after every change and fix any errors before finishing.
 
 The build outputs a single bundled file at `docs/gtr-cof.js`. CI/CD via GitHub Actions deploys to the `publish` branch on push to `master`.
 

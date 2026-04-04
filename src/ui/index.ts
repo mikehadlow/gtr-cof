@@ -66,13 +66,28 @@ export type RenderNode =
           radius: { inner: number; outer: number };
           angle: { start: number; end: number };
           selection?: { class: string; fill?: string };
+          rouding?: CornerRounding;
           onClick: () => void;
       };
+
+export type CornerRounding = {
+    outerStart: boolean;
+    outerEnd: boolean;
+    innerStart: boolean;
+    innerEnd: boolean;
+};
 
 // Arc math — D3 convention: angle 0 = 12 o'clock, clockwise.
 // SVG coords: x = sin(a) * r,  y = -cos(a) * r
 
-export function arcPath(innerR: number, outerR: number, startAngle: number, endAngle: number, padAngle = 0): string {
+export function arcPath(
+    innerR: number,
+    outerR: number,
+    startAngle: number,
+    endAngle: number,
+    padAngle = 0,
+    rounding?: CornerRounding,
+): string {
     const sa = startAngle + padAngle / 2;
     const ea = endAngle - padAngle / 2;
     const x1 = Math.sin(sa) * outerR,
@@ -84,7 +99,73 @@ export function arcPath(innerR: number, outerR: number, startAngle: number, endA
     const x4 = Math.sin(sa) * innerR,
         y4 = -Math.cos(sa) * innerR; // inner start
     const largeArc = ea - sa > Math.PI ? 1 : 0;
-    return `M ${x1},${y1} A ${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} L ${x3},${y3} A ${innerR},${innerR} 0 ${largeArc},0 ${x4},${y4} Z`;
+
+    if (!rounding) {
+        return `M ${x1},${y1} A ${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} L ${x3},${y3} A ${innerR},${innerR} 0 ${largeArc},0 ${x4},${y4} Z`;
+    }
+
+    // Corner rounding radius in SVG units.
+    const cr = 10;
+
+    // Each corner has an incoming and outgoing unit tangent vector along the path.
+    // arc_start = corner - cr * t_in  (cr before the corner)
+    // arc_end   = corner + cr * t_out (cr after the corner)
+    // All four corners turn the same way (cross product = 1), so all corner arcs use sweep=1.
+    //
+    // Tangent conventions (x = sin(a)*r, y = -cos(a)*r):
+    //   CW tangent at a:     ( cos(a),  sin(a))
+    //   CCW tangent at a:    (-cos(a), -sin(a))
+    //   Outward radial at a: ( sin(a), -cos(a))
+    //   Inward radial at a:  (-sin(a),  cos(a))
+
+    // outerStart (x1,y1): incoming = outward radial at sa, outgoing = CW tangent at sa
+    const os0x = x1 - cr * Math.sin(sa),
+        os0y = y1 + cr * Math.cos(sa); // on close-line, cr before corner
+    const os1x = x1 + cr * Math.cos(sa),
+        os1y = y1 + cr * Math.sin(sa); // on outer arc,  cr after corner
+
+    // outerEnd (x2,y2): incoming = CW tangent at ea, outgoing = inward radial at ea
+    const oe0x = x2 - cr * Math.cos(ea),
+        oe0y = y2 - cr * Math.sin(ea); // on outer arc,    cr before corner
+    const oe1x = x2 - cr * Math.sin(ea),
+        oe1y = y2 + cr * Math.cos(ea); // on radial line,  cr after corner
+
+    // innerEnd (x3,y3): incoming = inward radial at ea, outgoing = CCW tangent at ea
+    const ie0x = x3 + cr * Math.sin(ea),
+        ie0y = y3 - cr * Math.cos(ea); // on radial line,  cr before corner
+    const ie1x = x3 - cr * Math.cos(ea),
+        ie1y = y3 - cr * Math.sin(ea); // on inner arc,    cr after corner
+
+    // innerStart (x4,y4): incoming = CCW tangent at sa, outgoing = outward radial at sa
+    const is0x = x4 + cr * Math.cos(sa),
+        is0y = y4 + cr * Math.sin(sa); // on inner arc,    cr before corner
+    const is1x = x4 + cr * Math.sin(sa),
+        is1y = y4 - cr * Math.cos(sa); // on close-line,   cr after corner
+
+    const { outerStart, outerEnd, innerStart, innerEnd } = rounding;
+    const ca = (r: number, x: number, y: number) => ` A ${r},${r} 0 0,1 ${x},${y}`; // corner arc helper
+
+    // Path starts at outerStart (or its arc-end if rounded), then:
+    //   outer arc → outerEnd corner → radial line → innerEnd corner → inner arc → innerStart corner → close line → outerStart corner → Z
+    let d = `M ${outerStart ? `${os1x},${os1y}` : `${x1},${y1}`}`;
+    d += ` A ${outerR},${outerR} 0 ${largeArc},1 ${outerEnd ? `${oe0x},${oe0y}` : `${x2},${y2}`}`;
+    if (outerEnd) {
+        d += ca(cr, oe1x, oe1y);
+    }
+    d += ` L ${innerEnd ? `${ie0x},${ie0y}` : `${x3},${y3}`}`;
+    if (innerEnd) {
+        d += ca(cr, ie1x, ie1y);
+    }
+    d += ` A ${innerR},${innerR} 0 ${largeArc},0 ${innerStart ? `${is0x},${is0y}` : `${x4},${y4}`}`;
+    if (innerStart) {
+        d += ca(cr, is1x, is1y);
+    }
+    if (outerStart) {
+        d += ` L ${os0x},${os0y}${ca(cr, os1x, os1y)}`;
+    }
+    d += ` Z`;
+
+    return d;
 }
 
 export function arcCentroid(innerR: number, outerR: number, startAngle: number, endAngle: number): [number, number] {
@@ -289,12 +370,18 @@ function createElement(node: RenderNode): Element[] {
         }
         case "segment": {
             const [x, y] = arcCentroid(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end);
+            const rounding: CornerRounding = node.rouding || {
+                outerStart: false,
+                outerEnd: false,
+                innerEnd: false,
+                innerStart: false,
+            };
             const path = createElement({
                 type: "g" as const,
                 children: [
                     {
                         type: "path" as const,
-                        d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end),
+                        d: arcPath(node.radius.inner, node.radius.outer, node.angle.start, node.angle.end, 0, rounding),
                         class: node.class,
                         onClick: node.onClick,
                     },

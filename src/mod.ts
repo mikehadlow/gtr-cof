@@ -35,6 +35,14 @@ export class Mod<T> {
     }
 }
 
+export function previous<T>(a: T[], i: number): T {
+    return a[i - 1 < 0 ? a.length - 1 : i - 1];
+}
+
+export function next<T>(a: T[], i: number): T {
+    return a[i + 1 >= a.length ? 0 : i + 1];
+}
+
 export function zip<A, B>(a: A[], b: B[]): [A, B][] {
     if (a.length !== b.length) {
         throw new Error("Cannot merge arrays of different lengths");
