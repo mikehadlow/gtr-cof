@@ -1,6 +1,13 @@
 /* Fretboard */
 
-/* Interval stroke classes — applied to note circles when a chord is selected */
+/* Note circles */
+.fret-note        { fill: var(--color-fret-note-hidden); stroke: none; stroke-width: 0; }
+.fret-note-scale  { fill: var(--color-fret-note); stroke: var(--color-segment-stroke); stroke-width: var(--stroke-width); }
+.fret-note-tonic  { fill: var(--color-segment-tonic); stroke: var(--color-segment-stroke); stroke-width: var(--stroke-width); }
+.fret-note-dimmed { fill: var(--color-fret-note); stroke: none; }
+.fret-note-toggle { fill: var(--color-fret-note); stroke-width: var(--stroke-width-toggle); }
+
+/* Interval stroke classes — must appear after .fret-note so they override stroke: none */
 .interval-stroke-0  { stroke: var(--interval-color-0);  }
 .interval-stroke-1  { stroke: var(--interval-color-1);  }
 .interval-stroke-2  { stroke: var(--interval-color-2);  }
@@ -13,3 +20,13 @@
 .interval-stroke-9  { stroke: var(--interval-color-9);  }
 .interval-stroke-10 { stroke: var(--interval-color-10); }
 .interval-stroke-11 { stroke: var(--interval-color-11); }
+
+/* Fret lines and nut */
+.fret-nut  { fill: var(--color-fret-nut);  stroke: var(--color-fret-line); stroke-width: var(--stroke-width-fret); }
+.fret-line { fill: none;                   stroke: var(--color-fret-line); stroke-width: var(--stroke-width-fret); }
+
+/* Fret position dots */
+.fret-dot { fill: var(--color-fret-dot); }
+
+/* Guitar strings */
+.fret-string { stroke: var(--color-fret-string); stroke-width: var(--stroke-width); }

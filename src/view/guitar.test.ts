@@ -164,7 +164,7 @@ describe("guitarNodes - structure", () => {
 describe("guitarNodes - fret geometry", () => {
     const nodes = guitarNodes(model, noRaise);
 
-    test("first fret rect has fill black (nut)", () => {
+    test("first fret rect has class fret-nut (nut)", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
         if (fretsGroup.type !== "g") {
@@ -174,10 +174,10 @@ describe("guitarNodes - fret geometry", () => {
         if (firstRect.type !== "rect") {
             throw new Error();
         }
-        expect(firstRect.fill).toBe("black");
+        expect(firstRect.class).toBe("fret-nut");
     });
 
-    test("remaining fret rects have fill none", () => {
+    test("remaining fret rects have class fret-line", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
         if (fretsGroup.type !== "g") {
@@ -188,11 +188,11 @@ describe("guitarNodes - fret geometry", () => {
             if (rect.type !== "rect") {
                 throw new Error();
             }
-            expect(rect.fill).toBe("none");
+            expect(rect.class).toBe("fret-line");
         }
     });
 
-    test("fret rects have stroke grey and strokeWidth 1", () => {
+    test("fret rects have no inline stroke — styling via CSS class", () => {
         const fb = getFretboard(nodes);
         const fretsGroup = fb.children[0];
         if (fretsGroup.type !== "g") {
@@ -202,8 +202,8 @@ describe("guitarNodes - fret geometry", () => {
             if (c.type !== "rect") {
                 throw new Error();
             }
-            expect(c.stroke).toBe("grey");
-            expect(c.strokeWidth).toBe(1);
+            expect(c.stroke).toBeUndefined();
+            expect(c.strokeWidth).toBeUndefined();
         }
     });
 });
@@ -211,25 +211,25 @@ describe("guitarNodes - fret geometry", () => {
 // ─── note circle styling ───────────────────────────────────────────────────
 
 describe("guitarNodes - note circle styling", () => {
-    test("scale note circles have white fill", () => {
+    test("scale note circles have fret-note-scale class", () => {
         const nodes = guitarNodes(model, noRaise);
         const noteCircles = collect("circle", nodes).filter((c) => c.r === 15);
-        const whiteCircles = noteCircles.filter((c) => c.fill === "white");
-        expect(whiteCircles.length).toBeGreaterThan(0);
+        const scaleCircles = noteCircles.filter((c) => c.class?.includes("fret-note-scale"));
+        expect(scaleCircles.length).toBeGreaterThan(0);
     });
 
-    test("non-scale note circles have near-transparent fill", () => {
+    test("non-scale note circles have fret-note class only", () => {
         const nodes = guitarNodes(model, noRaise);
         const noteCircles = collect("circle", nodes).filter((c) => c.r === 15);
-        const transparent = noteCircles.filter((c) => c.fill === "rgba(255, 255, 255, 0.01)");
-        expect(transparent.length).toBeGreaterThan(0);
+        const hidden = noteCircles.filter((c) => c.class === "fret-note");
+        expect(hidden.length).toBeGreaterThan(0);
     });
 
-    test("tonic (noteNumber=0) with no toggled notes has tonic fill", () => {
-        // defaultState has no toggled notes; the tonic note gets tonic fill
+    test("tonic note with no toggled notes has fret-note-tonic class", () => {
+        // defaultState has no toggled notes; the tonic note gets fret-note-tonic class
         const nodes = guitarNodes(model, noRaise);
         const noteCircles = collect("circle", nodes).filter((c) => c.r === 15);
-        const tonic = noteCircles.filter((c) => c.fill === "#FFE000");
+        const tonic = noteCircles.filter((c) => c.class?.includes("fret-note-tonic"));
         expect(tonic.length).toBeGreaterThan(0);
     });
 });

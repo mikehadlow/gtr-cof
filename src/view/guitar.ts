@@ -25,47 +25,17 @@ function noteX(i: number): number {
     return i * fretGap + pad + 30;
 }
 
-function noteFill(sn: StringNote, hasToggledNotes: boolean): string {
+function noteClass(sn: StringNote, hasToggledNotes: boolean): string {
     if (sn.node.toggle) {
-        return "white";
+        return `fret-note fret-note-toggle ${sn.node.chordInterval.colour.replace("color", "stroke")}`;
     }
     if (sn.node.scaleNote.isScaleNote) {
-        if (sn.node.scaleNote.isTonic) {
-            return hasToggledNotes ? "white" : "#FFE000";
+        if (!hasToggledNotes) {
+            return sn.node.scaleNote.isTonic ? "fret-note fret-note-tonic" : "fret-note fret-note-scale";
         }
-        return "white";
+        return "fret-note fret-note-dimmed";
     }
-    return "rgba(255, 255, 255, 0.01)";
-}
-
-function noteStroke(sn: StringNote, hasToggledNotes: boolean): string | undefined {
-    if (sn.node.toggle) {
-        return undefined;
-    }
-    if (hasToggledNotes) {
-        return "none";
-    }
-    if (sn.node.scaleNote.isScaleNote) {
-        return "#1A1A2E";
-    }
-    return "none";
-}
-
-function noteClass(sn: StringNote): string | undefined {
-    if (sn.node.toggle) {
-        return sn.node.chordInterval.colour.replace("color", "stroke");
-    }
-    return undefined;
-}
-
-function noteStrokeWidth(sn: StringNote): number {
-    if (sn.node.toggle) {
-        return 4;
-    }
-    if (sn.node.scaleNote.isScaleNote) {
-        return 2;
-    }
-    return 0;
+    return "fret-note";
 }
 
 function labelText(sn: StringNote, labelType: FretboardLabelType): string {
@@ -127,9 +97,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
             y: pad + stringGap / 2 - fretWidth,
             width: fretWidth,
             height: stringGap * (tuningInfo.notes.length - 1) + fretWidth * 2,
-            fill: i === 0 ? "black" : "none",
-            stroke: "grey",
-            strokeWidth: 1,
+            class: i === 0 ? "fret-nut" : "fret-line",
         }),
     );
 
@@ -139,7 +107,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
             r: 10,
             cx: fret * fretGap + pad + 30 + pos * 10,
             cy: tuningInfo.notes.length * stringGap + pad + 15,
-            fill: "lightgrey",
+            class: "fret-dot",
         }),
     );
 
@@ -154,8 +122,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
             y1: stringGap / 2,
             x2: pad + fretGap * numberOfFrets + 20,
             y2: stringGap / 2,
-            stroke: "black",
-            strokeWidth: 2,
+            class: "fret-string",
         };
 
         const noteCircles: RenderNode[] = fretNotes.map(
@@ -164,10 +131,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
                 r: noteRadius,
                 cy: stringGap / 2,
                 cx: noteX(i),
-                class: noteClass(sn),
-                fill: noteFill(sn, hasToggledNotes),
-                stroke: noteStroke(sn, hasToggledNotes),
-                strokeWidth: noteStrokeWidth(sn),
+                class: noteClass(sn, hasToggledNotes),
                 onClick: () => raise({ id: "Toggle", index: sn.index }),
             }),
         );

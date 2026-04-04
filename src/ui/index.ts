@@ -35,7 +35,16 @@ export type RenderNode =
           transform?: string;
           content: string;
       }
-    | { type: "line"; x1: number; y1: number; x2: number; y2: number; stroke?: string; strokeWidth?: number }
+    | {
+          type: "line";
+          class?: string;
+          x1: number;
+          y1: number;
+          x2: number;
+          y2: number;
+          stroke?: string;
+          strokeWidth?: number;
+      }
     | {
           type: "use";
           href: string;
@@ -197,6 +206,9 @@ function createElement(node: RenderNode): Element[] {
             el.setAttribute("y1", String(node.y1));
             el.setAttribute("x2", String(node.x2));
             el.setAttribute("y2", String(node.y2));
+            if (node.class) {
+                el.setAttribute("class", node.class);
+            }
             if (node.stroke) {
                 el.setAttribute("stroke", node.stroke);
             }

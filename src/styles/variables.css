@@ -47,8 +47,18 @@
     --interval-color-10: #ff8282;
     --interval-color-11: #ff82fc;
 
-    /* Stroke */
+    /* Fretboard colours */
+    --color-fret-note: white;
+    --color-fret-note-hidden: rgba(255, 255, 255, 0.01);
+    --color-fret-nut: black;
+    --color-fret-line: grey;
+    --color-fret-dot: lightgrey;
+    --color-fret-string: black;
+
+    /* Stroke widths */
+    --stroke-width-fret: 1px;
     --stroke-width: 2px;
+    --stroke-width-toggle: 4px;
 
     /* Z-index */
     --z-dropdown: 1;
