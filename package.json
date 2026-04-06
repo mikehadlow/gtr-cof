@@ -25,6 +25,7 @@
     "typescript": "^5.7.0"
   },
   "dependencies": {
+    "smplr": "^0.20.0",
     "zod": "^4.3.6"
   }
 }
