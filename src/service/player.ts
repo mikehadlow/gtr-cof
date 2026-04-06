@@ -5,7 +5,7 @@ import type { Service } from "../types";
 
 type Toggle = Extract<Msg, { id: "Toggle" }>;
 
-const defaultOctave = 3;
+const defaultOctave = 57; // A3 MIDI note
 
 export const service: Service<Model, Toggle, Msg> = (model: Model, msg: Toggle, raise: (msg: Msg) => void): void => {
     console.log(`Toggle message: ${msg.id}, index: ${msg.index}`);
@@ -15,8 +15,7 @@ export const service: Service<Model, Toggle, Msg> = (model: Model, msg: Toggle, 
         console.log(`ON  node ${node.scaleNote.note.label}`);
         raise({
             id: "Play",
-            index: msg.index,
-            octave: defaultOctave,
+            midiNote: msg.index + defaultOctave,
         });
     } else {
         console.log(`OFF node ${node.scaleNote.note.label}`);

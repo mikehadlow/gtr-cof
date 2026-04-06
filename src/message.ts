@@ -59,6 +59,5 @@ export type Msg =
       }
     | {
           id: "Play";
-          index: number;
-          octave: number;
+          midiNote: number;
       };

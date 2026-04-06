@@ -4,6 +4,8 @@ import { defaultState } from "../update/test-default-state";
 import { updateScale } from "../update/updateScale";
 import { service } from "./player";
 
+const defaultOctave = 57; // MIDI note A3
+
 describe("player service", () => {
     test("raises Play message when toggling a note on", () => {
         // node[0] is A (chromatic index 0); bitmask bit 0 = 1 toggles it on
@@ -13,7 +15,7 @@ describe("player service", () => {
         service(model, { id: "Toggle", index: 0 }, (msg) => raised.push(msg));
 
         expect(raised).toHaveLength(1);
-        expect(raised[0]).toEqual({ id: "Play", index: 0, octave: 3 });
+        expect(raised[0]).toEqual({ id: "Play", midiNote: defaultOctave });
     });
 
     test("does not raise any message when toggling a note off", () => {
@@ -34,6 +36,6 @@ describe("player service", () => {
         service(model, { id: "Toggle", index: 7 }, (msg) => raised.push(msg));
 
         expect(raised).toHaveLength(1);
-        expect(raised[0]).toMatchObject({ id: "Play", index: 7 });
+        expect(raised[0]).toMatchObject({ id: "Play", midiNote: defaultOctave + 7 });
     });
 });
