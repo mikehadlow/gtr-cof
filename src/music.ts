@@ -545,3 +545,11 @@ export function chromatic(): Array<number> {
     }
     return indexes;
 }
+
+export function getNodeAtIndex(nodes: Node[], index: number): Node {
+    const node = nodes.find((node) => node.scaleNote.note.index === index);
+    if (!node) {
+        throw new Error(`Invalid index: ${index}`);
+    }
+    return node;
+}

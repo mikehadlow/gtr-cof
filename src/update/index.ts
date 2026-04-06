@@ -45,6 +45,9 @@ export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model =
             return UpdateSetCToNoon(model, msg);
         case "ModalStateChange":
             return UpdateModalState(model, msg);
+        case "Play":
+            // TODO: visual representation of played notes
+            return model;
         default: {
             const _exhaustiveCheck: never = msg;
             return _exhaustiveCheck;

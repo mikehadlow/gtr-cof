@@ -56,4 +56,9 @@ export type Msg =
     | {
           id: "ModalStateChange";
           modalState: ModalState;
+      }
+    | {
+          id: "Play";
+          index: number;
+          octave: number;
       };

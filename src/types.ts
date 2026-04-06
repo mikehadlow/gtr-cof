@@ -2,9 +2,15 @@ import { z } from "zod";
 
 // Elm inspired architectural types
 
+// Takes a message and the existing model, returns an updated model.
 export type Update<TModel, TMsg> = (model: TModel, msg: TMsg) => TModel;
 
+// Takes the model and a function to raise a message and outputs TRenderNodes that represent the UI.
 export type View<TModel, TMsg, TRenderNode> = (model: TModel, raise: (msg: TMsg) => void) => TRenderNode[];
+
+// Takes a message and the existing model, raises new messages via the raise function
+// Does not modify the model.
+export type Service<TModel, TMsg, TRaiseMsg> = (model: TModel, msg: TMsg, raise: (msg: TRaiseMsg) => void) => void;
 
 // State
 
