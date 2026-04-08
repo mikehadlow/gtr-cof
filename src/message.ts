@@ -59,5 +59,5 @@ export type Msg =
       }
     | {
           id: "Play";
-          midiNote: number;
+          midiNotes: number[];
       };

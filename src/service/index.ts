@@ -2,7 +2,7 @@ import type { Msg } from "../message";
 import type { Model } from "../model";
 import type { Service } from "../types";
 
-import { service as playerService } from "./player";
+import { playChordChanged, playToggle } from "./player";
 import { create as createSoundService } from "./sound";
 
 export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise: (msg: Msg) => void): void => {
@@ -10,7 +10,6 @@ export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise:
     switch (msg.id) {
         case "TonicChanged":
         case "ModeChanged":
-        case "ChordChanged":
         case "ChordIntervalChange":
         case "ScaleFamilyChange":
         case "TuningChanged":
@@ -23,7 +22,10 @@ export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise:
             // Do nothing
             break;
         case "Toggle":
-            playerService(model, msg, raise);
+            playToggle(model, msg, raise);
+            break;
+        case "ChordChanged":
+            playChordChanged(model, msg, raise);
             break;
         case "Play":
             soundService(model, msg, raise);
