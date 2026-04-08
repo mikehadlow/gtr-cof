@@ -1,5 +1,5 @@
 import { Soundfont } from "smplr";
-import type { Msg } from "../message";
+import type { Msg, SequenceEvent } from "../message";
 import type { Model } from "../model";
 import type { Service } from "../types";
 
@@ -9,23 +9,29 @@ export const create = (): Service<Model, Play, Msg> => {
     let context: AudioContext;
     let soundfont: Soundfont | null = null;
 
-    const play = (midiNotes: number[]) => {
+    const play = (seqence: SequenceEvent[]) => {
         if (soundfont === null) {
             context = new AudioContext();
             soundfont = new Soundfont(context, { instrument: "acoustic_grand_piano" });
             soundfont.load.then(() => {
-                midiNotes.forEach((midiNote) => {
-                    soundfont?.start({ note: midiNote, velocity: 127 });
-                });
+                playSequence(seqence);
             });
             return;
         }
-        midiNotes.forEach((midiNote) => {
-            soundfont?.start({ note: midiNote, velocity: 127 });
+        playSequence(seqence);
+    };
+
+    const playSequence = (seqence: SequenceEvent[]) => {
+        const now = context.currentTime;
+        seqence.forEach((event) => {
+            event.midiNotes.forEach((midiNote) => {
+                soundfont?.start({ note: midiNote, time: now + event.timestamp / 1000, velocity: 127, duration: 0.3 });
+            });
         });
     };
 
-    return (_model: Model, { midiNotes }: Play, _raise: (msg: Msg) => void): void => {
-        play(midiNotes);
+    return (_model: Model, { sequence }: Play, _raise: (msg: Msg) => void): void => {
+        console.log(`play ${JSON.stringify(sequence, null, 2)}`);
+        play(sequence);
     };
 };

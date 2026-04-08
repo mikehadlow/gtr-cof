@@ -1,6 +1,11 @@
 import type * as music from "./music";
 import type { FretboardLabelType, ModalState } from "./types";
 
+export type SequenceEvent = {
+    timestamp: number; // miliseconds
+    midiNotes: number[];
+};
+
 export type Msg =
     | {
           id: "TonicChanged";
@@ -54,11 +59,5 @@ export type Msg =
       }
     | {
           id: "Play";
-          midiNotes: number[];
-          sequence?: [
-              {
-                  timestamp: number; // miliseconds
-                  midiNotes: number[];
-              },
-          ];
+          sequence: SequenceEvent[];
       };
