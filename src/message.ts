@@ -44,11 +44,6 @@ export type Msg =
           labelType: FretboardLabelType;
       }
     | {
-          // MIDI only message
-          id: "MidiNote";
-          toggledIndexes: number;
-      }
-    | {
           // CoF only message
           id: "SetCToNoon";
           isC: boolean;
@@ -60,4 +55,10 @@ export type Msg =
     | {
           id: "Play";
           midiNotes: number[];
+          sequence?: [
+              {
+                  timestamp: number; // miliseconds
+                  midiNotes: number[];
+              },
+          ];
       };

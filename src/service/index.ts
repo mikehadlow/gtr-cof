@@ -16,7 +16,6 @@ export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise:
         case "LeftHandedFretboard":
         case "FlipNut":
         case "FretboardLabelChange":
-        case "MidiNote":
         case "SetCToNoon":
         case "ModalStateChange":
             // Do nothing

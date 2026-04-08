@@ -6,7 +6,6 @@ import { Update as UpdateChordIntervalChange } from "./update-chord-interval-cha
 import { Update as UpdateFlipNut } from "./update-flip-nut";
 import { Update as UpdateFretboardLabelChange } from "./update-fretboard-label-change";
 import { Update as UpdateLeftHandedFretboard } from "./update-left-handed-fretboard";
-import { Update as UpdateMidiNote } from "./update-midi-note";
 import { Update as UpdateModalState } from "./update-modal-state";
 import { Update as UpdateModeChanged } from "./update-mode-changed";
 import { Update as UpdateScaleFamilyChange } from "./update-scale-family-change";
@@ -39,8 +38,6 @@ export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model =
             return UpdateFlipNut(model, msg);
         case "FretboardLabelChange":
             return UpdateFretboardLabelChange(model, msg);
-        case "MidiNote":
-            return UpdateMidiNote(model, msg);
         case "SetCToNoon":
             return UpdateSetCToNoon(model, msg);
         case "ModalStateChange":
