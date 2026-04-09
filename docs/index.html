@@ -14,6 +14,14 @@
             content="Find the perfect way to play guitar chords with our free and interactive guitar dashboard. If you're struggling play chords the way you want, you must give this a try."
         />
         <link rel="canonical" href="https://guitardashboard.com/" />
+        <script>
+            (() => {
+                try {
+                    const theme = localStorage.getItem("app_theme");
+                    document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+                } catch {}
+            })();
+        </script>
         <link href="gtr-cof.css" rel="stylesheet" />
         <link rel="shortcut icon" href="favicon.ico?r=31241" />
     </head>
@@ -105,6 +113,13 @@
                         <label for="set-c-to-noon-checkbox"
                             >Set C To Noon</label
                         >
+                        <br />
+                        <input
+                            type="checkbox"
+                            id="dark-mode-checkbox"
+                            name="dark_mode"
+                        />
+                        <label for="dark-mode-checkbox">Dark Mode</label>
                     </div>
                     <div class="with-padding">
                         <fieldset>

@@ -126,7 +126,7 @@ export const circleNodes = (noteIndexes: number[], label: string, svgWidth: numb
                 type: "g",
                 transform: `translate(${cx}, ${cy})`,
                 children: [
-                    { type: "text", x: 0, y: 0, textAnchor: "middle", content: label },
+                    { type: "text", x: 0, y: 0, class: "svg-text", textAnchor: "middle", content: label },
                     { type: "g", children: noteSegments },
                     { type: "g", children: intervalSegments },
                     { type: "g", children: chordSegments },

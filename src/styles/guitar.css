@@ -6,6 +6,7 @@
 .fret-note-tonic  { fill: var(--color-segment-tonic); stroke: var(--color-segment-stroke); stroke-width: var(--stroke-width); }
 .fret-note-dimmed { fill: var(--color-fret-note); stroke: none; }
 .fret-note-toggle { fill: var(--color-fret-note); stroke-width: var(--stroke-width-toggle); }
+.fret-note-text   { fill: var(--color-fret-note-text); }
 
 /* Interval stroke classes — must appear after .fret-note so they override stroke: none */
 .interval-stroke-0  { stroke: var(--interval-color-0);  }

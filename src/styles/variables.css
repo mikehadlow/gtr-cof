@@ -1,4 +1,6 @@
 :root {
+    color-scheme: light;
+
     /* Typography */
     --font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
     --font-size-base: 12pt;
@@ -8,6 +10,18 @@
     --font-size-button: 15px;
     --font-size-modal-close: 20pt;
     --font-size-modal-select: 11pt;
+
+    /* Page chrome */
+    --color-page-bg: #f5f1e8;
+    --color-page-text: #1f2937;
+    --color-surface: #fffdf8;
+    --color-input-bg: #ffffff;
+    --color-input-text: #111827;
+    --color-input-border: #cbd5e1;
+    --color-link: #1d4ed8;
+    --color-link-hover: #1e3a8a;
+    --color-svg-text: #1f2937;
+    --color-fret-note-text: #111827;
 
     /* Colours — UI chrome */
     --color-header-bg: #333;
@@ -67,4 +81,48 @@
 
     /* Layout */
     --content-max-width: 1320px;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-page-bg: #080808;
+    --color-page-text: #e5e5e5;
+    --color-surface: #161616;
+    --color-input-bg: #101010;
+    --color-input-text: #e5e5e5;
+    --color-input-border: #3a3a3a;
+    --color-link: #d0d0d0;
+    --color-link-hover: #ffffff;
+    --color-svg-text: #e5e5e5;
+    --color-fret-note-text: #111827;
+
+    --color-header-bg: #000000;
+    --color-header-hover: #181818;
+    --color-header-text: #e5e5e5;
+    --color-dropdown-bg: #161616;
+    --color-dropdown-hover: #202020;
+    --color-dropdown-text: #e5e5e5;
+    --color-border: #343434;
+    --color-muted: #9a9a9a;
+
+    --color-segment-default: #b8b8b8;
+    --color-segment-tonic: #e7c84b;
+    --color-segment-scale: #ececec;
+    --color-segment-dim: #d86d76;
+    --color-segment-aug: #d49a4e;
+    --color-segment-minor: #7da9c7;
+    --color-segment-major: #78b878;
+    --color-segment-interval: #dedede;
+    --color-segment-stroke: #353535;
+    --color-button-selected: #e7c84b;
+    --color-button-default: #d8d8d8;
+    --color-button-disabled: #707070;
+
+    --color-fret-note: #ededed;
+    --color-fret-note-hidden: rgba(255, 255, 255, 0.08);
+    --color-fret-nut: #dfdfdf;
+    --color-fret-line: #9a9a9a;
+    --color-fret-dot: #444444;
+    --color-fret-string: #d9d9d9;
 }
