@@ -1817,7 +1817,6 @@ var create = () => {
     });
   };
   return (_model, { sequence }, _raise) => {
-    console.log(`play ${JSON.stringify(sequence, null, 2)}`);
     play(sequence);
   };
 };
@@ -16824,5 +16823,5 @@ var main = () => {
 };
 main();
 
-//# debugId=6D7373132EEEDF2064756E2164756E21
+//# debugId=905E197AD15B63FA64756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
