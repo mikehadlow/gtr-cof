@@ -39,6 +39,16 @@ describe("playToggle service", () => {
         expect(raised).toHaveLength(1);
         expect(raised[0]).toMatchObject({ id: "Play", sequence: [{ timestamp: 0, midiNotes: [defaultOctave + 7] }] });
     });
+
+    test("Toggle midiNote overrides generated", () => {
+        const model = updateScale({ ...defaultState, toggledNotesBitmask: 1 });
+
+        const raised: Msg[] = [];
+        playToggle(model, { id: "Toggle", index: 0, midiNote: 45 }, (msg) => raised.push(msg));
+
+        expect(raised).toHaveLength(1);
+        expect(raised[0]).toMatchObject({ id: "Play", sequence: [{ timestamp: 0, midiNotes: [45] }] });
+    });
 });
 
 const noteLength = 200;

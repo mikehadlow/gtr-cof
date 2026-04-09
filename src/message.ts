@@ -22,6 +22,7 @@ export type Msg =
     | {
           id: "Toggle";
           index: number;
+          midiNote?: number;
       }
     | {
           id: "ChordIntervalChange";

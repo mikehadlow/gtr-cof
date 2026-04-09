@@ -22,7 +22,7 @@ export const playToggle: Service<Model, Toggle, Msg> = (model: Model, msg: Toggl
             sequence: [
                 {
                     timestamp: 0,
-                    midiNotes: [getMidiNote(model.state.index, msg.index)],
+                    midiNotes: [msg.midiNote ?? getMidiNote(model.state.index, msg.index)],
                 },
             ],
         });

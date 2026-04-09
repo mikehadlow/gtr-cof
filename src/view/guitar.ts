@@ -10,6 +10,7 @@ type StringNote = {
     readonly octave: number;
     readonly index: number;
     readonly node: music.Node;
+    readonly midiNote: number;
 };
 
 const stringGap = 40;
@@ -63,6 +64,7 @@ function allNotesFromWithNodes(stringInfo: tuning.StringInfo, nodeByIndex: Map<n
             octave: Math.floor((i + 1) / 12),
             index: idx,
             node: nodeByIndex.get(idx) ?? music.nullNode,
+            midiNote: stringInfo.midiNote + i,
         });
     }
     return items;
@@ -132,7 +134,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
                 cy: stringGap / 2,
                 cx: noteX(i),
                 class: noteClass(sn, hasToggledNotes),
-                onClick: () => raise({ id: "Toggle", index: sn.index }),
+                onClick: () => raise({ id: "Toggle", index: sn.index, midiNote: sn.midiNote }),
             }),
         );
 
