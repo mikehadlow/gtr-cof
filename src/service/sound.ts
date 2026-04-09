@@ -13,9 +13,13 @@ export const create = (): Service<Model, Play, Msg> => {
         if (soundfont === null) {
             context = new AudioContext();
             soundfont = new Soundfont(context, { instrument: "acoustic_grand_piano" });
-            soundfont.load.then(() => {
-                playSequence(seqence);
-            });
+            soundfont.load
+                .then(() => {
+                    playSequence(seqence);
+                })
+                .catch((e: unknown) => {
+                    console.error("Failed to load soundfont", e);
+                });
             return;
         }
         playSequence(seqence);

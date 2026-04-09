@@ -32,6 +32,9 @@
                 "noUnusedVariables": "warn",
                 "noUnusedImports": "warn"
             },
+            "nursery": {
+                "noFloatingPromises": "error"
+            },
             "style": {
                 "noParameterAssign": "off",
                 "noNonNullAssertion": "off",
