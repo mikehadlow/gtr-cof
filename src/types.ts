@@ -35,6 +35,7 @@ export const StateSchema = z.object({
     circleIsCNoon: z.boolean(),
     tuningIndex: z.number(),
     modalState: ModalStateSchema,
+    sound: z.boolean(),
 });
 
 export type State = z.infer<typeof StateSchema>;

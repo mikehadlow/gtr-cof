@@ -60,4 +60,7 @@ export type Msg =
     | {
           id: "Play";
           sequence: SequenceEvent[];
+      }
+    | {
+          id: "ToggleSound";
       };

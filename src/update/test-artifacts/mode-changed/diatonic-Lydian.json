@@ -457,6 +457,7 @@
     "fretboardLabelType": "NoteName",
     "circleIsCNoon": true,
     "tuningIndex": 0,
-    "modalState": "closed"
+    "modalState": "closed",
+    "sound": true
   }
 }

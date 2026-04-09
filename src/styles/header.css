@@ -3,6 +3,8 @@
     padding: 0;
     overflow: hidden;
     background-color: var(--color-header-bg);
+    display: flex;
+    align-items: center;
 }
 
 .title {
@@ -57,4 +59,8 @@
 
 .dropdown-content-visible {
     display: block;
+}
+
+.menu-bar-icon {
+    fill: var(--color-header-text);
 }

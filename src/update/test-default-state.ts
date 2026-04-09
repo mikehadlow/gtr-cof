@@ -15,4 +15,5 @@ export const defaultState: State = {
     circleIsCNoon: true,
     tuningIndex: 0,
     modalState: "closed",
+    sound: true,
 };

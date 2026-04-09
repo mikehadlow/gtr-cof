@@ -12,6 +12,9 @@ const defaultOctave = 57; // A3 MIDI note
 const octave = 12;
 
 export const playToggle: Service<Model, Toggle, Msg> = (model: Model, msg: Toggle, raise: (msg: Msg) => void): void => {
+    if (!model.state.sound) {
+        return;
+    }
     const node = getNodeAtIndex(model.music.nodes, msg.index);
     if (node.toggle) {
         raise({
@@ -31,6 +34,9 @@ export const playChordChanged: Service<Model, ChordChanged, Msg> = (
     msg: ChordChanged,
     raise: (msg: Msg) => void,
 ): void => {
+    if (!state.sound) {
+        return;
+    }
     if (state.toggledNotesBitmask === 0) {
         // chord is toggled off, nothing to play.
         return;
@@ -60,6 +66,9 @@ export const playModeChanged: Service<Model, ModeChanged, Msg> = (
 ): void => playScale(model, raise);
 
 function playScale({ music, state }: Model, raise: (msg: Msg) => void): void {
+    if (!state.sound) {
+        return;
+    }
     let i = 0;
     const sequence: SequenceEvent[] = [
         ...music.nodes.filter((n) => n.scaleNote.isScaleNote).map(({ scaleNote }) => scaleNote.note.index),

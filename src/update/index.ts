@@ -11,6 +11,7 @@ import { Update as UpdateModeChanged } from "./update-mode-changed";
 import { Update as UpdateScaleFamilyChange } from "./update-scale-family-change";
 import { Update as UpdateSetCToNoon } from "./update-set-c-to-noon";
 import { Update as UpdateToggle } from "./update-toggle";
+import { Update as UpdateToggleSound } from "./update-toggle-sound";
 import { Update as UpdateTonicChanged } from "./update-tonic-changed";
 import { Update as UpdateTuningChanged } from "./update-tuning-changed";
 
@@ -45,6 +46,8 @@ export const update: UpdateModel<Model, Msg> = (model: Model, msg: Msg): Model =
         case "Play":
             // TODO: visual representation of played notes
             return model;
+        case "ToggleSound":
+            return UpdateToggleSound(model, msg);
         default: {
             const _exhaustiveCheck: never = msg;
             return _exhaustiveCheck;

@@ -12,6 +12,7 @@ import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
 import { scaleFamilyNodes } from "./scale-family";
 import { create as settingsCreate } from "./settings";
+import { create as speakerCreate } from "./speaker";
 import { view as storageView } from "./storage";
 import { tonicsNodes } from "./tonics";
 import { tuningNodes } from "./tuning";
@@ -34,6 +35,7 @@ const svgViews: { containerId: string; view: View<Model, Msg, RenderNode> }[] = 
     { containerId: "tuning-dropdown", view: tuningNodes },
     { containerId: "no-op", view: menuCreate() },
     { containerId: "no-op", view: settingsCreate() },
+    { containerId: "no-op", view: speakerCreate() },
     { containerId: "no-op", view: storageView },
     { containerId: "no-op", view: permalinkView },
     { containerId: "no-op", view: modalCreate() },

@@ -60,4 +60,5 @@ Plans for significant refactors or multi-phase work are kept in the `plans/` fol
 
 - Edit only `.ts` files in `/src/`, never edit generated `.js` files
 - Uses D3.js v3 (not current v7) - API differs significantly
-- No linting is configured
+- Linting is configured via Biome — see `biome.json` for the full rule set
+- Biome enforces multi-line block statements: `if (condition) { return; }` is not allowed; use braces on separate lines instead

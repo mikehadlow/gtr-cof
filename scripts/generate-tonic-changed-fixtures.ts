@@ -22,6 +22,7 @@ function makeInputModel(): Model {
         circleIsCNoon: true,
         tuningIndex: 0,
         modalState: "closed",
+        sound: true,
     };
 
     // music field isn't read by the Update function, but we need a valid Model shape.

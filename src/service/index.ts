@@ -5,8 +5,9 @@ import type { Service } from "../types";
 import { playChordChanged, playModeChanged, playToggle, playTonicChanged } from "./player";
 import { create as createSoundService } from "./sound";
 
+const soundService = createSoundService();
+
 export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise: (msg: Msg) => void): void => {
-    const soundService = createSoundService();
     switch (msg.id) {
         case "ChordIntervalChange":
         case "ScaleFamilyChange":
@@ -16,6 +17,7 @@ export const service: Service<Model, Msg, Msg> = (model: Model, msg: Msg, raise:
         case "FretboardLabelChange":
         case "SetCToNoon":
         case "ModalStateChange":
+        case "ToggleSound":
             // Do nothing
             break;
         case "Toggle":
