@@ -35,7 +35,6 @@ export const create = (): Service<Model, Play, Msg> => {
     };
 
     return (_model: Model, { sequence }: Play, _raise: (msg: Msg) => void): void => {
-        console.log(`play ${JSON.stringify(sequence, null, 2)}`);
         play(sequence);
     };
 };
