@@ -427,6 +427,1435 @@ function chromatic() {
   }
   return indexes;
 }
+function getNodeAtIndex(nodes, index) {
+  const node = nodes.find((node2) => node2.scaleNote.note.index === index);
+  if (!node) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+  return node;
+}
+function indexToMIDI(index, octave) {
+  return (index + 9) % 12 + octave * 12 + 12;
+}
+
+// src/service/player.ts
+var defaultOctave = 57;
+var octave = 12;
+var playToggle = (model, msg, raise) => {
+  if (!model.state.sound) {
+    return;
+  }
+  const node = getNodeAtIndex(model.music.nodes, msg.index);
+  if (node.toggle) {
+    raise({
+      id: "Play",
+      sequence: [
+        {
+          timestamp: 0,
+          midiNotes: [msg.midiNote ?? getMidiNote(model.state.index, msg.index)]
+        }
+      ]
+    });
+  }
+};
+var playChordChanged = ({ state }, msg, raise) => {
+  if (!state.sound) {
+    return;
+  }
+  if (state.toggledNotesBitmask === 0) {
+    return;
+  }
+  const midiNotes = getSetBits(state.toggledNotesBitmask).map((i) => getMidiNote(msg.chordIndex, i));
+  raise({
+    id: "Play",
+    sequence: [
+      {
+        timestamp: 0,
+        midiNotes
+      }
+    ]
+  });
+};
+var playTonicChanged = (model, _msg, raise) => playScale(model, raise);
+var playModeChanged = (model, _msg, raise) => playScale(model, raise);
+function playScale({ music, state }, raise) {
+  if (!state.sound) {
+    return;
+  }
+  let i = 0;
+  const sequence = [
+    ...music.nodes.filter((n) => n.scaleNote.isScaleNote).map(({ scaleNote }) => scaleNote.note.index),
+    state.index + octave
+  ].map((index) => ({
+    timestamp: i++ * 200,
+    midiNotes: [getMidiNote(state.index, index)]
+  }));
+  raise({
+    id: "Play",
+    sequence
+  });
+}
+function getMidiNote(root, index) {
+  return index < root ? defaultOctave + octave + index : defaultOctave + index;
+}
+function getSetBits(mask) {
+  const result = [];
+  let index = 0;
+  while (mask > 0) {
+    if (mask & 1) {
+      result.push(index);
+    }
+    mask >>= 1;
+    index++;
+  }
+  return result;
+}
+
+// node_modules/smplr/dist/index.mjs
+var __defProp2 = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __typeError = (msg) => {
+  throw TypeError(msg);
+};
+var __defNormalProp = (obj, key, value) => (key in obj) ? __defProp2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
+var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
+var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
+var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+var HttpStorage = {
+  fetch(url) {
+    return fetch(url);
+  }
+};
+var _cache;
+var _CacheStorage_instances;
+var tryFromCache_fn;
+var saveResponse_fn;
+_cache = new WeakMap;
+_CacheStorage_instances = new WeakSet;
+tryFromCache_fn = function(request) {
+  return __async(this, null, function* () {
+    const cache = yield __privateGet(this, _cache);
+    const response = yield cache.match(request);
+    if (response)
+      return response;
+    else
+      throw Error("Not found");
+  });
+};
+saveResponse_fn = function(request, response) {
+  return __async(this, null, function* () {
+    try {
+      const cache = yield __privateGet(this, _cache);
+      yield cache.put(request, response.clone());
+    } catch (err) {}
+  });
+};
+function connectSerial(nodes) {
+  const _nodes = nodes.filter((x) => !!x);
+  _nodes.reduce((a, b) => {
+    const left = "output" in a ? a.output : a;
+    const right = "input" in b ? b.input : b;
+    left.connect(right);
+    return b;
+  });
+  return () => {
+    _nodes.reduce((a, b) => {
+      const left = "output" in a ? a.output : a;
+      const right = "input" in b ? b.input : b;
+      left.disconnect(right);
+      return b;
+    });
+  };
+}
+function createControl(initialValue) {
+  let current = initialValue;
+  const listeners = /* @__PURE__ */ new Set;
+  function subscribe(listener) {
+    listeners.add(listener);
+    listener(current);
+    return () => {
+      listeners.delete(listener);
+    };
+  }
+  function set(value) {
+    current = value;
+    listeners.forEach((listener) => listener(current));
+  }
+  function get() {
+    return current;
+  }
+  return { subscribe, set, get };
+}
+function midiVelToGain(vel) {
+  return vel * vel / 16129;
+}
+function dbToGain(decibels) {
+  return Math.pow(10, decibels / 20);
+}
+var _volume;
+var _panner;
+var _sends;
+var _inserts;
+var _disconnect;
+var _unsubscribe;
+var _config;
+var _disconnected;
+var Channel = class {
+  constructor(context, options) {
+    this.context = context;
+    __privateAdd(this, _volume);
+    __privateAdd(this, _panner);
+    __privateAdd(this, _sends);
+    __privateAdd(this, _inserts);
+    __privateAdd(this, _disconnect);
+    __privateAdd(this, _unsubscribe);
+    __privateAdd(this, _config);
+    __privateAdd(this, _disconnected, false);
+    var _a, _b, _c, _d;
+    __privateSet(this, _config, {
+      destination: (_a = options == null ? undefined : options.destination) != null ? _a : context.destination,
+      volume: (_b = options == null ? undefined : options.volume) != null ? _b : 100,
+      volumeToGain: (_c = options == null ? undefined : options.volumeToGain) != null ? _c : midiVelToGain,
+      pan: (_d = options == null ? undefined : options.pan) != null ? _d : 0
+    });
+    this.input = context.createGain();
+    __privateSet(this, _volume, context.createGain());
+    __privateSet(this, _panner, context.createStereoPanner());
+    __privateGet(this, _panner).pan.value = __privateGet(this, _config).pan;
+    __privateSet(this, _disconnect, connectSerial([
+      this.input,
+      __privateGet(this, _volume),
+      __privateGet(this, _panner),
+      __privateGet(this, _config).destination
+    ]));
+    const volume = createControl(__privateGet(this, _config).volume);
+    this.setVolume = volume.set;
+    __privateSet(this, _unsubscribe, volume.subscribe((volume2) => {
+      __privateGet(this, _volume).gain.value = __privateGet(this, _config).volumeToGain(volume2);
+    }));
+  }
+  get pan() {
+    return __privateGet(this, _panner).pan.value;
+  }
+  set pan(value) {
+    __privateGet(this, _panner).pan.value = value;
+  }
+  addInsert(effect) {
+    var _a;
+    if (__privateGet(this, _disconnected)) {
+      throw Error("Can't add insert to disconnected channel");
+    }
+    (_a = __privateGet(this, _inserts)) != null || __privateSet(this, _inserts, []);
+    __privateGet(this, _inserts).push(effect);
+    __privateGet(this, _disconnect).call(this);
+    __privateSet(this, _disconnect, connectSerial([
+      this.input,
+      ...__privateGet(this, _inserts),
+      __privateGet(this, _volume),
+      __privateGet(this, _panner),
+      __privateGet(this, _config).destination
+    ]));
+  }
+  addEffect(name, effect, mixValue) {
+    var _a;
+    if (__privateGet(this, _disconnected)) {
+      throw Error("Can't add effect to disconnected channel");
+    }
+    const mix = this.context.createGain();
+    mix.gain.value = mixValue;
+    const input = "input" in effect ? effect.input : effect;
+    const disconnect = connectSerial([__privateGet(this, _volume), mix, input]);
+    (_a = __privateGet(this, _sends)) != null || __privateSet(this, _sends, []);
+    __privateGet(this, _sends).push({ name, mix, disconnect });
+  }
+  sendEffect(name, mix) {
+    var _a;
+    if (__privateGet(this, _disconnected)) {
+      throw Error("Can't send effect to disconnected channel");
+    }
+    const send = (_a = __privateGet(this, _sends)) == null ? undefined : _a.find((send2) => send2.name === name);
+    if (send) {
+      send.mix.gain.value = mix;
+    } else {
+      console.warn("Send bus not found: " + name);
+    }
+  }
+  disconnect() {
+    var _a;
+    if (__privateGet(this, _disconnected))
+      return;
+    __privateSet(this, _disconnected, true);
+    __privateGet(this, _disconnect).call(this);
+    __privateGet(this, _unsubscribe).call(this);
+    (_a = __privateGet(this, _sends)) == null || _a.forEach((send) => send.disconnect());
+    __privateSet(this, _sends, undefined);
+  }
+};
+_volume = new WeakMap;
+_panner = new WeakMap;
+_sends = new WeakMap;
+_inserts = new WeakMap;
+_disconnect = new WeakMap;
+_unsubscribe = new WeakMap;
+_config = new WeakMap;
+_disconnected = new WeakMap;
+function noteNameToMidi(note) {
+  const REGEX = /^([a-gA-G]?)(#{1,}|b{1,}|)(-?\d+)$/;
+  const m = REGEX.exec(note);
+  if (!m)
+    return;
+  const letter = m[1].toUpperCase();
+  if (!letter)
+    return;
+  const acc = m[2];
+  const alt = acc[0] === "b" ? -acc.length : acc.length;
+  const oct = m[3] ? +m[3] : 4;
+  const step = (letter.charCodeAt(0) + 3) % 7;
+  return [0, 2, 4, 5, 7, 9, 11][step] + alt + 12 * (oct + 1);
+}
+function toMidi(note) {
+  return note === undefined ? undefined : typeof note === "number" ? note : noteNameToMidi(note);
+}
+var PARAM_DEFAULTS = {
+  volume: 0,
+  tune: 0,
+  detune: 0,
+  ampRelease: 0.3,
+  ampAttack: 0,
+  lpfCutoffHz: 20000,
+  offset: 0,
+  loop: false,
+  loopStart: 0,
+  loopEnd: 0,
+  reverse: false
+};
+var PLAYBACK_KEYS = Object.keys(PARAM_DEFAULTS);
+function pickPlaybackParams(obj) {
+  const result = {};
+  for (const key of PLAYBACK_KEYS) {
+    const value = obj[key];
+    if (value !== undefined)
+      result[key] = value;
+  }
+  return result;
+}
+function resolveParams(defaults, group, region, midi, velocity, overrides) {
+  var _a, _b, _c, _d, _e;
+  const merged = __spreadValues(__spreadValues(__spreadValues(__spreadValues({}, PARAM_DEFAULTS), defaults), pickPlaybackParams(group)), pickPlaybackParams(region));
+  const pitch = (_b = (_a = region.pitch) != null ? _a : region.key) != null ? _b : midi;
+  const semitones = midi - pitch;
+  let detune = (semitones + merged.tune) * 100 + merged.detune;
+  if ((overrides == null ? undefined : overrides.detune) !== undefined)
+    detune += overrides.detune;
+  return {
+    detune,
+    velocity,
+    volume: merged.volume,
+    ampRelease: (_c = overrides == null ? undefined : overrides.ampRelease) != null ? _c : merged.ampRelease,
+    ampAttack: merged.ampAttack,
+    lpfCutoffHz: (_d = overrides == null ? undefined : overrides.lpfCutoffHz) != null ? _d : merged.lpfCutoffHz,
+    offset: merged.offset,
+    loop: (_e = overrides == null ? undefined : overrides.loop) != null ? _e : merged.loop,
+    loopStart: merged.loopStart,
+    loopEnd: merged.loopEnd,
+    ampVelCurve: region.ampVelCurve,
+    loopAuto: region.loopAuto,
+    reverse: overrides == null ? undefined : overrides.reverse
+  };
+}
+function processRegion(region) {
+  var _a, _b, _c, _d, _e;
+  let keyLow;
+  let keyHigh;
+  let pitch;
+  if (region.key !== undefined) {
+    keyLow = keyHigh = region.key;
+    pitch = region.key;
+  } else if (region.keyRange) {
+    [keyLow, keyHigh] = region.keyRange;
+    pitch = region.pitch;
+  } else {
+    keyLow = 0;
+    keyHigh = 127;
+    pitch = region.pitch;
+  }
+  return {
+    keyLow,
+    keyHigh,
+    pitch,
+    velLow: (_b = (_a = region.velRange) == null ? undefined : _a[0]) != null ? _b : 0,
+    velHigh: (_d = (_c = region.velRange) == null ? undefined : _c[1]) != null ? _d : 127,
+    ccRange: region.ccRange,
+    seqPosition: (_e = region.seqPosition) != null ? _e : 1,
+    group: region.group,
+    offBy: region.offBy,
+    sample: region.sample,
+    ref: region
+  };
+}
+function processGroup(group) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
+  return {
+    keyLow: (_b = (_a = group.keyRange) == null ? undefined : _a[0]) != null ? _b : 0,
+    keyHigh: (_d = (_c = group.keyRange) == null ? undefined : _c[1]) != null ? _d : 127,
+    velLow: (_f = (_e = group.velRange) == null ? undefined : _e[0]) != null ? _f : 0,
+    velHigh: (_h = (_g = group.velRange) == null ? undefined : _g[1]) != null ? _h : 127,
+    ccRange: group.ccRange,
+    seqLength: group.seqLength,
+    group: group.group,
+    offBy: group.offBy,
+    regions: group.regions.map(processRegion),
+    ref: group
+  };
+}
+function matchesCc(ccState, ccRange) {
+  var _a;
+  if (!ccRange)
+    return true;
+  for (const [ccStr, [low, high]] of Object.entries(ccRange)) {
+    const cc = parseInt(ccStr, 10);
+    const value = (_a = ccState.get(cc)) != null ? _a : 0;
+    if (value < low || value > high)
+      return false;
+  }
+  return true;
+}
+var _groups;
+var _seqCounters;
+var RegionMatcher = class {
+  constructor(json) {
+    __privateAdd(this, _groups);
+    __privateAdd(this, _seqCounters);
+    __privateSet(this, _groups, json.groups.map(processGroup));
+    __privateSet(this, _seqCounters, /* @__PURE__ */ new Map);
+  }
+  match(midi, velocity, ccState) {
+    var _a, _b, _c, _d;
+    const results = [];
+    for (let gi = 0;gi < __privateGet(this, _groups).length; gi++) {
+      const group = __privateGet(this, _groups)[gi];
+      if (midi < group.keyLow || midi > group.keyHigh)
+        continue;
+      if (velocity < group.velLow || velocity > group.velHigh)
+        continue;
+      if (!matchesCc(ccState, group.ccRange))
+        continue;
+      const counter = (_a = __privateGet(this, _seqCounters).get(gi)) != null ? _a : 0;
+      for (const region of group.regions) {
+        if (midi < region.keyLow || midi > region.keyHigh)
+          continue;
+        if (velocity < region.velLow || velocity > region.velHigh)
+          continue;
+        if (!matchesCc(ccState, region.ccRange))
+          continue;
+        if (group.seqLength !== undefined) {
+          const seqPos = region.seqPosition - 1;
+          if (counter % group.seqLength !== seqPos)
+            continue;
+        }
+        results.push({
+          sample: region.sample,
+          pitch: (_b = region.pitch) != null ? _b : midi,
+          group: (_c = region.group) != null ? _c : group.group,
+          offBy: (_d = region.offBy) != null ? _d : group.offBy,
+          groupRef: group.ref,
+          regionRef: region.ref
+        });
+      }
+      if (group.seqLength !== undefined) {
+        __privateGet(this, _seqCounters).set(gi, counter + 1);
+      }
+    }
+    return results;
+  }
+};
+_groups = new WeakMap;
+_seqCounters = new WeakMap;
+function loadAudioBuffer(context, url, storage) {
+  return __async(this, null, function* () {
+    url = url.replace(/#/g, "%23").replace(/ /g, "%20").replace(/([^:]\/)\/+/g, "$1");
+    const response = yield storage.fetch(url);
+    if (response.status !== 200) {
+      console.warn("Error loading buffer. Invalid status: ", response.status, url);
+      return;
+    }
+    try {
+      const audioData = yield response.arrayBuffer();
+      const buffer = yield context.decodeAudioData(audioData);
+      return buffer;
+    } catch (error) {
+      console.warn("Error loading buffer", error, url);
+    }
+  });
+}
+function isSafari() {
+  if (typeof navigator === "undefined")
+    return false;
+  const ua = navigator.userAgent;
+  return ua.includes("Safari") && !ua.includes("Chrome") && !ua.includes("Chromium");
+}
+function findFirstSupportedFormat(formats) {
+  if (typeof document === "undefined")
+    return null;
+  const skipOgg = isSafari();
+  const audio = document.createElement("audio");
+  for (let i = 0;i < formats.length; i++) {
+    const format = formats[i];
+    if (skipOgg && format === "ogg") {
+      continue;
+    }
+    const canPlay = audio.canPlayType(`audio/${format}`);
+    if (canPlay === "probably" || canPlay === "maybe") {
+      return format;
+    }
+    if (format === "m4a") {
+      const canPlay2 = audio.canPlayType(`audio/aac`);
+      if (canPlay2 === "probably" || canPlay2 === "maybe") {
+        return format;
+      }
+    }
+  }
+  return null;
+}
+var _context;
+var _storage;
+var _cache2;
+var SampleLoader = class {
+  constructor(context, options) {
+    __privateAdd(this, _context);
+    __privateAdd(this, _storage);
+    __privateAdd(this, _cache2, /* @__PURE__ */ new Map);
+    var _a;
+    __privateSet(this, _context, context);
+    __privateSet(this, _storage, (_a = options == null ? undefined : options.storage) != null ? _a : HttpStorage);
+  }
+  load(json, onProgressOrOptions) {
+    return __async(this, null, function* () {
+      var _a, _b;
+      const preloaded = typeof onProgressOrOptions === "object" ? onProgressOrOptions.buffers : undefined;
+      const onProgress = typeof onProgressOrOptions === "function" ? onProgressOrOptions : onProgressOrOptions == null ? undefined : onProgressOrOptions.onProgress;
+      const format = (_b = (_a = findFirstSupportedFormat(json.samples.formats)) != null ? _a : json.samples.formats[0]) != null ? _b : "ogg";
+      const base = json.samples.baseUrl.replace(/\/$/, "");
+      const names = collectSampleNames(json);
+      const total = names.length;
+      let loaded = 0;
+      const result = /* @__PURE__ */ new Map;
+      yield Promise.all(names.map((name) => __async(this, null, function* () {
+        var _a2, _b2;
+        const pre = preloaded == null ? undefined : preloaded.get(name);
+        if (pre) {
+          result.set(name, pre);
+          loaded++;
+          onProgress == null || onProgress(loaded, total);
+          return;
+        }
+        const path = (_b2 = (_a2 = json.samples.map) == null ? undefined : _a2[name]) != null ? _b2 : name;
+        const url = `${base}/${path}.${format}`;
+        let buffer = __privateGet(this, _cache2).get(url);
+        if (!buffer) {
+          const fetched = yield loadAudioBuffer(__privateGet(this, _context), url, __privateGet(this, _storage));
+          if (fetched) {
+            buffer = fetched;
+            __privateGet(this, _cache2).set(url, buffer);
+          }
+        }
+        if (buffer)
+          result.set(name, buffer);
+        loaded++;
+        onProgress == null || onProgress(loaded, total);
+      })));
+      return result;
+    });
+  }
+};
+_context = new WeakMap;
+_storage = new WeakMap;
+_cache2 = new WeakMap;
+function collectSampleNames(json) {
+  const seen = /* @__PURE__ */ new Set;
+  for (const group of json.groups) {
+    for (const region of group.regions) {
+      seen.add(region.sample);
+    }
+  }
+  return [...seen];
+}
+var _items;
+var SortedQueue = class {
+  constructor(compare) {
+    this.compare = compare;
+    __privateAdd(this, _items, []);
+  }
+  push(item) {
+    const len = __privateGet(this, _items).length;
+    let left = 0;
+    let right = len - 1;
+    let index = len;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      if (this.compare(item, __privateGet(this, _items)[mid]) < 0) {
+        index = mid;
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+    __privateGet(this, _items).splice(index, 0, item);
+  }
+  pop() {
+    return __privateGet(this, _items).shift();
+  }
+  peek() {
+    return __privateGet(this, _items)[0];
+  }
+  removeAll(predicate) {
+    const len = __privateGet(this, _items).length;
+    __privateSet(this, _items, __privateGet(this, _items).filter((item) => !predicate(item)));
+    return __privateGet(this, _items).length !== len;
+  }
+  clear() {
+    __privateSet(this, _items, []);
+  }
+  size() {
+    return __privateGet(this, _items).length;
+  }
+};
+_items = new WeakMap;
+var LOOKAHEAD_MS_DEFAULT = 200;
+var INTERVAL_MS_DEFAULT = 50;
+var _context2;
+var _lookaheadSec;
+var _intervalMs;
+var _queue;
+var _intervalId;
+var _Scheduler_instances;
+var ensureRunning_fn;
+var Scheduler = class {
+  constructor(context, options) {
+    __privateAdd(this, _Scheduler_instances);
+    __privateAdd(this, _context2);
+    __privateAdd(this, _lookaheadSec);
+    __privateAdd(this, _intervalMs);
+    __privateAdd(this, _queue);
+    __privateAdd(this, _intervalId);
+    var _a, _b;
+    __privateSet(this, _context2, context);
+    __privateSet(this, _lookaheadSec, ((_a = options == null ? undefined : options.lookaheadMs) != null ? _a : LOOKAHEAD_MS_DEFAULT) / 1000);
+    __privateSet(this, _intervalMs, (_b = options == null ? undefined : options.intervalMs) != null ? _b : INTERVAL_MS_DEFAULT);
+    __privateSet(this, _queue, new SortedQueue((a, b) => a.time - b.time));
+  }
+  schedule(event, callback) {
+    var _a;
+    const now = __privateGet(this, _context2).currentTime;
+    const time = (_a = getEventTime(event)) != null ? _a : now;
+    if (time <= now + __privateGet(this, _lookaheadSec)) {
+      callback(event);
+      return noOp;
+    }
+    const item = { time, event, callback };
+    __privateGet(this, _queue).push(item);
+    __privateMethod(this, _Scheduler_instances, ensureRunning_fn).call(this);
+    return () => {
+      __privateGet(this, _queue).removeAll((q) => q === item);
+    };
+  }
+  stop() {
+    __privateGet(this, _queue).clear();
+    if (__privateGet(this, _intervalId) !== undefined) {
+      clearInterval(__privateGet(this, _intervalId));
+      __privateSet(this, _intervalId, undefined);
+    }
+  }
+};
+_context2 = new WeakMap;
+_lookaheadSec = new WeakMap;
+_intervalMs = new WeakMap;
+_queue = new WeakMap;
+_intervalId = new WeakMap;
+_Scheduler_instances = new WeakSet;
+ensureRunning_fn = function() {
+  if (__privateGet(this, _intervalId) !== undefined)
+    return;
+  __privateSet(this, _intervalId, setInterval(() => {
+    const dispatchBefore = __privateGet(this, _context2).currentTime + __privateGet(this, _lookaheadSec);
+    while (__privateGet(this, _queue).size() > 0 && __privateGet(this, _queue).peek().time <= dispatchBefore) {
+      const item = __privateGet(this, _queue).pop();
+      item.callback(item.event);
+    }
+    if (__privateGet(this, _queue).size() === 0) {
+      clearInterval(__privateGet(this, _intervalId));
+      __privateSet(this, _intervalId, undefined);
+    }
+  }, __privateGet(this, _intervalMs)));
+};
+function getEventTime(event) {
+  return typeof event === "object" ? event.time : undefined;
+}
+var noOp = () => {};
+var _context3;
+var _source;
+var _envelope;
+var _startAt;
+var _ampRelease;
+var _state;
+var _endedCallbacks;
+var Voice = class {
+  constructor(context, buffer, params, destination, stopId, group, startTime) {
+    __privateAdd(this, _context3);
+    __privateAdd(this, _source);
+    __privateAdd(this, _envelope);
+    __privateAdd(this, _startAt);
+    __privateAdd(this, _ampRelease);
+    __privateAdd(this, _state, "playing");
+    __privateAdd(this, _endedCallbacks, []);
+    __privateSet(this, _context3, context);
+    this.stopId = stopId;
+    this.group = group;
+    __privateSet(this, _ampRelease, params.ampRelease);
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    const cents = params.detune;
+    if (source.detune) {
+      source.detune.value = cents;
+    } else {
+      source.playbackRate.value = Math.pow(2, cents / 1200);
+    }
+    if (params.loopAuto) {
+      source.loop = true;
+      source.loopStart = buffer.duration * params.loopAuto.startRatio;
+      source.loopEnd = buffer.duration * params.loopAuto.endRatio;
+    } else if (params.loop) {
+      source.loop = true;
+      source.loopStart = params.loopStart;
+      source.loopEnd = params.loopEnd || buffer.duration;
+    }
+    let lpf;
+    if (params.lpfCutoffHz < 20000) {
+      lpf = context.createBiquadFilter();
+      lpf.type = "lowpass";
+      lpf.frequency.value = params.lpfCutoffHz;
+    }
+    const gain = context.createGain();
+    gain.gain.value = midiVelToGain(params.velocity) * dbToGain(params.volume);
+    const envelope = context.createGain();
+    envelope.gain.value = 1;
+    if (lpf) {
+      source.connect(lpf);
+      lpf.connect(gain);
+    } else {
+      source.connect(gain);
+    }
+    gain.connect(envelope);
+    envelope.connect(destination);
+    const startAt = startTime != null ? startTime : context.currentTime;
+    __privateSet(this, _startAt, startAt);
+    let offsetSec = 0;
+    if (params.offset > 0) {
+      offsetSec = params.reverse ? (buffer.length - params.offset) / buffer.sampleRate : params.offset / buffer.sampleRate;
+    }
+    source.start(startAt, offsetSec);
+    __privateSet(this, _source, source);
+    __privateSet(this, _envelope, envelope);
+    source.onended = () => {
+      __privateSet(this, _state, "stopped");
+      envelope.disconnect();
+      gain.disconnect();
+      lpf == null || lpf.disconnect();
+      source.disconnect();
+      for (const cb of __privateGet(this, _endedCallbacks))
+        cb();
+      __privateSet(this, _endedCallbacks, []);
+    };
+  }
+  stop(time) {
+    if (__privateGet(this, _state) !== "playing")
+      return;
+    __privateSet(this, _state, "stopping");
+    const t = time != null ? time : __privateGet(this, _context3).currentTime;
+    if (t <= __privateGet(this, _startAt)) {
+      __privateGet(this, _source).stop(t);
+    } else {
+      const stopAt = t + __privateGet(this, _ampRelease);
+      __privateGet(this, _envelope).gain.cancelScheduledValues(t);
+      __privateGet(this, _envelope).gain.setValueAtTime(1, t);
+      __privateGet(this, _envelope).gain.linearRampToValueAtTime(0, stopAt);
+      __privateGet(this, _source).stop(stopAt);
+    }
+  }
+  onEnded(cb) {
+    if (__privateGet(this, _state) === "stopped") {
+      cb();
+    } else {
+      __privateGet(this, _endedCallbacks).push(cb);
+    }
+  }
+  get isActive() {
+    return __privateGet(this, _state) !== "stopped";
+  }
+};
+_context3 = new WeakMap;
+_source = new WeakMap;
+_envelope = new WeakMap;
+_startAt = new WeakMap;
+_ampRelease = new WeakMap;
+_state = new WeakMap;
+_endedCallbacks = new WeakMap;
+var _voices;
+var _byStopId;
+var _byGroup;
+var _VoiceManager_instances;
+var remove_fn;
+var VoiceManager = class {
+  constructor() {
+    __privateAdd(this, _VoiceManager_instances);
+    __privateAdd(this, _voices, /* @__PURE__ */ new Set);
+    __privateAdd(this, _byStopId, /* @__PURE__ */ new Map);
+    __privateAdd(this, _byGroup, /* @__PURE__ */ new Map);
+  }
+  add(voice) {
+    __privateGet(this, _voices).add(voice);
+    getOrCreate(__privateGet(this, _byStopId), voice.stopId).add(voice);
+    if (voice.group !== undefined) {
+      getOrCreate(__privateGet(this, _byGroup), voice.group).add(voice);
+    }
+    voice.onEnded(() => __privateMethod(this, _VoiceManager_instances, remove_fn).call(this, voice));
+  }
+  stopAll(time) {
+    for (const voice of [...__privateGet(this, _voices)]) {
+      voice.stop(time);
+    }
+  }
+  stopById(stopId, time) {
+    const voices = __privateGet(this, _byStopId).get(stopId);
+    if (!voices)
+      return;
+    for (const voice of [...voices]) {
+      voice.stop(time);
+    }
+  }
+  stopGroup(group, time) {
+    const voices = __privateGet(this, _byGroup).get(group);
+    if (!voices)
+      return;
+    for (const voice of [...voices]) {
+      voice.stop(time);
+    }
+  }
+  get activeCount() {
+    return __privateGet(this, _voices).size;
+  }
+};
+_voices = new WeakMap;
+_byStopId = new WeakMap;
+_byGroup = new WeakMap;
+_VoiceManager_instances = new WeakSet;
+remove_fn = function(voice) {
+  var _a, _b;
+  __privateGet(this, _voices).delete(voice);
+  (_a = __privateGet(this, _byStopId).get(voice.stopId)) == null || _a.delete(voice);
+  if (voice.group !== undefined) {
+    (_b = __privateGet(this, _byGroup).get(voice.group)) == null || _b.delete(voice);
+  }
+};
+function getOrCreate(map, key) {
+  let set = map.get(key);
+  if (!set) {
+    set = /* @__PURE__ */ new Set;
+    map.set(key, set);
+  }
+  return set;
+}
+function compose(a, b) {
+  if (a && b)
+    return (e) => {
+      a(e);
+      b(e);
+    };
+  return a != null ? a : b;
+}
+var EMPTY_JSON = {
+  samples: { baseUrl: "", formats: [] },
+  groups: []
+};
+function isSmplrJson(x) {
+  return typeof x === "object" && x !== null && "groups" in x && Array.isArray(x.groups);
+}
+var _loadProgress;
+var _buffers;
+var _reversedBuffers;
+var _defaults;
+var _defaultVelocity;
+var _aliases;
+var _matcher;
+var _voices2;
+var _scheduler;
+var _channel;
+var _loader;
+var _onLoadProgress;
+var _onStart;
+var _onEnded;
+var _ccState;
+var _Smplr_instances;
+var getBuffer_fn;
+var playNote_fn;
+var normalizeNoteEvent_fn;
+var Smplr = class {
+  constructor(context, jsonOrOptions, maybeOptions) {
+    __privateAdd(this, _Smplr_instances);
+    __privateAdd(this, _loadProgress, { loaded: 0, total: 0 });
+    __privateAdd(this, _buffers, /* @__PURE__ */ new Map);
+    __privateAdd(this, _reversedBuffers, /* @__PURE__ */ new Map);
+    __privateAdd(this, _defaults);
+    __privateAdd(this, _defaultVelocity);
+    __privateAdd(this, _aliases);
+    __privateAdd(this, _matcher);
+    __privateAdd(this, _voices2);
+    __privateAdd(this, _scheduler);
+    __privateAdd(this, _channel);
+    __privateAdd(this, _loader);
+    __privateAdd(this, _onLoadProgress);
+    __privateAdd(this, _onStart);
+    __privateAdd(this, _onEnded);
+    __privateAdd(this, _ccState, /* @__PURE__ */ new Map);
+    var _a, _b, _c;
+    const json = isSmplrJson(jsonOrOptions) ? jsonOrOptions : undefined;
+    const options = isSmplrJson(jsonOrOptions) ? maybeOptions : jsonOrOptions;
+    this.context = context;
+    __privateSet(this, _defaults, json == null ? undefined : json.defaults);
+    __privateSet(this, _defaultVelocity, (_a = options == null ? undefined : options.velocity) != null ? _a : 100);
+    __privateSet(this, _onLoadProgress, options == null ? undefined : options.onLoadProgress);
+    __privateSet(this, _onStart, options == null ? undefined : options.onStart);
+    __privateSet(this, _onEnded, options == null ? undefined : options.onEnded);
+    if (json == null ? undefined : json.aliases) {
+      __privateSet(this, _aliases, new Map(Object.entries(json.aliases)));
+    }
+    __privateSet(this, _channel, new Channel(context, {
+      destination: options == null ? undefined : options.destination,
+      volume: options == null ? undefined : options.volume,
+      volumeToGain: options == null ? undefined : options.volumeToGain,
+      pan: options == null ? undefined : options.pan
+    }));
+    __privateSet(this, _scheduler, (_b = options == null ? undefined : options.scheduler) != null ? _b : new Scheduler(context));
+    __privateSet(this, _matcher, new RegionMatcher(json != null ? json : EMPTY_JSON));
+    __privateSet(this, _voices2, new VoiceManager);
+    __privateSet(this, _loader, (_c = options == null ? undefined : options.loader) != null ? _c : new SampleLoader(context, { storage: options == null ? undefined : options.storage }));
+    if (json) {
+      this.load = __privateGet(this, _loader).load(json, (loaded, total) => {
+        var _a2;
+        __privateSet(this, _loadProgress, { loaded, total });
+        (_a2 = __privateGet(this, _onLoadProgress)) == null || _a2.call(this, { loaded, total });
+      }).then((buffers) => {
+        __privateSet(this, _buffers, buffers);
+        return this;
+      });
+    } else {
+      this.load = Promise.resolve(this);
+    }
+  }
+  loadInstrument(json, buffers) {
+    __privateSet(this, _defaults, json.defaults);
+    __privateSet(this, _aliases, json.aliases ? new Map(Object.entries(json.aliases)) : undefined);
+    __privateSet(this, _matcher, new RegionMatcher(json));
+    return __privateGet(this, _loader).load(json, {
+      buffers,
+      onProgress: (loaded, total) => {
+        var _a;
+        __privateSet(this, _loadProgress, { loaded, total });
+        (_a = __privateGet(this, _onLoadProgress)) == null || _a.call(this, { loaded, total });
+      }
+    }).then((newBuffers) => {
+      __privateSet(this, _buffers, newBuffers);
+    });
+  }
+  get loadProgress() {
+    return __privateGet(this, _loadProgress);
+  }
+  get output() {
+    return __privateGet(this, _channel);
+  }
+  setCC(cc, value) {
+    __privateGet(this, _ccState).set(cc, value);
+  }
+  start(event) {
+    const normalized = __privateMethod(this, _Smplr_instances, normalizeNoteEvent_fn).call(this, event);
+    const schedulerStop = __privateGet(this, _scheduler).schedule(normalized, (e) => __privateMethod(this, _Smplr_instances, playNote_fn).call(this, e));
+    return (time) => {
+      schedulerStop();
+      __privateGet(this, _voices2).stopById(normalized.stopId, time);
+    };
+  }
+  stop(target) {
+    if (target === undefined) {
+      __privateGet(this, _voices2).stopAll();
+    } else if (typeof target === "string" || typeof target === "number") {
+      __privateGet(this, _voices2).stopById(target);
+    } else {
+      if (target.stopId !== undefined) {
+        __privateGet(this, _voices2).stopById(target.stopId, target.time);
+      } else {
+        __privateGet(this, _voices2).stopAll(target.time);
+      }
+    }
+  }
+  disconnect() {
+    __privateGet(this, _voices2).stopAll();
+    __privateGet(this, _channel).disconnect();
+    __privateGet(this, _scheduler).stop();
+  }
+};
+_loadProgress = new WeakMap;
+_buffers = new WeakMap;
+_reversedBuffers = new WeakMap;
+_defaults = new WeakMap;
+_defaultVelocity = new WeakMap;
+_aliases = new WeakMap;
+_matcher = new WeakMap;
+_voices2 = new WeakMap;
+_scheduler = new WeakMap;
+_channel = new WeakMap;
+_loader = new WeakMap;
+_onLoadProgress = new WeakMap;
+_onStart = new WeakMap;
+_onEnded = new WeakMap;
+_ccState = new WeakMap;
+_Smplr_instances = new WeakSet;
+getBuffer_fn = function(sample, reverse) {
+  if (!reverse)
+    return __privateGet(this, _buffers).get(sample);
+  const cached = __privateGet(this, _reversedBuffers).get(sample);
+  if (cached)
+    return cached;
+  const original = __privateGet(this, _buffers).get(sample);
+  if (!original)
+    return;
+  const reversed = this.context.createBuffer(original.numberOfChannels, original.length, original.sampleRate);
+  for (let ch = 0;ch < original.numberOfChannels; ch++) {
+    const data = original.getChannelData(ch).slice().reverse();
+    reversed.copyToChannel(data, ch);
+  }
+  __privateGet(this, _reversedBuffers).set(sample, reversed);
+  return reversed;
+};
+playNote_fn = function(event) {
+  const { midi, velocity, time, stopId, duration, detune, lpfCutoffHz, loop, ampRelease, reverse, onStart, onEnded } = event;
+  const matches = __privateGet(this, _matcher).match(midi, velocity, __privateGet(this, _ccState));
+  for (const match of matches) {
+    if (match.offBy !== undefined) {
+      __privateGet(this, _voices2).stopGroup(match.offBy, time);
+    }
+  }
+  let voiceStarted = false;
+  for (const match of matches) {
+    const buffer = __privateMethod(this, _Smplr_instances, getBuffer_fn).call(this, match.sample, reverse != null ? reverse : false);
+    if (!buffer)
+      continue;
+    const params = resolveParams(__privateGet(this, _defaults), match.groupRef, match.regionRef, midi, velocity, { detune, lpfCutoffHz, loop, ampRelease, reverse });
+    const voice = new Voice(this.context, buffer, params, __privateGet(this, _channel).input, stopId, match.group, time);
+    __privateGet(this, _voices2).add(voice);
+    if (!voiceStarted) {
+      onStart == null || onStart(event);
+      voiceStarted = true;
+    }
+    if (onEnded) {
+      voice.onEnded(() => onEnded(event));
+    }
+    if (duration != null) {
+      const startT = time != null ? time : this.context.currentTime;
+      const releaseAt = startT + duration;
+      voice.stop(releaseAt);
+    }
+  }
+};
+normalizeNoteEvent_fn = function(event) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
+  if (typeof event === "string" || typeof event === "number") {
+    const midi2 = (_c = (_b = toMidi(event)) != null ? _b : (_a = __privateGet(this, _aliases)) == null ? undefined : _a.get(String(event))) != null ? _c : 0;
+    return {
+      note: event,
+      midi: midi2,
+      velocity: __privateGet(this, _defaultVelocity),
+      stopId: event,
+      onStart: __privateGet(this, _onStart),
+      onEnded: __privateGet(this, _onEnded)
+    };
+  }
+  const midi = (_f = (_e = toMidi(event.note)) != null ? _e : (_d = __privateGet(this, _aliases)) == null ? undefined : _d.get(String(event.note))) != null ? _f : 0;
+  return __spreadProps(__spreadValues({}, event), {
+    midi,
+    velocity: (_g = event.velocity) != null ? _g : __privateGet(this, _defaultVelocity),
+    stopId: (_h = event.stopId) != null ? _h : event.note,
+    onStart: compose(__privateGet(this, _onStart), event.onStart),
+    onEnded: compose(__privateGet(this, _onEnded), event.onEnded)
+  });
+};
+function spreadKeyRanges(samples) {
+  if (samples.length === 0)
+    return [];
+  const sorted = [...samples].sort(([a], [b]) => a - b);
+  return sorted.map(([midi, name], i) => {
+    const low = i === 0 ? 0 : Math.floor((sorted[i - 1][0] + midi) / 2) + 1;
+    const high = i === sorted.length - 1 ? 127 : Math.floor((midi + sorted[i + 1][0]) / 2);
+    return { keyRange: [low, high], pitch: midi, sample: name };
+  });
+}
+var _smplr;
+var _instrument;
+_smplr = new WeakMap;
+_instrument = new WeakMap;
+var _wavCache;
+var _wav16Cache;
+_wavCache = new WeakMap;
+_wav16Cache = new WeakMap;
+function gsPath(name) {
+  return "samples/" + name.replace(/\.\w+$/, "");
+}
+function vcslPath(name) {
+  return name.replace(/\.\w+$/, "");
+}
+var GS_BASE = "https://smpldsnds.github.io/sfzinstruments-greg-sullivan-e-pianos";
+var INSTRUMENTS2 = {
+  CP80: {
+    sfzUrl: `${GS_BASE}/cp80/CP80.sfz`,
+    baseUrl: `${GS_BASE}/cp80`,
+    pathFromSampleName: gsPath
+  },
+  PianetT: {
+    sfzUrl: `${GS_BASE}/planet-t/Pianet T.sfz`,
+    baseUrl: `${GS_BASE}/planet-t`,
+    pathFromSampleName: gsPath
+  },
+  WurlitzerEP200: {
+    sfzUrl: `${GS_BASE}/wurlitzer-ep200/Wurlitzer EP200.sfz`,
+    baseUrl: `${GS_BASE}/wurlitzer-ep200`,
+    pathFromSampleName: gsPath
+  },
+  TX81Z: {
+    sfzUrl: "https://smpldsnds.github.io/sgossner-vcsl/Electrophones/TX81Z - FM Piano.sfz",
+    baseUrl: "https://smpldsnds.github.io/sgossner-vcsl/Electrophones",
+    pathFromSampleName: vcslPath
+  }
+};
+var _smplr2;
+_smplr2 = new WeakMap;
+var _smplr3;
+_smplr3 = new WeakMap;
+var _smplr4;
+_smplr4 = new WeakMap;
+var _effect;
+var _ready;
+var _output;
+_effect = new WeakMap;
+_ready = new WeakMap;
+_output = new WeakMap;
+var _smplr5;
+_smplr5 = new WeakMap;
+var _smplr6;
+_smplr6 = new WeakMap;
+function gleitzKitUrl(name, kit) {
+  var _a;
+  const format = (_a = findFirstSupportedFormat(["ogg", "mp3"])) != null ? _a : "mp3";
+  console.debug(`Soundfont: using ${format} format for ${name}`);
+  return `https://gleitz.github.io/midi-js-soundfonts/${kit}/${name}-${format}.js`;
+}
+var SOUNDFONT_KITS = ["MusyngKite", "FluidR3_GM"];
+var DEFAULT_SOUNDFONT_KIT = SOUNDFONT_KITS[0];
+function getGoldstSoundfontLoopsUrl(instrument, kit) {
+  if (instrument.startsWith("http"))
+    return;
+  return `https://goldst.dev/midi-js-soundfonts/${kit}/${instrument}-loop.json`;
+}
+function fetchSoundfontLoopData(url, sampleRate = 44100) {
+  return __async(this, null, function* () {
+    if (!url)
+      return;
+    try {
+      const req = yield fetch(url);
+      if (req.status !== 200)
+        return;
+      const raw = yield req.json();
+      const loopData = {};
+      Object.keys(raw).forEach((key) => {
+        const midi = toMidi(key);
+        if (midi) {
+          const offsets = raw[key];
+          loopData[midi] = [offsets[0] / sampleRate, offsets[1] / sampleRate];
+        }
+      });
+      return loopData;
+    } catch (err) {
+      return;
+    }
+  });
+}
+var _smplr7;
+var _hasLoops;
+var Soundfont = class {
+  constructor(context, options) {
+    this.context = context;
+    __privateAdd(this, _smplr7);
+    __privateAdd(this, _hasLoops, false);
+    this.config = getSoundfontConfig(options);
+    const smplrOptions = {
+      destination: options.destination,
+      volume: options.volume,
+      velocity: options.velocity,
+      storage: this.config.storage,
+      onLoadProgress: options.onLoadProgress
+    };
+    __privateSet(this, _smplr7, new Smplr(context, smplrOptions));
+    const gain = context.createGain();
+    gain.gain.value = this.config.extraGain;
+    __privateGet(this, _smplr7).output.addInsert(gain);
+    this.load = loadSoundfontData(context, this.config).then(({ buffers, noteNames, loopData }) => {
+      __privateSet(this, _hasLoops, !!loopData);
+      return __privateGet(this, _smplr7).loadInstrument(soundfontToSmplrJson(noteNames, loopData), buffers);
+    }).then(() => this);
+  }
+  get hasLoops() {
+    return __privateGet(this, _hasLoops);
+  }
+  get output() {
+    return __privateGet(this, _smplr7).output;
+  }
+  loaded() {
+    return __async(this, null, function* () {
+      console.warn("deprecated: use load instead");
+      return this.load;
+    });
+  }
+  disconnect() {
+    return __privateGet(this, _smplr7).disconnect();
+  }
+  start(sample) {
+    return __privateGet(this, _smplr7).start(typeof sample === "object" ? sample : { note: sample });
+  }
+  stop(sample) {
+    return __privateGet(this, _smplr7).stop(sample === undefined ? undefined : sample);
+  }
+};
+_smplr7 = new WeakMap;
+_hasLoops = new WeakMap;
+function loadSoundfontData(context, config) {
+  return __async(this, null, function* () {
+    const [{ buffers, noteNames }, loopData] = yield Promise.all([
+      decodeSoundfontFile(context, config),
+      fetchSoundfontLoopData(config.loopDataUrl)
+    ]);
+    return { buffers, noteNames, loopData };
+  });
+}
+function decodeSoundfontFile(context, config) {
+  return __async(this, null, function* () {
+    const sourceFile = yield (yield config.storage.fetch(config.instrumentUrl)).text();
+    const json = midiJsToJson(sourceFile);
+    const noteNames = Object.keys(json);
+    const buffers = /* @__PURE__ */ new Map;
+    yield Promise.all(noteNames.map((noteName) => __async(null, null, function* () {
+      const midi = toMidi(noteName);
+      if (!midi)
+        return;
+      try {
+        const audioData = base64ToArrayBuffer(removeBase64Prefix(json[noteName]));
+        const buffer = yield context.decodeAudioData(audioData);
+        buffers.set(noteName, buffer);
+      } catch (error) {
+        console.warn(`Soundfont: failed to decode note ${noteName}`, error instanceof Error ? error.message : error);
+      }
+    })));
+    return { buffers, noteNames: [...buffers.keys()] };
+  });
+}
+function soundfontToSmplrJson(noteNames, loopData) {
+  const entries = [];
+  for (const noteName of noteNames) {
+    const midi = toMidi(noteName);
+    if (midi === undefined)
+      continue;
+    entries.push([midi, noteName]);
+  }
+  const spread = spreadKeyRanges(entries);
+  const regions = spread.map(({ keyRange, pitch, sample }) => {
+    const region = { sample, keyRange, pitch };
+    if (loopData) {
+      const loop = loopData[pitch];
+      if (loop) {
+        region.loop = true;
+        region.loopStart = loop[0];
+        region.loopEnd = loop[1];
+      }
+    }
+    return region;
+  });
+  return {
+    samples: { baseUrl: "", formats: ["ogg"] },
+    groups: [{ regions }]
+  };
+}
+function getSoundfontConfig(options) {
+  var _a, _b, _c, _d, _e;
+  if (!options.instrument && !options.instrumentUrl) {
+    throw Error("Soundfont: instrument or instrumentUrl is required");
+  }
+  const config = {
+    kit: (_a = options.kit) != null ? _a : DEFAULT_SOUNDFONT_KIT,
+    instrument: options.instrument,
+    storage: (_b = options.storage) != null ? _b : HttpStorage,
+    extraGain: (_c = options.extraGain) != null ? _c : 5,
+    loadLoopData: (_d = options.loadLoopData) != null ? _d : false,
+    loopDataUrl: options.loopDataUrl,
+    instrumentUrl: (_e = options.instrumentUrl) != null ? _e : ""
+  };
+  if (config.instrument && config.instrument.startsWith("http")) {
+    console.warn("Use 'instrumentUrl' instead of 'instrument' to load from a URL");
+    config.instrumentUrl = config.instrument;
+    config.instrument = undefined;
+  }
+  if (!config.instrumentUrl) {
+    if (config.instrument) {
+      config.instrumentUrl = gleitzKitUrl(config.instrument, config.kit);
+    } else {
+      throw Error("Soundfont: 'instrument' or 'instrumentUrl' configuration parameter is required");
+    }
+  } else {
+    if (config.kit !== DEFAULT_SOUNDFONT_KIT || config.instrument) {
+      console.warn("Soundfont: 'kit' and 'instrument' config parameters are ignored because 'instrumentUrl' is explicitly set.");
+    }
+  }
+  if (config.loadLoopData && config.instrument && !config.loopDataUrl) {
+    config.loopDataUrl = getGoldstSoundfontLoopsUrl(config.instrument, config.kit);
+  }
+  return config;
+}
+function midiJsToJson(source) {
+  const header = source.indexOf("MIDI.Soundfont.");
+  if (header < 0)
+    throw Error("Invalid MIDI.js Soundfont format");
+  const start = source.indexOf("=", header) + 2;
+  const end = source.lastIndexOf(",");
+  return JSON.parse(source.slice(start, end) + "}");
+}
+function removeBase64Prefix(audioBase64) {
+  return audioBase64.slice(audioBase64.indexOf(",") + 1);
+}
+function base64ToArrayBuffer(base64) {
+  const decoded = window.atob(base64);
+  const len = decoded.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0;i < len; i++) {
+    bytes[i] = decoded.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+var _smplr8;
+var _instrumentNames;
+_smplr8 = new WeakMap;
+_instrumentNames = new WeakMap;
+var _smplr9;
+_smplr9 = new WeakMap;
+
+// src/service/sound.ts
+var create = () => {
+  let context;
+  let soundfont = null;
+  const play = (seqence) => {
+    if (soundfont === null) {
+      context = new AudioContext;
+      soundfont = new Soundfont(context, { instrument: "acoustic_grand_piano" });
+      soundfont.load.then(() => {
+        playSequence(seqence);
+      }).catch((e) => {
+        console.error("Failed to load soundfont", e);
+      });
+      return;
+    }
+    playSequence(seqence);
+  };
+  const playSequence = (seqence) => {
+    const now = context.currentTime;
+    seqence.forEach((event) => {
+      event.midiNotes.forEach((midiNote) => {
+        soundfont?.start({ note: midiNote, time: now + event.timestamp / 1000, velocity: 127, duration: 0.3 });
+      });
+    });
+  };
+  return (_model, { sequence }, _raise) => {
+    console.log(`play ${JSON.stringify(sequence, null, 2)}`);
+    play(sequence);
+  };
+};
+
+// src/service/index.ts
+var soundService = create();
+var service = (model, msg, raise) => {
+  switch (msg.id) {
+    case "ChordIntervalChange":
+    case "ScaleFamilyChange":
+    case "TuningChanged":
+    case "LeftHandedFretboard":
+    case "FlipNut":
+    case "FretboardLabelChange":
+    case "SetCToNoon":
+    case "ModalStateChange":
+    case "ToggleSound":
+      break;
+    case "Toggle":
+      playToggle(model, msg, raise);
+      break;
+    case "ChordChanged":
+      playChordChanged(model, msg, raise);
+      break;
+    case "Play":
+      soundService(model, msg, raise);
+      break;
+    case "TonicChanged":
+      playTonicChanged(model, msg, raise);
+      break;
+    case "ModeChanged":
+      playModeChanged(model, msg, raise);
+      break;
+    default: {
+      const _exhaustiveCheck = msg;
+    }
+  }
+};
 
 // src/update/updateScale.ts
 var updateScale = (current) => {
@@ -490,20 +1919,14 @@ var Update5 = (model, msg) => {
   return model;
 };
 
-// src/update/update-midi-note.ts
-var Update6 = (model, msg) => {
-  model.state.midiToggledNotesBitmask = msg.toggledIndexes;
-  return updateScale(model.state);
-};
-
 // src/update/update-modal-state.ts
-var Update7 = (model, msg) => {
+var Update6 = (model, msg) => {
   model.state.modalState = msg.modalState;
   return model;
 };
 
 // src/update/update-mode-changed.ts
-var Update8 = (model, msg) => {
+var Update7 = (model, msg) => {
   const current = model.state;
   current.modeIndex = msg.mode.index;
   current.chordIndex = -1;
@@ -511,7 +1934,7 @@ var Update8 = (model, msg) => {
 };
 
 // src/update/update-scale-family-change.ts
-var Update9 = (model, msg) => {
+var Update8 = (model, msg) => {
   const current = model.state;
   current.scaleFamilyIndex = msg.scaleFamily.index;
   current.modeIndex = msg.scaleFamily.defaultModeIndex;
@@ -520,16 +1943,22 @@ var Update9 = (model, msg) => {
 };
 
 // src/update/update-set-c-to-noon.ts
-var Update10 = (model, msg) => {
+var Update9 = (model, msg) => {
   model.state.circleIsCNoon = msg.isC;
   return model;
 };
 
 // src/update/update-toggle.ts
-var Update11 = (model, msg) => {
+var Update10 = (model, msg) => {
   const current = model.state;
   current.toggledNotesBitmask = current.toggledNotesBitmask ^ 2 ** msg.index;
   return updateScale(current);
+};
+
+// src/update/update-toggle-sound.ts
+var Update11 = (model, _msg) => {
+  model.state.sound = !model.state.sound;
+  return model;
 };
 
 // src/update/update-tonic-changed.ts
@@ -553,15 +1982,15 @@ var update = (model, msg) => {
     case "TonicChanged":
       return Update12(model, msg);
     case "ModeChanged":
-      return Update8(model, msg);
+      return Update7(model, msg);
     case "ChordChanged":
       return Update(model, msg);
     case "Toggle":
-      return Update11(model, msg);
+      return Update10(model, msg);
     case "ChordIntervalChange":
       return Update2(model, msg);
     case "ScaleFamilyChange":
-      return Update9(model, msg);
+      return Update8(model, msg);
     case "TuningChanged":
       return Update13(model, msg);
     case "LeftHandedFretboard":
@@ -570,12 +1999,14 @@ var update = (model, msg) => {
       return Update3(model, msg);
     case "FretboardLabelChange":
       return Update4(model, msg);
-    case "MidiNote":
-      return Update6(model, msg);
     case "SetCToNoon":
-      return Update10(model, msg);
+      return Update9(model, msg);
     case "ModalStateChange":
-      return Update7(model, msg);
+      return Update6(model, msg);
+    case "Play":
+      return model;
+    case "ToggleSound":
+      return Update11(model, msg);
     default: {
       const _exhaustiveCheck = msg;
       return _exhaustiveCheck;
@@ -1110,42 +2541,42 @@ var violaDots = [
   [12, 1]
 ];
 var tuningInfos = [
-  { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
-  { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
-  { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
-  { tuning: "BFBFBF", dots: guitarDots, description: "Augmented Fourths" },
-  { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D" },
-  { tuning: "DADGAD", dots: guitarDots, description: "Celtic" },
-  { tuning: "CGDAEG", dots: guitarDots, description: "Guitar Fripp NST" },
-  { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string" },
+  { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard", octave: [2, 2, 3, 3, 3, 4] },
+  { tuning: "EADGCF", dots: guitarDots, description: "All Fourths", octave: [2, 2, 3, 3, 4, 4] },
+  { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths", octave: [2, 2, 3, 3, 4, 4] },
+  { tuning: "BFBFBF", dots: guitarDots, description: "Augmented Fourths", octave: [1, 2, 2, 3, 3, 4] },
+  { tuning: "DADGBE", dots: guitarDots, description: "Guitar Drop D", octave: [2, 2, 3, 3, 3, 4] },
+  { tuning: "DADGAD", dots: guitarDots, description: "Celtic", octave: [2, 2, 3, 3, 3, 4] },
+  { tuning: "CGDAEG", dots: guitarDots, description: "Guitar Fripp NST", octave: [2, 2, 3, 3, 4, 4] },
+  { tuning: "BEADGBE", dots: guitarDots, description: "Guitar 7 string", octave: [1, 2, 2, 3, 3, 3, 4] },
   { tuning: "DABEAB", dots: guitarDots, description: "Guitar Portuguese" },
-  { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G" },
-  { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert" },
-  { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)" },
-  { tuning: "CFA♯D♯GC", dots: guitarDots, description: "C Standard" },
-  { tuning: "BEADF♯B", dots: guitarDots, description: "Baritone B" },
-  { tuning: "ADGCEA", dots: guitarDots, description: "Baritone A" },
-  { tuning: "EADG", dots: guitarDots, description: "Bass Standard" },
-  { tuning: "DADG", dots: guitarDots, description: "Bass Drop D" },
-  { tuning: "EADGC", dots: guitarDots, description: "Bass 5 Strings Standard High" },
-  { tuning: "BEADG", dots: guitarDots, description: "Bass 5 Strings Standard Low" },
-  { tuning: "BEADGC", dots: guitarDots, description: "Bass 6 Strings Standard" },
-  { tuning: "BEADGCF", dots: guitarDots, description: "Bass 7 Strings Standard" },
-  { tuning: "DGBD", dots: guitarDots, description: "Banjo" },
+  { tuning: "DGDGBD", dots: guitarDots, description: "Guitar Open G", octave: [2, 2, 3, 3, 3, 4] },
+  { tuning: "EADGDG", dots: guitarDots, description: "Guitar Convert", octave: [2, 2, 3, 3, 4, 4] },
+  { tuning: "E♭A♭D♭G♭B♭E♭", dots: guitarDots, description: "Guitar E♭ (Hendrix)", octave: [2, 2, 3, 3, 3, 4] },
+  { tuning: "CFA♯D♯GC", dots: guitarDots, description: "C Standard", octave: [2, 2, 2, 3, 3, 4] },
+  { tuning: "BEADF♯B", dots: guitarDots, description: "Baritone B", octave: [1, 2, 2, 3, 3, 3] },
+  { tuning: "ADGCEA", dots: guitarDots, description: "Baritone A", octave: [1, 2, 2, 3, 3, 3] },
+  { tuning: "EADG", dots: guitarDots, description: "Bass Standard", octave: [1, 1, 2, 2] },
+  { tuning: "DADG", dots: guitarDots, description: "Bass Drop D", octave: [1, 1, 2, 2] },
+  { tuning: "EADGC", dots: guitarDots, description: "Bass 5 Strings Standard High", octave: [1, 1, 2, 2, 3] },
+  { tuning: "BEADG", dots: guitarDots, description: "Bass 5 Strings Standard Low", octave: [0, 1, 1, 2, 2] },
+  { tuning: "BEADGC", dots: guitarDots, description: "Bass 6 Strings Standard", octave: [0, 1, 1, 2, 2, 3] },
+  { tuning: "BEADGCF", dots: guitarDots, description: "Bass 7 Strings Standard", octave: [0, 1, 1, 2, 2, 3, 3] },
+  { tuning: "DGBD", dots: guitarDots, description: "Banjo", octave: [3, 3, 3, 4] },
   { tuning: "DGBD", dots: guitarDots, description: "Cavaquinho" },
-  { tuning: "GCEA", dots: guitarDots, description: "Ukulele C" },
-  { tuning: "CGDA", dots: violaDots, description: "Cello" },
-  { tuning: "GDAE", dots: violaDots, description: "Violin" },
-  { tuning: "CGDA", dots: violaDots, description: "Viola" }
+  { tuning: "GCEA", dots: guitarDots, description: "Ukulele C", octave: [4, 4, 4, 4] },
+  { tuning: "CGDA", dots: violaDots, description: "Cello", octave: [2, 2, 3, 3] },
+  { tuning: "GDAE", dots: violaDots, description: "Violin", octave: [3, 4, 4, 5] },
+  { tuning: "CGDA", dots: violaDots, description: "Viola", octave: [3, 3, 4, 4] }
 ];
 var tunings = buildTunings();
-function parseTuning(tuning) {
+function parseTuning(info) {
   const tokens = [];
   const result = [];
   let tokenIndex = 0;
   let lastWasChar = false;
-  for (let i = 0;i < tuning.length; i++) {
-    const noteChar = tuning.charAt(i);
+  for (let i = 0;i < info.tuning.length; i++) {
+    const noteChar = info.tuning.charAt(i);
     if ("ABCDEFG".indexOf(noteChar) >= 0) {
       tokens[tokenIndex] = noteChar;
       tokenIndex++;
@@ -1157,12 +2588,15 @@ function parseTuning(tuning) {
       throw new Error("Invalid tuning char");
     }
   }
-  for (const token of tokens) {
-    const noteName = notes.filter((x) => x.name === token);
+  if (info.octave !== undefined && info.octave.length !== tokens.length) {
+    throw new Error("octave length must match number of strings");
+  }
+  for (let i = 0;i < tokens.length; i++) {
+    const noteName = notes.filter((x) => x.name === tokens[i]);
     if (noteName.length !== 1) {
       throw new Error("Invalid token");
     }
-    result.push(noteName[0].index);
+    result.push({ index: noteName[0].index, midiNote: indexToMIDI(noteName[0].index, info.octave?.[i] ?? 3) });
   }
   return result;
 }
@@ -1175,7 +2609,7 @@ function buildTunings() {
       tuning: info.tuning,
       dots: info.dots,
       description: info.description,
-      notes: parseTuning(info.tuning)
+      notes: parseTuning(info)
     };
     tunings2.push(tuning);
     index++;
@@ -1230,14 +2664,15 @@ function labelText(sn, labelType) {
       throw new Error(`Unexpected label type: ${labelType}`);
   }
 }
-function allNotesFromWithNodes(startIndex, nodeByIndex) {
+function allNotesFromWithNodes(stringInfo, nodeByIndex) {
   const items = [];
   for (let i = 0;i < numberOfFrets; i++) {
-    const idx = (i + startIndex) % 12;
+    const idx = (i + stringInfo.index) % 12;
     items.push({
       octave: Math.floor((i + 1) / 12),
       index: idx,
-      node: nodeByIndex.get(idx) ?? nullNode
+      node: nodeByIndex.get(idx) ?? nullNode,
+      midiNote: stringInfo.midiNote + i
     });
   }
   return items;
@@ -1287,7 +2722,7 @@ var guitarNodes = (model, raise) => {
       cy: stringGap / 2,
       cx: noteX(i),
       class: noteClass(sn, hasToggledNotes),
-      onClick: () => raise({ id: "Toggle", index: sn.index })
+      onClick: () => raise({ id: "Toggle", index: sn.index, midiNote: sn.midiNote })
     }));
     const noteTexts = fretNotes.map((sn, i) => {
       const x = isLeftHanded ? -noteX(i) : noteX(i);
@@ -1321,7 +2756,7 @@ var guitarNodes = (model, raise) => {
 };
 
 // src/view/menu.ts
-var create = () => {
+var create2 = () => {
   let uninitialised = true;
   return (_model, _raise) => {
     if (uninitialised) {
@@ -1474,7 +2909,7 @@ function showFretboardSettings(state, raise) {
 
 // src/view/modal/index.ts
 var MODAL_BACKDROP_CLASS2 = "modal-backdrop";
-var create2 = () => {
+var create3 = () => {
   let previousState = "closed";
   return ({ state }, raise) => {
     if (state.modalState === previousState) {
@@ -1558,7 +2993,8 @@ var defaultState = Object.freeze({
   fretboardLabelType: "NoteName",
   circleIsCNoon: true,
   tuningIndex: 0,
-  modalState: "closed"
+  modalState: "closed",
+  sound: true
 });
 
 // src/view/permalink.ts
@@ -1636,7 +3072,7 @@ var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
 var FB_NT_NONE_ID = "fb-note-text-None";
 var FB_NT_NAME_ID = "fb-note-text-NoteName";
 var FB_NT_INT_ID = "fb-note-text-Interval";
-var create3 = () => {
+var create4 = () => {
   let uninitialised = true;
   return ({ state }, raise) => {
     const setCheckbox = (id, checked) => {
@@ -1679,6 +3115,27 @@ function onSetCToNoon(e, raise) {
 function onFbNoteTextClick(e, raise) {
   raise({ id: "FretboardLabelChange", labelType: e.value });
 }
+
+// src/view/speaker.ts
+var SPEAKER_BTN_ID = "speaker-btn";
+var SPEAKER_ICON_ID = "speaker-icon";
+var create5 = () => {
+  let uninitialised = true;
+  return ({ state }, raise) => {
+    const icon = document.getElementById(SPEAKER_ICON_ID);
+    if (icon) {
+      icon.setAttribute("href", state.sound ? "#icon-speaker-wave" : "#icon-speaker-x");
+    }
+    if (uninitialised) {
+      const btn = document.getElementById(SPEAKER_BTN_ID);
+      if (btn) {
+        btn.addEventListener("click", () => raise({ id: "ToggleSound" }));
+      }
+      uninitialised = false;
+    }
+    return [];
+  };
+};
 
 // node_modules/zod/v4/classic/external.js
 var exports_external = {};
@@ -15229,7 +16686,8 @@ var StateSchema = exports_external.object({
   fretboardLabelType: FretboardLabelTypeSchema,
   circleIsCNoon: exports_external.boolean(),
   tuningIndex: exports_external.number(),
-  modalState: ModalStateSchema
+  modalState: ModalStateSchema,
+  sound: exports_external.boolean()
 });
 
 // src/view/storage.ts
@@ -15307,11 +16765,12 @@ var svgViews = [
   { containerId: "gtr", view: guitarNodes },
   { containerId: "scale-dropdown", view: scaleFamilyNodes },
   { containerId: "tuning-dropdown", view: tuningNodes },
-  { containerId: "no-op", view: create() },
-  { containerId: "no-op", view: create3() },
+  { containerId: "no-op", view: create2() },
+  { containerId: "no-op", view: create4() },
+  { containerId: "no-op", view: create5() },
   { containerId: "no-op", view: view2 },
   { containerId: "no-op", view },
-  { containerId: "no-op", view: create2() }
+  { containerId: "no-op", view: create3() }
 ];
 var createViews = () => {
   return (model, raise) => {
@@ -15330,16 +16789,18 @@ function setWakeLock() {
   if (!("wakeLock" in navigator)) {
     return;
   }
-  tryAcquireWakeLock();
+  if (document.visibilityState === "visible") {
+    tryAcquireWakeLock();
+  }
   document.addEventListener("visibilitychange", async () => {
     if (lock !== null && document.visibilityState === "visible") {
-      tryAcquireWakeLock();
+      await tryAcquireWakeLock();
     }
   });
 }
-function tryAcquireWakeLock() {
+async function tryAcquireWakeLock() {
   try {
-    navigator.wakeLock.request("screen").then((l) => lock = l);
+    lock = await navigator.wakeLock.request("screen");
   } catch (_e) {
     console.log("Could not aquire wake lock");
   }
@@ -15355,6 +16816,7 @@ var main = () => {
   const view3 = createViews();
   const raise = (msg) => {
     model = update(model, msg);
+    service(model, msg, raise);
     view3(model, raise);
   };
   view3(model, raise);
@@ -15362,5 +16824,5 @@ var main = () => {
 };
 main();
 
-//# debugId=D7C718F77A36788264756E2164756E21
+//# debugId=6D7373132EEEDF2064756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

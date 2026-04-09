@@ -1,6 +1,11 @@
 import type * as music from "./music";
 import type { FretboardLabelType, ModalState } from "./types";
 
+export type SequenceEvent = {
+    timestamp: number; // miliseconds
+    midiNotes: number[];
+};
+
 export type Msg =
     | {
           id: "TonicChanged";
@@ -17,6 +22,7 @@ export type Msg =
     | {
           id: "Toggle";
           index: number;
+          midiNote?: number;
       }
     | {
           id: "ChordIntervalChange";
@@ -44,11 +50,6 @@ export type Msg =
           labelType: FretboardLabelType;
       }
     | {
-          // MIDI only message
-          id: "MidiNote";
-          toggledIndexes: number;
-      }
-    | {
           // CoF only message
           id: "SetCToNoon";
           isC: boolean;
@@ -56,4 +57,11 @@ export type Msg =
     | {
           id: "ModalStateChange";
           modalState: ModalState;
+      }
+    | {
+          id: "Play";
+          sequence: SequenceEvent[];
+      }
+    | {
+          id: "ToggleSound";
       };

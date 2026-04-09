@@ -75,6 +75,8 @@ div {
 .header {
   overflow: hidden;
   background-color: var(--color-header-bg);
+  display: flex;
+  align-items:  center;
   margin: 0;
   padding: 0;
 }
@@ -131,6 +133,10 @@ div {
 
 .dropdown-content-visible {
   display: block;
+}
+
+.menu-bar-icon {
+  fill: var(--color-header-text);
 }
 
 /* src/styles/layout.css */

@@ -545,3 +545,17 @@ export function chromatic(): Array<number> {
     }
     return indexes;
 }
+
+export function getNodeAtIndex(nodes: Node[], index: number): Node {
+    const node = nodes.find((node) => node.scaleNote.note.index === index);
+    if (!node) {
+        throw new Error(`Invalid index: ${index}`);
+    }
+    return node;
+}
+
+// takes a GD index A = 0, a MIDI octave number and outputs the MIDI note number
+export function indexToMIDI(index: number, octave: number): number {
+    // MIDI C is zero, A is 9.
+    return ((index + 9) % 12) + octave * 12 + 12;
+}

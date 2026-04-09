@@ -1,5 +1,6 @@
 import type { Msg } from "./message";
 import type { Model } from "./model";
+import { service } from "./service";
 import type { State } from "./types";
 import { update, updateScale } from "./update";
 import { createViews, getStateFromLocalStorage, updateStateFromQuerystring } from "./view";
@@ -16,6 +17,7 @@ const main = () => {
 
     const raise = (msg: Msg): void => {
         model = update(model, msg);
+        service(model, msg, raise);
         view(model, raise);
     };
 

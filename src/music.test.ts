@@ -7,6 +7,7 @@ import {
     generateChordNumbers,
     generateScale,
     getIntervalName,
+    indexToMIDI,
     naturals,
     notesInScaleFamily,
     scaleFamily,
@@ -291,5 +292,16 @@ describe("buildScaleCounter", () => {
         const diatonicAMin: boolean[] = [true, false, true, false, true, false, true, false, true, false, true, false];
         const counter = buildScaleCounter(diatonicAMin);
         expect(counter.map((x) => x[1])).toEqual([0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0]);
+    });
+});
+
+describe("indexToMIDI", () => {
+    test("maps correctly", () => {
+        // A0
+        expect(indexToMIDI(0, 0)).toEqual(21);
+        // C3
+        expect(indexToMIDI(3, 3)).toEqual(48);
+        // G#7
+        expect(indexToMIDI(11, 7)).toEqual(104);
     });
 });

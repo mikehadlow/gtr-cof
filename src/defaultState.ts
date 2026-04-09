@@ -15,4 +15,5 @@ export const defaultState: State = Object.freeze({
     circleIsCNoon: true,
     tuningIndex: 0,
     modalState: "closed",
+    sound: true,
 } as const satisfies State);
