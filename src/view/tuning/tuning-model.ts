@@ -1,4 +1,4 @@
-import { notes } from "../../music";
+import { indexToMIDI, notes } from "../../music";
 
 const guitarDots: Array<[number, number]> = [
     [3, 0], // [fret, position]
@@ -29,7 +29,7 @@ export type TuningInfo = {
 
 export type StringInfo = {
     readonly index: number;
-    readonly octave: number;
+    readonly midiNote: number;
 };
 
 export type Tuning = {
@@ -105,7 +105,7 @@ export function parseTuning(info: TuningInfo): Array<StringInfo> {
         if (noteName.length !== 1) {
             throw new Error("Invalid token");
         }
-        result.push({ index: noteName[0].index, octave: info.octave?.[i] ?? 3 });
+        result.push({ index: noteName[0].index, midiNote: indexToMIDI(noteName[0].index, info.octave?.[i] ?? 3) });
     }
 
     return result;

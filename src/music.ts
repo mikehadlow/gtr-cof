@@ -553,3 +553,9 @@ export function getNodeAtIndex(nodes: Node[], index: number): Node {
     }
     return node;
 }
+
+// takes a GD index A = 0, a MIDI octave number and outputs the MIDI note number
+export function indexToMIDI(index: number, octave: number): number {
+    // MIDI C is zero, A is 9.
+    return ((index + 9) % 12) + octave * 12 + 12;
+}

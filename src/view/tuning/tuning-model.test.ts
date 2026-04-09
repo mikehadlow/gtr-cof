@@ -31,12 +31,12 @@ describe("tuning-model", () => {
 
     test("parseTuning should output octave numbers", () => {
         const strings = parseTuning(tuningInfos[0]); // Guitar Standard: EADGBE [2,2,3,3,3,4]
-        expect(strings.map((x) => x.octave)).toEqual([2, 2, 3, 3, 3, 4]);
+        expect(strings.map((x) => x.midiNote)).toEqual([40, 45, 50, 55, 59, 64]);
     });
 
     test("parseTuning should default octave to 3 when not provided", () => {
         const strings = parseTuning({ tuning: "EADGBE", dots: [], description: "" });
-        expect(strings.map((x) => x.octave)).toEqual([3, 3, 3, 3, 3, 3]);
+        expect(strings.map((x) => x.midiNote)).toEqual([52, 57, 50, 55, 59, 52]);
     });
 
     test("parseTuning should throw when octave length does not match string count", () => {
