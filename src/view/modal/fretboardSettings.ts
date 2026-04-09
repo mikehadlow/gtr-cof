@@ -1,7 +1,7 @@
 import type { Msg } from "../../message";
 import type { FretboardLabelType, State } from "../../types";
 import { tunings } from "../tuning";
-import { createCheckbox, createModal, createSection } from "./common";
+import { applyTheme, createCheckbox, createModal, createSection, getTheme } from "./common";
 
 export function showFretboardSettings(state: State, raise: (msg: Msg) => void) {
     const modal = createModal("Fretboard Settings", raise);
@@ -35,6 +35,11 @@ export function showFretboardSettings(state: State, raise: (msg: Msg) => void) {
     // Flip Nut
     createCheckbox(modal, "Flip Nut", state.isNutFlipped, (isChecked) =>
         raise({ id: "FlipNut", isNutFlipped: isChecked }),
+    );
+
+    // Dark Mode
+    createCheckbox(modal, "Dark Mode", getTheme() === "dark", (isChecked) =>
+        applyTheme(isChecked ? "dark" : "light"),
     );
 
     // Note Labels

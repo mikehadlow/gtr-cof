@@ -5,6 +5,7 @@
     background-color: var(--color-header-bg);
     display: flex;
     align-items: center;
+    transition: background-color 150ms ease;
 }
 
 .title {
@@ -39,6 +40,7 @@
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     text-align: left;
     z-index: var(--z-dropdown);
+    border: 1px solid var(--color-border);
 }
 
 .with-padding {

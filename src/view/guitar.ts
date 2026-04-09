@@ -145,6 +145,7 @@ export const guitarNodes: View<Model, Msg, RenderNode> = (model: Model, raise: (
                 type: "text",
                 x,
                 y: stringGap / 2 + 5,
+                class: "fret-note-text",
                 textAnchor: "middle",
                 transform,
                 content: labelText(sn, fretboardLabelType),
