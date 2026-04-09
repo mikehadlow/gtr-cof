@@ -24,6 +24,12 @@ type TuningInfo = {
     readonly tuning: string;
     readonly dots: Array<[number, number]>;
     readonly description: string;
+    readonly octave?: number[];
+};
+
+export type StringInfo = {
+    readonly index: number;
+    readonly octave: number;
 };
 
 export type Tuning = {
@@ -31,11 +37,11 @@ export type Tuning = {
     readonly tuning: string;
     readonly dots: Array<[number, number]>;
     readonly description: string;
-    readonly notes: Array<number>;
+    readonly notes: Array<StringInfo>;
 };
 
 const tuningInfos: Array<TuningInfo> = [
-    { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard" },
+    { tuning: "EADGBE", dots: guitarDots, description: "Guitar Standard", octave: [2, 2, 3, 3, 3, 4] },
     { tuning: "EADGCF", dots: guitarDots, description: "All Fourths" },
     { tuning: "CGDAEB", dots: guitarDots, description: "All Fifths" },
     { tuning: "BFBFBF", dots: guitarDots, description: "Augmented Fourths" },
@@ -69,9 +75,9 @@ const tuningInfos: Array<TuningInfo> = [
 
 export const tunings: Array<Tuning> = buildTunings();
 
-export function parseTuning(tuning: string): Array<number> {
+export function parseTuning(tuning: string): Array<StringInfo> {
     const tokens: Array<string> = [];
-    const result: Array<number> = [];
+    const result: Array<StringInfo> = [];
 
     let tokenIndex = 0;
     let lastWasChar = false;
@@ -95,7 +101,7 @@ export function parseTuning(tuning: string): Array<number> {
         if (noteName.length !== 1) {
             throw new Error("Invalid token");
         }
-        result.push(noteName[0].index);
+        result.push({ index: noteName[0].index, octave: 3 });
     }
 
     return result;

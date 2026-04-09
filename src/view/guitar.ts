@@ -55,10 +55,10 @@ function labelText(sn: StringNote, labelType: FretboardLabelType): string {
     }
 }
 
-function allNotesFromWithNodes(startIndex: number, nodeByIndex: Map<number, music.Node>): StringNote[] {
+function allNotesFromWithNodes(stringInfo: tuning.StringInfo, nodeByIndex: Map<number, music.Node>): StringNote[] {
     const items: StringNote[] = [];
     for (let i = 0; i < numberOfFrets; i++) {
-        const idx = (i + startIndex) % 12;
+        const idx = (i + stringInfo.index) % 12;
         items.push({
             octave: Math.floor((i + 1) / 12),
             index: idx,

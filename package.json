@@ -7,7 +7,7 @@
     "build": "bun run check && bun build ./src/index.ts --outfile ./docs/gtr-cof.js --target=browser --sourcemap=linked && mv ./src/gtr-cof.js ./src/gtr-cof.js.map ./docs/ && bun build ./src/styles/index.css --outfile ./docs/gtr-cof.css",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "lint": "biome lint ./src",
+    "lint": "biome lint --write ./src",
     "format": "biome format --write ./src",
     "check-biome": "biome check ./src",
     "check-deps": "depcruise src --config .dependency-cruiser.cjs",
