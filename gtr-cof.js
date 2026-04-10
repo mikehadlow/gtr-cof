@@ -2780,9 +2780,12 @@ var create2 = () => {
   };
 };
 function init() {
-  const menuItems = document.getElementsByClassName("menu");
-  for (const menuItem of menuItems) {
-    menuItem.addEventListener("click", onMenuClick);
+  const dropdowns = document.getElementsByClassName("dropdown");
+  for (const dropdown of dropdowns) {
+    const menuItem = dropdown.querySelector(".menu");
+    if (menuItem) {
+      menuItem.addEventListener("click", onMenuClick);
+    }
   }
   document.addEventListener("mouseup", (event) => {
     const targetElement = event.target;
@@ -16799,5 +16802,5 @@ var main = () => {
 };
 main();
 
-//# debugId=423FB71BD283AAB864756E2164756E21
+//# debugId=E5CD681CA172CF5464756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
