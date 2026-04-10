@@ -35,7 +35,7 @@ function init(): void {
 }
 
 function onMenuClick(event: Event): void {
-    const menuElement = <Element>event.target;
+    const menuElement = <Element>event.currentTarget;
     const currentContentElement = menuElement.parentElement!.querySelector(".dropdown-content");
 
     const contentElements = document.getElementsByClassName("dropdown-content");

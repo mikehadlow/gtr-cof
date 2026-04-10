@@ -64,3 +64,9 @@
 .menu-bar-icon {
     fill: var(--color-header-text);
 }
+
+.scale-family-select {
+    width: 100%;
+    font-family: var(--font-family);
+    font-size: var(--font-size-button);
+}

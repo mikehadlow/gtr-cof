@@ -139,6 +139,12 @@ div {
   fill: var(--color-header-text);
 }
 
+.scale-family-select {
+  font-family: var(--font-family);
+  font-size: var(--font-size-button);
+  width: 100%;
+}
+
 /* src/styles/layout.css */
 .content {
   max-width: var(--content-max-width);
@@ -491,8 +497,3 @@ div {
 
 /* src/styles/index.css */
 
-.scale-family-select {
-  width: 100%;
-  font-family: var(--font-family);
-  font-size: var(--font-size-button);
-}
