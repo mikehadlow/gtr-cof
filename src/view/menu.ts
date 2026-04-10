@@ -15,9 +15,12 @@ export const create = (): View<Model, Msg, RenderNode> => {
 };
 
 function init(): void {
-    const menuItems = document.getElementsByClassName("menu");
-    for (const menuItem of menuItems) {
-        menuItem.addEventListener("click", onMenuClick);
+    const dropdowns = document.getElementsByClassName("dropdown");
+    for (const dropdown of dropdowns) {
+        const menuItem = dropdown.querySelector(".menu");
+        if (menuItem) {
+            menuItem.addEventListener("click", onMenuClick);
+        }
     }
 
     // close open menu when document is clicked outside
