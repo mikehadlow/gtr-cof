@@ -2301,6 +2301,29 @@ function createElement(node) {
       });
       return [...path, ...selectionElements, ...text];
     }
+    case "selectHtml": {
+      const fo = document.createElementNS(SVG_NS, "foreignObject");
+      fo.setAttribute("x", String(node.x));
+      fo.setAttribute("y", String(node.y));
+      fo.setAttribute("width", String(node.width));
+      fo.setAttribute("height", String(node.height));
+      const select = document.createElement("select");
+      select.setAttribute("class", node.class);
+      for (const opt of node.options) {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.textContent = opt.label;
+        if (opt.value === node.selectedValue) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      }
+      select.addEventListener("change", (e) => {
+        node.onChange(e.target.value);
+      });
+      fo.appendChild(select);
+      return [fo];
+    }
     default: {
       const _exhaustiveCheck = node;
       return _exhaustiveCheck;
@@ -2363,7 +2386,7 @@ function chordIntervalNodes(model, raise) {
       }
     ]
   }));
-  return [{ type: "g", transform: "translate(0, 240)", children }];
+  return [{ type: "g", transform: "translate(0, 250)", children }];
 }
 
 // src/view/circle.ts
@@ -2615,15 +2638,6 @@ function buildTunings() {
   }
   return tunings2;
 }
-
-// src/view/tuning/index.ts
-var tuningNodes = (_model, raise) => tunings.map((t) => ({
-  type: "div",
-  class: "dropdown-content-item",
-  textContent: `${t.tuning}   ${t.description}`,
-  onClick: () => raise({ id: "TuningChanged", index: t.index })
-}));
-
 // src/view/guitar.ts
 var stringGap = 40;
 var fretGap = 70;
@@ -2783,7 +2797,7 @@ function init() {
   });
 }
 function onMenuClick(event) {
-  const menuElement = event.target;
+  const menuElement = event.currentTarget;
   const currentContentElement = menuElement.parentElement.querySelector(".dropdown-content");
   const contentElements = document.getElementsByClassName("dropdown-content");
   for (const contentElement of contentElements) {
@@ -2974,7 +2988,7 @@ function modesNodes(model, raise) {
       }
     ]
   }));
-  return [{ type: "g", transform: "translate(0, 280)", children }];
+  return [{ type: "g", transform: "translate(0, 275)", children }];
 }
 
 // src/defaultState.ts
@@ -3057,68 +3071,32 @@ function updateStateFromQuerystring(existingState) {
 }
 
 // src/view/scale-family.ts
-var scaleFamilyNodes = (_model, raise) => scaleFamily.map((sf) => ({
-  type: "div",
-  class: "dropdown-content-item",
-  textContent: sf.name,
-  onClick: () => raise({ id: "ScaleFamilyChange", scaleFamily: sf })
-}));
-
-// src/view/settings.ts
-var LH_CHKBOX_ID = "left-handed-checkbox";
-var FLIPNUT_CHKBOX_ID = "flip-nut-checkbox";
-var CNOON_CHKBOX_ID = "set-c-to-noon-checkbox";
-var FB_NT_NONE_ID = "fb-note-text-None";
-var FB_NT_NAME_ID = "fb-note-text-NoteName";
-var FB_NT_INT_ID = "fb-note-text-Interval";
-var create4 = () => {
-  let uninitialised = true;
-  return ({ state }, raise) => {
-    const setCheckbox = (id, checked) => {
-      const checkbox = document.getElementById(id);
-      if (checkbox === null) {
-        throw new Error(`checkbox with id '${id}' not found.`);
+var scaleFamilySelectNodes = (model, raise) => {
+  const currentFamily = scaleFamily[model.state.scaleFamilyIndex];
+  return [
+    {
+      type: "selectHtml",
+      x: 5,
+      y: 5,
+      width: 150,
+      height: 25,
+      class: "scale-family-select",
+      options: scaleFamily.map((sf) => ({ value: String(sf.index), label: sf.name })),
+      selectedValue: String(currentFamily.index),
+      onChange: (value) => {
+        const sf = scaleFamily.find((x) => String(x.index) === value);
+        if (sf) {
+          raise({ id: "ScaleFamilyChange", scaleFamily: sf });
+        }
       }
-      checkbox.checked = checked;
-    };
-    const setClickHandler = (id, handler) => {
-      const element = document.getElementById(id);
-      element.onclick = (x) => handler(x.currentTarget, raise);
-    };
-    setCheckbox("left-handed-checkbox", state.isLeftHanded);
-    setCheckbox("flip-nut-checkbox", state.isNutFlipped);
-    setCheckbox("set-c-to-noon-checkbox", state.circleIsCNoon);
-    const selected = `fb-note-text-${state.fretboardLabelType}`;
-    setCheckbox(selected, true);
-    if (uninitialised) {
-      setClickHandler(LH_CHKBOX_ID, onLeftHandedClick);
-      setClickHandler(FLIPNUT_CHKBOX_ID, onFlipNut);
-      setClickHandler(CNOON_CHKBOX_ID, onSetCToNoon);
-      setClickHandler(FB_NT_NONE_ID, onFbNoteTextClick);
-      setClickHandler(FB_NT_NAME_ID, onFbNoteTextClick);
-      setClickHandler(FB_NT_INT_ID, onFbNoteTextClick);
-      uninitialised = false;
     }
-    return [];
-  };
+  ];
 };
-function onLeftHandedClick(e, raise) {
-  raise({ id: "LeftHandedFretboard", isLeftHanded: e.checked });
-}
-function onFlipNut(e, raise) {
-  raise({ id: "FlipNut", isNutFlipped: e.checked });
-}
-function onSetCToNoon(e, raise) {
-  raise({ id: "SetCToNoon", isC: e.checked });
-}
-function onFbNoteTextClick(e, raise) {
-  raise({ id: "FretboardLabelChange", labelType: e.value });
-}
 
 // src/view/speaker.ts
 var SPEAKER_BTN_ID = "speaker-btn";
 var SPEAKER_ICON_ID = "speaker-icon";
-var create5 = () => {
+var create4 = () => {
   let uninitialised = true;
   return ({ state }, raise) => {
     const icon = document.getElementById(SPEAKER_ICON_ID);
@@ -16727,7 +16705,7 @@ function tonicsNodes(model, raise) {
       onClick: () => raise({ id: "TonicChanged", noteSpec: data.noteSpec })
     }))
   }));
-  return [{ type: "g", children }];
+  return [{ type: "g", transform: "translate(0, 30)", children }];
 }
 function tonicButtonClass(noteSpec, selectedNoteSpec) {
   if (noteSpec.label === selectedNoteSpec.label) {
@@ -16753,6 +16731,7 @@ function isSameNoteAsNatural(noteSpec) {
 
 // src/view/index.ts
 var modesPanelView = (model, raise) => [
+  ...scaleFamilySelectNodes(model, raise),
   ...tonicsNodes(model, raise),
   ...chordIntervalNodes(model, raise),
   ...modesNodes(model, raise)
@@ -16762,11 +16741,8 @@ var svgViews = [
   { containerId: "chromatic", view: circleNodes(chromatic(), "Chromatic", 500) },
   { containerId: "cof", view: circleNodes(fifths(), "Circle of Fifths", 500) },
   { containerId: "gtr", view: guitarNodes },
-  { containerId: "scale-dropdown", view: scaleFamilyNodes },
-  { containerId: "tuning-dropdown", view: tuningNodes },
   { containerId: "no-op", view: create2() },
   { containerId: "no-op", view: create4() },
-  { containerId: "no-op", view: create5() },
   { containerId: "no-op", view: view2 },
   { containerId: "no-op", view },
   { containerId: "no-op", view: create3() }
@@ -16823,5 +16799,5 @@ var main = () => {
 };
 main();
 
-//# debugId=905E197AD15B63FA64756E2164756E21
+//# debugId=423FB71BD283AAB864756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
