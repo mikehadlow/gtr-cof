@@ -34,11 +34,11 @@ describe("chordIntervalNodes", () => {
         expect(nodes[0].type).toBe("g");
     });
 
-    test("top-level g has transform translate(0, 240)", () => {
+    test("top-level g has transform translate(0, 250)", () => {
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
-        expect(nodes[0].transform).toBe("translate(0, 240)");
+        expect(nodes[0].transform).toBe("translate(0, 250)");
     });
 
     test("contains 7 child g nodes", () => {
@@ -141,12 +141,12 @@ describe("modesNodes", () => {
     const scaleFamily0 = music.scaleFamily[0];
     const nodes = modesNodes(model, noRaise);
 
-    test("returns a single g node with translate(0, 280)", () => {
+    test("returns a single g node with translate(0, 275)", () => {
         expect(nodes).toHaveLength(1);
         if (nodes[0].type !== "g") {
             throw new Error("expected g");
         }
-        expect(nodes[0].transform).toBe("translate(0, 280)");
+        expect(nodes[0].transform).toBe("translate(0, 275)");
     });
 
     test("child count matches mode count in scale family 0", () => {

@@ -19,7 +19,7 @@ export function tonicsNodes(model: Model, raise: (msg: Msg) => void): RenderNode
         })),
     }));
 
-    return [{ type: "g", children }];
+    return [{ type: "g", transform: "translate(0, 30)", children }];
 }
 
 function tonicButtonClass(noteSpec: music.NoteSpec, selectedNoteSpec: music.NoteSpec): string {

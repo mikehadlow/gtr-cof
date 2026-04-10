@@ -22,5 +22,5 @@ export function modesNodes(model: Model, raise: (msg: Msg) => void): RenderNode[
         ],
     }));
 
-    return [{ type: "g", transform: "translate(0, 280)", children }];
+    return [{ type: "g", transform: "translate(0, 275)", children }];
 }

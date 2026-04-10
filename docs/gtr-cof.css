@@ -491,3 +491,8 @@ div {
 
 /* src/styles/index.css */
 
+.scale-family-select {
+  width: 100%;
+  font-family: var(--font-family);
+  font-size: var(--font-size-button);
+}

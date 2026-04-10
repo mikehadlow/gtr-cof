@@ -10,7 +10,7 @@ import { create as menuCreate } from "./menu";
 import { create as modalCreate } from "./modal";
 import { modesNodes } from "./modes";
 import { view as permalinkView } from "./permalink";
-import { scaleFamilyNodes } from "./scale-family";
+import { scaleFamilySelectNodes } from "./scale-family";
 import { create as settingsCreate } from "./settings";
 import { create as speakerCreate } from "./speaker";
 import { view as storageView } from "./storage";
@@ -21,6 +21,7 @@ export { updateStateFromQuerystring } from "./permalink";
 export { getStateFromLocalStorage } from "./storage";
 
 const modesPanelView: View<Model, Msg, RenderNode> = (model, raise) => [
+    ...scaleFamilySelectNodes(model, raise),
     ...tonicsNodes(model, raise),
     ...chordIntervalNodes(model, raise),
     ...modesNodes(model, raise),
@@ -31,7 +32,6 @@ const svgViews: { containerId: string; view: View<Model, Msg, RenderNode> }[] = 
     { containerId: "chromatic", view: circleNodes(music.chromatic(), "Chromatic", 500) },
     { containerId: "cof", view: circleNodes(music.fifths(), "Circle of Fifths", 500) },
     { containerId: "gtr", view: guitarNodes },
-    { containerId: "scale-dropdown", view: scaleFamilyNodes },
     { containerId: "tuning-dropdown", view: tuningNodes },
     { containerId: "no-op", view: menuCreate() },
     { containerId: "no-op", view: settingsCreate() },

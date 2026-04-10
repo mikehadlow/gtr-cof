@@ -55,6 +55,17 @@ export type RenderNode =
           style?: Record<string, string>;
       }
     | { type: "div"; class?: string; textContent?: string; onClick?: () => void; children?: RenderNode[] }
+    | {
+          type: "selectHtml";
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+          class: string;
+          options: { value: string; label: string }[];
+          selectedValue: string;
+          onChange: (value: string) => void;
+      }
     // Below are meta-nodes that render low level nodes above
     | { type: "svgButton"; class: string; label: string; xPos: number; xSize: number; onClick: () => void }
     | { type: "buttonRow"; row: number; children: RenderNode[] }
@@ -420,6 +431,29 @@ function createElement(node: RenderNode): Element[] {
                 ],
             });
             return [...path, ...selectionElements, ...text];
+        }
+        case "selectHtml": {
+            const fo = document.createElementNS(SVG_NS, "foreignObject");
+            fo.setAttribute("x", String(node.x));
+            fo.setAttribute("y", String(node.y));
+            fo.setAttribute("width", String(node.width));
+            fo.setAttribute("height", String(node.height));
+            const select = document.createElement("select");
+            select.setAttribute("class", node.class);
+            for (const opt of node.options) {
+                const option = document.createElement("option");
+                option.value = opt.value;
+                option.textContent = opt.label;
+                if (opt.value === node.selectedValue) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            }
+            select.addEventListener("change", (e) => {
+                node.onChange((e.target as HTMLSelectElement).value);
+            });
+            fo.appendChild(select);
+            return [fo];
         }
         default: {
             const _exhaustiveCheck: never = node;

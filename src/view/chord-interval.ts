@@ -35,5 +35,5 @@ export function chordIntervalNodes(model: Model, raise: (msg: Msg) => void): Ren
         ],
     }));
 
-    return [{ type: "g", transform: "translate(0, 240)", children }];
+    return [{ type: "g", transform: "translate(0, 250)", children }];
 }
