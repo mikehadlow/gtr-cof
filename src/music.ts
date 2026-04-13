@@ -358,27 +358,25 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
     scaleFamilyArg.intervals.setStart(mode.index);
     intervals.setStart(0);
     const workingSet = indexList.merge3(buildScaleCounter(scaleFamilyArg.intervals.toArray()), intervals.toArray());
+
     const isSevenNoteScale = notesInScaleFamily(scaleFamilyArg) === 7;
 
-    return workingSet.map((item) => {
-        const index = item[0];
-        const isScaleNote = item[1][0];
-
+    return workingSet.map(([index, [isScaleNote, counterNoteNumber], intervalCandidates]) => {
         let noteNumber: number;
         let natural: Natural;
-        let activeInterval: Interval;
+        let interval: Interval;
 
         if (isScaleNote && isSevenNoteScale) {
-            noteNumber = item[1][1];
+            noteNumber = counterNoteNumber;
             natural = naturalList.itemAt(noteNumber);
-            activeInterval = item[2].filter((x) => x.ord === noteNumber)[0];
-            if (activeInterval == null) {
-                activeInterval = item[2][0];
+            interval = intervalCandidates.filter((x) => x.ord === noteNumber)[0];
+            if (interval == null) {
+                interval = intervalCandidates[0];
             }
         } else {
-            activeInterval = item[2][0];
-            noteNumber = isScaleNote ? item[1][1] : activeInterval.ord;
-            natural = naturalList.itemAt(activeInterval.ord);
+            interval = intervalCandidates[0];
+            noteNumber = isScaleNote ? counterNoteNumber : interval.ord;
+            natural = naturalList.itemAt(interval.ord);
         }
 
         // console.log("index: " + index + ", isScaleNote: " + isScaleNote
@@ -388,11 +386,11 @@ export function generateScale(noteSpec: NoteSpec, mode: Mode, scaleFamilyArg: Sc
 
         return {
             note: createNoteSpec(natural.index, index),
-            interval: activeInterval,
-            intervalName: getIntervalName(activeInterval),
-            isScaleNote: isScaleNote,
+            interval,
+            intervalName: getIntervalName(interval),
+            isScaleNote,
             isTonic: index === noteSpec.index,
-            noteNumber: noteNumber,
+            noteNumber,
         };
     });
 }
@@ -415,10 +413,7 @@ function generateNodes(
     const startAt = scaleNotes.filter((x) => x.note.index === chordIndex)[0].noteNumber;
     const workingSet = intervals.merge3(scaleNotes, buildScaleCounter(scaleFamilyIntervals.toArray(), startAt));
 
-    return workingSet.map((item) => {
-        const chordIntervalCandidates = item[0];
-        const scaleNote = item[1];
-        const scaleCounter = item[2];
+    return workingSet.map(([chordIntervalCandidates, scaleNote, scaleCounter]) => {
         let activeInterval = scaleNote.isScaleNote
             ? chordIntervalCandidates.filter((x) => x.ord === scaleCounter[1])[0]
             : chordIntervalCandidates[0];
