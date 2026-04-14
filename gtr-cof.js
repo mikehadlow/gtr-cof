@@ -272,24 +272,28 @@ var nullNode = {
       },
       index: 0,
       offset: 0,
-      label: ""
+      label: "A"
     },
     interval: {
-      ord: 0,
-      type: "Nat",
+      ord: 5,
+      type: "Maj",
       colour: "interval-color-0"
     },
-    intervalName: "",
-    isScaleNote: false,
+    intervalName: "M6",
+    isScaleNote: true,
     isTonic: false,
-    noteNumber: 0
+    noteNumber: 5,
+    chord: {
+      romanNumeral: "vi",
+      type: "Minor"
+    }
   },
   chordInterval: {
     ord: 0,
     type: "Nat",
     colour: "interval-color-0"
   },
-  intervalName: "",
+  intervalName: "1",
   isChordRoot: false,
   toggle: false,
   midiToggle: false
@@ -312,28 +316,26 @@ function generateScale(noteSpec, mode, scaleFamilyArg) {
   intervals.setStart(0);
   const workingSet = indexList.merge3(buildScaleCounter(scaleFamilyArg.intervals.toArray()), intervals.toArray());
   const isSevenNoteScale = notesInScaleFamily(scaleFamilyArg) === 7;
-  return workingSet.map((item) => {
-    const index = item[0];
-    const isScaleNote = item[1][0];
+  return workingSet.map(([index, [isScaleNote, counterNoteNumber], intervalCandidates]) => {
     let noteNumber;
     let natural;
-    let activeInterval;
+    let interval;
     if (isScaleNote && isSevenNoteScale) {
-      noteNumber = item[1][1];
+      noteNumber = counterNoteNumber;
       natural = naturalList.itemAt(noteNumber);
-      activeInterval = item[2].filter((x) => x.ord === noteNumber)[0];
-      if (activeInterval == null) {
-        activeInterval = item[2][0];
+      interval = intervalCandidates.filter((x) => x.ord === noteNumber)[0];
+      if (interval == null) {
+        interval = intervalCandidates[0];
       }
     } else {
-      activeInterval = item[2][0];
-      noteNumber = isScaleNote ? item[1][1] : activeInterval.ord;
-      natural = naturalList.itemAt(activeInterval.ord);
+      interval = intervalCandidates[0];
+      noteNumber = isScaleNote ? counterNoteNumber : interval.ord;
+      natural = naturalList.itemAt(interval.ord);
     }
     return {
       note: createNoteSpec(natural.index, index),
-      interval: activeInterval,
-      intervalName: getIntervalName(activeInterval),
+      interval,
+      intervalName: getIntervalName(interval),
       isScaleNote,
       isTonic: index === noteSpec.index,
       noteNumber
@@ -346,10 +348,7 @@ function generateNodes(scaleNotes, mode, chordIndex, chordIntervals, toggledInde
   scaleFamilyIntervals.setStart(mode.index);
   const startAt = scaleNotes.filter((x) => x.note.index === chordIndex)[0].noteNumber;
   const workingSet = intervals.merge3(scaleNotes, buildScaleCounter(scaleFamilyIntervals.toArray(), startAt));
-  return workingSet.map((item) => {
-    const chordIntervalCandidates = item[0];
-    const scaleNote = item[1];
-    const scaleCounter = item[2];
+  return workingSet.map(([chordIntervalCandidates, scaleNote, scaleCounter]) => {
     let activeInterval = scaleNote.isScaleNote ? chordIntervalCandidates.filter((x) => x.ord === scaleCounter[1])[0] : chordIntervalCandidates[0];
     if (activeInterval == null) {
       activeInterval = chordIntervalCandidates[0];
@@ -378,7 +377,7 @@ function buildScaleCounter(diatonic, startAt = 0) {
 }
 var romanNumeral = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"];
 function generateChordNumbers(scaleNotes, mode, scaleFamilyIntervals) {
-  return scaleNotes.map((scaleNote, _i) => {
+  return scaleNotes.map((scaleNote) => {
     if (scaleNote.isScaleNote) {
       let roman = romanNumeral[scaleNote.noteNumber];
       const nodes = generateNodes(scaleNotes, mode, scaleNote.note.index, [], 0, 0, scaleFamilyIntervals);
@@ -1857,24 +1856,24 @@ var service = (model, msg, raise) => {
 };
 
 // src/update/updateScale.ts
-var updateScale = (current) => {
-  const scaleFamily2 = scaleFamily.find((x) => x.index === current.scaleFamilyIndex);
+var updateScale = (state) => {
+  const scaleFamily2 = scaleFamily.find((x) => x.index === state.scaleFamilyIndex);
   if (!scaleFamily2) {
-    throw new Error(`Invalid scaleFamilyIndex, current.scaleFamilyIndex = ${current.scaleFamilyIndex}`);
+    throw new Error(`Invalid scaleFamilyIndex, current.scaleFamilyIndex = ${state.scaleFamilyIndex}`);
   }
-  const mode = scaleFamily2.modes.find((x) => x.index === current.modeIndex);
+  const mode = scaleFamily2.modes.find((x) => x.index === state.modeIndex);
   if (!mode) {
-    throw new Error(`Invalid modeIndex, current.modeIndex = ${current.modeIndex}`);
+    throw new Error(`Invalid modeIndex, current.modeIndex = ${state.modeIndex}`);
   }
-  const noteSpec = createNoteSpec(current.naturalIndex, current.index);
-  const nodes = generateScaleShim(noteSpec, mode, current.chordIndex, current.chordIntervals, current.toggledNotesBitmask, current.midiToggledNotesBitmask, scaleFamily2);
-  current.toggledNotesBitmask = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
+  const noteSpec = createNoteSpec(state.naturalIndex, state.index);
+  const nodes = generateScaleShim(noteSpec, mode, state.chordIndex, state.chordIntervals, state.toggledNotesBitmask, state.midiToggledNotesBitmask, scaleFamily2);
+  state.toggledNotesBitmask = nodes.filter((x) => x.toggle).map((x) => x.scaleNote.note.index).reduce((a, b) => a + 2 ** b, 0);
   return {
     music: {
       nodes,
       mode
     },
-    state: current
+    state
   };
 };
 
@@ -16802,5 +16801,5 @@ var main = () => {
 };
 main();
 
-//# debugId=E5CD681CA172CF5464756E2164756E21
+//# debugId=B85587B4078FFA6564756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
