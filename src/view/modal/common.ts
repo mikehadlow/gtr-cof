@@ -2,6 +2,9 @@ import type { Msg } from "../../message";
 
 const MODAL_BACKDROP_CLASS = "modal-backdrop";
 const MODAL_CONTAINER_CLASS = "modal-container";
+const THEME_STORAGE_KEY = "app_theme";
+
+export type Theme = "light" | "dark";
 
 export function createSection(titleText?: string): HTMLDivElement {
     const section = document.createElement("div");
@@ -38,6 +41,17 @@ export function createCheckbox(
     checkbox.addEventListener("change", () => onClick((checkbox as HTMLInputElement).checked));
     section.appendChild(label);
     modal.appendChild(section);
+}
+
+export function getTheme(): Theme {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+export function applyTheme(theme: Theme): void {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {}
 }
 
 export function createModal(modalTitle: string, raise: (msg: Msg) => void): HTMLDivElement {

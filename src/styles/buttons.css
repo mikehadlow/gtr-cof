@@ -11,7 +11,7 @@
 .mode-text {
     font-size: var(--font-size-button);
     text-anchor: left;
-    fill: var(--color-segment-stroke);
+    fill: var(--color-svg-text);
 }
 
 /* Tonics */
