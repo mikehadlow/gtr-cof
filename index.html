@@ -14,7 +14,15 @@
             content="A free, open source, music theory explorer for guitarists. Discover how scales and modes map to the fretboard and how chords work within scales."
         />
         <link rel="canonical" href="https://guitardashboard.com/" />
-        <link href="gtr-cof.css?v=48cbd4390ddb937e12d36e51d4d74b52e3dfa185" rel="stylesheet" />
+        <script>
+            (() => {
+                try {
+                    const theme = localStorage.getItem("app_theme");
+                    document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+                } catch {}
+            })();
+        </script>
+        <link href="gtr-cof.css?v=537f1a2fd8718dcabe76f5def1d9411b8d45fedd" rel="stylesheet" />
         <link rel="shortcut icon" href="favicon.ico?r=31241" />
     </head>
 
@@ -195,6 +203,6 @@
             </svg>
         </div>
         <div id="no-op"></div>
-        <script src="gtr-cof.js?v=48cbd4390ddb937e12d36e51d4d74b52e3dfa185"></script>
+        <script src="gtr-cof.js?v=537f1a2fd8718dcabe76f5def1d9411b8d45fedd"></script>
     </body>
 </html>

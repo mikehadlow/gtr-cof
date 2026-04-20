@@ -2278,7 +2278,7 @@ function createElement(node) {
             r: 25,
             class: node.selection.class,
             fill: node.selection.fill,
-            stroke: "black",
+            stroke: "var(--color-segment-stroke)",
             strokeWidth: 2,
             pointerEvents: "none"
           }
@@ -2348,7 +2348,7 @@ function settingsIconNodes(svgWidth, onClick) {
           y: gearY,
           width: size,
           height: size,
-          style: { fill: "none", stroke: "black", "pointer-events": "none" }
+          style: { fill: "none", stroke: "var(--color-segment-stroke)", "pointer-events": "none" }
         }
       ]
     }
@@ -2482,7 +2482,7 @@ var circleNodes = (noteIndexes, label, svgWidth) => {
         type: "g",
         transform: `translate(${cx}, ${cy})`,
         children: [
-          { type: "text", x: 0, y: 0, textAnchor: "middle", content: label },
+          { type: "text", x: 0, y: 0, class: "svg-text", textAnchor: "middle", content: label },
           { type: "g", children: noteSegments },
           { type: "g", children: intervalSegments },
           { type: "g", children: chordSegments }
@@ -2743,6 +2743,7 @@ var guitarNodes = (model, raise) => {
         type: "text",
         x,
         y: stringGap / 2 + 5,
+        class: "fret-note-text",
         textAnchor: "middle",
         transform,
         content: labelText(sn, fretboardLabelType)
@@ -2814,6 +2815,7 @@ function onMenuClick(event) {
 // src/view/modal/common.ts
 var MODAL_BACKDROP_CLASS = "modal-backdrop";
 var MODAL_CONTAINER_CLASS = "modal-container";
+var THEME_STORAGE_KEY = "app_theme";
 function createSection(titleText) {
   const section = document.createElement("div");
   section.className = "modal-section";
@@ -2843,6 +2845,15 @@ function createCheckbox(modal, labelText2, checkboxState, onClick) {
   section.appendChild(label);
   modal.appendChild(section);
 }
+function getTheme() {
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {}
+}
 function createModal(modalTitle, raise) {
   const backdrop = document.createElement("div");
   backdrop.className = MODAL_BACKDROP_CLASS;
@@ -2870,6 +2881,7 @@ function createModal(modalTitle, raise) {
 function showCircleSettings(state, raise) {
   const modal = createModal("Circle Settings", raise);
   createCheckbox(modal, "Set C To Noon", state.circleIsCNoon, (isChecked) => raise({ id: "SetCToNoon", isC: isChecked }));
+  createCheckbox(modal, "Dark Mode", getTheme() === "dark", (isChecked) => applyTheme(isChecked ? "dark" : "light"));
 }
 
 // src/view/modal/fretboardSettings.ts
@@ -2896,6 +2908,7 @@ function showFretboardSettings(state, raise) {
   }
   createCheckbox(modal, "Left Handed", state.isLeftHanded, (isChecked) => raise({ id: "LeftHandedFretboard", isLeftHanded: isChecked }));
   createCheckbox(modal, "Flip Nut", state.isNutFlipped, (isChecked) => raise({ id: "FlipNut", isNutFlipped: isChecked }));
+  createCheckbox(modal, "Dark Mode", getTheme() === "dark", (isChecked) => applyTheme(isChecked ? "dark" : "light"));
   {
     const nlSection = createSection("Note Labels");
     const labelOptions = [
@@ -16801,5 +16814,5 @@ var main = () => {
 };
 main();
 
-//# debugId=B85587B4078FFA6564756E2164756E21
+//# debugId=FF89F0042DBFDF5864756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map
