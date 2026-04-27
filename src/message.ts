@@ -1,8 +1,8 @@
 import type * as music from "./music";
-import type { FretboardLabelType, ModalState } from "./types";
+import type { FretboardLabelType, ModalState, Theme } from "./types";
 
 export type SequenceEvent = {
-    timestamp: number; // miliseconds
+    timestamp: number; // milliseconds
     midiNotes: number[];
 };
 
@@ -64,4 +64,8 @@ export type Msg =
       }
     | {
           id: "ToggleSound";
+      }
+    | {
+          id: "Theme";
+          theme: Theme;
       };

@@ -16,4 +16,5 @@ export const defaultState: State = Object.freeze({
     tuningIndex: 0,
     modalState: "closed",
     sound: true,
+    theme: "light",
 } as const satisfies State);

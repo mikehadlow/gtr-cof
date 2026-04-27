@@ -20,6 +20,9 @@ export type FretboardLabelType = z.infer<typeof FretboardLabelTypeSchema>;
 export const ModalStateSchema = z.enum(["closed", "guitar-settings", "circle-settings"]);
 export type ModalState = z.infer<typeof ModalStateSchema>;
 
+export const ThemeSchema = z.enum(["light", "dark"]);
+export type Theme = z.Infer<typeof ThemeSchema>;
+
 export const StateSchema = z.object({
     index: z.number(),
     naturalIndex: z.number(),
@@ -36,6 +39,7 @@ export const StateSchema = z.object({
     tuningIndex: z.number(),
     modalState: ModalStateSchema,
     sound: z.boolean(),
+    theme: ThemeSchema,
 });
 
 export type State = z.infer<typeof StateSchema>;

@@ -1833,6 +1833,7 @@ var service = (model, msg, raise) => {
     case "SetCToNoon":
     case "ModalStateChange":
     case "ToggleSound":
+    case "Theme":
       break;
     case "Toggle":
       playToggle(model, msg, raise);
@@ -1946,21 +1947,37 @@ var Update9 = (model, msg) => {
   return model;
 };
 
+// src/update/update-theme.ts
+var Update10 = (model, _msg) => {
+  switch (model.state.theme) {
+    case "dark":
+      model.state.theme = "light";
+      break;
+    case "light":
+      model.state.theme = "dark";
+      break;
+    default: {
+      const _exhaustivenessCheck = model.state.theme;
+    }
+  }
+  return model;
+};
+
 // src/update/update-toggle.ts
-var Update10 = (model, msg) => {
+var Update11 = (model, msg) => {
   const current = model.state;
   current.toggledNotesBitmask = current.toggledNotesBitmask ^ 2 ** msg.index;
   return updateScale(current);
 };
 
 // src/update/update-toggle-sound.ts
-var Update11 = (model, _msg) => {
+var Update12 = (model, _msg) => {
   model.state.sound = !model.state.sound;
   return model;
 };
 
 // src/update/update-tonic-changed.ts
-var Update12 = (model, msg) => {
+var Update13 = (model, msg) => {
   const current = model.state;
   current.index = msg.noteSpec.index;
   current.naturalIndex = msg.noteSpec.natural.index;
@@ -1969,7 +1986,7 @@ var Update12 = (model, msg) => {
 };
 
 // src/update/update-tuning-changed.ts
-var Update13 = (model, msg) => {
+var Update14 = (model, msg) => {
   model.state.tuningIndex = msg.index;
   return model;
 };
@@ -1978,19 +1995,19 @@ var Update13 = (model, msg) => {
 var update = (model, msg) => {
   switch (msg.id) {
     case "TonicChanged":
-      return Update12(model, msg);
+      return Update13(model, msg);
     case "ModeChanged":
       return Update7(model, msg);
     case "ChordChanged":
       return Update(model, msg);
     case "Toggle":
-      return Update10(model, msg);
+      return Update11(model, msg);
     case "ChordIntervalChange":
       return Update2(model, msg);
     case "ScaleFamilyChange":
       return Update8(model, msg);
     case "TuningChanged":
-      return Update13(model, msg);
+      return Update14(model, msg);
     case "LeftHandedFretboard":
       return Update5(model, msg);
     case "FlipNut":
@@ -2004,7 +2021,9 @@ var update = (model, msg) => {
     case "Play":
       return model;
     case "ToggleSound":
-      return Update11(model, msg);
+      return Update12(model, msg);
+    case "Theme":
+      return Update10(model, msg);
     default: {
       const _exhaustiveCheck = msg;
       return _exhaustiveCheck;
@@ -2815,7 +2834,6 @@ function onMenuClick(event) {
 // src/view/modal/common.ts
 var MODAL_BACKDROP_CLASS = "modal-backdrop";
 var MODAL_CONTAINER_CLASS = "modal-container";
-var THEME_STORAGE_KEY = "app_theme";
 function createSection(titleText) {
   const section = document.createElement("div");
   section.className = "modal-section";
@@ -2845,15 +2863,6 @@ function createCheckbox(modal, labelText2, checkboxState, onClick) {
   section.appendChild(label);
   modal.appendChild(section);
 }
-function getTheme() {
-  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-}
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-  } catch {}
-}
 function createModal(modalTitle, raise) {
   const backdrop = document.createElement("div");
   backdrop.className = MODAL_BACKDROP_CLASS;
@@ -2881,7 +2890,6 @@ function createModal(modalTitle, raise) {
 function showCircleSettings(state, raise) {
   const modal = createModal("Circle Settings", raise);
   createCheckbox(modal, "Set C To Noon", state.circleIsCNoon, (isChecked) => raise({ id: "SetCToNoon", isC: isChecked }));
-  createCheckbox(modal, "Dark Mode", getTheme() === "dark", (isChecked) => applyTheme(isChecked ? "dark" : "light"));
 }
 
 // src/view/modal/fretboardSettings.ts
@@ -2908,7 +2916,6 @@ function showFretboardSettings(state, raise) {
   }
   createCheckbox(modal, "Left Handed", state.isLeftHanded, (isChecked) => raise({ id: "LeftHandedFretboard", isLeftHanded: isChecked }));
   createCheckbox(modal, "Flip Nut", state.isNutFlipped, (isChecked) => raise({ id: "FlipNut", isNutFlipped: isChecked }));
-  createCheckbox(modal, "Dark Mode", getTheme() === "dark", (isChecked) => applyTheme(isChecked ? "dark" : "light"));
   {
     const nlSection = createSection("Note Labels");
     const labelOptions = [
@@ -3022,7 +3029,8 @@ var defaultState = Object.freeze({
   circleIsCNoon: true,
   tuningIndex: 0,
   modalState: "closed",
-  sound: true
+  sound: true,
+  theme: "light"
 });
 
 // src/view/permalink.ts
@@ -16664,6 +16672,7 @@ config(en_default());
 // src/types.ts
 var FretboardLabelTypeSchema = exports_external.enum(["None", "NoteName", "Interval"]);
 var ModalStateSchema = exports_external.enum(["closed", "guitar-settings", "circle-settings"]);
+var ThemeSchema = exports_external.enum(["light", "dark"]);
 var StateSchema = exports_external.object({
   index: exports_external.number(),
   naturalIndex: exports_external.number(),
@@ -16679,7 +16688,8 @@ var StateSchema = exports_external.object({
   circleIsCNoon: exports_external.boolean(),
   tuningIndex: exports_external.number(),
   modalState: ModalStateSchema,
-  sound: exports_external.boolean()
+  sound: exports_external.boolean(),
+  theme: ThemeSchema
 });
 
 // src/view/storage.ts
@@ -16704,6 +16714,43 @@ var getStateFromLocalStorage = () => {
   }
   return parsed.data;
 };
+
+// src/view/theme.ts
+var THEME_BTN_ID = "theme-btn";
+var THEME_ICON_ID = "theme-icon";
+var create5 = () => {
+  let uninitialised = true;
+  return ({ state }, raise) => {
+    const icon = document.getElementById(THEME_ICON_ID);
+    if (icon) {
+      icon.setAttribute("href", (() => {
+        switch (state.theme) {
+          case "light":
+            setTheme(state.theme);
+            return "#icon-theme-light";
+          case "dark":
+            setTheme(state.theme);
+            return "#icon-theme-dark";
+          default: {
+            const _exhaustiveCheck = state.theme;
+            return _exhaustiveCheck;
+          }
+        }
+      })());
+    }
+    if (uninitialised) {
+      const btn = document.getElementById(THEME_BTN_ID);
+      if (btn) {
+        btn.addEventListener("click", () => raise({ id: "Theme", theme: state.theme }));
+      }
+      uninitialised = false;
+    }
+    return [];
+  };
+};
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+}
 
 // src/view/tonics.ts
 function tonicsNodes(model, raise) {
@@ -16753,11 +16800,18 @@ var modesPanelView = (model, raise) => [
 ];
 var svgViews = [
   { containerId: "modes", view: modesPanelView },
-  { containerId: "chromatic", view: circleNodes(chromatic(), "Chromatic", 500) },
-  { containerId: "cof", view: circleNodes(fifths(), "Circle of Fifths", 500) },
+  {
+    containerId: "chromatic",
+    view: circleNodes(chromatic(), "Chromatic", 500)
+  },
+  {
+    containerId: "cof",
+    view: circleNodes(fifths(), "Circle of Fifths", 500)
+  },
   { containerId: "gtr", view: guitarNodes },
   { containerId: "no-op", view: create2() },
   { containerId: "no-op", view: create4() },
+  { containerId: "no-op", view: create5() },
   { containerId: "no-op", view: view2 },
   { containerId: "no-op", view },
   { containerId: "no-op", view: create3() }
@@ -16814,5 +16868,5 @@ var main = () => {
 };
 main();
 
-//# debugId=FF89F0042DBFDF5864756E2164756E21
+//# debugId=E6C7BF45E996B65C64756E2164756E21
 //# sourceMappingURL=gtr-cof.js.map

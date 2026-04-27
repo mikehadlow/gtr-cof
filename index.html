@@ -14,15 +14,7 @@
             content="A free, open source, music theory explorer for guitarists. Discover how scales and modes map to the fretboard and how chords work within scales."
         />
         <link rel="canonical" href="https://guitardashboard.com/" />
-        <script>
-            (() => {
-                try {
-                    const theme = localStorage.getItem("app_theme");
-                    document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
-                } catch {}
-            })();
-        </script>
-        <link href="gtr-cof.css?v=537f1a2fd8718dcabe76f5def1d9411b8d45fedd" rel="stylesheet" />
+        <link href="gtr-cof.css?v=a4acef481ec224c690bb5c729dd9813b5820055b" rel="stylesheet" />
         <link rel="shortcut icon" href="favicon.ico?r=31241" />
     </head>
 
@@ -78,10 +70,19 @@
                     </div>
                 </div>
             </div>
-            <div id="speaker-btn" class="menu" style="margin-left: auto">
-                <svg class="menu-bar-icon" width="24" height="24">
-                    <use id="speaker-icon" href="#icon-speaker-wave" />
-                </svg>
+            <div class="dropdown" style="margin-left: auto">
+                <div id="speaker-btn" class="menu">
+                    <svg class="menu-bar-icon" width="24" height="24">
+                        <use id="speaker-icon" href="#icon-speaker-wave" />
+                    </svg>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div id="theme-btn" class="menu">
+                    <svg class="menu-bar-icon" width="24" height="24">
+                        <use id="theme-icon" href="#icon-theme-dark" />
+                    </svg>
+                </div>
             </div>
             <div id="bluesky-link" class="menu">
                 <a
@@ -167,6 +168,28 @@
                             d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
                         />
                     </symbol>
+                    <symbol
+                        id="icon-theme-dark"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        stroke="none"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z"
+                            clip-rule="evenodd"
+                        />
+                    </symbol>
+                    <symbol
+                        id="icon-theme-light"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        stroke="none"
+                    >
+                        <path
+                            d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"
+                        />
+                    </symbol>
                 </defs>
                 <svg
                     id="chromatic"
@@ -203,6 +226,6 @@
             </svg>
         </div>
         <div id="no-op"></div>
-        <script src="gtr-cof.js?v=537f1a2fd8718dcabe76f5def1d9411b8d45fedd"></script>
+        <script src="gtr-cof.js?v=a4acef481ec224c690bb5c729dd9813b5820055b"></script>
     </body>
 </html>
